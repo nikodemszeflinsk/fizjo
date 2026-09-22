@@ -260,34 +260,31 @@
           <thead>
             <tr>
               <td></td>
-              <th scope="col">Start<span>Jeden gabinet, który chce przestać tracić pacjentów po godzinach.</span></th>
-              <th scope="col" class="is-main">Wzrost<span>Pacjenci wracają i polecają. Najczęściej wybierany.</span></th>
-              <th scope="col">Klinika<span>Kilka lokalizacji i specjalizacji.</span></th>
+              <th scope="col">Podstawowy<span>Jeden gabinet, który chce przestać tracić pacjentów po godzinach.</span></th>
+              <th scope="col" class="is-main">Rozbudowany<span>Klinika, w której pacjenci mają wracać i polecać.</span></th>
             </tr>
           </thead>
           <tbody>
-            <tr><th scope="row">Strona z rezerwacją online</th><td>✓</td><td class="is-main">✓</td><td>✓</td></tr>
-            <tr><th scope="row">SEO lokalne i Mapy Google</th><td>✓</td><td class="is-main">✓</td><td>✓</td></tr>
-            <tr><th scope="row">Przypomnienia SMS</th><td>✓</td><td class="is-main">✓</td><td>✓</td></tr>
-            <tr><th scope="row">Zbieranie opinii</th><td>–</td><td class="is-main">✓</td><td>✓</td></tr>
-            <tr><th scope="row">Przypomnienia o powrocie i kontroli</th><td>–</td><td class="is-main">✓</td><td>✓</td></tr>
-            <tr><th scope="row">Kilka lokalizacji i specjalizacji</th><td>–</td><td class="is-main">–</td><td>✓</td></tr>
-            <tr><th scope="row">Pełny CRM i historia pacjenta</th><td>–</td><td class="is-main">–</td><td>✓</td></tr>
-            <tr><th scope="row">Raport miesięczny</th><td>e-mail</td><td class="is-main">e-mail</td><td>spotkanie</td></tr>
-            <tr class="plans__opt"><th scope="row">Reklamy Google i Meta</th><td>opcja</td><td class="is-main">opcja</td><td>opcja</td></tr>
+            <tr><th scope="row">Strona z rezerwacją online</th><td>✓</td><td class="is-main">✓</td></tr>
+            <tr><th scope="row">SEO lokalne i Mapy Google</th><td>✓</td><td class="is-main">✓</td></tr>
+            <tr><th scope="row">Przypomnienia SMS o wizycie</th><td>✓</td><td class="is-main">✓</td></tr>
+            <tr><th scope="row">Zbieranie opinii po terapii</th><td>–</td><td class="is-main">✓</td></tr>
+            <tr><th scope="row">Przypomnienia o powrocie i kontroli</th><td>–</td><td class="is-main">✓</td></tr>
+            <tr><th scope="row">Kilka lokalizacji i specjalizacji</th><td>–</td><td class="is-main">✓</td></tr>
+            <tr><th scope="row">Pełny CRM i historia pacjenta</th><td>–</td><td class="is-main">✓</td></tr>
+            <tr><th scope="row">Raport miesięczny</th><td>e-mail</td><td class="is-main">e-mail i spotkanie</td></tr>
+            <tr class="plans__opt"><th scope="row">Reklamy Google i Meta</th><td>opcja</td><td class="is-main">opcja</td></tr>
           </tbody>
           <tfoot>
-            <tr><th scope="row">Abonament</th><td>[cena] zł / mies.</td><td class="is-main">[cena] zł / mies.</td><td>[cena] zł / mies.</td></tr>
+            <tr><th scope="row">Abonament</th><td>[cena] zł / mies.</td><td class="is-main">[cena] zł / mies.</td></tr>
             <tr class="plans__pick">
               <td></td>
-              <td><a class="plan-pick" href="#kontakt" data-plan="Start">Wybieram Start</a></td>
-              <td class="is-main"><a class="plan-pick" href="#kontakt" data-plan="Wzrost">Wybieram Wzrost</a></td>
-              <td><a class="plan-pick" href="#kontakt" data-plan="Klinika">Wybieram Klinikę</a></td>
+              <td><a class="plan-pick" href="#kontakt" data-plan="Podstawowy">Wybieram</a></td>
+              <td class="is-main"><a class="plan-pick" href="#kontakt" data-plan="Rozbudowany">Wybieram</a></td>
             </tr>
           </tfoot>
         </table>
       </div>
-      <p class="plans-hint" aria-hidden="true">Przesuń tabelę w bok, żeby zobaczyć pakiety Wzrost i Klinika →</p>
       <p class="fine">Reklamy to dodatek do każdego pakietu: obsługa [cena] zł / mies., budżet reklamowy płatny osobno, bezpośrednio do Google i Meta. Wdrożenie: [cena] zł jednorazowo. Umowa: [okres].</p>
 
       <h2 class="h2 h2--sm">Wdrożenie w 4 tygodnie</h2>
@@ -324,9 +321,8 @@
           <fieldset class="form__plans">
             <legend>Pakiet</legend>
             <div class="picks">
-              <label class="pick"><input type="radio" name="pakiet" value="Start" /><span>Start</span></label>
-              <label class="pick"><input type="radio" name="pakiet" value="Wzrost" checked /><span>Wzrost</span></label>
-              <label class="pick"><input type="radio" name="pakiet" value="Klinika" /><span>Klinika</span></label>
+              <label class="pick"><input type="radio" name="pakiet" value="Podstawowy" /><span>Podstawowy</span></label>
+              <label class="pick"><input type="radio" name="pakiet" value="Rozbudowany" checked /><span>Rozbudowany</span></label>
               <label class="pick"><input type="radio" name="pakiet" value="Jeszcze nie wiem" /><span>Jeszcze nie wiem</span></label>
             </div>
             <label class="check check--inline"><input type="checkbox" name="reklamy" value="tak" /><span>Interesują mnie też reklamy Google i Meta</span></label>

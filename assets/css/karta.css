@@ -865,7 +865,7 @@ svg path {
 
 .plans {
   width: 100%;
-  min-width: 560px;
+  min-width: 460px;
   border-collapse: collapse;
   font-size: 0.92rem;
 }
@@ -891,7 +891,7 @@ svg path {
   font-family: var(--f-display);
   font-weight: 900;
   font-size: 1.3rem;
-  width: 22%;
+  width: 27%;
 }
 
 .plans thead th span {
@@ -925,13 +925,6 @@ svg path {
   border-bottom: 0;
   font-family: var(--f-display);
   font-weight: 800;
-}
-
-.plans-hint {
-  display: none;
-  margin-top: 8px;
-  font-size: 0.85rem;
-  font-weight: 700;
 }
 
 .plans__opt th,
@@ -1450,35 +1443,34 @@ svg path {
 
 }
 
-/* Telefon: kolumna funkcji przypięta, następny pakiet wystaje — widać, że tabela się przewija. */
+/* Telefon: dwa pakiety mieszczą się w szerokości ekranu. */
 @media (max-width: 760px) {
   .plans {
     min-width: 0;
-    width: max-content;
+    width: 100%;
+    font-size: 0.85rem;
+  }
+
+  .plans th,
+  .plans td {
+    padding: 9px 4px;
   }
 
   .plans thead th {
-    width: 132px;
-    min-width: 132px;
-    font-size: 1.1rem;
+    width: 29%;
+    font-size: 0.92rem;
+    letter-spacing: -0.01em;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+  }
+
+  .plans thead th span {
+    font-size: 0.72rem;
   }
 
   .plans tbody th,
-  .plans tfoot th,
-  .plans thead td {
-    position: sticky;
-    left: 0;
-    z-index: 1;
-    width: 128px;
-    min-width: 128px;
-    background: var(--paper);
-    padding-right: 10px;
-    font-size: 0.85rem;
-    box-shadow: 8px 0 10px -8px rgba(20, 23, 26, 0.25);
-  }
-
-  .plans-hint {
-    display: block;
+  .plans tfoot th {
+    padding-right: 8px;
   }
 }
 
@@ -1512,8 +1504,7 @@ svg path {
   .skip,
   .form,
   .cta,
-  .plans__pick,
-  .plans-hint {
+  .plans__pick {
     display: none !important;
   }
 
