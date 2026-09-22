@@ -858,6 +858,64 @@ svg path {
   background: var(--ink);
 }
 
+.plans__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px 24px;
+  flex-wrap: wrap;
+}
+
+.plans__head .h2--sm {
+  margin-bottom: 0;
+}
+
+/* Przełącznik rozliczenia */
+.billing {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--floor-2);
+}
+
+.billing button {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  min-height: 38px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-2);
+  font-family: var(--f-display);
+  font-weight: 800;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.billing button span {
+  font-family: var(--f-body);
+  font-weight: 500;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.billing button:hover {
+  color: var(--ink);
+}
+
+.billing button[aria-pressed='true'] {
+  background: #1f5fd6;
+  background: var(--accent);
+  color: #fff;
+}
+
+.billing button[aria-pressed='true'] span {
+  color: rgba(255, 255, 255, 0.85);
+}
+
 /* Pakiety: tabela porównawcza, kolumna główna na atramencie. */
 .plans-wrap {
   overflow-x: auto;
@@ -922,19 +980,70 @@ svg path {
 
 .plans tfoot th,
 .plans tfoot td {
-  border-bottom: 0;
   font-family: var(--f-display);
   font-weight: 800;
 }
 
-.plans__opt th,
-.plans__opt td {
-  font-style: italic;
+.plans tfoot th em {
+  display: block;
+  font-family: var(--f-body);
+  font-style: normal;
+  font-weight: 500;
+  font-size: 0.8rem;
   color: var(--muted);
 }
 
-.plans__opt .is-main {
-  color: #cfd3d6;
+.plans tfoot .is-main em {
+  color: #aab1b6;
+}
+
+.plans__price td {
+  font-size: 1.15rem;
+  padding-top: 14px;
+}
+
+.plans__setup td,
+.plans__ads td {
+  font-size: 1.02rem;
+}
+
+.plans__setup td {
+  transition: color 0.3s;
+}
+
+.plans__setup s {
+  margin-right: 6px;
+  color: var(--muted);
+  font-weight: 500;
+  text-decoration-thickness: 1px;
+}
+
+.plans__setup .is-main s {
+  color: #8f959b;
+}
+
+.is-free {
+  color: #1f5fd6;
+  color: var(--accent);
+}
+
+.plans .is-main .is-free {
+  color: #7aa6f0;
+}
+
+.plans tfoot tr.plans__ads th em {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--floor-2);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.plans__pick td {
+  border-bottom: 0;
 }
 
 .plans__pick td {
@@ -1462,6 +1571,22 @@ svg path {
     letter-spacing: -0.01em;
     overflow-wrap: anywhere;
     hyphens: auto;
+  }
+
+  .plans__setup s {
+    display: block;
+    margin: 0 0 2px;
+  }
+
+  .billing {
+    width: 100%;
+  }
+
+  .billing button {
+    flex: 1 1 0;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 6px 10px;
   }
 
   .plans thead th span {

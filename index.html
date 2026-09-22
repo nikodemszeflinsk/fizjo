@@ -253,14 +253,20 @@
         </ul>
       </div>
 
-      <h2 class="h2 h2--sm h2--plans" id="pakiety">Pakiety</h2>
+      <div class="plans__head">
+        <h2 class="h2 h2--sm h2--plans" id="pakiety">Pakiety</h2>
+        <div class="billing" role="group" aria-label="Sposób rozliczenia">
+          <button type="button" data-bill="m" aria-pressed="true">Miesięcznie</button>
+          <button type="button" data-bill="r" aria-pressed="false">Rocznie <span>taniej, wdrożenie 0 zł</span></button>
+        </div>
+      </div>
       <div class="plans-wrap">
         <table class="plans">
           <caption class="visually-hidden">Porównanie pakietów</caption>
           <thead>
             <tr>
               <td></td>
-              <th scope="col">Pierwszy krok<span>Jeden gabinet, który chce przestać tracić pacjentów po godzinach.</span></th>
+              <th scope="col">Rozruch<span>Jeden gabinet, który chce przestać tracić pacjentów po godzinach.</span></th>
               <th scope="col" class="is-main">Pełen zakres<span>Klinika, w której pacjenci mają wracać i polecać.</span></th>
             </tr>
           </thead>
@@ -268,24 +274,37 @@
             <tr><th scope="row">Strona z rezerwacją online</th><td>✓</td><td class="is-main">✓</td></tr>
             <tr><th scope="row">SEO lokalne i Mapy Google</th><td>✓</td><td class="is-main">✓</td></tr>
             <tr><th scope="row">Przypomnienia SMS o wizycie</th><td>✓</td><td class="is-main">✓</td></tr>
-            <tr><th scope="row">Zbieranie opinii po terapii</th><td>–</td><td class="is-main">✓</td></tr>
+            <tr><th scope="row">Zbieranie opinii po terapii</th><td>✓</td><td class="is-main">✓</td></tr>
             <tr><th scope="row">Przypomnienia o powrocie i kontroli</th><td>–</td><td class="is-main">✓</td></tr>
             <tr><th scope="row">Kilka lokalizacji i specjalizacji</th><td>–</td><td class="is-main">✓</td></tr>
             <tr><th scope="row">Pełny CRM i historia pacjenta</th><td>–</td><td class="is-main">✓</td></tr>
             <tr><th scope="row">Raport miesięczny</th><td>e-mail</td><td class="is-main">e-mail i spotkanie</td></tr>
-            <tr class="plans__opt"><th scope="row">Reklamy Google i Meta</th><td>opcja</td><td class="is-main">opcja</td></tr>
           </tbody>
           <tfoot>
-            <tr><th scope="row">Abonament</th><td>690 zł / mies.</td><td class="is-main">1 690 zł / mies.</td></tr>
+            <tr class="plans__price">
+              <th scope="row">Abonament</th>
+              <td data-m="690 zł / mies." data-r="590 zł / mies.">690 zł / mies.</td>
+              <td class="is-main" data-m="990 zł / mies." data-r="840 zł / mies.">990 zł / mies.</td>
+            </tr>
+            <tr class="plans__setup">
+              <th scope="row">Wdrożenie <em>jednorazowo</em></th>
+              <td data-m="1 900 zł" data-r="0 zł" data-was="1 900 zł">1 900 zł</td>
+              <td class="is-main" data-m="1 900 zł" data-r="0 zł" data-was="1 900 zł">1 900 zł</td>
+            </tr>
+            <tr class="plans__ads">
+              <th scope="row">Reklamy Google i Meta <em>opcja</em></th>
+              <td>790 zł / mies.</td>
+              <td class="is-main">790 zł / mies.</td>
+            </tr>
             <tr class="plans__pick">
               <td></td>
-              <td><a class="plan-pick" href="#kontakt" data-plan="Pierwszy krok">Wybieram</a></td>
+              <td><a class="plan-pick" href="#kontakt" data-plan="Rozruch">Wybieram</a></td>
               <td class="is-main"><a class="plan-pick" href="#kontakt" data-plan="Pełen zakres">Wybieram</a></td>
             </tr>
           </tfoot>
         </table>
       </div>
-      <p class="fine">Wdrożenie: 2 900 zł jednorazowo, w obu pakietach. Umowa na 12 miesięcy, potem na czas nieokreślony z miesięcznym wypowiedzeniem; pierwsze 30 dni bez zobowiązania. Reklamy Google i Meta: obsługa 790 zł / mies., budżet reklamowy płatny osobno, bezpośrednio do Google i Meta; minimum trzy miesiące, włączasz i wyłączasz w dowolnym momencie. Ceny netto.</p>
+      <p class="fine">Płatność roczna: abonament za 12 miesięcy z góry, wdrożenie w cenie. Umowa na 12 miesięcy, potem na czas nieokreślony z miesięcznym wypowiedzeniem; pierwsze 30 dni bez zobowiązania. Reklamy: budżet reklamowy płatny osobno, bezpośrednio do Google i Meta; minimum trzy miesiące, włączasz i wyłączasz w dowolnym momencie. Ceny netto.</p>
 
       <h2 class="h2 h2--sm">Wdrożenie w 4 tygodnie</h2>
       <ol class="timeline">
@@ -317,11 +336,12 @@
 
         <form class="form" id="form" action="https://formsubmit.co/kontakt@studio-widok.pl" method="post" novalidate>
           <input type="text" name="_honey" class="visually-hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          <input type="hidden" name="rozliczenie" id="c-bill" value="miesięczne" />
 
           <fieldset class="form__plans">
             <legend>Pakiet</legend>
             <div class="picks">
-              <label class="pick"><input type="radio" name="pakiet" value="Pierwszy krok" /><span>Pierwszy krok</span></label>
+              <label class="pick"><input type="radio" name="pakiet" value="Rozruch" /><span>Rozruch</span></label>
               <label class="pick"><input type="radio" name="pakiet" value="Pełen zakres" checked /><span>Pełen zakres</span></label>
               <label class="pick"><input type="radio" name="pakiet" value="Jeszcze nie wiem" /><span>Jeszcze nie wiem</span></label>
             </div>
@@ -426,6 +446,28 @@
       document.querySelectorAll('[data-calc]').forEach((i) => i.addEventListener('input', update));
       update();
       document.getElementById('rok').textContent = new Date().getFullYear();
+
+      // Rozliczenie: miesięczne albo roczne. Roczne zeruje wdrożenie.
+      const bill = (mode) => {
+        document.querySelectorAll('[data-bill]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.bill === mode)));
+        document.querySelectorAll('.plans [data-m]').forEach((td) => {
+          const value = mode === 'r' ? td.dataset.r : td.dataset.m;
+          td.textContent = '';
+          if (mode === 'r' && td.dataset.was) {
+            const was = document.createElement('s');
+            was.textContent = td.dataset.was;
+            td.append(was, ' ');
+          }
+          const now = document.createElement('span');
+          now.className = mode === 'r' && td.dataset.was ? 'is-free' : '';
+          now.textContent = value;
+          td.append(now);
+        });
+        document.querySelector('.plans').classList.toggle('is-yearly', mode === 'r');
+        const f = document.getElementById('c-bill');
+        if (f) f.value = mode === 'r' ? 'roczne (wdrożenie 0 zł)' : 'miesięczne';
+      };
+      document.querySelectorAll('[data-bill]').forEach((b) => b.addEventListener('click', () => bill(b.dataset.bill)));
 
       // Wybór pakietu z tabeli ustawia go w formularzu.
       const form = document.getElementById('form');
