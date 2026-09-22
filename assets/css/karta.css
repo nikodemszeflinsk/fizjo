@@ -858,64 +858,6 @@ svg path {
   background: var(--ink);
 }
 
-.plans__head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px 24px;
-  flex-wrap: wrap;
-}
-
-.plans__head .h2--sm {
-  margin-bottom: 0;
-}
-
-/* Przełącznik rozliczenia */
-.billing {
-  display: inline-flex;
-  padding: 3px;
-  border-radius: 999px;
-  background: var(--floor-2);
-}
-
-.billing button {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 6px;
-  min-height: 38px;
-  padding: 0 16px;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--ink-2);
-  font-family: var(--f-display);
-  font-weight: 800;
-  font-size: 0.92rem;
-  cursor: pointer;
-  transition: background-color 0.2s, color 0.2s;
-}
-
-.billing button span {
-  font-family: var(--f-body);
-  font-weight: 500;
-  font-size: 0.8rem;
-  color: var(--muted);
-}
-
-.billing button:hover {
-  color: var(--ink);
-}
-
-.billing button[aria-pressed='true'] {
-  background: #1f5fd6;
-  background: var(--accent);
-  color: #fff;
-}
-
-.billing button[aria-pressed='true'] span {
-  color: rgba(255, 255, 255, 0.85);
-}
-
 /* Pakiety: tabela porównawcza, kolumna główna na atramencie. */
 .plans-wrap {
   overflow-x: auto;
@@ -966,6 +908,11 @@ svg path {
   border-top: 4px solid var(--ink);
 }
 
+.plans tbody tr:last-child .is-main,
+.plans .plans__pick .is-main {
+  border-bottom-left-radius: 0;
+}
+
 .plans .is-main {
   background: var(--ink);
   color: #fff;
@@ -1002,59 +949,38 @@ svg path {
   padding-top: 14px;
 }
 
-.plans__setup td,
 .plans__ads td {
   font-size: 1.02rem;
 }
 
-/* Reklamy: jedna, wspólna komórka dla obu pakietów. */
+/* Reklamy: dodatek pod przyciskami, cały wiersz na szarym. */
+.plans__ads th,
 .plans__ads td {
-  background: var(--floor);
+  background: var(--floor-2);
+  border-bottom: 0;
+}
+
+.plans__ads td {
   text-align: center;
 }
 
-.plans__ads td span {
-  display: block;
-  margin-top: 2px;
-  font-family: var(--f-body);
-  font-weight: 500;
-  font-size: 0.82rem;
-  color: var(--muted);
+.plans__ads th:first-child {
+  border-radius: var(--r-sign) 0 0 var(--r-sign);
 }
 
-.plans__setup td {
-  transition: color 0.3s;
-}
-
-.plans__setup s {
-  margin-right: 6px;
-  color: var(--muted);
-  font-weight: 500;
-  text-decoration-thickness: 1px;
-}
-
-.plans__setup .is-main s {
-  color: #8f959b;
-}
-
-.is-free {
-  color: #1f5fd6;
-  color: var(--accent);
-}
-
-.plans .is-main .is-free {
-  color: #7aa6f0;
+.plans__ads td:last-child {
+  border-radius: 0 var(--r-sign) var(--r-sign) 0;
 }
 
 .plans tfoot tr.plans__ads th em {
   display: inline-block;
-  margin-left: 6px;
-  padding: 2px 8px;
+  margin-left: 8px;
+  padding: 2px 9px;
   border-radius: 999px;
-  background: var(--floor-2);
-  font-size: 0.72rem;
+  border: 1px solid var(--hair-2);
+  font-size: 0.75rem;
   font-weight: 700;
-  color: var(--ink-2);
+  color: var(--muted);
 }
 
 .plans__pick td {
@@ -1062,8 +988,8 @@ svg path {
 }
 
 .plans__pick td {
-  padding-top: 4px;
-  padding-bottom: 16px;
+  padding-top: 6px;
+  padding-bottom: 18px;
   border-bottom: 0;
 }
 
@@ -1586,11 +1512,6 @@ svg path {
     letter-spacing: -0.01em;
     overflow-wrap: anywhere;
     hyphens: auto;
-  }
-
-  .plans__setup s {
-    display: block;
-    margin: 0 0 2px;
   }
 
   .billing {
