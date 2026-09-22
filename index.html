@@ -15,12 +15,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/karta.css" />
+  <link rel="stylesheet" href="assets/css/karta.css?v=3" />
 </head>
 <body>
   <a class="skip" href="#tresc">Przejdź do treści</a>
 
   <!-- Nagłówek strony produktu: marka, demo, PDF. Nie drukuje się. -->
+  <!-- Pasek: marka, skróty i jedno wezwanie — zobacz demo. Nie drukuje się. -->
   <header class="tools">
     <a class="tools__brand" href="index.html" aria-label="Studio Widok — strona główna">
       <svg class="tools__mark" viewBox="0 0 40 40" aria-hidden="true">
@@ -32,13 +33,12 @@
       </svg>
       Studio Widok
     </a>
-    <nav class="tools__right" aria-label="Na skróty">
-      <a class="tools__link" href="karta-produktu.pdf" download>
-        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3.5v9m-4-4 4 4 4-4M4 16.5h12" /></svg>
-        Pobierz PDF
-      </a>
+    <nav class="tools__nav" aria-label="Na skróty">
+      <a href="#co-robimy">Co robimy</a>
+      <a href="#reklamy">Reklamy</a>
+      <a href="#kontakt">Kontakt</a>
       <a class="tools__cta" href="demo.html">
-        Zobacz demo strony
+        Zobacz demo
         <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
       </a>
     </nav>
@@ -104,7 +104,7 @@
         <div class="cover__proof-text">
           <p class="cover__proof-h">Zobacz system w działaniu</p>
           <p>Przykładowa klinika „Linia Ruchu”: pacjent wybiera, co go boli, i w minutę umawia wizytę u właściwego specjalisty, w najbliższym gabinecie. Sprawdź to na telefonie.</p>
-          <a class="cta" href="demo.html">
+          <a class="cta cta--blue" href="demo.html">
             Zobacz, jak może wyglądać Twoja strona
             <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
           </a>
@@ -199,7 +199,7 @@
     </section>
 
     <!-- ── Strona 3: moduły — trzy w systemie, reklamy jako dodatek ───── -->
-    <section class="page" aria-labelledby="k-modules">
+    <section class="page" id="co-robimy" aria-labelledby="k-modules">
       <h2 class="h2" id="k-modules">Co dokładnie robimy</h2>
       <p class="lead">Najpierw budujemy fundament, który działa sam: pacjent Cię znajduje, umawia się i wraca. Reklamy to przyspieszenie, które możesz dołożyć później.</p>
 
@@ -238,7 +238,7 @@
       </ol>
 
       <!-- Dodatek: odgałęzienie od toru, rysowane przerywaną linią. -->
-      <div class="addon">
+      <div class="addon" id="reklamy">
         <span class="addon__num" aria-hidden="true">+</span>
         <div class="addon__head">
           <p class="track__label">Opcja, kiedy zechcesz</p>
@@ -253,7 +253,7 @@
         </ul>
       </div>
 
-      <h2 class="h2 h2--sm h2--plans">Pakiety</h2>
+      <h2 class="h2 h2--sm h2--plans" id="pakiety">Pakiety</h2>
       <div class="plans-wrap">
         <table class="plans">
           <caption class="visually-hidden">Porównanie pakietów</caption>
@@ -298,33 +298,39 @@
         <li><strong>Tydzień 4</strong> Start systemu i pierwszy raport. Reklamy, gdy zechcesz.</li>
       </ol>
 
-      <!-- Kontakt: formularz z wybranym pakietem. Wysyłka przez FormSubmit (bez własnego serwera);
-           gdy się nie uda, otwiera się gotowa wiadomość w programie pocztowym. -->
+      <!-- Kontakt: ciemny panel jak kalkulator, formularz na papierze.
+           Wysyłka przez FormSubmit (bez własnego serwera); gdy się nie uda,
+           otwiera się gotowa wiadomość w programie pocztowym. -->
       <section class="contact" id="kontakt" aria-labelledby="k-contact">
         <div class="contact__intro">
-          <h2 class="h2 h2--sm" id="k-contact">Porozmawiajmy o Twoim gabinecie</h2>
-          <p>Wybierz pakiet albo zostaw „Jeszcze nie wiem”. Oddzwonimy w ciągu jednego dnia roboczego, pokażemy demo na przykładzie Twojej specjalizacji i policzymy, ilu pacjentów potrzeba, żeby system się zwrócił.</p>
-          <address>
-            <strong>Studio Widok</strong><br />
-            <a href="tel:+48783480341">+48 783 480 341</a><br />
-            <a href="mailto:kontakt@studio-widok.pl">kontakt@studio-widok.pl</a><br />
+          <h2 class="contact__title" id="k-contact">Porozmawiajmy o Twoim gabinecie</h2>
+          <p class="contact__lead">Wybierz pakiet albo zostaw „Jeszcze nie wiem”. Reszta to trzy zdania o Twoim gabinecie.</p>
+          <ul class="contact__points">
+            <li>Oddzwonimy w ciągu jednego dnia roboczego</li>
+            <li>Pokażemy demo na przykładzie Twojej specjalizacji</li>
+            <li>Policzymy, ilu pacjentów zwraca koszt systemu</li>
+          </ul>
+          <address class="contact__address">
+            <strong>Studio Widok</strong>
+            <a href="tel:+48783480341">+48 783 480 341</a>
+            <a href="mailto:kontakt@studio-widok.pl">kontakt@studio-widok.pl</a>
             <a href="https://studio-widok.pl" rel="noopener">studio-widok.pl</a>
           </address>
         </div>
 
         <form class="form" id="form" action="https://formsubmit.co/kontakt@studio-widok.pl" method="post" novalidate>
-          <input type="hidden" name="_subject" value="Zapytanie: system pozyskiwania pacjentów" />
-          <input type="hidden" name="_template" value="table" />
           <input type="text" name="_honey" class="visually-hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
 
           <fieldset class="form__plans">
             <legend>Pakiet</legend>
-            <label class="pick"><input type="radio" name="pakiet" value="Start" /><span>Start</span></label>
-            <label class="pick"><input type="radio" name="pakiet" value="Wzrost" checked /><span>Wzrost</span></label>
-            <label class="pick"><input type="radio" name="pakiet" value="Klinika" /><span>Klinika</span></label>
-            <label class="pick"><input type="radio" name="pakiet" value="Jeszcze nie wiem" /><span>Jeszcze nie wiem</span></label>
+            <div class="picks">
+              <label class="pick"><input type="radio" name="pakiet" value="Start" /><span>Start</span></label>
+              <label class="pick"><input type="radio" name="pakiet" value="Wzrost" checked /><span>Wzrost</span></label>
+              <label class="pick"><input type="radio" name="pakiet" value="Klinika" /><span>Klinika</span></label>
+              <label class="pick"><input type="radio" name="pakiet" value="Jeszcze nie wiem" /><span>Jeszcze nie wiem</span></label>
+            </div>
+            <label class="check check--inline"><input type="checkbox" name="reklamy" value="tak" /><span>Interesują mnie też reklamy Google i Meta</span></label>
           </fieldset>
-          <label class="check"><input type="checkbox" name="reklamy" value="tak" /> Interesują mnie też reklamy Google i Meta</label>
 
           <div class="form__grid">
             <div class="field">
@@ -345,14 +351,14 @@
             </div>
             <div class="field field--full">
               <label for="c-msg">Twoja wiadomość <em>(opcjonalnie)</em></label>
-              <textarea id="c-msg" name="wiadomosc" rows="5" placeholder="Napisz własnymi słowami: ilu macie terapeutów, jakie specjalizacje, co chcecie poprawić, kiedy chcecie ruszyć."></textarea>
+              <textarea id="c-msg" name="wiadomosc" rows="4" placeholder="Napisz własnymi słowami: ilu macie terapeutów, jakie specjalizacje, co chcecie poprawić, kiedy chcecie ruszyć."></textarea>
             </div>
           </div>
 
-          <label class="check"><input type="checkbox" name="zgoda" value="tak" required /> Zgadzam się, żeby Studio Widok skontaktowało się ze mną w sprawie tej oferty.</label>
+          <label class="check"><input type="checkbox" name="zgoda" value="tak" required /><span>Zgadzam się, żeby Studio Widok skontaktowało się ze mną w sprawie tej oferty.</span></label>
 
           <div class="form__foot">
-            <button class="cta" type="submit">
+            <button class="cta cta--blue" type="submit">
               Wyślij zapytanie
               <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
             </button>
