@@ -1,0 +1,101 @@
+[
+  {
+    "file": "assets/img/spec-kregoslup.jpg",
+    "unsplashId": "8qwYA4INVCk",
+    "author": "Edward Muntinga",
+    "page": "https://unsplash.com/photos/8qwYA4INVCk",
+    "source": "https://images.unsplash.com/photo-1699523229208-be1e1dd9252d?w=1800&q=72&fm=jpg&fit=max",
+    "license": "Unsplash License",
+    "alt": "Dłonie terapeuty uciskające plecy pacjenta"
+  },
+  {
+    "file": "assets/img/spec-sport.jpg",
+    "unsplashId": "pbUWW-CBoqY",
+    "author": "yury kirillov",
+    "page": "https://unsplash.com/photos/pbUWW-CBoqY",
+    "source": "https://images.unsplash.com/photo-1649751361457-01d3a696c7e6?w=1800&q=72&fm=jpg&fit=max",
+    "license": "Unsplash License",
+    "alt": "Terapeuta badający nogę pacjenta"
+  },
+  {
+    "file": "assets/img/spec-uraz.jpg",
+    "unsplashId": "f7EQyJe2Tr8",
+    "author": "Judy Beth Morris",
+    "page": "https://unsplash.com/photos/f7EQyJe2Tr8",
+    "source": "https://images.unsplash.com/photo-1746806942507-a7e93fdd6dd4?w=1800&q=72&fm=jpg&fit=max",
+    "license": "Unsplash License",
+    "alt": "Fizjoterapia pacjenta po urazie"
+  },
+  {
+    "file": "assets/img/spec-ciaza.jpg",
+    "unsplashId": "qH3kUl3JUxc",
+    "author": "Jeferson Santu",
+    "page": "https://unsplash.com/photos/qH3kUl3JUxc",
+    "source": "https://images.unsplash.com/photo-1710897869539-a48e3d69a8d7?w=1200&q=72&fm=jpg&fit=max",
+    "license": "Unsplash License",
+    "alt": "Kobieta w ciąży w stroju sportowym"
+  },
+  {
+    "file": "assets/img/spec-dzieci.jpg",
+    "unsplashId": "iKCuym5Kt5o",
+    "author": "Ortopediatri Çocuk Ortopedi Akademisi",
+    "page": "https://unsplash.com/photos/iKCuym5Kt5o",
+    "source": "https://images.unsplash.com/photo-1708687045030-26702e62fc65?w=1800&q=72&fm=jpg&fit=max",
+    "license": "Unsplash License",
+    "alt": "Terapeutka przybija piątkę z chłopcem"
+  },
+  {
+    "file": "assets/img/wnetrze-korytarz.jpg",
+    "unsplashId": "Pk-KuizxQv8",
+    "author": "Tasha Kostyuk",
+    "page": "https://unsplash.com/photos/Pk-KuizxQv8",
+    "source": "https://images.unsplash.com/photo-1777269749032-d8d458ae594d?w=1800&q=72&fm=jpg&fit=max",
+    "license": "Unsplash License",
+    "alt": "Pusty korytarz przychodni z ławkami"
+  },
+  {
+    "file": "assets/img/zespol-1.jpg",
+    "unsplashId": "bBuUjB98PPY",
+    "author": "Derick McKinney",
+    "page": "https://unsplash.com/photos/bBuUjB98PPY",
+    "source": "https://images.unsplash.com/photo-1611608822650-925c227ef4d2?w=720&h=900&fit=crop&crop=faces&q=74&fm=jpg",
+    "license": "Unsplash License",
+    "alt": "Portret uśmiechniętego mężczyzny"
+  },
+  {
+    "file": "assets/img/zespol-2.jpg",
+    "unsplashId": "P7KsjmFiCNM",
+    "author": "PodMatch",
+    "page": "https://unsplash.com/photos/P7KsjmFiCNM",
+    "source": "https://images.unsplash.com/photo-1746813628081-0c8c1611aace?w=720&h=900&fit=crop&crop=faces&q=74&fm=jpg",
+    "license": "Unsplash License",
+    "alt": "Portret mężczyzny ze skrzyżowanymi rękami"
+  },
+  {
+    "file": "assets/img/zespol-3.jpg",
+    "unsplashId": "rm7rZYdl3rY",
+    "author": "Ocho Artex Media",
+    "page": "https://unsplash.com/photos/rm7rZYdl3rY",
+    "source": "https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=720&h=900&fit=crop&crop=faces&q=74&fm=jpg",
+    "license": "Unsplash License",
+    "alt": "Portret kobiety w stroju medycznym"
+  },
+  {
+    "file": "assets/img/zespol-4.jpg",
+    "unsplashId": "_4xStiTXY1o",
+    "author": "Beatriz Mendez",
+    "page": "https://unsplash.com/photos/_4xStiTXY1o",
+    "source": "https://images.unsplash.com/photo-1770134223774-13b735e29201?w=720&h=900&fit=crop&crop=faces&q=74&fm=jpg",
+    "license": "Unsplash License",
+    "alt": "Portret kobiety w okularach w stroju medycznym"
+  },
+  {
+    "file": "assets/img/zespol-5.jpg",
+    "unsplashId": "Al7MrS572G0",
+    "author": "SoyBreno",
+    "page": "https://unsplash.com/photos/Al7MrS572G0",
+    "source": "https://images.unsplash.com/photo-1756699197333-b938d9332352?w=720&h=900&fit=crop&crop=faces&q=74&fm=jpg",
+    "license": "Unsplash License",
+    "alt": "Portret uśmiechniętej kobiety w fartuchu"
+  }
+]

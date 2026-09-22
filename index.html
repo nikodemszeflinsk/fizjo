@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>System pozyskiwania pacjentów dla fizjoterapeutów — Studio Widok</title>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+  <meta name="description" content="Strona z rezerwacją online, widoczność w Mapach Google i automatyczne przypomnienia SMS dla gabinetów fizjoterapii. Reklamy dołączysz, kiedy zechcesz. Studio Widok." />
+  <meta name="theme-color" content="#EDEFEC" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="System pozyskiwania pacjentów dla fizjoterapeutów — Studio Widok" />
+  <meta property="og:description" content="Pacjent znajduje Cię wieczorem, umawia się w minutę i wraca na kolejne wizyty. Zobacz demo strony kliniki." />
+  <meta property="og:image" content="assets/img/demo-telefon.jpg" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/karta.css" />
+</head>
+<body>
+  <a class="skip" href="#tresc">Przejdź do treści</a>
+
+  <!-- Nagłówek strony produktu: marka, demo, PDF. Nie drukuje się. -->
+  <header class="tools">
+    <a class="tools__brand" href="index.html" aria-label="Studio Widok — strona główna">
+      <svg class="tools__mark" viewBox="0 0 40 40" aria-hidden="true">
+        <path d="M8 6v20a8 8 0 0 1-3 6" style="stroke:#1F5FD6" />
+        <path d="M15 6v28" style="stroke:#E8590C" />
+        <path d="M22 6v28" style="stroke:#13875A" />
+        <path d="M29 6v28" style="stroke:#C2255C" />
+        <path d="M36 6v28" style="stroke:#F2B705" />
+      </svg>
+      Studio Widok
+    </a>
+    <nav class="tools__right" aria-label="Na skróty">
+      <a class="tools__link" href="karta-produktu.pdf" download>
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3.5v9m-4-4 4 4 4-4M4 16.5h12" /></svg>
+        Pobierz PDF
+      </a>
+      <a class="tools__cta" href="demo.html">
+        Zobacz demo strony
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
+      </a>
+    </nav>
+  </header>
+
+  <main class="sheet" id="tresc">
+
+    <!-- ── Strona 1: obietnica i ścieżka pacjenta ─────────────────────── -->
+    <section class="page page--cover" aria-labelledby="k-title">
+      <header class="cover__top">
+        <p class="brandline">
+          <svg class="brandline__mark" viewBox="0 0 40 40" aria-hidden="true">
+            <path d="M8 6v20a8 8 0 0 1-3 6" style="stroke:#1F5FD6" />
+            <path d="M15 6v28" style="stroke:#E8590C" />
+            <path d="M22 6v28" style="stroke:#13875A" />
+            <path d="M29 6v28" style="stroke:#C2255C" />
+            <path d="M36 6v28" style="stroke:#F2B705" />
+          </svg>
+          <span><strong>System pozyskiwania pacjentów</strong> · Studio Widok</span>
+        </p>
+        <p class="cover__for">Dla gabinetów i klinik fizjoterapii</p>
+      </header>
+
+      <h1 class="cover__title" id="k-title">
+        Pacjent znajduje Cię wieczorem, umawia się w minutę i wraca na kolejne wizyty.
+      </h1>
+
+      <p class="cover__lead">
+        Jeden system zamiast kilku dostawców: strona z rezerwacją online, widoczność w Mapach Google
+        i automatyczne przypomnienia. Ty prowadzisz terapię, a grafik zapełnia się sam.
+        Reklamy dołączysz, kiedy zechcesz.
+      </p>
+
+      <!-- Ścieżka pacjenta: trzy przystanki systemu i jeden opcjonalny. Numery to kolejność drogi pacjenta. -->
+      <ol class="path" aria-label="Droga pacjenta i moduły systemu">
+        <li class="path__stop">
+          <span class="path__num" aria-hidden="true">1</span>
+          <p class="path__verb">Znajdzie Cię</p>
+          <p class="path__mod">SEO lokalne i Mapy Google</p>
+          <p>Uporządkowany profil firmy, zdjęcia, godziny, usługi i opinie. Gabinet pojawia się w mapach, gdy ktoś szuka pomocy w okolicy.</p>
+        </li>
+        <li class="path__stop">
+          <span class="path__num" aria-hidden="true">2</span>
+          <p class="path__verb">Umówi się</p>
+          <p class="path__mod">Strona z rezerwacją online</p>
+          <p>Pacjent wybiera problem, specjalistę, gabinet i godzinę. Bez telefonu, także o 23:00. Termin trafia prosto do Twojego kalendarza.</p>
+        </li>
+        <li class="path__stop">
+          <span class="path__num" aria-hidden="true">3</span>
+          <p class="path__verb">Wróci</p>
+          <p class="path__mod">Automatyzacje i CRM</p>
+          <p>SMS dzień przed wizytą, prośba o opinię po terapii, przypomnienie o kontroli po 6 tygodniach. Baza pacjentów w jednym miejscu.</p>
+        </li>
+        <li class="path__stop path__stop--opt">
+          <span class="path__num" aria-hidden="true">+</span>
+          <p class="path__verb">Zobaczy Cię</p>
+          <p class="path__mod">Reklamy Google i Meta · opcja</p>
+          <p>Gdy chcesz szybciej zapełnić grafik lub nową lokalizację. Włączasz w dowolnym momencie, także po starcie systemu.</p>
+        </li>
+      </ol>
+
+      <div class="cover__proof">
+        <div class="cover__proof-text">
+          <p class="cover__proof-h">Zobacz system w działaniu</p>
+          <p>Przykładowa klinika „Linia Ruchu”: pacjent wybiera, co go boli, i w minutę umawia wizytę u właściwego specjalisty, w najbliższym gabinecie. Sprawdź to na telefonie.</p>
+          <a class="cta" href="demo.html">
+            Zobacz, jak może wyglądać Twoja strona
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
+          </a>
+        </div>
+        <a class="phone" href="demo.html" tabindex="-1" aria-hidden="true">
+          <img src="assets/img/demo-telefon.jpg" alt="" width="780" height="1688" loading="lazy" />
+        </a>
+      </div>
+    </section>
+
+    <!-- ── Strona 2: co dostaje właściciel ────────────────────────────── -->
+    <section class="page" aria-labelledby="k-benefits">
+      <h2 class="h2" id="k-benefits">Co zmienia się w gabinecie</h2>
+      <p class="lead">Mniej odbierania telefonów w trakcie zabiegu. Mniej pustych okienek. Więcej pacjentów, którzy przychodzą na cały cykl terapii.</p>
+
+      <div class="benefits">
+        <article class="benefit">
+          <h3>Pełniejszy grafik</h3>
+          <p>Rezerwacja działa całą dobę. Pacjent, który szuka pomocy wieczorem, umawia się od razu, zamiast odkładać telefon „na jutro”.</p>
+        </article>
+        <article class="benefit">
+          <h3>Mniej telefonów</h3>
+          <p>Terapeuta nie przerywa zabiegu, żeby odebrać. Rejestracja zajmuje się sprawami, których nie da się załatwić online.</p>
+        </article>
+        <article class="benefit">
+          <h3>Mniej nieobecności</h3>
+          <p>Przypomnienie SMS dzień przed wizytą i link do zmiany terminu. Zwolnione okienko może od razu zająć ktoś inny.</p>
+        </article>
+        <article class="benefit">
+          <h3>Widoczność w okolicy</h3>
+          <p>Gabinet pojawia się w Mapach Google z aktualnymi godzinami, zdjęciami i opiniami, czyli tam, gdzie pacjent wybiera.</p>
+        </article>
+        <article class="benefit">
+          <h3>Wiesz, co działa</h3>
+          <p>Co miesiąc prosty raport: ile osób zobaczyło gabinet, ile się umówiło i skąd przyszło. Bez żargonu.</p>
+        </article>
+        <article class="benefit">
+          <h3>Pacjenci wracają</h3>
+          <p>Automatyczne przypomnienie o kontroli i ćwiczeniach. Pacjent kończy cykl terapii, a nie znika po drugiej wizycie.</p>
+        </article>
+      </div>
+
+      <!-- Kalkulator: jasno opisany jako przykład, nie obietnica. -->
+      <section class="calc" aria-labelledby="k-calc">
+        <div class="calc__head">
+          <h3 id="k-calc">Policz na swoich liczbach</h3>
+          <p>Przykładowy scenariusz, nie gwarancja wyniku. Ustaw wartości ze swojego gabinetu.</p>
+        </div>
+        <div class="calc__grid">
+          <div class="calc__inputs">
+            <label class="range">
+              <span class="range__label">Nowi pacjenci miesięcznie z systemu</span>
+              <input type="range" min="2" max="60" step="1" value="8" data-calc="pacjenci" />
+              <output data-out="pacjenci">8</output>
+            </label>
+            <label class="range">
+              <span class="range__label">Średnia cena wizyty</span>
+              <input type="range" min="100" max="400" step="10" value="200" data-calc="cena" />
+              <output data-out="cena">200 zł</output>
+            </label>
+            <label class="range">
+              <span class="range__label">Wizyt w jednym cyklu terapii</span>
+              <input type="range" min="1" max="12" step="1" value="5" data-calc="wizyty" />
+              <output data-out="wizyty">5</output>
+            </label>
+            <label class="range">
+              <span class="range__label">Miesięczny koszt systemu (i reklam, jeśli włączone)</span>
+              <input type="range" min="500" max="10000" step="250" value="2000" data-calc="koszt" />
+              <output data-out="koszt">2 000 zł</output>
+            </label>
+          </div>
+          <dl class="calc__result" aria-live="polite">
+            <div class="calc__big">
+              <dt>Na każdą złotówkę wydaną na system</dt>
+              <dd data-res="zwrot">4 zł przychodu</dd>
+            </div>
+            <div>
+              <dt>Przychód z nowych pacjentów</dt>
+              <dd data-res="przychod">8 000 zł</dd>
+            </div>
+            <div>
+              <dt>Koszt miesięczny</dt>
+              <dd data-res="koszt">2 000 zł</dd>
+            </div>
+            <div class="calc__wide">
+              <dt>Nowych pacjentów miesięcznie, żeby koszt się zwrócił</dt>
+              <dd data-res="prog">2</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+    </section>
+
+    <!-- ── Strona 3: moduły — trzy w systemie, reklamy jako dodatek ───── -->
+    <section class="page" aria-labelledby="k-modules">
+      <h2 class="h2" id="k-modules">Co dokładnie robimy</h2>
+      <p class="lead">Najpierw budujemy fundament, który działa sam: pacjent Cię znajduje, umawia się i wraca. Reklamy to przyspieszenie, które możesz dołożyć później.</p>
+
+      <p class="track__label">W systemie</p>
+      <ol class="track" aria-label="Moduły systemu">
+        <li class="track__stop">
+          <span class="track__num" aria-hidden="true">1</span>
+          <h3>Strona z rezerwacją online</h3>
+          <ul>
+            <li>Projekt strony dla Twojego gabinetu, szybka na telefonie</li>
+            <li>Rezerwacja: usługa, specjalista, gabinet, termin</li>
+            <li>Połączenie z Twoim kalendarzem lub systemem gabinetowym</li>
+            <li>Mapa gabinetów, cennik, zespół, pytania pacjentów</li>
+          </ul>
+        </li>
+        <li class="track__stop">
+          <span class="track__num" aria-hidden="true">2</span>
+          <h3>SEO lokalne i Mapy Google</h3>
+          <ul>
+            <li>Profil firmy Google: usługi, zdjęcia, godziny, atrybuty</li>
+            <li>Podstrony specjalizacji pod lokalne wyszukiwania</li>
+            <li>Zbieranie opinii po zakończonej terapii</li>
+            <li>Wpisy w katalogach medycznych i spójne dane adresowe</li>
+          </ul>
+        </li>
+        <li class="track__stop">
+          <span class="track__num" aria-hidden="true">3</span>
+          <h3>Automatyzacje i CRM</h3>
+          <ul>
+            <li>SMS i e-mail: potwierdzenie i przypomnienie o wizycie</li>
+            <li>Prośba o opinię po zakończonym cyklu terapii</li>
+            <li>Przypomnienie o kontroli i powrocie</li>
+            <li>Baza pacjentów i historia kontaktu w jednym miejscu</li>
+          </ul>
+        </li>
+      </ol>
+
+      <!-- Dodatek: odgałęzienie od toru, rysowane przerywaną linią. -->
+      <div class="addon">
+        <span class="addon__num" aria-hidden="true">+</span>
+        <div class="addon__head">
+          <p class="track__label">Opcja, kiedy zechcesz</p>
+          <h3>Reklamy Google i Meta</h3>
+          <p>Włączasz w dowolnym momencie, także kilka miesięcy po starcie systemu. Najpierw porządkujemy stronę, rezerwację i Mapy, żeby każda złotówka z reklamy trafiała na gotową ścieżkę, a nie na numer telefonu, którego nikt nie odbierze.</p>
+        </div>
+        <ul>
+          <li>Kampania w wyszukiwarce na hasła „z bólem” i nazwy zabiegów</li>
+          <li>Reklamy na Facebooku i Instagramie w promieniu dojazdu</li>
+          <li>Osobne kampanie dla specjalizacji lub nowej lokalizacji</li>
+          <li>Pomiar: ile rezerwacji dała każda złotówka</li>
+        </ul>
+      </div>
+
+      <h2 class="h2 h2--sm h2--plans">Pakiety</h2>
+      <div class="plans-wrap">
+        <table class="plans">
+          <caption class="visually-hidden">Porównanie pakietów</caption>
+          <thead>
+            <tr>
+              <td></td>
+              <th scope="col">Start<span>Jeden gabinet, który chce przestać tracić pacjentów po godzinach.</span></th>
+              <th scope="col" class="is-main">Wzrost<span>Pacjenci wracają i polecają. Najczęściej wybierany.</span></th>
+              <th scope="col">Klinika<span>Kilka lokalizacji i specjalizacji.</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Strona z rezerwacją online</th><td>✓</td><td class="is-main">✓</td><td>✓</td></tr>
+            <tr><th scope="row">SEO lokalne i Mapy Google</th><td>✓</td><td class="is-main">✓</td><td>✓</td></tr>
+            <tr><th scope="row">Przypomnienia SMS</th><td>✓</td><td class="is-main">✓</td><td>✓</td></tr>
+            <tr><th scope="row">Zbieranie opinii</th><td>–</td><td class="is-main">✓</td><td>✓</td></tr>
+            <tr><th scope="row">Przypomnienia o powrocie i kontroli</th><td>–</td><td class="is-main">✓</td><td>✓</td></tr>
+            <tr><th scope="row">Kilka lokalizacji i specjalizacji</th><td>–</td><td class="is-main">–</td><td>✓</td></tr>
+            <tr><th scope="row">Pełny CRM i historia pacjenta</th><td>–</td><td class="is-main">–</td><td>✓</td></tr>
+            <tr><th scope="row">Raport miesięczny</th><td>e-mail</td><td class="is-main">e-mail</td><td>spotkanie</td></tr>
+            <tr class="plans__opt"><th scope="row">Reklamy Google i Meta</th><td>opcja</td><td class="is-main">opcja</td><td>opcja</td></tr>
+          </tbody>
+          <tfoot>
+            <tr><th scope="row">Abonament</th><td>[cena] zł / mies.</td><td class="is-main">[cena] zł / mies.</td><td>[cena] zł / mies.</td></tr>
+            <tr class="plans__pick">
+              <td></td>
+              <td><a class="plan-pick" href="#kontakt" data-plan="Start">Wybieram Start</a></td>
+              <td class="is-main"><a class="plan-pick" href="#kontakt" data-plan="Wzrost">Wybieram Wzrost</a></td>
+              <td><a class="plan-pick" href="#kontakt" data-plan="Klinika">Wybieram Klinikę</a></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <p class="plans-hint" aria-hidden="true">Przesuń tabelę w bok, żeby zobaczyć pakiety Wzrost i Klinika →</p>
+      <p class="fine">Reklamy to dodatek do każdego pakietu: obsługa [cena] zł / mies., budżet reklamowy płatny osobno, bezpośrednio do Google i Meta. Wdrożenie: [cena] zł jednorazowo. Umowa: [okres].</p>
+
+      <h2 class="h2 h2--sm">Wdrożenie w 4 tygodnie</h2>
+      <ol class="timeline">
+        <li><strong>Tydzień 1</strong> Rozmowa, dostęp do kalendarza, zdjęcia i teksty.</li>
+        <li><strong>Tydzień 2</strong> Strona i rezerwacja online na Twoich danych.</li>
+        <li><strong>Tydzień 3</strong> Profil Google, opinie, przypomnienia SMS.</li>
+        <li><strong>Tydzień 4</strong> Start systemu i pierwszy raport. Reklamy, gdy zechcesz.</li>
+      </ol>
+
+      <!-- Kontakt: formularz z wybranym pakietem. Wysyłka przez FormSubmit (bez własnego serwera);
+           gdy się nie uda, otwiera się gotowa wiadomość w programie pocztowym. -->
+      <section class="contact" id="kontakt" aria-labelledby="k-contact">
+        <div class="contact__intro">
+          <h2 class="h2 h2--sm" id="k-contact">Porozmawiajmy o Twoim gabinecie</h2>
+          <p>Wybierz pakiet albo zostaw „Jeszcze nie wiem”. Oddzwonimy w ciągu jednego dnia roboczego, pokażemy demo na przykładzie Twojej specjalizacji i policzymy, ilu pacjentów potrzeba, żeby system się zwrócił.</p>
+          <address>
+            <strong>Studio Widok</strong><br />
+            <a href="tel:+48783480341">+48 783 480 341</a><br />
+            <a href="mailto:kontakt@studio-widok.pl">kontakt@studio-widok.pl</a><br />
+            <a href="https://studio-widok.pl" rel="noopener">studio-widok.pl</a>
+          </address>
+        </div>
+
+        <form class="form" id="form" action="https://formsubmit.co/kontakt@studio-widok.pl" method="post" novalidate>
+          <input type="hidden" name="_subject" value="Zapytanie: system pozyskiwania pacjentów" />
+          <input type="hidden" name="_template" value="table" />
+          <input type="text" name="_honey" class="visually-hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+          <fieldset class="form__plans">
+            <legend>Pakiet</legend>
+            <label class="pick"><input type="radio" name="pakiet" value="Start" /><span>Start</span></label>
+            <label class="pick"><input type="radio" name="pakiet" value="Wzrost" checked /><span>Wzrost</span></label>
+            <label class="pick"><input type="radio" name="pakiet" value="Klinika" /><span>Klinika</span></label>
+            <label class="pick"><input type="radio" name="pakiet" value="Jeszcze nie wiem" /><span>Jeszcze nie wiem</span></label>
+          </fieldset>
+          <label class="check"><input type="checkbox" name="reklamy" value="tak" /> Interesują mnie też reklamy Google i Meta</label>
+
+          <div class="form__grid">
+            <div class="field">
+              <label for="c-name">Imię i nazwisko</label>
+              <input id="c-name" name="imie" type="text" autocomplete="name" required />
+            </div>
+            <div class="field">
+              <label for="c-clinic">Gabinet i miasto</label>
+              <input id="c-clinic" name="gabinet" type="text" autocomplete="organization" placeholder="np. Fizjo Centrum, Poznań" required />
+            </div>
+            <div class="field">
+              <label for="c-phone">Telefon</label>
+              <input id="c-phone" name="telefon" type="tel" autocomplete="tel" inputmode="tel" required />
+            </div>
+            <div class="field">
+              <label for="c-email">E-mail</label>
+              <input id="c-email" name="email" type="email" autocomplete="email" required />
+            </div>
+            <div class="field field--full">
+              <label for="c-msg">Twoja wiadomość <em>(opcjonalnie)</em></label>
+              <textarea id="c-msg" name="wiadomosc" rows="5" placeholder="Napisz własnymi słowami: ilu macie terapeutów, jakie specjalizacje, co chcecie poprawić, kiedy chcecie ruszyć."></textarea>
+            </div>
+          </div>
+
+          <label class="check"><input type="checkbox" name="zgoda" value="tak" required /> Zgadzam się, żeby Studio Widok skontaktowało się ze mną w sprawie tej oferty.</label>
+
+          <div class="form__foot">
+            <button class="cta" type="submit">
+              Wyślij zapytanie
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
+            </button>
+            <p class="form__status" id="form-status" role="status"></p>
+          </div>
+        </form>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      // Kalkulator zwrotu — liczby przykładowe, wpisuje je właściciel gabinetu.
+      const zl = (n) => `${Math.round(n).toLocaleString('pl-PL')} zł`;
+      const val = (k) => Number(document.querySelector(`[data-calc="${k}"]`).value);
+      const out = (k, t) => (document.querySelector(`[data-out="${k}"]`).textContent = t);
+      const res = (k, t) => (document.querySelector(`[data-res="${k}"]`).textContent = t);
+      const update = () => {
+        const p = val('pacjenci'), c = val('cena'), w = val('wizyty'), k = val('koszt');
+        out('pacjenci', p); out('cena', zl(c)); out('wizyty', w); out('koszt', zl(k));
+        const przychod = p * c * w;
+        res('przychod', zl(przychod));
+        res('koszt', zl(k));
+        res('zwrot', `${(przychod / k).toLocaleString('pl-PL', { maximumFractionDigits: 1 })} zł przychodu`);
+        res('prog', String(Math.ceil(k / (c * w))));
+        document.querySelectorAll('.range input').forEach((i) => i.style.setProperty('--p', `${((i.value - i.min) / (i.max - i.min)) * 100}%`));
+      };
+      document.querySelectorAll('[data-calc]').forEach((i) => i.addEventListener('input', update));
+      update();
+
+      // Wybór pakietu z tabeli ustawia go w formularzu.
+      const form = document.getElementById('form');
+      const status = document.getElementById('form-status');
+      document.querySelectorAll('[data-plan]').forEach((a) =>
+        a.addEventListener('click', () => {
+          const r = form.querySelector(`input[name="pakiet"][value="${a.dataset.plan}"]`);
+          if (r) r.checked = true;
+          setTimeout(() => form.querySelector('#c-name').focus({ preventScroll: true }), 500);
+        })
+      );
+
+      const fail = (el, msg) => {
+        el.setAttribute('aria-invalid', 'true');
+        const box = el.closest('.field, .check');
+        const e = document.createElement('p');
+        e.className = 'field__err';
+        e.textContent = msg;
+        box.append(e);
+      };
+
+      form.addEventListener('submit', async (ev) => {
+        ev.preventDefault();
+        form.querySelectorAll('.field__err').forEach((e) => e.remove());
+        form.querySelectorAll('[aria-invalid]').forEach((e) => e.removeAttribute('aria-invalid'));
+        const f = new FormData(form);
+        const bad = [];
+        if (String(f.get('imie')).trim().length < 3) bad.push([form.imie, 'Podaj imię i nazwisko.']);
+        if (String(f.get('gabinet')).trim().length < 2) bad.push([form.gabinet, 'Podaj nazwę gabinetu i miasto.']);
+        if (String(f.get('telefon')).replace(/\D/g, '').length < 9) bad.push([form.telefon, 'Podaj numer telefonu, oddzwonimy.']);
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(f.get('email')))) bad.push([form.email, 'Sprawdź adres e-mail, brakuje w nim „@” albo domeny.']);
+        if (!f.get('zgoda')) bad.push([form.zgoda, 'Bez tej zgody nie możemy się odezwać.']);
+        if (bad.length) {
+          bad.forEach(([el, m]) => fail(el, m));
+          bad[0][0].focus();
+          return;
+        }
+        if (f.get('_honey')) return;
+        const btn = form.querySelector('button[type="submit"]');
+        btn.disabled = true;
+        status.textContent = 'Wysyłamy…';
+        try {
+          const r = await fetch('https://formsubmit.co/ajax/kontakt@studio-widok.pl', {
+            method: 'POST',
+            headers: { Accept: 'application/json' },
+            body: f,
+          });
+          if (!r.ok) throw new Error(String(r.status));
+          form.classList.add('is-sent');
+          status.textContent = `Dziękujemy! Zapytanie o pakiet ${f.get('pakiet')} dotarło. Oddzwonimy w ciągu jednego dnia roboczego.`;
+        } catch (_) {
+          // Zapasowo: gotowa wiadomość w programie pocztowym.
+          const body = [
+            ['Imię i nazwisko', 'imie'], ['Gabinet', 'gabinet'], ['Telefon', 'telefon'], ['E-mail', 'email'],
+            ['Pakiet', 'pakiet'], ['Reklamy', 'reklamy'], ['Wiadomość', 'wiadomosc'],
+          ].map(([l, k]) => `${l}: ${f.get(k) || '-'}`).join('\n');
+          location.href = `mailto:kontakt@studio-widok.pl?subject=${encodeURIComponent('Zapytanie: pakiet ' + f.get('pakiet'))}&body=${encodeURIComponent(body)}`;
+          status.textContent = 'Nie udało się wysłać automatycznie, więc otworzyliśmy wiadomość w Twoim programie pocztowym. Możesz też zadzwonić: +48 783 480 341.';
+          btn.disabled = false;
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

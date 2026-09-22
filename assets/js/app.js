@@ -1,0 +1,1013 @@
+/* Linia Ruchu — logika demo: kalendarz, rezerwacja, mapa, linia przewodnia. */
+(() => {
+  'use strict';
+
+  const K = window.KLINIKA;
+  if (!K) return;
+
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const LINES = Object.fromEntries(K.linie.map((l) => [l.id, l]));
+  const TEAM = Object.fromEntries(K.zespol.map((t) => [t.id, t]));
+  const PLACES = Object.fromEntries(K.lokalizacje.map((p) => [p.id, p]));
+  const SERVICES = {};
+  K.linie.forEach((l) => l.uslugi.forEach((u) => (SERVICES[u.id] = { ...u, linia: l.id })));
+
+  /* ── Ikony (jedna grubość kreski, jeden rysunek) ─────────────────────── */
+  const ICON = {
+    arrow: '<path d="M4 10h11m-4-4 4 4-4 4"/>',
+    back: '<path d="M16 10H5m4-4-4 4 4 4"/>',
+    check: '<path d="M5 10.5 8.5 14 15 6.5"/>',
+    people:
+      '<path d="M7.5 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM2.5 17c0-2.8 2.2-5 5-5s5 2.2 5 5M13 4.2a3 3 0 0 1 0 5.6M14.5 12.3c1.8.6 3 2.3 3 4.7"/>',
+    pin: '<path d="M10 17.5s5.5-4.8 5.5-9a5.5 5.5 0 1 0-11 0c0 4.2 5.5 9 5.5 9Zm0-7.3a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6Z"/>',
+    route: '<path d="M3.5 9.5 16.5 3.5l-6 13-1.7-5.3Z"/>',
+    calendar: '<path d="M4 5.5h12v11H4ZM4 8.5h12M7.5 3.5v3M12.5 3.5v3"/>',
+    star: '<path d="M10 1.8l2.5 5.2 5.7.7-4.2 3.9 1.1 5.6L10 14.4l-5.1 2.8L6 11.6 1.8 7.7l5.7-.7Z"/>',
+  };
+  const icon = (name, cls = '') =>
+    `<svg class="${cls}" viewBox="0 0 20 20" aria-hidden="true">${ICON[name]}</svg>`;
+
+  const esc = (s) =>
+    String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+
+  const zl = (n) => `${n.toLocaleString('pl-PL')} zł`;
+
+  /* ── Placeholdery z konfiguracji ─────────────────────────────────────── */
+  $$('[data-k]').forEach((el) => {
+    const v = K[el.dataset.k];
+    if (v) el.textContent = v;
+  });
+
+  /* ── Duoton: atrament + kolor linii ──────────────────────────────────── */
+  const hexRgb = (h) => {
+    const n = parseInt(h.slice(1), 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => v / 255);
+  };
+  const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+
+  (function injectDuotone() {
+    const ink = hexRgb('#14171A');
+    const paper = hexRgb('#F4F6F3');
+    const tones = { ...Object.fromEntries(K.linie.map((l) => [l.id, l.kolor])), ink: '#5B6168' };
+    const filters = Object.entries(tones)
+      .map(([id, hex]) => {
+        const c = hexRgb(hex);
+        // Trzy przystanki: głęboki cień zabarwiony linią, sam kolor linii, jasny papier.
+        const stops = [mix(ink, c, 0.18), mix(c, ink, 0.12), mix(c, paper, 0.55), paper];
+        const ch = (i) => stops.map((s) => s[i].toFixed(3)).join(' ');
+        return `<filter id="duo-${id}" color-interpolation-filters="sRGB">
+          <feColorMatrix type="matrix" values="0.30 0.59 0.11 0 0  0.30 0.59 0.11 0 0  0.30 0.59 0.11 0 0  0 0 0 1 0"/>
+          <feComponentTransfer>
+            <feFuncR type="table" tableValues="${ch(0)}"/>
+            <feFuncG type="table" tableValues="${ch(1)}"/>
+            <feFuncB type="table" tableValues="${ch(2)}"/>
+          </feComponentTransfer></filter>`;
+      })
+      .join('');
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.setAttribute('width', '0');
+    svg.setAttribute('height', '0');
+    svg.style.position = 'absolute';
+    svg.innerHTML = `<defs>${filters}</defs>`;
+    document.body.prepend(svg);
+  })();
+
+  /* ── Kalendarz: deterministyczna dostępność z grafiku ────────────────── */
+  const hash = (str) => {
+    let h1 = 0xdeadbeef;
+    for (let i = 0; i < str.length; i++) h1 = Math.imul(h1 ^ str.charCodeAt(i), 2654435761);
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
+    return ((h1 ^ (h1 >>> 13)) >>> 0) / 4294967296;
+  };
+
+  const DOW = ['nd', 'pn', 'wt', 'śr', 'cz', 'pt', 'sb'];
+  const DOW_LONG = ['niedziela', 'poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota'];
+  const MONTHS = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'];
+
+  const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const fromIso = (s) => {
+    const [y, m, d] = s.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  };
+
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  const DAYS = (() => {
+    const out = [];
+    for (let i = 0; out.length < 14 && i < 21; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() + i);
+      if (d.getDay() !== 0) out.push(d);
+    }
+    return out;
+  })();
+
+  const dayLabel = (d) => {
+    const diff = Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()) - today) / 86400000);
+    if (diff === 0) return 'dziś';
+    if (diff === 1) return 'jutro';
+    return `${DOW[d.getDay()]} ${d.getDate()}.${String(d.getMonth() + 1).padStart(2, '0')}`;
+  };
+
+  const dayLong = (d) => `${DOW_LONG[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]}`;
+
+  /** Wolne godziny terapeuty w danym gabinecie i dniu. */
+  function slotsFor(tid, pid, d) {
+    const t = TEAM[tid];
+    const days = (t.grafik[pid] || []);
+    const dow = d.getDay();
+    if (!days.includes(dow)) return [];
+    const [from, to] = dow === 6 ? K.godzinyWizyt.sobota : K.godzinyWizyt.tydzien;
+    const offset = Number(tid.slice(1)) % 2 ? 0 : 30;
+    const out = [];
+    for (let h = from; h < to; h++) {
+      const min = h === from ? 0 : offset;
+      const at = new Date(d);
+      at.setHours(h, min, 0, 0);
+      if (at - now < 60 * 60 * 1000) continue; // nie wcześniej niż za godzinę
+      if (hash(`${tid}|${pid}|${iso(d)}|${h}`) < 0.58) continue; // termin zajęty
+      out.push({ time: `${h}:${String(min).padStart(2, '0')}`, tid, pid, date: iso(d), at });
+    }
+    return out;
+  }
+
+  /** Wszystkie wolne terminy spełniające filtr, posortowane w czasie. */
+  function findSlots({ line, tid, pid, date } = {}) {
+    const people = tid && tid !== 'any' ? [TEAM[tid]] : K.zespol.filter((t) => !line || t.linie.includes(line));
+    const days = date ? [fromIso(date)] : DAYS;
+    const out = [];
+    days.forEach((d) =>
+      people.forEach((t) =>
+        Object.keys(t.grafik)
+          .filter((p) => !pid || p === pid)
+          .forEach((p) => out.push(...slotsFor(t.id, p, d)))
+      )
+    );
+    return out.sort((a, b) => a.at - b.at);
+  }
+
+  const nextSlot = (f) => findSlots(f)[0] || null;
+  const slotText = (s) => (s ? `${dayLabel(s.at)}, ${s.time}` : 'brak w 2 tygodnie');
+
+  /* ── Stan linii przewodniej ──────────────────────────────────────────── */
+  const root = document.documentElement;
+  function setGuide(lineId) {
+    const l = LINES[lineId];
+    root.style.setProperty('--guide', l ? l.kolor : 'var(--ink)');
+    root.style.setProperty('--guide-on', l ? l.naKolorze : '#fff');
+    $$('.line').forEach((b) => b.classList.toggle('is-chosen', b.dataset.line === lineId));
+  }
+
+  /* ── Tablica najbliższych terminów ───────────────────────────────────── */
+  function renderBoard() {
+    const all = findSlots();
+    const picked = [];
+    const seen = new Set();
+    for (const s of all) {
+      if (seen.has(s.tid)) continue;
+      seen.add(s.tid);
+      picked.push(s);
+      if (picked.length === 3) break;
+    }
+    const box = $('#board-rows');
+    if (!picked.length) {
+      box.innerHTML = '<li class="board__empty">Brak wolnych terminów w najbliższych dwóch tygodniach. Zadzwoń — znajdziemy miejsce.</li>';
+      return;
+    }
+    box.innerHTML = picked
+      .map((s) => {
+        const t = TEAM[s.tid];
+        const l = LINES[t.linie[0]];
+        return `<li><button class="board__row" type="button" data-slot="${s.tid}|${s.pid}|${s.date}|${s.time}">
+          <span class="board__time">${s.time}</span>
+          <span class="board__day">${dayLabel(s.at)} · ${esc(PLACES[s.pid].nazwa)}</span>
+          <span class="board__line"><span class="swatch" style="--c:${l.kolor}"></span>${esc(l.problem)}${icon('arrow', 'board__go')}</span>
+          <span class="board__who">${esc(t.imie)}</span>
+        </button></li>`;
+      })
+      .join('');
+  }
+
+  /* ── Pięć linii w pierwszym ekranie ──────────────────────────────────── */
+  function renderLines() {
+    const lens = [60, 47, 66, 39, 53];
+    const mr = [0, 14, 4, 22, 9];
+    $('#lines').innerHTML = K.linie
+      .map((l, i) => {
+        const people = K.zespol.filter((t) => t.linie.includes(l.id)).length;
+        const from = Math.min(...l.uslugi.map((u) => u.cena));
+        return `<button class="line" type="button" role="listitem" data-line="${l.id}"
+            style="--c:${l.kolor};--on:${l.naKolorze};--len-base:${lens[i]}%;--mr:${mr[i]}%;--i:${i}"
+            aria-label="${esc(l.problem)} — ${esc(l.specjalizacja)}. Umów wizytę">
+          <span class="line__stripe" aria-hidden="true"></span>
+          <span class="line__stop" aria-hidden="true"></span>
+          <span class="line__label">
+            <span class="line__name">${esc(l.problem)}</span>
+            <span class="line__meta">${people === 1 ? '1 terapeutka' : `${people} terapeutów`} · od ${zl(from)}</span>
+          </span>
+          ${icon('arrow', 'line__arrow')}
+        </button>`;
+      })
+      .join('');
+  }
+
+  /* ── Specjalizacje ───────────────────────────────────────────────────── */
+  function renderSpecs() {
+    $('#specs').innerHTML = K.linie
+      .map(
+        (l) => `<article class="spec" id="linia-${l.id}" style="--c:${l.kolor};--on:${l.naKolorze}">
+          <div class="spec__text">
+            <h3 class="spec__stripe">${esc(l.problem)}</h3>
+            <p class="spec__desc"><strong>${esc(l.specjalizacja)}.</strong> ${esc(l.opis)}</p>
+            <ul class="chips" aria-label="Z czym przychodzą pacjenci">${l.objawy.map((o) => `<li>${esc(o)}</li>`).join('')}</ul>
+            <ul class="services" aria-label="Usługi i ceny">
+              ${l.uslugi
+                .map(
+                  (u) => `<li><span class="services__name">${esc(u.nazwa)}</span>
+                    <span class="services__time">${u.minuty} min</span>
+                    <span class="services__price">${zl(u.cena)}</span></li>`
+                )
+                .join('')}
+            </ul>
+            <button class="btn btn--color spec__cta" type="button" data-start-line="${l.id}">
+              Umów: ${esc(l.specjalizacja.toLowerCase())} ${icon('arrow')}
+            </button>
+          </div>
+          <figure class="spec__photo">
+            <img class="duo" data-duo="${l.id}" src="${l.zdjecie}" alt="${esc(l.alt)}" width="1800" height="1200" loading="lazy" />
+          </figure>
+        </article>`
+      )
+      .join('');
+  }
+
+  /* ── Zespół ──────────────────────────────────────────────────────────── */
+  function renderTeam() {
+    const filters = [{ id: 'all', label: 'Wszyscy' }, ...K.linie.map((l) => ({ id: l.id, label: l.problem, c: l.kolor }))];
+    $('#team-filters').innerHTML = filters
+      .map(
+        (f) => `<button class="filter" type="button" data-filter="${f.id}" aria-pressed="${f.id === 'all'}">
+          ${f.c ? `<span class="swatch" style="--c:${f.c}"></span>` : ''}${esc(f.label)}</button>`
+      )
+      .join('');
+
+    $('#team').innerHTML = K.zespol
+      .map((t) => {
+        const l = LINES[t.linie[0]];
+        const s = nextSlot({ tid: t.id });
+        const first = t.imie.replace(/^mgr\s+/, '').split(' ')[0];
+        return `<li class="member" data-lines="${t.linie.join(' ')}" style="--c:${l.kolor}">
+          <div class="member__photo">
+            <img class="duo" data-duo="${l.id}" src="${t.zdjecie}" alt="${esc(t.alt)}" width="720" height="900" loading="lazy" />
+            <div class="member__lines" aria-hidden="true">${t.linie.map((id) => `<span style="--c:${LINES[id].kolor}"></span>`).join('')}</div>
+          </div>
+          <div class="member__body">
+            <h3 class="member__name">${esc(t.imie)}</h3>
+            <p class="member__role">${esc(t.rola)}</p>
+            <p class="member__tags">${t.linie
+              .map((id) => `<span><span class="swatch" style="--c:${LINES[id].kolor}"></span>${esc(LINES[id].problem)}</span>`)
+              .join('')}</p>
+            <p class="member__bio">${esc(t.bio)} Języki: ${t.jezyki.join(', ')}.</p>
+            <p class="member__next">Najbliższy termin: <strong>${slotText(s)}</strong></p>
+            <button class="btn btn--line" type="button" data-start-person="${t.id}">Umów u: ${esc(first)}</button>
+          </div>
+        </li>`;
+      })
+      .join('');
+
+    $('#team-filters').addEventListener('click', (e) => {
+      const b = e.target.closest('.filter');
+      if (!b) return;
+      const id = b.dataset.filter;
+      $$('.filter').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      $$('.member').forEach((m) => {
+        const show = id === 'all' || m.dataset.lines.split(' ').includes(id);
+        if (show) {
+          m.hidden = false;
+          requestAnimationFrame(() => m.classList.remove('is-leaving'));
+        } else {
+          m.classList.add('is-leaving');
+          setTimeout(() => m.classList.contains('is-leaving') && (m.hidden = true), reduced ? 0 : 280);
+        }
+      });
+    });
+  }
+
+  /* ── Cennik, opinie, FAQ, stopka ─────────────────────────────────────── */
+  function renderPrices() {
+    $('#prices').innerHTML = K.linie
+      .map(
+        (l) => `<div class="price-group">
+          <h3><span class="swatch" style="--c:${l.kolor}"></span>${esc(l.specjalizacja)}</h3>
+          <table><tbody>${l.uslugi
+            .map((u) => `<tr><td>${esc(u.nazwa)}</td><td>${u.minuty} min</td><td>${zl(u.cena)}</td></tr>`)
+            .join('')}</tbody></table>
+        </div>`
+      )
+      .join('');
+  }
+
+  function renderReviews() {
+    $('#rating-stars').innerHTML = Array.from({ length: 5 }, () => icon('star')).join('');
+    $('#reviews').innerHTML = K.opinie
+      .map((o) => {
+        const l = LINES[o.linia];
+        return `<li class="review rv">
+          <p class="review__line"><span class="swatch" style="--c:${l.kolor}"></span>${esc(l.specjalizacja)}</p>
+          <blockquote>„${esc(o.tekst)}”</blockquote>
+          <p class="review__who">${esc(o.autor)}</p>
+        </li>`;
+      })
+      .join('');
+  }
+
+  function renderFaq() {
+    $('#faq-list').innerHTML = K.faq
+      .map(
+        (f) => `<details><summary>${esc(f.q)}<span class="faq__icon" aria-hidden="true"></span></summary>
+          <p class="faq__a">${esc(f.a)}</p></details>`
+      )
+      .join('');
+  }
+
+  const linesAt = (pid) =>
+    K.linie.filter((l) => K.zespol.some((t) => t.linie.includes(l.id) && t.grafik[pid]));
+
+  function renderPlaces() {
+    $('#places').innerHTML = K.lokalizacje
+      .map((p) => {
+        const s = nextSlot({ pid: p.id });
+        const route = `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`;
+        return `<li class="place" data-place="${p.id}">
+          <h3 class="place__name">${esc(p.nazwa)}</h3>
+          <div class="place__lines" aria-label="Specjalizacje w tym gabinecie: ${linesAt(p.id).map((l) => l.specjalizacja).join(', ')}">
+            ${linesAt(p.id).map((l) => `<span class="swatch" style="--c:${l.kolor}" title="${esc(l.specjalizacja)}"></span>`).join('')}
+          </div>
+          <address class="place__addr">${esc(p.adres)}<br />${esc(p.kod)}</address>
+          <dl class="place__hours">${p.godziny.map(([d, h]) => `<dt>${d}</dt><dd>${h}</dd>`).join('')}</dl>
+          <p class="place__more">${p.udogodnienia.map(esc).join(' · ')}</p>
+          <p class="place__more">Najbliższy wolny termin: <strong>${slotText(s)}</strong></p>
+          <div class="place__actions">
+            <button class="btn btn--line" type="button" data-show-place="${p.id}">${icon('pin')}Pokaż na mapie</button>
+            <a class="btn btn--line" href="${route}" target="_blank" rel="noopener">${icon('route')}Wyznacz trasę</a>
+            <button class="btn btn--ink" type="button" data-start-place="${p.id}">Umów tutaj</button>
+          </div>
+        </li>`;
+      })
+      .join('');
+
+    $('#foot-places').innerHTML = `<p class="foot__h">Gabinety</p><div class="foot__places">${K.lokalizacje
+      .map((p) => `<p><strong>${esc(p.nazwa)}</strong>${esc(p.adres)}<br />${esc(p.kod)}</p>`)
+      .join('')}</div>`;
+  }
+
+  /* ── Mapa ────────────────────────────────────────────────────────────── */
+  let map = null;
+  const markers = {};
+
+  function initMap() {
+    const box = $('#map');
+    const fail = () => {
+      $('#map-fallback').hidden = false;
+    };
+    if (!window.L) return fail();
+
+    map = L.map(box, { scrollWheelZoom: false, zoomControl: true, attributionControl: true });
+    let tileErrors = 0;
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19,
+      subdomains: 'abcd',
+      attribution: '&copy; OpenStreetMap &copy; CARTO',
+    })
+      .on('tileerror', () => ++tileErrors > 6 && fail())
+      .addTo(map);
+
+    K.lokalizacje.forEach((p) => {
+      const stops = linesAt(p.id).map((l) => `<i style="--c:${l.kolor}"></i>`).join('');
+      const html = `<div class="pin" data-pin="${p.id}"><div class="pin__head"><span class="pin__stops">${stops}</span>${esc(p.nazwa)}</div><div class="pin__tail"></div></div>`;
+      const m = L.marker([p.lat, p.lng], {
+        icon: L.divIcon({ className: '', html, iconSize: [140, 48], iconAnchor: [70, 48] }),
+        title: `Linia Ruchu — ${p.nazwa}`,
+        keyboard: true,
+      }).addTo(map);
+      m.on('click', () => focusPlace(p.id, false));
+      markers[p.id] = m;
+    });
+
+    map.fitBounds(
+      L.latLngBounds(K.lokalizacje.map((p) => [p.lat, p.lng])),
+      { padding: [70, 70] }
+    );
+  }
+
+  function focusPlace(pid, fly = true) {
+    $$('.place').forEach((x) => x.classList.toggle('is-active', x.dataset.place === pid));
+    $$('.pin').forEach((x) => x.classList.toggle('is-active', x.dataset.pin === pid));
+    const p = PLACES[pid];
+    if (map && fly) map.flyTo([p.lat, p.lng], 15, { duration: reduced ? 0 : 1.1 });
+    if (window.innerWidth < 980 && fly) $('#map').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' });
+  }
+
+  /* ── Rezerwacja ──────────────────────────────────────────────────────── */
+  const STEPS = [
+    { id: 'usluga', label: 'Usługa' },
+    { id: 'specjalista', label: 'Specjalista' },
+    { id: 'miejsce', label: 'Gabinet' },
+    { id: 'termin', label: 'Termin' },
+    { id: 'dane', label: 'Twoje dane' },
+  ];
+
+  const B = {
+    step: 0,
+    line: null,
+    service: null,
+    tid: null, // id albo 'any'
+    pid: null,
+    date: null,
+    time: null,
+    slotTid: null, // faktyczny terapeuta wybranego terminu
+    data: { name: '', phone: '', email: '', note: '', first: true, sms: true, consent: false },
+    done: null,
+  };
+
+  const lineOf = () => LINES[B.line];
+
+  function complete(i) {
+    return [!!B.service, !!B.tid, !!B.pid, !!(B.date && B.time), false][i];
+  }
+
+  function firstOpen() {
+    for (let i = 0; i < 4; i++) if (!complete(i)) return i;
+    return 4;
+  }
+
+  /** Czyści wybory, które przestały pasować po zmianie wcześniejszego kroku. */
+  function reconcile() {
+    if (B.service && SERVICES[B.service].linia !== B.line) B.service = null;
+    if (B.tid && B.tid !== 'any' && !TEAM[B.tid].linie.includes(B.line)) B.tid = null;
+    const places = placesForChoice();
+    if (B.pid && !places.includes(B.pid)) B.pid = null;
+    if (B.date && B.time) {
+      const ok = findSlots({ line: B.line, tid: B.tid, pid: B.pid, date: B.date }).some(
+        (s) => s.time === B.time && (B.tid === 'any' || s.tid === B.tid)
+      );
+      if (!ok) B.date = B.time = B.slotTid = null;
+    }
+  }
+
+  function placesForChoice() {
+    if (!B.line) return [];
+    const people = B.tid && B.tid !== 'any' ? [TEAM[B.tid]] : K.zespol.filter((t) => t.linie.includes(B.line));
+    return K.lokalizacje.map((p) => p.id).filter((pid) => people.some((t) => t.grafik[pid]));
+  }
+
+  function mountBooking() {
+    $('#booking').innerHTML = `
+      <div class="booking__main" id="booking-main"></div>
+      <aside class="rail" aria-labelledby="rail-title">
+        <h3 class="rail__title" id="rail-title">Twoja wizyta</h3>
+        <ol class="rail__stops" id="rail-stops"></ol>
+        <div class="rail__sum"><span id="rail-meta">Wybierz usługę</span><strong id="rail-price">—</strong></div>
+      </aside>`;
+    renderBooking(false);
+  }
+
+  function renderRail() {
+    const l = lineOf();
+    const svc = B.service && SERVICES[B.service];
+    const who =
+      B.tid === 'any'
+        ? B.slotTid
+          ? `Pierwszy wolny: ${TEAM[B.slotTid].imie}`
+          : 'Pierwszy wolny specjalista'
+        : B.tid && TEAM[B.tid].imie;
+    const when = B.date && B.time ? `${dayLong(fromIso(B.date))}, ${B.time}` : null;
+    const values = [
+      svc ? `${svc.nazwa}` : l ? `${l.specjalizacja} — wybierz usługę` : null,
+      who,
+      B.pid && `${PLACES[B.pid].nazwa}, ${PLACES[B.pid].adres}`,
+      when,
+      B.done ? B.data.name : null,
+    ];
+    const doneCount = B.done ? 5 : [0, 1, 2, 3].filter(complete).length;
+    $('#rail-stops').style.setProperty('--rail', String(Math.min(doneCount, 4) / 4));
+    $('#rail-stops').innerHTML = STEPS.map((s, i) => {
+      const isDone = B.done || complete(i);
+      const cur = !B.done && B.step === i;
+      return `<li class="rail__stop${isDone ? ' is-done' : ''}${cur ? ' is-current' : ''}">
+        <span class="rail__dot" aria-hidden="true"></span>
+        <span class="rail__label">${s.label}</span>
+        <span class="rail__value${values[i] ? '' : ' is-empty'}">${values[i] ? esc(values[i]) : 'jeszcze nie wybrano'}</span>
+        ${isDone && !B.done && i < 4 && !cur ? `<button class="rail__edit" type="button" data-goto="${i}">Zmień<span class="visually-hidden"> — ${s.label}</span></button>` : ''}
+      </li>`;
+    }).join('');
+    $('#rail-meta').textContent = svc ? `${svc.minuty} min · płatne na miejscu` : 'Wybierz usługę';
+    $('#rail-price').textContent = svc ? zl(svc.cena) : '—';
+  }
+
+  function stepShell(i, title, body, { next = true, nextLabel = 'Dalej', nextDisabled = false } = {}) {
+    return `<fieldset class="step is-entering" data-step="${i}">
+      <p class="step__count">Krok ${i + 1} z ${STEPS.length}</p>
+      <legend class="step__title" tabindex="-1">${title}</legend>
+      ${body}
+      <div class="step__nav">
+        ${i > 0 ? `<button class="back" type="button" data-goto="${i - 1}">${icon('back')}Wstecz</button>` : '<span></span>'}
+        ${next ? `<button class="btn btn--ink" type="button" data-next ${nextDisabled ? 'disabled' : ''}>${nextLabel}${icon('arrow')}</button>` : ''}
+      </div>
+    </fieldset>`;
+  }
+
+  function viewService() {
+    const body = `
+      <div class="options" role="radiogroup" aria-label="Czego dotyczy wizyta">
+        ${K.linie
+          .map(
+            (l) => `<button class="opt" type="button" role="radio" aria-checked="${B.line === l.id}" data-pick-line="${l.id}" style="--c:${l.kolor}">
+              <span class="opt__lead"><span class="swatch" style="--c:${l.kolor}"></span></span>
+              <span class="opt__title">${esc(l.problem)}</span>
+              <span class="opt__sub">${esc(l.specjalizacja)}</span>
+            </button>`
+          )
+          .join('')}
+      </div>
+      ${
+        B.line
+          ? `<h4 class="sub-h">Rodzaj wizyty</h4>
+        <div class="options options--wide" role="radiogroup" aria-label="Rodzaj wizyty">
+          ${lineOf()
+            .uslugi.map(
+              (u) => `<button class="opt" type="button" role="radio" aria-checked="${B.service === u.id}" data-pick-service="${u.id}" style="--c:${lineOf().kolor}">
+                <span class="opt__lead"><span class="swatch" style="--c:${lineOf().kolor}"></span></span>
+                <span class="opt__title">${esc(u.nazwa)}</span>
+                <span class="opt__sub">${u.minuty} minut${u.id.endsWith('1') ? ' · polecana na pierwszą wizytę' : ''}</span>
+                <span class="opt__aside">${zl(u.cena)}</span>
+              </button>`
+            )
+            .join('')}
+        </div>`
+          : ''
+      }`;
+    return stepShell(0, 'Czego dotyczy wizyta?', body, { nextDisabled: !B.service });
+  }
+
+  function viewPerson() {
+    const l = lineOf();
+    const people = K.zespol.filter((t) => t.linie.includes(B.line));
+    const anyNext = nextSlot({ line: B.line });
+    const body = `<div class="options options--wide" role="radiogroup" aria-label="Wybierz specjalistę">
+      <button class="opt" type="button" role="radio" aria-checked="${B.tid === 'any'}" data-pick-person="any" style="--c:${l.kolor}">
+        <span class="opt__lead"><span class="opt__any">${icon('people')}</span></span>
+        <span class="opt__title">Pierwszy wolny specjalista</span>
+        <span class="opt__sub">Najszybciej: ${slotText(anyNext)}</span>
+      </button>
+      ${people
+        .map((t) => {
+          const s = nextSlot({ tid: t.id });
+          return `<button class="opt" type="button" role="radio" aria-checked="${B.tid === t.id}" data-pick-person="${t.id}" style="--c:${l.kolor}">
+            <span class="opt__lead"><img class="opt__avatar duo" data-duo="${t.linie[0]}" src="${t.zdjecie}" alt="" width="96" height="96" /></span>
+            <span class="opt__title">${esc(t.imie)}</span>
+            <span class="opt__sub">${esc(t.rola)} · najbliżej: ${slotText(s)}</span>
+          </button>`;
+        })
+        .join('')}
+    </div>`;
+    return stepShell(1, 'U kogo?', body, { nextDisabled: !B.tid });
+  }
+
+  function viewPlace() {
+    const l = lineOf();
+    const ids = placesForChoice();
+    const body = `<div class="options options--wide" role="radiogroup" aria-label="Wybierz gabinet">
+      ${ids
+        .map((pid) => {
+          const p = PLACES[pid];
+          const s = nextSlot({ line: B.line, tid: B.tid, pid });
+          return `<button class="opt" type="button" role="radio" aria-checked="${B.pid === pid}" data-pick-place="${pid}" style="--c:${l.kolor}">
+            <span class="opt__lead"><span class="opt__any" style="background:var(--floor-2);color:var(--ink)">${icon('pin')}</span></span>
+            <span class="opt__title">${esc(p.nazwa)}</span>
+            <span class="opt__sub">${esc(p.adres)}, ${esc(p.kod)} · najbliżej: ${slotText(s)}</span>
+          </button>`;
+        })
+        .join('')}
+    </div>`;
+    return stepShell(2, 'W którym gabinecie?', body, { nextDisabled: !B.pid });
+  }
+
+  function viewTime() {
+    const l = lineOf();
+    const counts = DAYS.map((d) => findSlots({ line: B.line, tid: B.tid, pid: B.pid, date: iso(d) }).length);
+    if (!B.date) {
+      const idx = counts.findIndex((c) => c > 0);
+      if (idx >= 0) B.date = iso(DAYS[idx]);
+    }
+    const slots = B.date ? findSlots({ line: B.line, tid: B.tid, pid: B.pid, date: B.date }) : [];
+    // Przy „pierwszym wolnym” jedna godzina może mieć kilku terapeutów — pokazujemy godzinę raz.
+    const byTime = [];
+    const seen = new Set();
+    slots.forEach((s) => {
+      if (!seen.has(s.time)) {
+        seen.add(s.time);
+        byTime.push(s);
+      }
+    });
+
+    const body = `
+      <div class="days" role="group" aria-label="Wybierz dzień">
+        ${DAYS.map(
+          (d, i) => `<button class="day" type="button" data-pick-date="${iso(d)}" aria-pressed="${B.date === iso(d)}" ${counts[i] ? '' : 'disabled'}
+              aria-label="${dayLong(d)}: ${counts[i] ? `${counts[i]} wolnych terminów` : 'brak wolnych terminów'}">
+            <span class="day__dow">${DOW[d.getDay()]}</span>
+            <span class="day__num">${d.getDate()}</span>
+            <span class="day__free">${counts[i] ? `${counts[i]} wolne` : 'brak'}</span>
+          </button>`
+        ).join('')}
+      </div>
+      <h4 class="sub-h">${B.date ? `Godziny: ${dayLong(fromIso(B.date))}` : 'Godziny'}</h4>
+      ${
+        byTime.length
+          ? `<div class="slots" role="group" aria-label="Wybierz godzinę" style="--c:${l.kolor};--on:${l.naKolorze}">
+            ${byTime
+              .map((s) => `<button class="slot" type="button" data-pick-time="${s.time}" data-tid="${s.tid}" aria-pressed="${B.time === s.time}">${s.time}</button>`)
+              .join('')}
+          </div>`
+          : `<div class="empty"><strong>Brak wolnych terminów w wybranym układzie.</strong>
+             Wybierz inny gabinet albo „Pierwszy wolny specjalista” — albo zadzwoń: ${esc(K.telefon)}.</div>`
+      }`;
+    return stepShell(3, 'Kiedy?', body, { nextDisabled: !(B.date && B.time) });
+  }
+
+  function viewData(errors = {}) {
+    const d = B.data;
+    const field = (id, label, type, value, extra = '', full = false, auto = '') => `
+      <div class="field${full ? ' field--full' : ''}">
+        <label for="f-${id}">${label}</label>
+        <input id="f-${id}" name="${id}" type="${type}" value="${esc(value)}" ${auto ? `autocomplete="${auto}"` : ''} ${extra}
+          ${errors[id] ? `aria-invalid="true" aria-describedby="e-${id}"` : ''} />
+        ${errors[id] ? `<p class="field__err" id="e-${id}">${errors[id]}</p>` : ''}
+      </div>`;
+    const body = `
+      <div class="fields">
+        ${field('name', 'Imię i nazwisko', 'text', d.name, 'placeholder="Jan Przykładowy"', true, 'name')}
+        ${field('phone', 'Telefon', 'tel', d.phone, 'placeholder="+48 000 000 000" inputmode="tel"', false, 'tel')}
+        ${field('email', 'E-mail', 'email', d.email, 'placeholder="adres@email.com"', false, 'email')}
+        <div class="field field--full">
+          <label for="f-note">Co Ci dolega? <em>(opcjonalnie)</em></label>
+          <textarea id="f-note" name="note" placeholder="Np. ból lędźwi od dwóch tygodni, promieniuje do lewej nogi.">${esc(d.note)}</textarea>
+        </div>
+        <label class="check field--full"><input type="checkbox" name="first" ${d.first ? 'checked' : ''} /> To moja pierwsza wizyta w Linii Ruchu</label>
+        <label class="check field--full"><input type="checkbox" name="sms" ${d.sms ? 'checked' : ''} /> Przypomnij mi SMS-em dzień przed wizytą</label>
+        <div class="field field--full">
+          <label class="check"><input type="checkbox" name="consent" ${d.consent ? 'checked' : ''} ${errors.consent ? 'aria-invalid="true" aria-describedby="e-consent"' : ''} />
+            Zgadzam się na przetwarzanie danych w celu umówienia wizyty (regulamin i polityka prywatności — do uzupełnienia).</label>
+          ${errors.consent ? `<p class="field__err" id="e-consent">${errors.consent}</p>` : ''}
+        </div>
+      </div>
+      <p class="demo-note">Tryb demo: rezerwacja nie zostanie nigdzie wysłana.</p>`;
+    return stepShell(4, 'Twoje dane', body, { nextLabel: 'Potwierdź wizytę' });
+  }
+
+  function viewDone() {
+    const l = lineOf();
+    const svc = SERVICES[B.service];
+    const t = TEAM[B.slotTid || B.tid];
+    const p = PLACES[B.pid];
+    return `<div class="done step is-entering" style="--c:${l.kolor};--on:${l.naKolorze}">
+      <div class="done__mark">${icon('check')}</div>
+      <h3 class="done__title" tabindex="-1">Do zobaczenia ${dayLabel(fromIso(B.date)) === 'jutro' ? 'jutro' : dayLong(fromIso(B.date))}.</h3>
+      <p class="done__code">Numer rezerwacji: <strong>${B.done}</strong></p>
+      <dl class="done__list">
+        <dt>Wizyta</dt><dd>${esc(svc.nazwa)} · ${svc.minuty} min · ${zl(svc.cena)}</dd>
+        <dt>Specjalista</dt><dd>${esc(t.imie)}</dd>
+        <dt>Kiedy</dt><dd>${dayLong(fromIso(B.date))}, ${B.time}</dd>
+        <dt>Gdzie</dt><dd>${esc(p.nazwa)} — ${esc(p.adres)}, ${esc(p.kod)}</dd>
+        <dt>Potwierdzenie</dt><dd>${B.data.sms ? 'SMS na ' + esc(B.data.phone) : 'e-mail na ' + esc(B.data.email)}</dd>
+      </dl>
+      <div class="done__actions">
+        <button class="btn btn--color" type="button" data-ics>${icon('calendar')}Dodaj do kalendarza</button>
+        <a class="btn btn--line" href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}" target="_blank" rel="noopener">${icon('route')}Wyznacz trasę</a>
+        <button class="back" type="button" data-restart>Umów kolejną wizytę</button>
+      </div>
+      <p class="demo-note">Tryb demo: w prawdziwym wdrożeniu rezerwacja trafia do kalendarza gabinetu, a pacjent dostaje SMS z przypomnieniem.</p>
+    </div>`;
+  }
+
+  function renderBooking(focus = true, errors) {
+    const main = $('#booking-main');
+    if (!main) return;
+    setGuide(B.line);
+    if (B.done) main.innerHTML = viewDone();
+    else main.innerHTML = [viewService, viewPerson, viewPlace, viewTime, () => viewData(errors)][B.step]();
+    renderRail();
+    if (focus) {
+      const target = errors ? $('[aria-invalid="true"]', main) : $('.step__title, .done__title', main);
+      target && target.focus({ preventScroll: true });
+      const top = $('#booking').getBoundingClientRect().top;
+      if (top < 0 || top > window.innerHeight * 0.6) {
+        $('#rezerwacja').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+      }
+    }
+  }
+
+  function goto(i) {
+    B.step = Math.max(0, Math.min(4, i));
+    B.done = null;
+    renderBooking();
+  }
+
+  function readForm() {
+    const main = $('#booking-main');
+    const val = (n) => ($(`[name="${n}"]`, main) || {}).value || '';
+    const chk = (n) => !!($(`[name="${n}"]`, main) || {}).checked;
+    B.data = {
+      name: val('name').trim(),
+      phone: val('phone').trim(),
+      email: val('email').trim(),
+      note: val('note').trim(),
+      first: chk('first'),
+      sms: chk('sms'),
+      consent: chk('consent'),
+    };
+  }
+
+  function validate() {
+    const d = B.data;
+    const e = {};
+    if (d.name.length < 3) e.name = 'Podaj imię i nazwisko.';
+    if (d.phone.replace(/\D/g, '').length < 9) e.phone = 'Podaj numer telefonu — wyślemy na niego przypomnienie.';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)) e.email = 'Sprawdź adres e-mail — brakuje w nim „@” albo domeny.';
+    if (!d.consent) e.consent = 'Bez tej zgody nie możemy zapisać wizyty.';
+    return e;
+  }
+
+  function confirm() {
+    readForm();
+    const errors = validate();
+    if (Object.keys(errors).length) return renderBooking(true, errors);
+    const letters = 'ABCDEFGHJKLMNPRSTUWXYZ23456789';
+    B.done = 'LR-' + Array.from({ length: 5 }, () => letters[Math.floor(Math.random() * letters.length)]).join('');
+    try {
+      localStorage.setItem(
+        'linia-ruchu-wizyta',
+        JSON.stringify({ code: B.done, date: B.date, time: B.time, service: B.service, tid: B.slotTid || B.tid, pid: B.pid })
+      );
+    } catch (_) {}
+    renderBooking();
+    toast(`Wizyta zarezerwowana: ${dayLabel(fromIso(B.date))}, ${B.time}`);
+  }
+
+  function downloadIcs() {
+    const svc = SERVICES[B.service];
+    const t = TEAM[B.slotTid || B.tid];
+    const p = PLACES[B.pid];
+    const start = fromIso(B.date);
+    const [h, m] = B.time.split(':').map(Number);
+    start.setHours(h, m, 0, 0);
+    const end = new Date(start.getTime() + svc.minuty * 60000);
+    const f = (d) =>
+      `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}T${String(d.getHours()).padStart(2, '0')}${String(d.getMinutes()).padStart(2, '0')}00`;
+    const ics = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Linia Ruchu//Demo//PL',
+      'BEGIN:VEVENT',
+      `UID:${B.done}@linia-ruchu.demo`,
+      `DTSTART:${f(start)}`,
+      `DTEND:${f(end)}`,
+      `SUMMARY:${svc.nazwa} — Linia Ruchu`,
+      `DESCRIPTION:${t.imie}. Numer rezerwacji ${B.done}. Zabierz wygodny strój.`,
+      `LOCATION:${p.adres}\\, ${p.kod}`,
+      'END:VEVENT',
+      'END:VCALENDAR',
+    ].join('\r\n');
+    const url = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }));
+    const a = Object.assign(document.createElement('a'), { href: url, download: `wizyta-${B.done}.ics` });
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  /** Wejście do rezerwacji z dowolnego miejsca strony, z tym, co już wiadomo. */
+  function startBooking(pre = {}) {
+    B.done = null;
+    if (pre.line) B.line = pre.line;
+    if (pre.tid) {
+      B.tid = pre.tid;
+      if (!B.line || !TEAM[pre.tid].linie.includes(B.line)) B.line = TEAM[pre.tid].linie[0];
+    }
+    if (pre.pid) B.pid = pre.pid;
+    if (pre.date) {
+      B.date = pre.date;
+      B.time = pre.time;
+      B.slotTid = pre.tid;
+    }
+    if (pre.line && !pre.tid) {
+      B.service = null;
+      B.date = B.time = B.slotTid = null;
+    }
+    if (pre.date && !B.service) B.service = LINES[B.line].uslugi[0].id;
+    reconcile();
+    B.step = pre.date && B.service ? 4 : !B.line || !B.service ? 0 : firstOpen();
+    renderBooking(true);
+  }
+
+  function onBookingClick(e) {
+    const t = e.target.closest('button');
+    if (!t || !$('#booking').contains(t)) return;
+    const d = t.dataset;
+    if (d.pickLine) {
+      B.line = d.pickLine;
+      reconcile();
+      renderBooking(false);
+      const first = $('[data-pick-service]', $('#booking-main'));
+      first && first.focus();
+    } else if (d.pickService) {
+      B.service = d.pickService;
+      goto(firstOpen());
+    } else if (d.pickPerson) {
+      B.tid = d.pickPerson;
+      B.slotTid = null;
+      reconcile();
+      const places = placesForChoice();
+      if (places.length === 1) B.pid = places[0];
+      goto(firstOpen());
+    } else if (d.pickPlace) {
+      B.pid = d.pickPlace;
+      reconcile();
+      goto(firstOpen());
+    } else if (d.pickDate) {
+      B.date = d.pickDate;
+      B.time = B.slotTid = null;
+      renderBooking(false);
+      const s = $('.slot', $('#booking-main'));
+      s && s.focus();
+    } else if (d.pickTime) {
+      B.time = d.pickTime;
+      B.slotTid = d.tid;
+      goto(4);
+    } else if ('goto' in d) {
+      if (B.step === 4) readForm();
+      goto(Number(d.goto));
+    } else if ('next' in d) {
+      if (B.step === 4) confirm();
+      else goto(firstOpen() > B.step ? firstOpen() : B.step + 1);
+    } else if ('ics' in d) {
+      downloadIcs();
+    } else if ('restart' in d) {
+      Object.assign(B, { step: 0, line: null, service: null, tid: null, pid: null, date: null, time: null, slotTid: null, done: null });
+      B.data.consent = false;
+      renderBooking();
+    }
+  }
+
+  /* ── Komunikat ───────────────────────────────────────────────────────── */
+  let toastTimer;
+  function toast(msg) {
+    const el = $('#toast');
+    el.textContent = msg;
+    el.classList.add('is-on');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('is-on'), 4200);
+  }
+
+  /* ── Linia przewodnia, przystanki, nawigacja ─────────────────────────── */
+  function initGuide() {
+    const journey = $('#journey');
+    const fill = $('#guide-fill');
+    const stops = $$('.stop', journey);
+    let ticking = false;
+
+    const update = () => {
+      ticking = false;
+      const r = journey.getBoundingClientRect();
+      const probe = window.innerHeight * 0.55;
+      const progress = Math.min(1, Math.max(0, (probe - r.top) / r.height));
+      fill && fill.style.setProperty('--progress', progress.toFixed(4));
+      stops.forEach((s) => s.classList.toggle('is-passed', s.getBoundingClientRect().top < probe));
+      $('#top').classList.toggle('is-stuck', window.scrollY > 8);
+    };
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    update();
+
+    const links = $$('.nav a');
+    const io = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((en) => {
+          if (!en.isIntersecting) return;
+          links.forEach((a) => a.setAttribute('aria-current', String(a.getAttribute('href') === `#${en.target.id}`)));
+        }),
+      { rootMargin: '-45% 0px -50% 0px' }
+    );
+    stops.forEach((s) => io.observe(s));
+  }
+
+  /* ── Wejścia elementów ───────────────────────────────────────────────── */
+  function initReveals() {
+    $$('.visit__step').forEach((el, i) => el.style.setProperty('--i', i));
+    const targets = [...$$('.spec'), $('#visit-steps'), $('.finale'), ...$$('.rv')].filter(Boolean);
+    if (reduced || !('IntersectionObserver' in window)) {
+      targets.forEach((t) => t.classList.add('is-in'));
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((en) => {
+          if (en.isIntersecting) {
+            en.target.classList.add('is-in');
+            io.unobserve(en.target);
+          }
+        }),
+      { rootMargin: '0px 0px -12% 0px', threshold: 0.12 }
+    );
+    targets.forEach((t) => io.observe(t));
+  }
+
+  /* ── Globalne kliknięcia ─────────────────────────────────────────────── */
+  function initClicks() {
+    document.addEventListener('click', (e) => {
+      const el = e.target.closest('a, button');
+      if (!el) return;
+      const d = el.dataset;
+
+      if (el.matches('.line')) return startBooking({ line: d.line });
+      if (d.startLine) return startBooking({ line: d.startLine });
+      if (d.startPerson) return startBooking({ tid: d.startPerson });
+      if (d.startPlace) {
+        B.pid = d.startPlace;
+        return startBooking({ pid: d.startPlace });
+      }
+      if (d.showPlace) return focusPlace(d.showPlace);
+      if (d.slot) {
+        const [tid, pid, date, time] = d.slot.split('|');
+        return startBooking({ tid, pid, date, time });
+      }
+      if ('book' in d) {
+        e.preventDefault();
+        $('#rezerwacja').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+        setTimeout(() => {
+          const t = $('.step__title, .done__title', $('#booking-main'));
+          t && t.focus({ preventScroll: true });
+        }, reduced ? 0 : 600);
+      }
+    });
+
+    $('#booking').addEventListener('click', onBookingClick);
+
+    const bar = $('#demo-bar');
+    try {
+      if (sessionStorage.getItem('demo-bar-off')) bar.remove();
+    } catch (_) {}
+    $('.demo-bar__close', bar)?.addEventListener('click', () => {
+      bar.remove();
+      try {
+        sessionStorage.setItem('demo-bar-off', '1');
+      } catch (_) {}
+    });
+  }
+
+  /* ── Start ───────────────────────────────────────────────────────────── */
+  renderLines();
+  renderBoard();
+  renderSpecs();
+  renderTeam();
+  renderPrices();
+  renderReviews();
+  renderFaq();
+  renderPlaces();
+  mountBooking();
+  initClicks();
+  initGuide();
+  initReveals();
+
+  const fin = nextSlot();
+  $('#finale-next').textContent = fin ? `${dayLabel(fin.at)}, ${fin.time} — ${TEAM[fin.tid].imie}` : 'zadzwoń, znajdziemy miejsce';
+
+  // Linie wjeżdżają dopiero, gdy krój jest gotowy — inaczej podpisy przeskoczą.
+  const reveal = () => requestAnimationFrame(() => $('#lines').classList.add('is-in'));
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(reveal);
+  setTimeout(reveal, 900);
+
+  // Leaflet ładuje się z opóźnieniem (defer) — mapa startuje, gdy jest gotowy.
+  if (window.L) initMap();
+  else window.addEventListener('load', initMap, { once: true });
+
+  // Powrót pacjenta z zarezerwowaną wizytą.
+  try {
+    const saved = JSON.parse(localStorage.getItem('linia-ruchu-wizyta') || 'null');
+    if (saved && fromIso(saved.date) >= today) {
+      setTimeout(() => toast(`Twoja wizyta: ${dayLabel(fromIso(saved.date))}, ${saved.time} · nr ${saved.code}`), 1400);
+    }
+  } catch (_) {}
+})();

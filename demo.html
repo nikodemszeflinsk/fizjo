@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Linia Ruchu — klinika fizjoterapii · [Twoje Miasto]</title>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+  <meta name="description" content="Fizjoterapia kręgosłupa, sportowa, ortopedyczna, uroginekologiczna i dziecięca. Pięć specjalizacji, trzy lokalizacje, rezerwacja online 24/7." />
+  <meta name="theme-color" content="#EDEFEC" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+  <link rel="stylesheet" href="assets/css/site.css" />
+  <script>document.documentElement.classList.add('js');</script>
+</head>
+<body>
+  <a class="skip" href="#tresc">Przejdź do treści</a>
+
+  <!-- Pasek dla leada: mówi, że to demo, i prowadzi do karty produktu. -->
+  <aside class="demo-bar" id="demo-bar" aria-label="Informacja o demo">
+    <p>
+      <strong>To jest demo</strong> przygotowane przez <span data-k="agencja">Studio Widok</span>.
+      Tak może wyglądać strona Twojego gabinetu.
+    </p>
+    <a class="demo-bar__link" href="index.html">
+      Co to daje Twojemu gabinetowi
+      <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
+    </a>
+    <button class="demo-bar__close" type="button" aria-label="Ukryj pasek demo">
+      <svg aria-hidden="true" viewBox="0 0 20 20"><path d="m5 5 10 10M15 5 5 15" /></svg>
+    </button>
+  </aside>
+
+  <header class="top" id="top">
+    <div class="top__in">
+      <a class="brand" href="#tresc" aria-label="Linia Ruchu — strona główna">
+        <svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true">
+          <path d="M3 34h14a6 6 0 0 0 6-6V6" style="stroke: var(--l-kregoslup)" />
+          <path d="M3 29h10a5 5 0 0 0 5-5V6" style="stroke: var(--l-sport)" />
+          <path d="M3 24h6a4 4 0 0 0 4-4V6" style="stroke: var(--l-uraz)" />
+          <path d="M28 6v28" style="stroke: var(--l-ciaza)" />
+          <path d="M34 6v28" style="stroke: var(--l-dzieci)" />
+        </svg>
+        <span class="brand__name">Linia Ruchu</span>
+      </a>
+
+      <nav class="nav" aria-label="Nawigacja główna">
+        <ul>
+          <li><a href="#specjalizacje">Specjalizacje</a></li>
+          <li><a href="#zespol">Zespół</a></li>
+          <li><a href="#pierwsza-wizyta">Pierwsza wizyta</a></li>
+          <li><a href="#cennik">Cennik</a></li>
+          <li><a href="#lokalizacje">Lokalizacje</a></li>
+        </ul>
+      </nav>
+
+      <div class="top__actions">
+        <a class="phone" href="tel:+48000000000">
+          <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M6.6 3.5 8 6.8 6.4 8.2a9.5 9.5 0 0 0 5.4 5.4l1.4-1.6 3.3 1.4-.6 2.6c-.1.5-.6.9-1.1.9A13.4 13.4 0 0 1 2.1 4.2c0-.5.4-1 .9-1.1z" /></svg>
+          <span data-k="telefon">+48 000 000 000</span>
+        </a>
+        <a class="btn btn--ink" href="#rezerwacja" data-book>Umów wizytę</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="tresc">
+    <!-- ── Pierwszy ekran ─────────────────────────────────────────── -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero__grid">
+        <div class="hero__copy">
+          <h1 class="hero__title" id="hero-title">
+            <span>Co Cię boli?</span>
+            <span>Idź za kolorem.</span>
+          </h1>
+          <p class="hero__lead">
+            Pięć specjalizacji, jedna klinika. Wybierz swój problem, a zaprowadzimy Cię do właściwego
+            fizjoterapeuty i najbliższego wolnego terminu. Rezerwacja zajmuje mniej niż minutę.
+          </p>
+          <div class="hero__cta">
+            <a class="btn btn--ink btn--lg" href="#rezerwacja" data-book>Umów wizytę online</a>
+            <a class="btn btn--line btn--lg" href="tel:+48000000000">Zadzwoń: <span data-k="telefon">+48 000 000 000</span></a>
+          </div>
+          <ul class="hero__facts">
+            <li><strong>3 lokalizacje</strong> w <span data-k="miasto">[Twoje Miasto]</span></li>
+            <li><strong>Bez skierowania</strong>, faktura na żądanie</li>
+            <li><strong>4,9 / 5</strong> w opiniach Google <em>(przykład)</em></li>
+          </ul>
+        </div>
+
+        <!-- Tablica kierunkowa z najbliższymi terminami — dane z tego samego kalendarza co rezerwacja. -->
+        <aside class="board" aria-labelledby="board-title">
+          <div class="board__head">
+            <h2 class="board__title" id="board-title">Najbliższe wolne terminy</h2>
+            <span class="board__live"><span class="board__dot" aria-hidden="true"></span>z grafiku</span>
+          </div>
+          <ol class="board__rows" id="board-rows"></ol>
+          <a class="board__more" href="#rezerwacja" data-book>
+            Wszystkie terminy
+            <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
+          </a>
+        </aside>
+      </div>
+
+      <!-- Pięć linii specjalizacji: każda jest przyciskiem, który otwiera rezerwację na swojej linii. -->
+      <div class="lines" id="lines" role="list" aria-label="Wybierz swój problem"></div>
+    </section>
+
+    <!-- Linia przewodnia przez całą stronę; sekcje są jej przystankami. -->
+    <div class="journey" id="journey">
+      <div class="guide" aria-hidden="true"><span class="guide__fill" id="guide-fill"></span></div>
+
+      <!-- ── Specjalizacje ──────────────────────────────────────── -->
+      <section class="stop" id="specjalizacje" aria-labelledby="specjalizacje-title">
+        <header class="stop__head">
+          <h2 class="stop__title" id="specjalizacje-title">Pięć linii leczenia</h2>
+          <p class="stop__lead">
+            Każda specjalizacja ma swoich terapeutów, swój sprzęt i swój kolor. Wiesz, dokąd idziesz,
+            zanim wejdziesz do gabinetu.
+          </p>
+        </header>
+        <div class="specs" id="specs"></div>
+      </section>
+
+      <!-- ── Zespół ──────────────────────────────────────────────── -->
+      <section class="stop" id="zespol" aria-labelledby="zespol-title">
+        <header class="stop__head">
+          <h2 class="stop__title" id="zespol-title">Zespół</h2>
+          <p class="stop__lead">
+            Pięcioro fizjoterapeutów z magisterium i kursami specjalistycznymi. Wybierz osobę albo
+            linię, a pokażemy najbliższy termin.
+          </p>
+        </header>
+        <div class="filters" id="team-filters" role="group" aria-label="Filtruj zespół według specjalizacji"></div>
+        <ul class="team" id="team"></ul>
+      </section>
+
+      <!-- ── Rezerwacja ──────────────────────────────────────────── -->
+      <section class="stop stop--booking" id="rezerwacja" aria-labelledby="rezerwacja-title">
+        <header class="stop__head">
+          <h2 class="stop__title" id="rezerwacja-title">Umów wizytę</h2>
+          <p class="stop__lead">
+            Pięć kroków, każdy możesz cofnąć. Termin jest Twój od razu, a potwierdzenie przyjdzie SMS-em.
+          </p>
+        </header>
+        <div class="booking" id="booking">
+          <noscript>
+            <p class="booking__noscript">
+              Rezerwacja online wymaga JavaScriptu. Zadzwoń: +48 000 000 000 albo napisz: adres@email.com.
+            </p>
+          </noscript>
+        </div>
+      </section>
+
+      <!-- ── Pierwsza wizyta ─────────────────────────────────────── -->
+      <section class="stop" id="pierwsza-wizyta" aria-labelledby="pw-title">
+        <header class="stop__head">
+          <h2 class="stop__title" id="pw-title">Jak wygląda pierwsza wizyta</h2>
+          <p class="stop__lead">
+            Sześćdziesiąt minut, cztery etapy. Wychodzisz z wiedzą, co Ci jest, i z planem na kolejne tygodnie.
+          </p>
+        </header>
+
+        <div class="visit">
+          <ol class="visit__steps" id="visit-steps">
+            <li class="visit__step">
+              <span class="visit__num">1</span>
+              <h3>Rozmowa</h3>
+              <p>Pytamy, co boli, od kiedy i co pogarsza objawy. Przeglądamy Twoje wyniki badań.</p>
+              <span class="visit__time">ok. 10 min</span>
+            </li>
+            <li class="visit__step">
+              <span class="visit__num">2</span>
+              <h3>Badanie ruchu</h3>
+              <p>Sprawdzamy zakres ruchu, siłę i napięcie mięśni. Szukamy źródła, nie tylko miejsca bólu.</p>
+              <span class="visit__time">ok. 15 min</span>
+            </li>
+            <li class="visit__step">
+              <span class="visit__num">3</span>
+              <h3>Pierwsza terapia</h3>
+              <p>Terapia manualna, praca z tkankami albo ćwiczenia, dobrane do tego, co znaleźliśmy.</p>
+              <span class="visit__time">ok. 25 min</span>
+            </li>
+            <li class="visit__step">
+              <span class="visit__num">4</span>
+              <h3>Plan i ćwiczenia</h3>
+              <p>Dostajesz plan terapii i 2–3 ćwiczenia do domu. Wysyłamy je też mailem, z filmami.</p>
+              <span class="visit__time">ok. 10 min</span>
+            </li>
+          </ol>
+
+          <figure class="visit__photo">
+            <img class="duo" data-duo="ink" src="assets/img/wnetrze-korytarz.jpg"
+                 alt="Jasny korytarz przychodni z ławkami przy ścianie." width="1800" height="1200" loading="lazy" />
+            <figcaption>
+              <strong>Co zabrać:</strong> wygodny strój sportowy i dokumentację, jeśli ją masz.
+              Ręczniki czekają na miejscu.
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <!-- ── Cennik ──────────────────────────────────────────────── -->
+      <section class="stop" id="cennik" aria-labelledby="cennik-title">
+        <header class="stop__head">
+          <h2 class="stop__title" id="cennik-title">Cennik</h2>
+          <p class="stop__lead">
+            Cena obejmuje całą wizytę. Płatność kartą, BLIK-iem lub gotówką. Pakiety 5 wizyt: 10% taniej.
+          </p>
+        </header>
+        <div class="prices" id="prices"></div>
+        <p class="note">Ceny przykładowe.</p>
+      </section>
+
+      <!-- ── Opinie ──────────────────────────────────────────────── -->
+      <section class="stop" id="opinie" aria-labelledby="opinie-title">
+        <header class="stop__head">
+          <h2 class="stop__title" id="opinie-title">Co mówią pacjenci</h2>
+          <p class="stop__lead">
+            <span class="rating">
+              <span class="rating__stars" aria-hidden="true" id="rating-stars"></span>
+              <strong>4,9 / 5</strong>
+            </span>
+            średnia z opinii Google <em>(przykładowe dane)</em>.
+          </p>
+        </header>
+        <ul class="reviews" id="reviews"></ul>
+        <p class="note">Opinie przykładowe, przygotowane na potrzeby demo.</p>
+      </section>
+
+      <!-- ── Lokalizacje ─────────────────────────────────────────── -->
+      <section class="stop" id="lokalizacje" aria-labelledby="lokalizacje-title">
+        <header class="stop__head">
+          <h2 class="stop__title" id="lokalizacje-title">Trzy gabinety w <span data-k="miasto">[Twoje Miasto]</span></h2>
+          <p class="stop__lead">
+            Kolor przy adresie mówi, które specjalizacje przyjmują w danym gabinecie.
+          </p>
+        </header>
+        <div class="places">
+          <ul class="places__list" id="places"></ul>
+          <div class="map-wrap">
+            <div class="map" id="map" role="region" aria-label="Mapa gabinetów"></div>
+            <p class="map-fallback" id="map-fallback" hidden>
+              Mapa potrzebuje połączenia z internetem. Adresy i godziny gabinetów są na liście.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── FAQ ─────────────────────────────────────────────────── -->
+      <section class="stop" id="faq" aria-labelledby="faq-title">
+        <header class="stop__head">
+          <h2 class="stop__title" id="faq-title">Pytania przed pierwszą wizytą</h2>
+        </header>
+        <div class="faq" id="faq-list"></div>
+      </section>
+    </div>
+
+    <!-- ── Zakończenie ─────────────────────────────────────────── -->
+    <section class="finale" aria-labelledby="finale-title">
+      <div class="finale__lines" aria-hidden="true">
+        <span style="background: var(--l-kregoslup)"></span>
+        <span style="background: var(--l-sport)"></span>
+        <span style="background: var(--l-uraz)"></span>
+        <span style="background: var(--l-ciaza)"></span>
+        <span style="background: var(--l-dzieci)"></span>
+      </div>
+      <div class="finale__in">
+        <h2 class="finale__title" id="finale-title">Każda linia kończy się wizytą.</h2>
+        <p>Najbliższy wolny termin: <strong id="finale-next">—</strong></p>
+        <div class="hero__cta">
+          <a class="btn btn--paper btn--lg" href="#rezerwacja" data-book>Umów wizytę</a>
+          <a class="btn btn--ghost btn--lg" href="tel:+48000000000">Zadzwoń: <span data-k="telefon">+48 000 000 000</span></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="foot__in">
+      <div class="foot__brand">
+        <p class="foot__name">Linia Ruchu</p>
+        <p>Klinika fizjoterapii w <span data-k="miasto">[Twoje Miasto]</span></p>
+        <p><a href="tel:+48000000000" data-k="telefon">+48 000 000 000</a><br /><a href="mailto:adres@email.com" data-k="email">adres@email.com</a></p>
+      </div>
+      <div class="foot__col" id="foot-places"></div>
+      <div class="foot__col">
+        <p class="foot__h">Informacje</p>
+        <ul>
+          <li><a href="#faq">Pytania i odpowiedzi</a></li>
+          <li><a href="#cennik">Cennik</a></li>
+          <li><a href="#" aria-disabled="true">Polityka prywatności [do uzupełnienia]</a></li>
+          <li><a href="#" aria-disabled="true">Regulamin rezerwacji [do uzupełnienia]</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot__base">
+      <p>Projekt demonstracyjny — <span data-k="agencja">Studio Widok</span>. Dane kontaktowe, adresy, nazwiska i ceny są przykładowe.</p>
+      <p>Zdjęcia: <a href="https://unsplash.com" rel="noopener">Unsplash</a>, autorzy w pliku <code>assets/img/credits.json</code>.</p>
+    </div>
+  </footer>
+
+  <!-- Pasek akcji na telefonie: rezerwacja i telefon zawsze pod kciukiem. -->
+  <nav class="thumbbar" aria-label="Szybkie akcje">
+    <a class="thumbbar__call" href="tel:+48000000000">
+      <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M6.6 3.5 8 6.8 6.4 8.2a9.5 9.5 0 0 0 5.4 5.4l1.4-1.6 3.3 1.4-.6 2.6c-.1.5-.6.9-1.1.9A13.4 13.4 0 0 1 2.1 4.2c0-.5.4-1 .9-1.1z" /></svg>
+      Zadzwoń
+    </a>
+    <a class="thumbbar__book" href="#rezerwacja" data-book>Umów wizytę</a>
+  </nav>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>
+  <script src="assets/js/data.js" defer></script>
+  <script src="assets/js/app.js" defer></script>
+</body>
+</html>
