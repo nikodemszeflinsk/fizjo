@@ -1624,69 +1624,40 @@ svg path {
 
 .foot {
   margin-top: clamp(40px, 6vw, 72px);
-  background: var(--ink);
-  color: #cfd3d6;
+  padding-top: clamp(32px, 5vw, 56px);
+  background: var(--floor);
+  color: var(--ink-2);
+  overflow: hidden;
 }
 
-.foot :focus-visible {
-  outline-color: #fff;
-}
-
-/* Pięć linii marki wjeżdża od lewej — ten sam znak co w logo. */
-.foot__lines {
-  display: grid;
-  gap: 4px;
-  padding: 26px 0 0;
-}
-
-.foot__lines span {
-  display: block;
-  height: 7px;
-  border-radius: 0 999px 999px 0;
-  background: var(--c);
-}
-
-.foot__lines span:nth-child(1) { width: 34%; }
-.foot__lines span:nth-child(2) { width: 22%; }
-.foot__lines span:nth-child(3) { width: 42%; }
-.foot__lines span:nth-child(4) { width: 15%; }
-.foot__lines span:nth-child(5) { width: 27%; }
-
-.foot__in {
+.foot__top,
+.foot__base {
   max-width: 1000px;
   margin: 0 auto;
-  padding: clamp(32px, 5vw, 56px) clamp(20px, 4vw, 40px) clamp(24px, 3vw, 36px);
+  padding: 0 clamp(20px, 4vw, 40px);
+}
+
+.foot__top {
   display: grid;
-  grid-template-columns: 1.4fr 0.8fr 1fr 1fr;
+  grid-template-columns: 1.5fr 0.7fr 1fr 1fr;
   gap: 28px;
   align-items: start;
 }
 
-.foot__name {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.foot__claim {
   font-family: var(--f-display);
   font-weight: 900;
-  font-size: 1.15rem;
-  color: #fff;
-}
-
-.foot__claim {
-  margin-top: 14px;
-  font-family: var(--f-display);
-  font-weight: 800;
-  font-size: 1.35rem;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  color: #fff;
+  font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: var(--ink);
   text-wrap: balance;
 }
 
 .foot__note {
-  margin-top: 8px;
-  font-size: 0.9rem;
-  max-width: 34ch;
+  margin-top: 10px;
+  max-width: 36ch;
+  font-size: 0.92rem;
 }
 
 .foot__col {
@@ -1703,53 +1674,69 @@ svg path {
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #8f959b;
+  color: var(--muted);
 }
 
 .foot__col a {
   width: max-content;
-  color: #cfd3d6;
+  color: var(--ink-2);
   text-decoration: none;
 }
 
 .foot__col a:hover {
-  color: #fff;
+  color: var(--ink);
   text-decoration: underline;
 }
 
-.foot__cta .cta {
-  margin-top: 4px;
+.foot__col--cta .cta {
+  margin-top: 2px;
 }
 
 .foot__base {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 18px clamp(20px, 4vw, 40px) 30px;
-  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  margin-top: clamp(28px, 4vw, 44px);
+  padding-top: 16px;
+  border-top: 1px solid var(--hair);
   display: flex;
   justify-content: space-between;
   gap: 8px 24px;
   flex-wrap: wrap;
-  font-size: 0.82rem;
-  color: #8f959b;
+  font-size: 0.8rem;
+  color: var(--muted);
 }
 
-.foot__base a {
-  color: #cfd3d6;
+/* Znak firmowy: wielki napis urwany dolną krawędzią strony. */
+.foot__word {
+  margin: clamp(10px, 2vw, 22px) 0 0;
+  padding: 0 clamp(20px, 4vw, 40px);
+  max-width: 1000px;
+  margin-inline: auto;
+  font-family: var(--f-display);
+  font-weight: 900;
+  font-size: clamp(3.1rem, 13.5vw, 9.5rem);
+  line-height: 0.78;
+  letter-spacing: -0.05em;
+  color: var(--ink);
+  white-space: nowrap;
+  user-select: none;
+  translate: 0 0.1em;
 }
 
-@media (max-width: 760px) {
-  .foot__in {
+.foot__word span {
+  color: var(--accent);
+}
+
+@media (max-width: 980px) {
+  .foot__top {
     grid-template-columns: 1fr 1fr;
     gap: 24px;
   }
 
-  .foot__brand,
-  .foot__cta {
+  .foot__say,
+  .foot__col--cta {
     grid-column: 1 / -1;
   }
 
-  .foot__cta .cta {
+  .foot__col--cta .cta {
     width: 100%;
   }
 }
