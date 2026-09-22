@@ -1520,13 +1520,13 @@ svg path {
   .contact {
     grid-template-columns: 1fr;
     break-inside: avoid;
-    padding: 0;
     margin-top: 26px;
-    padding-top: 22px;
+    padding: 20px 22px;
     border-radius: 0;
-    border-top: 4px solid var(--ink);
-    background: #fff;
+    background: var(--floor);
     color: var(--ink);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 
   .contact__title,
