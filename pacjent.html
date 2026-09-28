@@ -12,16 +12,34 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/pacjent.css?v=2" />
+  <link rel="stylesheet" href="assets/css/pacjent.css?v=3" />
 </head>
 <body>
   <main class="karta" id="karta">
     <p class="wczytywanie">Wczytuję Twoją kartę…</p>
   </main>
 
+  <!-- Przełożenie wizyty przez pacjenta -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal__veil" data-close></div>
+    <div class="modal__box" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <header class="modal__head">
+        <h2 id="modal-title">Przełóż wizytę</h2>
+        <button class="modal__close" type="button" data-close aria-label="Zamknij">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" /></svg>
+        </button>
+      </header>
+      <div class="modal__body" id="modal-body"></div>
+      <footer class="modal__foot">
+        <button class="btn btn--linia" type="button" data-close>Anuluj</button>
+        <button class="btn btn--ink" type="button" data-zapisz="przelozenie">Przełóż wizytę</button>
+      </footer>
+    </div>
+  </div>
+
   <div class="toast" id="toast" role="status" aria-live="polite"><span id="toast-text"></span></div>
 
-  <script src="assets/js/store.js?v=1"></script>
-  <script src="assets/js/pacjent.js?v=2"></script>
+  <script src="assets/js/store.js?v=3"></script>
+  <script src="assets/js/pacjent.js?v=4"></script>
 </body>
 </html>

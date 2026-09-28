@@ -11,7 +11,7 @@
   'use strict';
 
   const KLUCZ = 'panel-gabinetu';
-  const WERSJA = 1;
+  const WERSJA = 2;
 
   /* ── Pomocnicze ────────────────────────────────────────────────────── */
   const dzis = new Date();
@@ -51,18 +51,19 @@
       { id: 'u-stanowisko', nazwa: 'Konsultacja z oceną stanowiska', minuty: 60, cena: 230 },
     ];
 
-    /* Biblioteka ćwiczeń — terapeuta wybiera z niej albo dopisuje własne. */
+    /* Biblioteka ćwiczeń — terapeuta wybiera z niej albo dopisuje własne.
+       `rysunek` to id sylwetki rysowanej w karcie pacjenta (assets/js/pacjent.js). */
     const cwiczeniaBiblioteka = [
-      { id: 'c-koci', nazwa: 'Koci grzbiet', opis: 'W klęku podpartym zaokrąglaj i prostuj plecy, powoli, bez bólu.' },
-      { id: 'c-mostek', nazwa: 'Mostek biodrowy', opis: 'Leżąc na plecach unieś biodra, zatrzymaj na 3 sekundy, opuść.' },
-      { id: 'c-ptak', nazwa: 'Ptak-pies', opis: 'W klęku podpartym wyprostuj przeciwną rękę i nogę, utrzymaj 5 sekund.' },
-      { id: 'c-rotacja', nazwa: 'Rotacja odcinka piersiowego', opis: 'Siedząc, obróć tułów w bok i zatrzymaj oddech na 2 sekundy.' },
-      { id: 'c-lopatki', nazwa: 'Ściąganie łopatek', opis: 'Siedząc prosto, ściągnij łopatki do siebie i w dół, przytrzymaj 5 sekund.' },
-      { id: 'c-kark', nazwa: 'Rozciąganie karku', opis: 'Delikatnie przyciągnij ucho do barku, wytrzymaj 20 sekund na stronę.' },
-      { id: 'c-nadgarstek', nazwa: 'Mobilizacja nadgarstka', opis: 'Zegnij i wyprostuj nadgarstek, potem krążenia w obie strony.' },
-      { id: 'c-przysiad', nazwa: 'Przysiad przy ścianie', opis: 'Plecy na ścianie, zejdź do kąta prostego i wytrzymaj.' },
-      { id: 'c-lydka', nazwa: 'Wspięcia na palce', opis: 'Stojąc, unieś się na palce i powoli opuść. Trzymaj się oparcia.' },
-      { id: 'c-balans', nazwa: 'Stanie na jednej nodze', opis: 'Utrzymaj równowagę 30 sekund, potem z zamkniętymi oczami.' },
+      { id: 'c-koci', nazwa: 'Koci grzbiet', opis: 'W klęku podpartym zaokrąglaj i prostuj plecy, powoli, bez bólu.', rysunek: 'kleczenie' },
+      { id: 'c-mostek', nazwa: 'Mostek biodrowy', opis: 'Leżąc na plecach unieś biodra, zatrzymaj na 3 sekundy, opuść.', rysunek: 'lezenie' },
+      { id: 'c-ptak', nazwa: 'Ptak-pies', opis: 'W klęku podpartym wyprostuj przeciwną rękę i nogę, utrzymaj 5 sekund.', rysunek: 'kleczenie' },
+      { id: 'c-rotacja', nazwa: 'Rotacja odcinka piersiowego', opis: 'Siedząc, obróć tułów w bok i zatrzymaj oddech na 2 sekundy.', rysunek: 'siedzenie' },
+      { id: 'c-lopatki', nazwa: 'Ściąganie łopatek', opis: 'Siedząc prosto, ściągnij łopatki do siebie i w dół, przytrzymaj 5 sekund.', rysunek: 'siedzenie' },
+      { id: 'c-kark', nazwa: 'Rozciąganie karku', opis: 'Delikatnie przyciągnij ucho do barku, wytrzymaj 20 sekund na stronę.', rysunek: 'siedzenie' },
+      { id: 'c-nadgarstek', nazwa: 'Mobilizacja nadgarstka', opis: 'Zegnij i wyprostuj nadgarstek, potem krążenia w obie strony.', rysunek: 'siedzenie' },
+      { id: 'c-przysiad', nazwa: 'Przysiad przy ścianie', opis: 'Plecy na ścianie, zejdź do kąta prostego i wytrzymaj.', rysunek: 'sciana' },
+      { id: 'c-lydka', nazwa: 'Wspięcia na palce', opis: 'Stojąc, unieś się na palce i powoli opuść. Trzymaj się oparcia.', rysunek: 'stanie' },
+      { id: 'c-balans', nazwa: 'Stanie na jednej nodze', opis: 'Utrzymaj równowagę 30 sekund, potem z zamkniętymi oczami.', rysunek: 'stanie' },
     ];
 
     const pacjenci = [
@@ -226,6 +227,14 @@
       odhaczenia,
       bol,
       zdarzenia,
+      /* Urlop, przerwa, wyjazd — godziny wycięte z grafiku. */
+      blokady: [
+        { id: id('bl'), data: isoZa(11), od: 8, do: 19, powod: 'Szkolenie — terapia wisceralna' },
+        { id: id('bl'), data: isoZa(12), od: 8, do: 19, powod: 'Szkolenie — terapia wisceralna' },
+        { id: id('bl'), data: isoZa(3), od: 14, do: 19, powod: 'Wyjazd prywatny' },
+      ],
+      /* Pacjenci, którzy nie chcą danego typu wiadomości. */
+      wylaczone: [],
     };
   }
 
@@ -240,6 +249,13 @@
       if (surowe) {
         const dane = JSON.parse(surowe);
         if (dane && dane.wersja === WERSJA) return dane;
+        /* Starsze dane uzupełniamy o nowe kolekcje, zamiast kasować pracę. */
+        if (dane && dane.wersja === 1) {
+          dane.wersja = WERSJA;
+          dane.blokady = dane.blokady || [];
+          dane.wylaczone = dane.wylaczone || [];
+          return dane;
+        }
       }
     } catch (_) {}
     return daneStartowe();
@@ -313,30 +329,50 @@
 
   const bolTerapii = (tid) => stan.bol.filter((b) => b.terapiaId === tid).sort((a, b) => a.data.localeCompare(b.data));
 
-  /** Wolne godziny danego dnia: grafik minus wizyty, bez terminów z przeszłości. */
-  function wolneGodziny(isoData) {
+  /** Minuty od północy — wspólna miara dla godzin, wizyt i blokad. */
+  const naMinuty = (g) => {
+    const [h, m] = String(g).split(':').map(Number);
+    return h * 60 + (m || 0);
+  };
+  const naGodzine = (min) => `${Math.floor(min / 60)}:${String(min % 60).padStart(2, '0')}`;
+
+  /** Zajęte przedziały dnia: wizyty z ich długością plus blokady. */
+  function zajetePrzedzialy(isoData, pomijajWizyte = null) {
+    const z = stan.wizyty
+      .filter((w) => w.data === isoData && w.status !== 'odwolana' && w.id !== pomijajWizyte)
+      .map((w) => [naMinuty(w.godzina), naMinuty(w.godzina) + (w.minuty || 60)]);
+    stan.blokady
+      .filter((b) => b.data === isoData)
+      .forEach((b) => z.push([b.od * 60, b.do * 60]));
+    return z;
+  }
+
+  const koliduje = (start, dlugosc, przedzialy) =>
+    przedzialy.some(([a, b]) => start < b && start + dlugosc > a);
+
+  /** Wolne godziny danego dnia: grafik minus wizyty i blokady, bez przeszłości. */
+  function wolneGodziny(isoData, dlugosc = null, pomijajWizyte = null) {
     const d = fromIso(isoData);
     const zakres = stan.ustawienia.godziny[d.getDay()];
     if (!zakres) return [];
     const [od, doGodz] = zakres;
     const krok = stan.ustawienia.krokMinut;
-    const zajete = new Set(
-      stan.wizyty.filter((w) => w.data === isoData && w.status !== 'odwolana').map((w) => w.godzina)
-    );
+    const trwa = dlugosc || krok;
+    const przedzialy = zajetePrzedzialy(isoData, pomijajWizyte);
     const teraz = new Date();
     const out = [];
-    for (let h = od; h < doGodz; h++) {
-      for (let m = 0; m < 60; m += krok) {
-        const g = `${h}:${String(m).padStart(2, '0')}`;
-        if (zajete.has(g)) continue;
-        const kiedy = new Date(d);
-        kiedy.setHours(h, m, 0, 0);
-        if (kiedy - teraz < 60 * 60 * 1000) continue;
-        out.push(g);
-      }
+    for (let min = od * 60; min + trwa <= doGodz * 60; min += krok) {
+      if (koliduje(min, trwa, przedzialy)) continue;
+      const kiedy = new Date(d);
+      kiedy.setHours(0, min, 0, 0);
+      if (kiedy - teraz < 60 * 60 * 1000) continue;
+      out.push(naGodzine(min));
     }
     return out;
   }
+
+  /** Blokady danego dnia — panel rysuje z nich paski w kalendarzu. */
+  const blokadyDnia = (isoData) => stan.blokady.filter((b) => b.data === isoData);
 
   /** Najbliższe wolne terminy w kolejnych dniach. */
   function najblizszeTerminy(ile = 5, odDnia = 0) {
@@ -395,6 +431,163 @@
     else if (powody.some((r) => r.typ === 'bol')) akcja = 'Zweryfikuj plan terapii';
     else if (powody.some((r) => r.typ === 'cwiczenia')) akcja = 'Zapytaj o ćwiczenia domowe';
     return { punkty, powody, poziom, akcja };
+  }
+
+  /* ── Kolejka wiadomości ────────────────────────────────────────────── */
+  /* Nic tu nie jest zapisane: kolejka wynika z wizyt, terapii i kalendarza.
+     Zapisujemy tylko wyłączenia i ślad po wysyłce. */
+  const TYPY_WIADOMOSCI = {
+    przypomnienie: { nazwa: 'Przypomnienie o wizycie', godzina: '18:00' },
+    'ankieta-bol': { nazwa: 'Pytanie o ból po wizycie', godzina: '19:00' },
+    'ankieta-cwiczenia': { nazwa: 'Tygodniowe pytanie o ćwiczenia', godzina: '9:00' },
+    opinia: { nazwa: 'Prośba o opinię w Google', godzina: '10:00' },
+  };
+
+  const wylaczona = (pacjentId, typ) => stan.wylaczone.some((x) => x.pacjentId === pacjentId && x.typ === typ);
+
+  function kolejkaWiadomosci(dniDoPrzodu = 7) {
+    const dzisIso = iso(dzis);
+    const granica = isoZa(dniDoPrzodu);
+    const out = [];
+    const dodaj = (pacjentId, terapiaId, typ, data, tresc) => {
+      if (data < dzisIso || data > granica) return;
+      const p = pacjent(pacjentId);
+      if (!p) return;
+      out.push({
+        id: `${typ}-${pacjentId}-${data}`,
+        pacjentId,
+        terapiaId,
+        typ,
+        data,
+        godzina: TYPY_WIADOMOSCI[typ].godzina,
+        nazwa: TYPY_WIADOMOSCI[typ].nazwa,
+        tresc,
+        wylaczona: wylaczona(pacjentId, typ) || p.zgodaSms === false,
+      });
+    };
+
+    stan.wizyty
+      .filter((w) => ['zaplanowana', 'potwierdzona'].includes(w.status) && w.data >= dzisIso)
+      .forEach((w) => {
+        const p = pacjent(w.pacjentId);
+        const dzien = fromIso(w.data);
+        dzien.setDate(dzien.getDate() - 1);
+        dodaj(
+          w.pacjentId,
+          w.terapiaId,
+          'przypomnienie',
+          iso(dzien),
+          `${p.imie.split(' ')[0]}, przypominamy o wizycie jutro o ${w.godzina}. ${stan.ustawienia.nazwa}`
+        );
+      });
+
+    stan.wizyty
+      .filter((w) => w.status === 'odbyta' && w.data === dzisIso)
+      .forEach((w) => {
+        const p = pacjent(w.pacjentId);
+        dodaj(
+          w.pacjentId,
+          w.terapiaId,
+          'ankieta-bol',
+          dzisIso,
+          `${p.imie.split(' ')[0]}, jak dziś z bólem w skali 0–10? Odpowiedz jedną cyfrą albo kliknij w swoją kartę.`
+        );
+      });
+
+    /* Pytanie o ćwiczenia idzie w poniedziałek rano. */
+    const poniedzialek = new Date(dzis);
+    poniedzialek.setDate(dzis.getDate() + ((8 - dzis.getDay()) % 7 || 7));
+    stan.terapie
+      .filter((t) => t.status === 'aktywna' && t.cwiczenia.length)
+      .forEach((t) => {
+        const p = pacjent(t.pacjentId);
+        dodaj(
+          t.pacjentId,
+          t.id,
+          'ankieta-cwiczenia',
+          iso(poniedzialek),
+          `${p.imie.split(' ')[0]}, jak poszły ćwiczenia w minionym tygodniu? Odhacz je w swojej karcie.`
+        );
+      });
+
+    stan.terapie
+      .filter((t) => t.status !== 'aktywna' && t.koniec && dniOd(t.koniec) <= 3)
+      .filter((t) => !stan.zdarzenia.some((z) => z.pacjentId === t.pacjentId && z.typ === 'opinia'))
+      .forEach((t) => {
+        const p = pacjent(t.pacjentId);
+        const dzien = fromIso(t.koniec);
+        dzien.setDate(dzien.getDate() + 1);
+        dodaj(
+          t.pacjentId,
+          t.id,
+          'opinia',
+          iso(dzien),
+          `${p.imie.split(' ')[0]}, cieszymy się, że terapia dobiegła końca. Jeśli było warto, opinia w Mapach Google bardzo nam pomaga.`
+        );
+      });
+
+    return out.sort((a, b) => (a.data + a.godzina.padStart(5, '0')).localeCompare(b.data + b.godzina.padStart(5, '0')));
+  }
+
+  /* ── Kto wejdzie na zwolniony termin ───────────────────────────────── */
+  /** Pacjenci bez umówionego terminu, najpierw z tej samej linii problemu. */
+  function kandydaciNaTermin(isoData, godzina, liniaZwolniona = null) {
+    return stan.terapie
+      .filter((t) => t.status === 'aktywna' && !nastepnaWizyta(t.id))
+      .map((t) => {
+        const ost = ostatniaWizyta(t.id);
+        const czeka = ost ? dniOd(ost.data) : 999;
+        return { terapia: t, pacjent: pacjent(t.pacjentId), czeka, taSamaLinia: t.linia === liniaZwolniona };
+      })
+      .filter((x) => x.pacjent)
+      .sort((a, b) => b.taSamaLinia - a.taSamaLinia || b.czeka - a.czeka)
+      .slice(0, 5);
+  }
+
+  /* ── Wynik terapii ─────────────────────────────────────────────────── */
+  /** Liczby, które zamykają cykl. Liczone teraz, zamrażane przy zamknięciu. */
+  function wynikTerapii(tid) {
+    const t = terapia(tid);
+    if (!t) return null;
+    const odczyty = bolTerapii(tid);
+    return {
+      wizytyOdbyte: odbyte(tid),
+      planWizyt: t.planWizyt,
+      bolStart: odczyty.length ? odczyty[0].wartosc : null,
+      bolKoniec: odczyty.length ? odczyty[odczyty.length - 1].wartosc : null,
+      cwiczenia: compliance(tid),
+      dni: t.start ? dniOd(t.start) : null,
+    };
+  }
+
+  /* ── Podsumowanie miesiąca ─────────────────────────────────────────── */
+  /** Przesunięcie 0 to bieżący miesiąc, -1 poprzedni. */
+  function podsumowanieMiesiaca(przesuniecie = 0) {
+    const d = new Date(dzis.getFullYear(), dzis.getMonth() + przesuniecie, 1);
+    const prefiks = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const wizyty = stan.wizyty.filter((w) => w.data.startsWith(prefiks));
+    const odbyteW = wizyty.filter((w) => w.status === 'odbyta');
+    const nowi = stan.pacjenci.filter((p) => p.utworzony && p.utworzony.startsWith(prefiks));
+    const zamkniete = stan.terapie.filter((t) => t.koniec && t.koniec.startsWith(prefiks));
+    const zrodla = {};
+    nowi.forEach((p) => (zrodla[p.zrodlo] = (zrodla[p.zrodlo] || 0) + 1));
+    return {
+      miesiac: d,
+      nowiPacjenci: nowi.length,
+      zrodla,
+      wizytyOdbyte: odbyteW.length,
+      nieobecnosci: wizyty.filter((w) => w.status === 'nieobecnosc').length,
+      odwolane: wizyty.filter((w) => w.status === 'odwolana').length,
+      przychod: odbyteW.reduce((s, w) => s + ((usluga(w.uslugaId) || {}).cena || 0), 0),
+      terapieZamkniete: zamkniete.length,
+      terapieWToku: stan.terapie.filter((t) => t.status === 'aktywna').length,
+      sredniSpadekBolu: (() => {
+        const spadki = zamkniete
+          .map((t) => (t.wynik && t.wynik.bolStart !== null && t.wynik.bolKoniec !== null ? t.wynik.bolStart - t.wynik.bolKoniec : null))
+          .filter((x) => x !== null);
+        return spadki.length ? Math.round((spadki.reduce((a, b) => a + b, 0) / spadki.length) * 10) / 10 : null;
+      })(),
+    };
   }
 
   /* ── Akcje ─────────────────────────────────────────────────────────── */
@@ -456,13 +649,87 @@
       });
     },
 
-    zakonczTerapie(tid) {
+    /** Zamknięcie cyklu zamraża liczby — potem okno 14 dni by je przesunęło. */
+    zakonczTerapie(tid, powod = 'plan zrealizowany') {
+      const wynik = wynikTerapii(tid);
       return zmien('Zakończono terapię', (s) => {
         const t = s.terapie.find((x) => x.id === tid);
         t.status = 'zakonczona';
         t.koniec = iso(new Date());
-        log(s, t.pacjentId, 'terapia', 'Cykl terapii zakończony');
+        t.powodZakonczenia = powod;
+        t.wynik = wynik;
+        const spadek = wynik.bolStart !== null && wynik.bolKoniec !== null ? `, ból ${wynik.bolStart} → ${wynik.bolKoniec}` : '';
+        log(s, t.pacjentId, 'terapia', `Cykl zakończony po ${wynik.wizytyOdbyte} wizytach${spadek}`);
         return t;
+      });
+    },
+
+    /** Seria wizyt co tyle samo dni, o tej samej godzinie. Kolizje omija. */
+    umowSerie({ pacjentId, terapiaId, uslugaId, data, godzina, ile, coIleDni }) {
+      return zmien('Umówiono serię wizyt', (s) => {
+        const u = s.uslugi.find((x) => x.id === uslugaId);
+        const utworzone = [];
+        const pominiete = [];
+        let kursor = fromIso(data);
+        for (let i = 0; i < ile; i++) {
+          let dzienIso = iso(kursor);
+          let proba = 0;
+          /* Kolidujący termin przesuwamy o dzień do przodu, najwyżej o tydzień. */
+          while (
+            proba < 7 &&
+            (!s.ustawienia.godziny[fromIso(dzienIso).getDay()] ||
+              koliduje(naMinuty(godzina), u.minuty, zajetePrzedzialy(dzienIso)))
+          ) {
+            const d = fromIso(dzienIso);
+            d.setDate(d.getDate() + 1);
+            dzienIso = iso(d);
+            proba++;
+          }
+          if (proba >= 7) {
+            pominiete.push(iso(kursor));
+          } else {
+            const w = { id: id('w'), pacjentId, terapiaId, data: dzienIso, godzina, uslugaId, minuty: u.minuty, status: 'zaplanowana' };
+            s.wizyty.push(w);
+            utworzone.push(w);
+            kursor = fromIso(dzienIso);
+          }
+          kursor.setDate(kursor.getDate() + coIleDni);
+        }
+        log(s, pacjentId, 'wizyta', `Umówiono serię ${utworzone.length} wizyt co ${coIleDni} dni`);
+        return { utworzone, pominiete };
+      });
+    },
+
+    dodajBlokade({ data, od, do: doGodz, powod, dni = 1 }) {
+      return zmien('Zablokowano czas', (s) => {
+        const dodane = [];
+        for (let i = 0; i < dni; i++) {
+          const d = fromIso(data);
+          d.setDate(d.getDate() + i);
+          const b = { id: id('bl'), data: iso(d), od: Number(od), do: Number(doGodz), powod: (powod || 'Niedostępny').trim() };
+          s.blokady.push(b);
+          dodane.push(b);
+        }
+        return dodane;
+      });
+    },
+
+    usunBlokade(bid) {
+      return zmien('Zdjęto blokadę', (s) => {
+        s.blokady = s.blokady.filter((b) => b.id !== bid);
+      });
+    },
+
+    /** Wyłączenie albo włączenie typu wiadomości dla jednego pacjenta. */
+    przelaczWiadomosc(pacjentId, typ) {
+      return zmien('Zmieniono ustawienia wiadomości', (s) => {
+        const byla = s.wylaczone.findIndex((x) => x.pacjentId === pacjentId && x.typ === typ);
+        if (byla >= 0) {
+          s.wylaczone.splice(byla, 1);
+          return { wylaczona: false };
+        }
+        s.wylaczone.push({ pacjentId, typ });
+        return { wylaczona: true };
       });
     },
 
@@ -477,9 +744,10 @@
 
     umowWizyte({ pacjentId, terapiaId, data, godzina, uslugaId }) {
       return zmien('Umówiono wizytę', (s) => {
-        const zajety = s.wizyty.some((w) => w.data === data && w.godzina === godzina && w.status !== 'odwolana');
-        if (zajety) return { blad: 'Ten termin jest już zajęty.' };
         const u = s.uslugi.find((x) => x.id === uslugaId);
+        if (koliduje(naMinuty(godzina), u.minuty, zajetePrzedzialy(data))) {
+          return { blad: 'Ten termin nachodzi na inną wizytę albo na blokadę.' };
+        }
         const w = { id: id('w'), pacjentId, terapiaId, data, godzina, uslugaId, minuty: u.minuty, status: 'zaplanowana' };
         s.wizyty.push(w);
         log(s, pacjentId, 'wizyta', `Umówiono wizytę: ${data} ${godzina}`);
@@ -489,9 +757,10 @@
 
     przelozWizyte(wid, data, godzina) {
       return zmien('Przełożono wizytę', (s) => {
-        const zajety = s.wizyty.some((w) => w.id !== wid && w.data === data && w.godzina === godzina && w.status !== 'odwolana');
-        if (zajety) return { blad: 'Ten termin jest już zajęty.' };
         const w = s.wizyty.find((x) => x.id === wid);
+        if (koliduje(naMinuty(godzina), w.minuty || 60, zajetePrzedzialy(data, wid))) {
+          return { blad: 'Ten termin nachodzi na inną wizytę albo na blokadę.' };
+        }
         const stara = `${w.data} ${w.godzina}`;
         w.data = data;
         w.godzina = godzina;
@@ -509,6 +778,11 @@
         log(s, w.pacjentId, 'wizyta', `${nazwy[status] || status}: ${w.data} ${w.godzina}`);
         return w;
       });
+    },
+
+    /** Zwykły wpis w historii pacjenta — fakt, nie wysyłka. */
+    zapiszZdarzenie(pacjentId, typ, tekst) {
+      return zmien('Zapisano zdarzenie', (s) => log(s, pacjentId, typ, tekst));
     },
 
     /** Symulacja wysyłki — nic nie wychodzi na zewnątrz, ale zostaje ślad. */
@@ -606,5 +880,11 @@
     wolneGodziny,
     najblizszeTerminy,
     ryzyko,
+    blokadyDnia,
+    kolejkaWiadomosci,
+    kandydaciNaTermin,
+    wynikTerapii,
+    podsumowanieMiesiaca,
+    TYPY_WIADOMOSCI,
   };
 })();

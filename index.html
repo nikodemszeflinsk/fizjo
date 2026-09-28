@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/karta.css?v=11" />
+  <link rel="stylesheet" href="assets/css/karta.css?v=14" />
 </head>
 <body>
   <a class="skip" href="#tresc">Przejdź do treści</a>
@@ -217,33 +217,40 @@
         <h2 class="h2" id="h-demo">Zobacz, zanim zdecydujesz</h2>
         <p class="lead">Dwa działające dema na przykładzie fikcyjnego gabinetu „Linia Ruchu”. Klikaj do woli, nic się nie zepsuje.</p>
 
-        <div class="proof">
-          <div class="proof__text">
-            <p class="proof__h">Strona, na której pacjent umawia się w minutę</p>
-            <p>Wybiera, z czym przychodzi, i godzinę z Twojego grafiku. Trzy kroki, numer rezerwacji, wizyta w kalendarzu. Najlepiej otwórz to na telefonie.</p>
-            <a class="cta cta--blue" href="demo.html">
-              Otwórz demo strony
-              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
-            </a>
+        <div class="widok">
+          <div class="widok__taby" role="tablist" aria-label="Dwie strony systemu">
+            <button class="widok__tab" type="button" role="tab" id="tab-pacjent" aria-controls="p-pacjent" aria-selected="true">Oczami pacjenta</button>
+            <button class="widok__tab" type="button" role="tab" id="tab-gabinet" aria-controls="p-gabinet" aria-selected="false">Oczami gabinetu</button>
           </div>
-          <a class="phone" href="demo.html" tabindex="-1" aria-hidden="true">
-            <img src="assets/img/demo-telefon.jpg" alt="" width="780" height="1688" loading="lazy" />
-          </a>
-        </div>
 
-        <div class="proof proof--crm" id="crm">
-          <div class="proof__text">
-            <p class="proof__h">Panel do zarządzania wizytami</p>
-            <p>Dzień w jednym ekranie: wizyty, nowe zgłoszenia i lista osób, które nie umówiły kolejnej wizyty — z powodem przy każdej. Do tego kalendarz, kartoteka i przypomnienia, które wychodzą same.</p>
-            <a class="cta cta--blue" href="crm.html">
-              Otwórz demo panelu
-              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
+          <div class="widok__panel" id="p-pacjent" role="tabpanel" aria-labelledby="tab-pacjent">
+            <div class="widok__text">
+              <p class="proof__h">Umawia się w minutę, bez telefonu</p>
+              <p>Wybiera, z czym przychodzi, i godzinę z Twojego grafiku. Trzy kroki, numer rezerwacji, wizyta w kalendarzu. Dzień przed dostaje SMS, a w nim link do własnej karty: ćwiczenia, terminy i przycisk „nie mogę, przełóż”.</p>
+              <a class="cta cta--blue" href="demo.html">
+                Otwórz demo strony
+                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
+              </a>
+            </div>
+            <a class="phone" href="demo.html" tabindex="-1" aria-hidden="true">
+              <img src="assets/img/demo-telefon.jpg" alt="" width="780" height="1688" loading="lazy" />
             </a>
           </div>
-          <a class="screen" href="crm.html" tabindex="-1" aria-hidden="true">
-            <span class="screen__bar"><i></i><i></i><i></i></span>
-            <img src="assets/img/crm-podglad.jpg" alt="" width="1440" height="900" loading="lazy" />
-          </a>
+
+          <div class="widok__panel" id="p-gabinet" role="tabpanel" aria-labelledby="tab-gabinet" hidden>
+            <div class="widok__text">
+              <p class="proof__h">Dzień w jednym ekranie</p>
+              <p>Wizyty na dziś z jednym kliknięciem na każdą, lista osób, które nie umówiły kolejnej wizyty — z powodem przy każdej — i kolejka wiadomości, które wychodzą same. Do tego kalendarz z blokadami na urlop i kartoteka.</p>
+              <a class="cta cta--blue" href="crm.html">
+                Otwórz demo panelu
+                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
+              </a>
+            </div>
+            <a class="screen" href="crm.html" tabindex="-1" aria-hidden="true">
+              <span class="screen__bar"><i></i><i></i><i></i></span>
+              <img src="assets/img/crm-podglad.jpg" alt="" width="1440" height="900" loading="lazy" />
+            </a>
+          </div>
         </div>
       </div>
     </section>
@@ -325,8 +332,13 @@
               </label>
               <label class="range">
                 <span class="range__label">Miesięczny koszt systemu</span>
-                <input type="range" min="100" max="5000" step="50" value="690" data-calc="koszt" />
+                <input type="range" min="100" max="5000" step="10" value="690" data-calc="koszt" />
                 <output data-out="koszt">690 zł</output>
+              </label>
+              <label class="range">
+                <span class="range__label">Ilu na dziesięciu przerywa terapię w połowie</span>
+                <input type="range" min="0" max="8" step="1" value="3" data-calc="przerywa" />
+                <output data-out="przerywa">3 z 10</output>
               </label>
             </div>
             <dl class="calc__result" aria-live="polite">
@@ -345,6 +357,10 @@
               <div class="calc__wide">
                 <dt>Nowych pacjentów miesięcznie, żeby koszt się zwrócił</dt>
                 <dd data-res="prog">1</dd>
+              </div>
+              <div class="calc__wide calc__strata">
+                <dt>Zostaje na stole, gdy pacjent nie wraca na drugą połowę terapii</dt>
+                <dd data-res="strata">0 zł rocznie</dd>
               </div>
             </dl>
           </div>
@@ -516,9 +532,11 @@
       const out = (k, t) => (document.querySelector(`[data-out="${k}"]`).textContent = t);
       const res = (k, t) => (document.querySelector(`[data-res="${k}"]`).textContent = t);
       const update = () => {
-        const p = val('pacjenci'), c = val('cena'), w = val('wizyty'), k = val('koszt');
-        out('pacjenci', p); out('cena', zl(c)); out('wizyty', w); out('koszt', zl(k));
+        const p = val('pacjenci'), c = val('cena'), w = val('wizyty'), k = val('koszt'), x = val('przerywa');
+        out('pacjenci', p); out('cena', zl(c)); out('wizyty', w); out('koszt', zl(k)); out('przerywa', `${x} z 10`);
         const przychod = p * c * w;
+        // Kto przerywa, zwykle znika mniej więcej w połowie zaplanowanych wizyt.
+        res('strata', `${zl(p * 12 * (x / 10) * Math.floor(w / 2) * c)} rocznie`);
         res('przychod', zl(przychod));
         res('koszt', zl(k));
         res('zwrot', `${(przychod / k).toLocaleString('pl-PL', { maximumFractionDigits: 1 })} zł przychodu`);
@@ -528,6 +546,18 @@
       document.querySelectorAll('[data-calc]').forEach((i) => i.addEventListener('input', update));
       update();
       document.getElementById('rok').textContent = new Date().getFullYear();
+
+      // Przełącznik perspektyw: ta sama sekcja raz oczami pacjenta, raz gabinetu.
+      const taby = document.querySelectorAll('.widok__tab');
+      taby.forEach((t) =>
+        t.addEventListener('click', () => {
+          taby.forEach((x) => {
+            const wybrany = x === t;
+            x.setAttribute('aria-selected', String(wybrany));
+            document.getElementById(x.getAttribute('aria-controls')).hidden = !wybrany;
+          });
+        })
+      );
 
       // Wybór pakietu z cennika ustawia go w formularzu.
       const form = document.getElementById('form');

@@ -482,3 +482,400 @@ a {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ── Rysunek przy ćwiczeniu ─────────────────────────────────────────── */
+.cw__btn {
+  position: relative;
+  padding-right: 92px;
+}
+
+.cw__rys {
+  position: absolute;
+  top: 12px;
+  right: 10px;
+  width: 72px;
+  height: 64px;
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.85;
+}
+
+.cw__rys .podloga {
+  stroke: var(--hair-2);
+  stroke-width: 2;
+}
+
+.cw__btn[aria-pressed='true'] .cw__rys {
+  stroke: var(--ok);
+}
+
+/* ── Akcje przy terminie ────────────────────────────────────────────── */
+.termin__akcje {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.btn--linia {
+  border: 1px solid var(--hair-2);
+  background: var(--white);
+  color: var(--ink);
+}
+
+.btn--linia:hover {
+  border-color: var(--ink);
+}
+
+/* ── Okno przełożenia ───────────────────────────────────────────────── */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: end center;
+  padding: 0;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.modal__veil {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(20, 23, 26, 0.5);
+}
+
+.modal__box {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(520px, 100%);
+  max-height: 88vh;
+  border-radius: var(--r) var(--r) 0 0;
+  background: var(--white);
+  box-shadow: 0 -20px 60px rgba(20, 23, 26, 0.28);
+  animation: wjazd 0.28s var(--ease-out);
+}
+
+@keyframes wjazd {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+}
+
+.modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--hair);
+}
+
+.modal__head h2 {
+  margin: 0;
+  font-family: var(--f-display);
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.modal__close {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 9px;
+  background: var(--floor);
+  cursor: pointer;
+}
+
+.modal__close svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+}
+
+.modal__body {
+  padding: 18px 20px;
+  overflow: auto;
+}
+
+.modal__foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 20px 20px;
+  border-top: 1px solid var(--hair);
+}
+
+.modal__info {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.modal__info strong {
+  color: var(--ink);
+}
+
+.modal__label {
+  margin: 18px 0 8px;
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.modal__err {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border-radius: var(--r-sm);
+  background: rgba(179, 38, 30, 0.08);
+  color: #b3261e;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.field select {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid var(--hair-2);
+  border-radius: var(--r-sm);
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+}
+
+.sloty {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.slot {
+  padding: 10px 14px;
+  border: 1px solid var(--hair-2);
+  border-radius: 999px;
+  background: var(--white);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.slot[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--white);
+  font-weight: 700;
+}
+
+.pusto {
+  margin: 0;
+  color: var(--faint);
+  font-size: 0.9rem;
+}
+
+/* ── Pasek „Zadzwoń” ────────────────────────────────────────────────── */
+.dzwon {
+  display: none;
+}
+
+@media (max-width: 620px) {
+  body {
+    padding-bottom: 84px;
+  }
+
+  .dzwon {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px;
+    background: var(--ink);
+    color: var(--white);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .dzwon svg {
+    width: 19px;
+    height: 19px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+  }
+
+  .toast {
+    bottom: 84px;
+  }
+
+  .cw__btn {
+    padding-right: 14px;
+  }
+
+  .cw__rys {
+    position: static;
+    display: block;
+    width: 100%;
+    max-width: 120px;
+    height: 56px;
+    margin-top: 10px;
+  }
+
+  .cw__btn {
+    flex-wrap: wrap;
+  }
+}
+
+/* ── Karta do druku ─────────────────────────────────────────────────── */
+.druk {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 0;
+}
+
+.druk__head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--ink);
+}
+
+.druk__gabinet {
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.druk__head h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 900;
+}
+
+.druk__terapia {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.druk__tel {
+  margin: 0;
+  text-align: right;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.druk__tel span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+.druk__tabela {
+  width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
+}
+
+.druk__tabela th {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--hair-2);
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.druk__tabela td {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--hair);
+  vertical-align: top;
+  font-size: 0.92rem;
+}
+
+.druk__tabela em {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-style: normal;
+  font-size: 0.8rem;
+}
+
+.druk__kratka {
+  width: 34px;
+}
+
+.druk__kratka::after {
+  content: '';
+  display: block;
+  width: 22px;
+  height: 22px;
+  border: 1.5px solid var(--hair-2);
+  border-radius: 4px;
+}
+
+.druk__stopka {
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.druk__btn {
+  margin-top: 20px;
+}
+
+@media print {
+  body {
+    padding: 0;
+    background: #fff;
+  }
+
+  .druk__btn,
+  .dzwon,
+  .toast,
+  .modal {
+    display: none !important;
+  }
+
+  .druk {
+    padding: 0;
+  }
+}

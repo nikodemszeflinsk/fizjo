@@ -1969,3 +1969,103 @@ svg path {
     display: block;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Dwie perspektywy w jednym miejscu
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.widok {
+  margin-top: 34px;
+}
+
+.widok__taby {
+  display: inline-flex;
+  gap: 4px;
+  margin-bottom: 14px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--floor-2, #e2e5e1);
+}
+
+.widok__tab {
+  padding: 10px 20px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--f-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.widok__tab:hover {
+  color: var(--ink);
+}
+
+.widok__tab[aria-selected='true'] {
+  background: var(--ink);
+  color: #fff;
+}
+
+/* Atrybut hidden musi wygrać z display: grid. */
+.widok__panel[hidden] {
+  display: none;
+}
+
+.widok__panel {
+  padding: clamp(20px, 3vw, 32px) clamp(20px, 3vw, 32px) 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(20px, 3vw, 36px);
+  align-items: end;
+  border-radius: var(--r-sign);
+  background: var(--ink);
+  color: #cfd3d6;
+  overflow: hidden;
+  scroll-margin-top: 90px;
+}
+
+.widok__panel :focus-visible {
+  outline-color: #fff;
+}
+
+.widok__text {
+  display: grid;
+  gap: 12px;
+  align-content: center;
+  padding-bottom: clamp(20px, 3vw, 32px);
+}
+
+.widok__text p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.widok__panel .phone,
+.widok__panel .screen {
+  align-self: end;
+}
+
+/* Liczba, która boli: przerwane terapie. */
+.calc__strata dd {
+  color: #b3261e;
+}
+
+@media (max-width: 760px) {
+  .widok__panel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .widok__taby {
+    display: flex;
+    width: 100%;
+  }
+
+  .widok__tab {
+    flex: 1 1 0;
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+}

@@ -12,6 +12,14 @@
   const LINES = Object.fromEntries(K.linie.map((l) => [l.id, l]));
   const FIZJO = K.fizjoterapeuta;
   const GABINET = K.gabinet;
+  /* Każdy problem ma własną stronę — to ona odpowiada na pytanie z wyszukiwarki. */
+  const PODSTRONY = {
+    kregoslup: 'fizjoterapia-kregoslupa',
+    sport: 'fizjoterapia-sportowa',
+    uraz: 'rehabilitacja-po-operacji',
+    biuro: 'bol-karku-i-barkow',
+  };
+
   const SERVICES = {};
   K.linie.forEach((l) => l.uslugi.forEach((u) => (SERVICES[u.id] = { ...u, linia: l.id })));
 
@@ -212,9 +220,12 @@
                 )
                 .join('')}
             </ul>
-            <button class="btn btn--color spec__cta" type="button" data-start-line="${l.id}">
-              Umów: ${esc(l.problem.toLowerCase())} ${icon('arrow')}
-            </button>
+            <div class="spec__akcje">
+              <button class="btn btn--color spec__cta" type="button" data-start-line="${l.id}">
+                Umów: ${esc(l.problem.toLowerCase())} ${icon('arrow')}
+              </button>
+              ${PODSTRONY[l.id] ? `<a class="spec__wiecej" href="${PODSTRONY[l.id]}.html">Więcej o tym problemie</a>` : ''}
+            </div>
           </div>
           <figure class="spec__photo">
             <img class="duo" data-duo="${l.id}" src="${l.zdjecie}" alt="${esc(l.alt)}" width="1800" height="1200" loading="lazy" />
@@ -526,6 +537,11 @@
         <a class="btn btn--line" href="https://www.google.com/maps/dir/?api=1&destination=${GABINET.lat},${GABINET.lng}" target="_blank" rel="noopener">${icon('route')}Wyznacz trasę</a>
         <button class="back" type="button" data-restart>Umów kolejną wizytę</button>
       </div>
+      <ul class="done__dalej">
+        <li>Dzień przed wizytą dostaniesz SMS z przypomnieniem.</li>
+        <li>W SMS-ie jest link do Twojej karty: terminy, ćwiczenia i przycisk „nie mogę, przełóż”.</li>
+        <li>Termin możesz zmienić sam, bez dzwonienia.</li>
+      </ul>
       <p class="demo-note">Tryb demo: w prawdziwym wdrożeniu rezerwacja trafia do kalendarza gabinetu, a pacjent dostaje SMS z przypomnieniem.</p>
     </div>`;
   }
@@ -629,6 +645,8 @@
       B.service = null;
       B.date = B.time = null;
     }
+    /* Kwalifikator zna już usługę — rezerwacja zaczyna się od wyboru terminu. */
+    if (pre.service) B.service = pre.service;
     if (pre.date) {
       B.date = pre.date;
       B.time = pre.time;
@@ -638,6 +656,7 @@
     reconcile();
     B.step = pre.date && B.service ? 2 : firstOpen();
     renderBooking(true);
+    $('#rezerwacja').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
   }
 
   function onBookingClick(e) {
@@ -753,6 +772,29 @@
       if (!el) return;
       const d = el.dataset;
 
+      /* Kwalifikator: odpowiedź, krok wstecz, reset, przejście do rezerwacji. */
+      if (d.kw) {
+        KW.odp[d.kw] = d.kwVal;
+        KW.krok += 1;
+        renderKw();
+        return;
+      }
+      if ('kwWstecz' in d) {
+        KW.krok = Math.max(0, KW.krok - 1);
+        renderKw();
+        return;
+      }
+      if ('kwReset' in d) {
+        KW.krok = 0;
+        KW.odp = {};
+        renderKw();
+        return;
+      }
+      if (d.kwUmow) {
+        const u = SERVICES[d.kwUmow];
+        return startBooking({ line: u.linia, service: u.id });
+      }
+
       if (el.matches('.line')) return startBooking({ line: d.line });
       if (d.startLine) return startBooking({ line: d.startLine });
       if (d.slot) {
@@ -783,6 +825,134 @@
     });
   }
 
+  /* ── Kwalifikator ────────────────────────────────────────────────────── */
+  /* Trzy pytania zamiast przeglądania cennika. Odpowiedzi wskazują linię
+     problemu i usługę, od której najsensowniej zacząć. */
+  const PYTANIA = [
+    {
+      id: 'gdzie',
+      tekst: 'Gdzie boli najbardziej?',
+      opcje: [
+        { id: 'plecy', tekst: 'Plecy albo krzyż', linia: 'kregoslup' },
+        { id: 'kark', tekst: 'Kark, barki, głowa', linia: 'biuro' },
+        { id: 'staw', tekst: 'Kolano, bark, staw skokowy', linia: 'sport' },
+        { id: 'pooperacyjne', tekst: 'Miejsce po operacji lub złamaniu', linia: 'uraz' },
+      ],
+    },
+    {
+      id: 'kiedy',
+      tekst: 'Od jak dawna?',
+      opcje: [
+        { id: 'swieze', tekst: 'Krócej niż dwa tygodnie' },
+        { id: 'kilka', tekst: 'Od kilku tygodni' },
+        { id: 'dlugo', tekst: 'Od miesięcy, wraca falami' },
+      ],
+    },
+    {
+      id: 'co',
+      tekst: 'Co pogarsza objawy?',
+      opcje: [
+        { id: 'siedzenie', tekst: 'Siedzenie i praca przy biurku' },
+        { id: 'ruch', tekst: 'Wysiłek, bieganie, trening' },
+        { id: 'rano', tekst: 'Poranna sztywność' },
+        { id: 'uraz', tekst: 'Konkretny uraz albo zabieg' },
+      ],
+    },
+  ];
+
+  const KW = { krok: 0, odp: {} };
+
+  /** Usługa startowa dla linii i odpowiedzi — pierwsza wizyta zawsze diagnostyczna. */
+  function kwUsluga(linia, odp) {
+    const l = LINES[linia];
+    if (!l) return null;
+    if (odp.co === 'ruch' && l.uslugi.some((u) => /diagnostyka/i.test(u.nazwa)))
+      return l.uslugi.find((u) => /diagnostyka/i.test(u.nazwa));
+    if (odp.kiedy === 'swieze' && l.uslugi.some((u) => /manualna|tkanek/i.test(u.nazwa)))
+      return l.uslugi.find((u) => /manualna|tkanek/i.test(u.nazwa));
+    return l.uslugi.find((u) => /konsultacja/i.test(u.nazwa)) || l.uslugi[0];
+  }
+
+  function kwUzasadnienie(odp) {
+    if (odp.co === 'ruch') return 'Objawy wracają przy wysiłku, więc zaczynamy od sprawdzenia, jak pracuje całe ciało w ruchu.';
+    if (odp.co === 'siedzenie') return 'Ból od pozycji siedzącej najczęściej ma źródło poza miejscem, które boli — pierwsza wizyta to szukanie tego źródła.';
+    if (odp.kiedy === 'swieze') return 'Świeży problem reaguje najlepiej, więc zaczynamy od terapii, nie od czekania.';
+    if (odp.kiedy === 'dlugo') return 'Dolegliwość wraca falami, więc pierwsza wizyta idzie w stronę przyczyny, a nie doraźnej ulgi.';
+    return 'Pierwsza wizyta to rozmowa, badanie ruchu i terapia — wychodzisz z planem na kolejne tygodnie.';
+  }
+
+  function renderKw() {
+    const box = $('#kw');
+    if (!box) return;
+
+    if (KW.krok >= PYTANIA.length) {
+      const linia = PYTANIA[0].opcje.find((o) => o.id === KW.odp.gdzie).linia;
+      const l = LINES[linia];
+      const u = kwUsluga(linia, KW.odp);
+      const slot = nextSlot();
+      box.innerHTML = `<div class="kw__wynik" style="--c:${l.kolor};--on:${l.naKolorze}">
+        <p class="kw__label">Na podstawie Twoich odpowiedzi</p>
+        <h3 class="kw__h3">${esc(l.specjalizacja)}</h3>
+        <p class="kw__dlaczego">${esc(kwUzasadnienie(KW.odp))}</p>
+        <dl class="kw__dane">
+          <div><dt>Zaczynamy od</dt><dd>${esc(u.nazwa)}</dd></div>
+          <div><dt>Czas i koszt</dt><dd>${u.minuty} min · ${zl(u.cena)}</dd></div>
+          <div><dt>Najbliższy termin</dt><dd>${slot ? `${dayLong(slot.at)}, ${slot.time}` : 'zadzwoń, dobierzemy termin'}</dd></div>
+        </dl>
+        <div class="kw__akcje">
+          <button class="btn btn--color btn--lg" type="button" data-kw-umow="${u.id}">Umów ten termin</button>
+          <button class="back" type="button" data-kw-reset>Zacznij od nowa</button>
+        </div>
+        <p class="kw__uwaga">To podpowiedź, nie diagnoza. Na wizycie sprawdzam, czy kierunek jest właściwy — jeśli nie, mówię to wprost.</p>
+      </div>`;
+      return;
+    }
+
+    const q = PYTANIA[KW.krok];
+    box.innerHTML = `<div class="kw__pytanie">
+      <p class="kw__licznik">Pytanie ${KW.krok + 1} z ${PYTANIA.length}</p>
+      <h3 class="kw__h3">${esc(q.tekst)}</h3>
+      <div class="kw__opcje">
+        ${q.opcje
+          .map(
+            (o) => `<button class="kw__opcja" type="button" data-kw="${q.id}" data-kw-val="${o.id}"
+              ${o.linia ? `style="--c:${LINES[o.linia].kolor}"` : ''}>
+              ${o.linia ? '<span class="kw__kreska"></span>' : ''}${esc(o.tekst)}
+            </button>`
+          )
+          .join('')}
+      </div>
+      ${KW.krok ? '<button class="back" type="button" data-kw-wstecz>Wróć</button>' : ''}
+    </div>`;
+  }
+
+  /* ── Otwarte teraz ───────────────────────────────────────────────────── */
+  function renderTeraz() {
+    const el = $('#teraz');
+    if (!el) return;
+    const teraz = new Date();
+    const dow = teraz.getDay();
+    const zakres = dow === 0 ? null : dow === 6 ? K.godzinyWizyt.sobota : K.godzinyWizyt.tydzien;
+    const minuty = teraz.getHours() * 60 + teraz.getMinutes();
+    const otwarte = zakres && minuty >= zakres[0] * 60 && minuty < zakres[1] * 60;
+    el.hidden = false;
+    el.className = `teraz ${otwarte ? 'is-open' : ''}`;
+    if (otwarte) {
+      el.innerHTML = `<span class="teraz__kropka" aria-hidden="true"></span>Otwarte teraz<em>do ${zakres[1]}:00</em>`;
+      return;
+    }
+    /* Najbliższy dzień pracy: fizjoterapeuta ma grafik w danych. */
+    for (let i = 1; i <= 7; i++) {
+      const d = new Date(teraz);
+      d.setDate(teraz.getDate() + i);
+      if (!FIZJO.grafik.includes(d.getDay())) continue;
+      const od = d.getDay() === 6 ? K.godzinyWizyt.sobota[0] : K.godzinyWizyt.tydzien[0];
+      el.innerHTML = `<span class="teraz__kropka" aria-hidden="true"></span>Zamknięte<em>${i === 1 ? 'jutro' : dayLong(d)} od ${od}:00</em>`;
+      return;
+    }
+    el.hidden = true;
+  }
+
   /* ── Start ───────────────────────────────────────────────────────────── */
   renderLines();
   renderBoard();
@@ -792,6 +962,8 @@
   renderReviews();
   renderFaq();
   renderPlaces();
+  renderKw();
+  renderTeraz();
   mountBooking();
   initClicks();
   initGuide();

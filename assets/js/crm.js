@@ -54,6 +54,10 @@
     phone: '<path d="M6.5 3.5h-2a1 1 0 0 0-1 1c0 6.6 5.4 12 12 12a1 1 0 0 0 1-1v-2L13 12l-1.5 1.5a8 8 0 0 1-4-4L9 8 6.5 3.5Z"/>',
     sms: '<path d="M3.5 4.5h13v9h-8l-4 3v-3h-1Z"/>',
     link: '<path d="M8.5 11.5a3 3 0 0 0 4.2 0l2.3-2.3a3 3 0 1 0-4.2-4.2l-.9.9M11.5 8.5a3 3 0 0 0-4.2 0L5 10.8a3 3 0 1 0 4.2 4.2l.9-.9"/>',
+    wiadomosci: '<path d="M3.5 4.5h13v9h-8l-4 3v-3h-1Z"/>',
+    miesiac: '<path d="M3.5 16.5v-6M8 16.5V6M12.5 16.5v-9M17 16.5V3.5"/>',
+    druk: '<path d="M6 8V3.5h8V8M5 8h10v6h-2v3H7v-3H5Z"/>',
+    blokada: '<path d="M6.5 9V6.5a3.5 3.5 0 0 1 7 0V9M4.5 9h11v7.5h-11Z"/>',
   };
   const ikona = (n) => `<svg viewBox="0 0 20 20" aria-hidden="true">${ICON[n]}</svg>`;
 
@@ -87,6 +91,8 @@
     { id: 'dzis', nazwa: 'Dziś' },
     { id: 'kalendarz', nazwa: 'Kalendarz' },
     { id: 'pacjenci', nazwa: 'Pacjenci' },
+    { id: 'wiadomosci', nazwa: 'Wiadomości' },
+    { id: 'miesiac', nazwa: 'Miesiąc' },
     { id: 'ustawienia', nazwa: 'Ustawienia' },
   ];
   let widok = 'dzis';
@@ -317,8 +323,16 @@
       if (!godzinyDnia(d)) return `<div class="cal__col cal__col--off"><p class="cal__off">wolne</p></div>`;
       const wizyty = wizytyDnia(isoD);
       const wolne = P.wolneGodziny(isoD);
+      const blokady = P.blokadyDnia(isoD);
       return `<div class="cal__col">
         ${godziny.map(() => '<div class="cal__line"></div>').join('')}
+        ${blokady
+          .map(
+            (b) => `<button class="blok" type="button" data-akcja="zdejmij-blokade" data-blokada="${b.id}"
+              style="top:${pozycja(`${b.od}:00`) + 1}px;height:${(b.do - b.od) * 52 - 3}px"
+              title="Kliknij, żeby zdjąć blokadę"><span>${esc(b.powod)}</span></button>`
+          )
+          .join('')}
         ${wolne
           .map(
             (g) => `<button class="wolny" type="button" data-akcja="umow-slot" data-data="${isoD}" data-godzina="${g}"
@@ -346,6 +360,7 @@
           <button class="btn btn--sm" type="button" data-akcja="tydzien" data-o="1">Następny →</button>
         </div>
         <p class="cal__hint">Kliknij wolną godzinę, żeby umówić wizytę. Kolor paska to rodzaj terapii.</p>
+        <button class="btn btn--sm" type="button" data-akcja="blokada">${ikona('blokada')}Zablokuj czas</button>
       </div>
       <div class="cal">
         <div class="cal__head"></div>
@@ -425,6 +440,126 @@
           </tr></thead>
           <tbody>${lista.length ? lista.map(wiersz).join('') : '<tr><td colspan="6" class="pusto">Nikogo tu nie ma. Zmień filtr albo dodaj pacjenta.</td></tr>'}</tbody>
         </table>
+      </div>`;
+  }
+
+  /* ── Widok: Wiadomości ─────────────────────────────────────────────── */
+  function renderWiadomosci() {
+    const kolejka = P.kolejkaWiadomosci(7);
+    const czynne = kolejka.filter((w) => !w.wylaczona);
+    $('#view-date').textContent = `${czynne.length} wiadomości w kolejce na siedem dni`;
+
+    const dni = [...new Set(kolejka.map((w) => w.data))];
+    const grupa = (dataIso) => {
+      const poz = kolejka.filter((w) => w.data === dataIso);
+      return `<article class="card">
+        <header class="card__head card__head--row">
+          <div>
+            <h2>${krotka(dataIso)}${P.dniOd(dataIso) === 0 ? ' · dzisiaj' : ''}</h2>
+            <p class="card__note">${poz.filter((w) => !w.wylaczona).length} z ${poz.length} pójdzie</p>
+          </div>
+        </header>
+        <ul class="kolejka">
+          ${poz
+            .map((w) => {
+              const p = P.pacjent(w.pacjentId);
+              return `<li class="${w.wylaczona ? 'is-off' : ''}">
+                <span class="kolejka__czas">${w.godzina}</span>
+                <span class="kolejka__co">
+                  <strong>${esc(w.nazwa)}</strong>
+                  <button class="kolejka__kto" type="button" data-pacjent="${p.id}">${esc(p.imie)} · ${esc(p.telefon)}</button>
+                  <em>${esc(w.tresc)}</em>
+                </span>
+                <button class="switch" type="button" role="switch" aria-checked="${!w.wylaczona}"
+                  data-akcja="przelacz-wiadomosc" data-pacjent-id="${p.id}" data-typ="${w.typ}">
+                  <span></span>${w.wylaczona ? 'wyłączone' : 'włączone'}
+                </button>
+              </li>`;
+            })
+            .join('')}
+        </ul>
+      </article>`;
+    };
+
+    $('#wiadomosci').innerHTML = `
+      <p class="wyjasnienie">Kolejka wynika z kalendarza i z terapii — nic nie trzeba w nią wpisywać. Przypomnienie idzie dzień przed wizytą, pytanie o ból wieczorem po wizycie, pytanie o ćwiczenia w poniedziałek rano. Wyłącznik działa dla jednego pacjenta i jednego rodzaju wiadomości.</p>
+      <p class="wyjasnienie wyjasnienie--uwaga">W prototypie nic nie wychodzi na zewnątrz. W działającym systemie SMS-y są wliczone w abonament do 200 miesięcznie.</p>
+      ${dni.length ? dni.map(grupa).join('') : '<p class="pusto">Na najbliższy tydzień nie ma nic do wysłania.</p>'}`;
+  }
+
+  /* ── Widok: Miesiąc ────────────────────────────────────────────────── */
+  let miesiacPrzesuniecie = 0;
+
+  function renderMiesiac() {
+    const m = P.podsumowanieMiesiaca(miesiacPrzesuniecie);
+    const nazwa = ['styczeń', 'luty', 'marzec', 'kwiecień', 'maj', 'czerwiec', 'lipiec', 'sierpień', 'wrzesień', 'październik', 'listopad', 'grudzień'][m.miesiac.getMonth()];
+    $('#view-date').textContent = `${nazwa} ${m.miesiac.getFullYear()}`;
+
+    const zrodla = Object.entries(m.zrodla).sort((a, b) => b[1] - a[1]);
+    const suma = m.nowiPacjenci || 1;
+    const kafel = (label, value, foot, klasa = '') =>
+      `<article class="tile${klasa}"><p class="tile__label">${label}</p><p class="tile__value">${value}</p><p class="tile__foot">${foot}</p></article>`;
+
+    $('#miesiac').innerHTML = `
+      <div class="cal__bar">
+        <div class="cal__nav">
+          <button class="btn btn--sm" type="button" data-akcja="miesiac" data-o="-1">← Poprzedni</button>
+          <button class="btn btn--sm" type="button" data-akcja="miesiac" data-o="0">Ten miesiąc</button>
+          <button class="btn btn--sm" type="button" data-akcja="miesiac" data-o="1">Następny →</button>
+        </div>
+        <p class="cal__hint">To samo podsumowanie idzie raz w miesiącu na Twojego maila.</p>
+      </div>
+
+      <div class="tiles">
+        ${kafel('Nowi pacjenci', m.nowiPacjenci, m.nowiPacjenci ? 'weszli do kartoteki' : 'brak nowych')}
+        ${kafel('Wizyty odbyte', m.wizytyOdbyte, `${m.nieobecnosci} nieobecności, ${m.odwolane} odwołań`)}
+        ${kafel('Terapie zamknięte', m.terapieZamkniete, `${m.terapieWToku} nadal w toku`)}
+        ${kafel('Przychód', zl(m.przychod), 'z wizyt oznaczonych jako odbyte', ' tile--ink')}
+      </div>
+
+      <div class="grid grid--ust">
+        <article class="card">
+          <header class="card__head"><h2>Skąd przyszli nowi</h2><p class="card__note">${m.nowiPacjenci} osób w tym miesiącu</p></header>
+          ${
+            zrodla.length
+              ? `<ul class="sources">${zrodla
+                  .map(
+                    ([k, ile]) => `<li><span>${ZRODLA[k] || k}</span><b>${ile}</b>
+                      <span class="sources__track"><span class="sources__fill" style="width:${(ile / suma) * 100}%"></span></span></li>`
+                  )
+                  .join('')}</ul>`
+              : '<p class="pusto">W tym miesiącu nikt nowy nie trafił do kartoteki.</p>'
+          }
+        </article>
+
+        <article class="card">
+          <header class="card__head"><h2>Efekt terapii</h2><p class="card__note">Z zamkniętych cykli</p></header>
+          ${
+            m.sredniSpadekBolu !== null
+              ? `<p class="duza">${m.sredniSpadekBolu}<span>punktu spadku bólu średnio na zamkniętą terapię, w skali 0–10</span></p>`
+              : '<p class="pusto">Żadna terapia nie została w tym miesiącu zamknięta z odczytami bólu.</p>'
+          }
+        </article>
+
+        <article class="card">
+          <header class="card__head"><h2>Zamknięte cykle</h2><p class="card__note">Z wynikiem i powodem</p></header>
+          ${(() => {
+            const prefiks = `${m.miesiac.getFullYear()}-${String(m.miesiac.getMonth() + 1).padStart(2, '0')}`;
+            const lista = S().terapie.filter((t) => t.koniec && t.koniec.startsWith(prefiks));
+            if (!lista.length) return '<p class="pusto">Brak.</p>';
+            return `<ul class="prosta">${lista
+              .map((t) => {
+                const p = P.pacjent(t.pacjentId);
+                const w = t.wynik || {};
+                const spadek = w.bolStart !== null && w.bolStart !== undefined && w.bolKoniec !== null ? `ból ${w.bolStart} → ${w.bolKoniec}` : 'bez odczytów bólu';
+                return `<li>
+                  <button class="prosta__kto" type="button" data-pacjent="${p.id}">${esc(p.imie)}<em>${esc(t.etykieta)} · ${w.wizytyOdbyte || 0} wizyt · ${spadek}</em></button>
+                  <span class="tag">${esc(t.powodZakonczenia || 'zakończona')}</span>
+                </li>`;
+              })
+              .join('')}</ul>`;
+          })()}
+        </article>
       </div>`;
   }
 
@@ -525,6 +660,11 @@
                   ? `<p class="pat__bol-txt">Ból z ankiet: <strong>${odczyty[0].wartosc} → ${odczyty[odczyty.length - 1].wartosc}</strong> w skali 0–10</p>`
                   : '<p class="pat__bol-txt">Pacjent nie odpowiedział jeszcze na pytanie o ból.</p>'
               }
+              ${
+                t.status !== 'aktywna' && t.wynik
+                  ? `<p class="pat__zamknieta">Cykl zamknięty ${wzgledna(t.koniec)} — ${esc(t.powodZakonczenia || 'zakończony')}, ${t.wynik.wizytyOdbyte} wizyt.</p>`
+                  : ''
+              }
             </div>
 
             <div class="pat__block">
@@ -545,6 +685,7 @@
               <div class="pat__akcje pat__akcje--male">
                 <button class="btn btn--sm" type="button" data-akcja="cwiczenia" data-terapia="${t.id}">Zmień ćwiczenia</button>
                 <button class="btn btn--sm" type="button" data-akcja="link" data-terapia="${t.id}">${ikona('link')}Wyślij link pacjentowi</button>
+                <button class="btn btn--sm btn--ghost" type="button" data-akcja="druk-cwiczen" data-terapia="${t.id}">${ikona('druk')}Wydrukuj kartę</button>
               </div>
             </div>`
           : `<div class="pat__epizod pat__epizod--pusty">
@@ -579,6 +720,24 @@
       }
 
       <div class="pat__block">
+        <h3>Wiadomości do pacjenta</h3>
+        <ul class="ustawienia-sms">
+          ${Object.entries(P.TYPY_WIADOMOSCI)
+            .map(([typ, def]) => {
+              const wyl = S().wylaczone.some((x) => x.pacjentId === p.id && x.typ === typ);
+              return `<li>
+                <span>${esc(def.nazwa)}<em>o ${def.godzina}</em></span>
+                <button class="switch" type="button" role="switch" aria-checked="${!wyl}"
+                  data-akcja="przelacz-wiadomosc" data-pacjent-id="${p.id}" data-typ="${typ}">
+                  <span></span>${wyl ? 'wyłączone' : 'włączone'}
+                </button>
+              </li>`;
+            })
+            .join('')}
+        </ul>
+      </div>
+
+      <div class="pat__block">
         <h3>Notatka</h3>
         <p class="pat__note">${esc(p.notatka || 'Brak notatki.')}</p>
         <div class="pat__akcje pat__akcje--male">
@@ -590,7 +749,7 @@
         <button class="btn btn--accent" type="button" data-akcja="umow" data-pacjent-id="${p.id}">${ikona('plus')}Umów wizytę</button>
         <button class="btn" type="button" data-akcja="przypomnienie" data-pacjent-id="${p.id}">${ikona('sms')}Wyślij przypomnienie</button>
         <a class="btn btn--ghost" href="tel:${esc(String(p.telefon).replace(/\s/g, ''))}">${ikona('phone')}${esc(p.telefon)}</a>
-        ${t && t.status === 'aktywna' ? `<button class="btn btn--ghost" type="button" data-akcja="zakoncz" data-terapia="${t.id}">Zakończ terapię</button>` : ''}
+        ${t && t.status === 'aktywna' ? `<button class="btn btn--ghost" type="button" data-akcja="zakoncz" data-terapia="${t.id}">Zamknij terapię z wynikiem</button>` : ''}
       </div>`;
   }
 
@@ -814,6 +973,19 @@
       </div>
       <p class="modal__label">Wolne godziny</p>
       <div class="sloty" id="uw-sloty"></div>
+      ${
+        przekladana
+          ? ''
+          : `<div class="seria">
+              <label class="seria__check"><input type="checkbox" id="uw-seria" /><span><strong>Umów od razu całą serię</strong><em>Ta sama godzina, stały odstęp. Kolidujące terminy przesuwają się o dzień.</em></span></label>
+              <div class="seria__pola" id="uw-seria-pola" hidden>
+                <label for="uw-ile">Ile wizyt</label>
+                <input id="uw-ile" type="number" value="6" min="2" max="20" />
+                <label for="uw-co-ile">co ile dni</label>
+                <input id="uw-co-ile" type="number" value="7" min="1" max="30" />
+              </div>
+            </div>`
+      }
       <p class="modal__err" id="uw-err" hidden></p>`,
       `<button class="btn btn--ghost" type="button" data-close>Anuluj</button>
        <button class="btn btn--accent" type="button" data-zapisz="${wizytaId ? 'przelozenie' : 'wizyta'}" ${wizytaId ? `data-wizyta="${wizytaId}"` : ''}>${wizytaId ? 'Przełóż' : 'Umów'}</button>`
@@ -835,6 +1007,28 @@
     if (!wybrana) return bladModalu('uw-err', 'Wybierz godzinę.');
     const pacjentId = $('#uw-pacjent').value;
     const t = P.terapiaPacjenta(pacjentId);
+
+    if ($('#uw-seria') && $('#uw-seria').checked) {
+      const wynik = P.akcje.umowSerie({
+        pacjentId,
+        terapiaId: t && t.status === 'aktywna' ? t.id : null,
+        uslugaId: $('#uw-usluga').value,
+        data: $('#uw-dzien').value,
+        godzina: wybrana.dataset.godz,
+        ile: Number($('#uw-ile').value) || 6,
+        coIleDni: Number($('#uw-co-ile').value) || 7,
+      });
+      schowajModal();
+      const od = wynik.utworzone[0];
+      const do_ = wynik.utworzone[wynik.utworzone.length - 1];
+      return toast(
+        wynik.utworzone.length
+          ? `Umówiono ${wynik.utworzone.length} wizyt: ${krotka(od.data)} – ${krotka(do_.data)}`
+          : 'Nie udało się umówić żadnego terminu w tej serii',
+        true
+      );
+    }
+
     const wynik = P.akcje.umowWizyte({
       pacjentId,
       terapiaId: t && t.status === 'aktywna' ? t.id : null,
@@ -854,6 +1048,121 @@
     if (wynik.blad) return bladModalu('uw-err', wynik.blad);
     schowajModal();
     toast(`Przełożono na ${krotka(wynik.wizyta.data)}, ${wynik.wizyta.godzina}`, true);
+  }
+
+  /* ── Blokada czasu ─────────────────────────────────────────────────── */
+  function formBlokada() {
+    const dzisIso = P.iso(P.dzis);
+    modal(
+      'Zablokuj czas',
+      `<p class="modal__info">Urlop, szkolenie, wyjazd. Zablokowane godziny znikają z wolnych terminów — Twoich i tych, które widzi pacjent na stronie.</p>
+      <div class="form-grid">
+        ${pole('bl-data', 'Od dnia', 'date', dzisIso)}
+        ${pole('bl-dni', 'Ile dni', 'number', '1', 'min="1" max="30"')}
+        ${pole('bl-od', 'Od godziny', 'number', '8', 'min="0" max="23"')}
+        ${pole('bl-do', 'Do godziny', 'number', '19', 'min="1" max="24"')}
+        <div class="field field--full">
+          <label for="bl-powod">Powód <em>(widoczny tylko dla Ciebie)</em></label>
+          <input id="bl-powod" type="text" placeholder="np. szkolenie, urlop" />
+        </div>
+      </div>
+      <p class="modal__err" id="bl-err" hidden></p>`,
+      `<button class="btn btn--ghost" type="button" data-close>Anuluj</button>
+       <button class="btn btn--accent" type="button" data-zapisz="blokada">Zablokuj</button>`
+    );
+  }
+
+  function zapiszBlokade() {
+    const data = $('#bl-data').value;
+    const od = Number($('#bl-od').value);
+    const doG = Number($('#bl-do').value);
+    if (!data) return bladModalu('bl-err', 'Wybierz dzień.');
+    if (!(doG > od)) return bladModalu('bl-err', 'Godzina końca musi być późniejsza niż początku.');
+    const dni = Math.min(Number($('#bl-dni').value) || 1, 30);
+    const kolidujace = [];
+    for (let i = 0; i < dni; i++) {
+      const d = P.fromIso(data);
+      d.setDate(d.getDate() + i);
+      const iso = P.iso(d);
+      S()
+        .wizyty.filter((w) => w.data === iso && w.status !== 'odwolana')
+        .forEach((w) => {
+          const h = Number(w.godzina.split(':')[0]);
+          if (h >= od && h < doG) kolidujace.push(w);
+        });
+    }
+    P.akcje.dodajBlokade({ data, od, do: doG, powod: $('#bl-powod').value, dni });
+    schowajModal();
+    toast(
+      kolidujace.length
+        ? `Zablokowano. Uwaga: w tym czasie stoi ${kolidujace.length} umówionych wizyt — przełóż je.`
+        : `Zablokowano ${dni > 1 ? `${dni} dni` : 'czas'}`,
+      true
+    );
+  }
+
+  /* ── Kto wejdzie na zwolniony termin ───────────────────────────────── */
+  function formKandydaci(wizyta) {
+    const t = wizyta.terapiaId ? P.terapia(wizyta.terapiaId) : null;
+    const kandydaci = P.kandydaciNaTermin(wizyta.data, wizyta.godzina, t ? t.linia : null);
+    if (!kandydaci.length) return;
+    modal(
+      'Zwolnił się termin',
+      `<p class="modal__info"><strong>${krotka(wizyta.data)}, ${wizyta.godzina}</strong> jest znów wolny. Ci pacjenci mają aktywną terapię i nie mają umówionego kolejnego terminu — na górze osoby z tym samym problemem i czekające najdłużej.</p>
+      <ul class="prosta">
+        ${kandydaci
+          .map(
+            (k) => `<li>
+              <span>${esc(k.pacjent.imie)}<em>${esc(k.terapia.etykieta)}${k.czeka < 900 ? ` · ${k.czeka} dni od ostatniej wizyty` : ' · jeszcze bez wizyty'}${k.taSamaLinia ? ' · ten sam problem' : ''}</em></span>
+              <span class="prosta__akcje">
+                <a class="btn btn--sm btn--ghost" href="tel:${esc(String(k.pacjent.telefon).replace(/\s/g, ''))}">${ikona('phone')}Zadzwoń</a>
+                <button class="btn btn--sm btn--accent" type="button" data-zapisz="wstaw-na-termin"
+                  data-pacjent-id="${k.pacjent.id}" data-terapia="${k.terapia.id}"
+                  data-data="${wizyta.data}" data-godzina="${wizyta.godzina}" data-usluga="${wizyta.uslugaId}">Wstaw tutaj</button>
+              </span>
+            </li>`
+          )
+          .join('')}
+      </ul>`,
+      `<button class="btn btn--ghost" type="button" data-close>Zostaw wolny</button>`
+    );
+  }
+
+  /* ── Zamknięcie terapii ────────────────────────────────────────────── */
+  function formZamknij(tid) {
+    const t = P.terapia(tid);
+    const p = P.pacjent(t.pacjentId);
+    const w = P.wynikTerapii(tid);
+    const poprawa = w.bolStart !== null && w.bolKoniec !== null ? w.bolStart - w.bolKoniec : null;
+    const tekst =
+      `${p.imie.split(' ')[0]}, dziękujemy za wspólną pracę. ` +
+      (poprawa !== null && poprawa > 0 ? `Ból spadł z ${w.bolStart} na ${w.bolKoniec} w skali 0–10. ` : '') +
+      `Jeśli było warto, opinia w Mapach Google bardzo pomaga innym trafić do gabinetu: [link do wizytówki]`;
+
+    modal(
+      'Zamknij terapię',
+      `<p class="modal__info">${esc(p.imie)} · ${esc(t.etykieta)}</p>
+      <div class="wynik">
+        <div><span>Wizyty</span><b>${w.wizytyOdbyte} z ${w.planWizyt}</b></div>
+        <div><span>Ból</span><b>${w.bolStart !== null ? `${w.bolStart} → ${w.bolKoniec}` : 'brak odczytów'}</b></div>
+        <div><span>Ćwiczenia</span><b>${w.cwiczenia === null ? 'brak odhaczeń' : `${w.cwiczenia}%`}</b></div>
+        <div><span>Czas terapii</span><b>${w.dni !== null ? `${w.dni} dni` : '—'}</b></div>
+      </div>
+      <div class="field field--full">
+        <label for="zk-powod">Dlaczego kończymy</label>
+        <select id="zk-powod">
+          <option value="plan zrealizowany">Plan zrealizowany, cel osiągnięty</option>
+          <option value="poprawa przed planem">Poprawa wcześniej niż zakładaliśmy</option>
+          <option value="pacjent przerwał">Pacjent przerwał terapię</option>
+          <option value="skierowanie dalej">Przekazany do innego specjalisty</option>
+        </select>
+      </div>
+      <p class="modal__label">Prośba o opinię — gotowa do wysłania</p>
+      <div class="field field--full"><textarea id="zk-opinia" rows="4" readonly>${esc(tekst)}</textarea></div>
+      <label class="seria__check"><input type="checkbox" id="zk-wyslij" checked /><span><strong>Zapisz prośbę o opinię</strong><em>Trafi do historii pacjenta i do kolejki wiadomości na jutro.</em></span></label>`,
+      `<button class="btn btn--ghost" type="button" data-close>Anuluj</button>
+       <button class="btn btn--accent" type="button" data-zapisz="zamknij-terapie" data-terapia="${tid}">Zamknij terapię</button>`
+    );
   }
 
   /* ── Link do karty pacjenta ────────────────────────────────────────── */
@@ -905,6 +1214,8 @@
     if (widok === 'dzis') renderDzis();
     if (widok === 'kalendarz') renderKalendarz();
     if (widok === 'pacjenci') renderPacjenci();
+    if (widok === 'wiadomosci') renderWiadomosci();
+    if (widok === 'miesiac') renderMiesiac();
     if (widok === 'ustawienia') renderUstawienia();
     if (otwartyPacjent) renderDrawer();
   }
@@ -964,12 +1275,35 @@
       }
       case 'przeloz':
         return formUmow({ wizytaId: d.wizyta });
-      case 'odwolaj':
+      case 'odwolaj': {
+        const w = S().wizyty.find((x) => x.id === d.wizyta);
+        const kopia = w ? { ...w } : null;
         P.akcje.zmienStatusWizyty(d.wizyta, 'odwolana');
-        return toast('Wizyta odwołana, termin znów jest wolny', true);
+        toast('Wizyta odwołana, termin znów jest wolny', true);
+        /* Zwolniona godzina to dziura w grafiku — pokazujemy, kim ją zapełnić. */
+        if (kopia && P.dniOd(kopia.data) <= 0) formKandydaci(kopia);
+        return;
+      }
       case 'zakoncz':
-        P.akcje.zakonczTerapie(d.terapia);
-        return toast('Terapia zakończona', true);
+        return formZamknij(d.terapia);
+      case 'blokada':
+        return formBlokada();
+      case 'zdejmij-blokade': {
+        const b = S().blokady.find((x) => x.id === d.blokada);
+        P.akcje.usunBlokade(d.blokada);
+        return toast(`Zdjęto blokadę${b ? `: ${b.powod}` : ''}`, true);
+      }
+      case 'miesiac':
+        miesiacPrzesuniecie = d.o === '0' ? 0 : miesiacPrzesuniecie + Number(d.o);
+        return renderMiesiac();
+      case 'przelacz-wiadomosc': {
+        const wynik = P.akcje.przelaczWiadomosc(d.pacjentId, d.typ);
+        return toast(wynik.wylaczona ? 'Wyłączono ten rodzaj wiadomości dla pacjenta' : 'Włączono z powrotem', true);
+      }
+      case 'druk-cwiczen': {
+        window.open(`pacjent.html?t=${d.terapia}&druk=1`, '_blank', 'noopener');
+        return;
+      }
       case 'przypomnienie': {
         const p = P.pacjent(d.pacjentId);
         P.akcje.zapiszWyslanie(p.id, 'sms', 'Przypomnienie o wizycie');
@@ -1037,6 +1371,26 @@
         P.akcje.zapiszWyslanie(d.pacjentId, 'sms', 'Link do karty terapii i ćwiczeń');
         schowajModal();
         return toast('SMS zapisany w historii pacjenta');
+      case 'blokada':
+        return zapiszBlokade();
+      case 'wstaw-na-termin': {
+        const wynik = P.akcje.umowWizyte({
+          pacjentId: d.pacjentId,
+          terapiaId: d.terapia,
+          data: d.data,
+          godzina: d.godzina,
+          uslugaId: d.usluga,
+        });
+        schowajModal();
+        return toast(wynik.blad ? wynik.blad : `Wstawiono na ${krotka(d.data)}, ${d.godzina}`, !wynik.blad);
+      }
+      case 'zamknij-terapie': {
+        const t = P.terapia(d.terapia);
+        P.akcje.zakonczTerapie(d.terapia, $('#zk-powod').value);
+        if ($('#zk-wyslij').checked) P.akcje.zapiszWyslanie(t.pacjentId, 'opinia', 'Prośba o opinię w Mapach Google');
+        schowajModal();
+        return toast('Terapia zamknięta z wynikiem', true);
+      }
       default:
         break;
     }
@@ -1044,6 +1398,7 @@
 
   document.addEventListener('change', (e) => {
     if (e.target.id === 'uw-dzien') renderSloty();
+    if (e.target.id === 'uw-seria') $('#uw-seria-pola').hidden = !e.target.checked;
   });
 
   document.addEventListener('keydown', (e) => {

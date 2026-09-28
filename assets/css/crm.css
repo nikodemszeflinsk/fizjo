@@ -1406,59 +1406,6 @@ svg path {
   color: var(--muted);
 }
 
-/* Przełącznik */
-.switch {
-  position: relative;
-  display: inline-flex;
-  flex: none;
-  width: 46px;
-  height: 26px;
-  cursor: pointer;
-}
-
-.switch input {
-  position: absolute;
-  opacity: 0;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  cursor: pointer;
-}
-
-.switch span {
-  position: absolute;
-  inset: 0;
-  border-radius: 999px;
-  background: var(--hair-2);
-  transition: background-color 0.25s;
-}
-
-.switch span::after {
-  content: '';
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--white);
-  box-shadow: 0 1px 3px rgba(20, 23, 26, 0.35);
-  transition: translate 0.25s var(--ease-out);
-}
-
-.switch input:checked + span {
-  background: var(--accent);
-}
-
-.switch input:checked + span::after {
-  translate: 20px 0;
-}
-
-.switch input:focus-visible + span {
-  outline: 3px solid var(--accent);
-  outline-offset: 2px;
-}
-
 /* ── Karta pacjenta ───────────────────────────────────────────────────── */
 
 .drawer {
@@ -2876,5 +2823,339 @@ svg path {
     width: 100%;
     max-height: 92vh;
     border-radius: var(--r) var(--r) 0 0;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Kolejka wiadomości, podsumowanie miesiąca, blokady, seria wizyt
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.wyjasnienie {
+  max-width: 76ch;
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.wyjasnienie--uwaga {
+  padding: 10px 14px;
+  border-radius: var(--r-sm);
+  background: var(--accent-soft);
+  color: var(--ink-2);
+}
+
+/* ── Kolejka wiadomości ─────────────────────────────────────────────── */
+.kolejka {
+  display: grid;
+  gap: 2px;
+}
+
+.kolejka > li {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 11px 10px;
+  border-radius: var(--r-sm);
+}
+
+.kolejka > li:nth-child(odd) {
+  background: var(--floor);
+}
+
+.kolejka > li.is-off {
+  opacity: 0.55;
+}
+
+.kolejka__czas {
+  font-family: var(--f-display);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.kolejka__co {
+  min-width: 0;
+}
+
+.kolejka__co strong {
+  display: block;
+  font-size: 0.95rem;
+}
+
+.kolejka__kto {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.kolejka__kto:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.kolejka__co em {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-style: normal;
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+/* ── Przełącznik włączone/wyłączone ─────────────────────────────────── */
+.switch {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.switch > span {
+  display: block;
+  position: relative;
+  width: 38px;
+  height: 22px;
+  border-radius: 11px;
+  background: var(--hair-2);
+  transition: background-color 0.2s;
+}
+
+.switch > span::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--white);
+  transition: transform 0.2s var(--ease-out);
+}
+
+.switch[aria-checked='true'] {
+  color: var(--ink);
+}
+
+.switch[aria-checked='true'] > span {
+  background: var(--ok);
+}
+
+.switch[aria-checked='true'] > span::after {
+  transform: translateX(16px);
+}
+
+.ustawienia-sms {
+  display: grid;
+  gap: 2px;
+}
+
+.ustawienia-sms > li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 9px 10px;
+  border-radius: var(--r-sm);
+}
+
+.ustawienia-sms > li:nth-child(odd) {
+  background: var(--floor);
+}
+
+.ustawienia-sms em {
+  display: block;
+  color: var(--muted);
+  font-style: normal;
+  font-size: 0.78rem;
+}
+
+/* ── Podsumowanie miesiąca ──────────────────────────────────────────── */
+.duza {
+  margin: 12px 0 0;
+  font-family: var(--f-display);
+  font-size: 3.4rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.duza span {
+  display: block;
+  margin-top: 10px;
+  color: var(--muted);
+  font-family: var(--f-body);
+  font-size: 0.88rem;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+.prosta__akcje {
+  flex: none;
+  display: flex;
+  gap: 6px;
+}
+
+/* ── Blokada w kalendarzu ───────────────────────────────────────────── */
+.blok {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  z-index: 2;
+  display: flex;
+  align-items: start;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 7px;
+  background: repeating-linear-gradient(135deg, var(--floor-2) 0 6px, #d7dbd6 6px 12px);
+  color: var(--faint);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.blok span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.blok:hover {
+  color: var(--alert);
+  outline: 2px solid var(--alert);
+}
+
+/* ── Seria wizyt ────────────────────────────────────────────────────── */
+.seria {
+  margin-top: 18px;
+  padding: 14px;
+  border-radius: var(--r-sm);
+  background: var(--floor);
+}
+
+.seria__check {
+  display: flex;
+  align-items: start;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.seria__check input {
+  flex: none;
+  width: 17px;
+  height: 17px;
+  margin-top: 2px;
+  accent-color: var(--accent);
+}
+
+.seria__check strong {
+  display: block;
+  font-size: 0.92rem;
+}
+
+.seria__check em {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-style: normal;
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.seria__pola {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 0 27px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.seria__pola input {
+  width: 62px;
+  padding: 7px 9px;
+  border: 1px solid var(--hair-2);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* ── Wynik terapii ──────────────────────────────────────────────────── */
+.wynik {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px;
+  margin-bottom: 18px;
+}
+
+.wynik > div {
+  padding: 12px 14px;
+  background: var(--floor);
+}
+
+.wynik span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.wynik b {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--f-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.pat__zamknieta {
+  margin: 12px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--hair);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 720px) {
+  .kolejka > li {
+    grid-template-columns: 54px minmax(0, 1fr);
+  }
+
+  .kolejka .switch {
+    grid-column: 2;
+    justify-content: start;
+  }
+
+  .wynik {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .duza {
+    font-size: 2.6rem;
   }
 }

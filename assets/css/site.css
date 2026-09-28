@@ -335,6 +335,7 @@ svg path {
   display: inline-flex;
   align-items: center;
   gap: 12px;
+  white-space: nowrap;
   text-decoration: none;
   margin-right: auto;
 }
@@ -2843,4 +2844,649 @@ svg path {
   .member__name {
     font-size: 1.05rem;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Kwalifikator, „otwarte teraz”, pasek telefonu
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.kw {
+  max-width: 720px;
+}
+
+.kw__licznik {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.kw__h3 {
+  margin: 0 0 20px;
+  font-family: var(--f-display);
+  font-size: clamp(1.4rem, 3.4vw, 1.9rem);
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+}
+
+.kw__opcje {
+  display: grid;
+  gap: 8px;
+}
+
+.kw__opcja {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 18px 20px;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sign);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 1.02rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.2s var(--ease-out), background-color 0.2s;
+}
+
+.kw__opcja:hover {
+  border-color: var(--ink);
+  transform: translateX(4px);
+}
+
+.kw__kreska {
+  flex: none;
+  width: 4px;
+  height: 26px;
+  border-radius: 2px;
+  background: var(--c, var(--ink));
+}
+
+.kw__wynik {
+  padding: 28px;
+  border-radius: var(--r-sign);
+  background: var(--paper);
+  border-top: 5px solid var(--c);
+}
+
+.kw__label {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.kw__dlaczego {
+  margin: 0 0 22px;
+  max-width: 56ch;
+  color: var(--ink-2, var(--ink));
+  font-size: 1.02rem;
+  line-height: 1.6;
+}
+
+.kw__dane {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 1px;
+  margin: 0 0 24px;
+  background: var(--hair);
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sign);
+  overflow: hidden;
+}
+
+.kw__dane > div {
+  padding: 14px 16px;
+  background: var(--floor);
+}
+
+.kw__dane dt {
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.kw__dane dd {
+  margin: 5px 0 0;
+  font-family: var(--f-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.kw__akcje {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.kw__uwaga {
+  margin: 20px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--hair);
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+/* ── Otwarte teraz ──────────────────────────────────────────────────── */
+/* Pasek górny jest ciasny — sygnał otwarcia pokazujemy tylko tam, gdzie się mieści. */
+@media (max-width: 1340px) {
+  .teraz {
+    display: none !important;
+  }
+}
+
+.teraz {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.teraz em {
+  color: var(--muted);
+  font-style: normal;
+  font-weight: 400;
+}
+
+.teraz__kropka {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+
+.teraz.is-open {
+  color: var(--ink);
+}
+
+.teraz.is-open .teraz__kropka {
+  background: #13875a;
+  box-shadow: 0 0 0 3px rgba(19, 135, 90, 0.18);
+}
+
+/* ── Co dalej po rezerwacji ─────────────────────────────────────────── */
+.done__dalej {
+  display: grid;
+  gap: 8px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.done__dalej li {
+  position: relative;
+  padding-left: 22px;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.done__dalej li::before {
+  content: '';
+  position: absolute;
+  top: 9px;
+  left: 0;
+  width: 10px;
+  height: 2px;
+  background: var(--c, var(--ink));
+}
+
+/* ── Pasek telefonu na telefonie ────────────────────────────────────── */
+.pasek {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .pasek {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 40;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+    background: var(--ink);
+  }
+
+  .pasek__tel,
+  .pasek__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px 18px;
+    border-radius: 999px;
+    font-family: var(--f-body);
+    font-size: 0.98rem;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .pasek__tel {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    color: #fff;
+  }
+
+  .pasek__tel svg {
+    width: 17px;
+    height: 17px;
+    fill: currentColor;
+  }
+
+  .pasek__btn {
+    background: #fff;
+    color: var(--ink);
+  }
+
+  body {
+    padding-bottom: 76px;
+  }
+
+  .toast {
+    bottom: 88px;
+  }
+
+  .teraz {
+    display: none;
+  }
+
+  .kw__wynik {
+    padding: 22px 18px;
+  }
+
+  .kw__opcja {
+    padding: 16px;
+    font-size: 0.98rem;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Podstrony problemowe: jedna kolumna, treść przed wszystkim
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.problem main {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 80px;
+}
+
+.okruchy {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 26px 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.okruchy a {
+  color: var(--muted);
+}
+
+.okruchy [aria-current] {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.pro-hero {
+  padding: 34px 0 44px;
+}
+
+.pro-hero__kicker {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0 18px;
+  padding: 6px 14px 6px 12px;
+  border-left: 4px solid var(--c);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.pro-hero__title {
+  margin: 0;
+  font-family: var(--f-display);
+  font-size: clamp(2.2rem, 7vw, 3.6rem);
+  font-weight: 900;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+
+.pro-hero__title span {
+  display: block;
+  color: var(--muted);
+}
+
+.pro-hero__lead {
+  max-width: 58ch;
+  margin: 22px 0 0;
+  font-size: clamp(1.05rem, 2.2vw, 1.22rem);
+  line-height: 1.6;
+}
+
+.pro-hero__cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.pro-hero__termin {
+  margin: 22px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--hair);
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.pro-hero__termin strong {
+  color: var(--ink);
+}
+
+.pro-blok {
+  padding: 40px 0;
+  border-top: 1px solid var(--hair);
+}
+
+.pro-h2 {
+  margin: 0 0 24px;
+  font-family: var(--f-display);
+  font-size: clamp(1.5rem, 3.6vw, 2.1rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+}
+
+.pro-tekst {
+  max-width: 62ch;
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.68;
+}
+
+/* ── Objawy ─────────────────────────────────────────────────────────── */
+.objawy {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.objawy li {
+  padding: 20px 22px;
+  border-left: 4px solid var(--c);
+  background: var(--paper);
+}
+
+.objawy h3 {
+  margin: 0 0 6px;
+  font-family: var(--f-display);
+  font-size: 1.12rem;
+  font-weight: 700;
+}
+
+.objawy p {
+  margin: 0;
+  max-width: 60ch;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* ── Przebieg ───────────────────────────────────────────────────────── */
+.pro-blok--ciemny {
+  margin: 0 calc(var(--pad) * -1);
+  padding: 44px var(--pad);
+  border-top: 0;
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.pro-blok--ciemny .pro-h2 {
+  color: #fff;
+}
+
+.przebieg {
+  display: grid;
+  gap: 26px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: krok;
+}
+
+.przebieg li {
+  position: relative;
+  padding-left: 52px;
+  counter-increment: krok;
+}
+
+.przebieg li::before {
+  content: counter(krok);
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--c);
+  color: var(--on);
+  font-family: var(--f-display);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.przebieg h3 {
+  margin: 4px 0 6px;
+  font-family: var(--f-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.przebieg p {
+  margin: 0;
+  max-width: 58ch;
+  color: #c9cdd1;
+  line-height: 1.62;
+}
+
+/* ── Cennik linii ───────────────────────────────────────────────────── */
+.pro-cennik {
+  margin-top: 28px;
+}
+
+.pro-tabela {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.pro-tabela caption {
+  padding-bottom: 12px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.pro-tabela th {
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--ink);
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.pro-tabela td {
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--hair);
+  font-size: 1rem;
+}
+
+.pro-tabela td:first-child {
+  font-weight: 700;
+}
+
+.pro-tabela td:not(:first-child) {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.pro-tabela__note {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+/* ── Pytania ────────────────────────────────────────────────────────── */
+.pro-faq {
+  margin: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.pro-faq > div {
+  padding: 20px 22px;
+  background: var(--paper);
+}
+
+.pro-faq dt {
+  font-family: var(--f-display);
+  font-size: 1.08rem;
+  font-weight: 700;
+}
+
+.pro-faq dd {
+  margin: 8px 0 0;
+  max-width: 62ch;
+  color: var(--muted);
+  line-height: 1.62;
+}
+
+/* ── Finał i stopka ─────────────────────────────────────────────────── */
+.pro-finale {
+  margin-top: 44px;
+  padding: 40px 32px;
+  border-top: 5px solid var(--c);
+  background: var(--paper);
+}
+
+.pro-finale__h {
+  margin: 0 0 12px;
+  font-family: var(--f-display);
+  font-size: clamp(1.6rem, 4vw, 2.3rem);
+  font-weight: 900;
+  letter-spacing: -0.025em;
+}
+
+.pro-finale p {
+  max-width: 54ch;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.pro-stopka {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 30px var(--pad) 60px;
+  border-top: 1px solid var(--hair);
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.pro-stopka p {
+  margin: 0 0 6px;
+}
+
+.pro-stopka strong {
+  color: var(--ink);
+}
+
+.pro-stopka__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.pro-stopka__nav a {
+  padding: 8px 14px;
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  color: var(--ink);
+  font-size: 0.88rem;
+  text-decoration: none;
+}
+
+.pro-stopka__nav a:hover {
+  border-color: var(--ink);
+}
+
+@media (max-width: 760px) {
+  .pro-finale {
+    padding: 30px 20px;
+  }
+
+  .objawy li,
+  .pro-faq > div {
+    padding: 18px;
+  }
+
+  .pro-stopka {
+    padding-bottom: 100px;
+  }
+}
+
+/* Link do podstrony problemu obok przycisku rezerwacji. */
+.spec__akcje {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 20px;
+}
+
+.spec__wiecej {
+  color: var(--ink);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-decoration-color: var(--hair-2);
+  text-underline-offset: 4px;
+}
+
+.spec__wiecej:hover {
+  text-decoration-color: currentColor;
 }

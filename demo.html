@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
-  <link rel="stylesheet" href="assets/css/site.css?v=4" />
+  <link rel="stylesheet" href="assets/css/site.css?v=6" />
   <script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
@@ -58,6 +58,7 @@
       </nav>
 
       <div class="top__actions">
+        <p class="teraz" id="teraz" hidden></p>
         <a class="phone" href="tel:+48000000000">
           <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M6.6 3.5 8 6.8 6.4 8.2a9.5 9.5 0 0 0 5.4 5.4l1.4-1.6 3.3 1.4-.6 2.6c-.1.5-.6.9-1.1.9A13.4 13.4 0 0 1 2.1 4.2c0-.5.4-1 .9-1.1z" /></svg>
           <span data-k="telefon">+48 000 000 000</span>
@@ -112,6 +113,17 @@
     <!-- Linia przewodnia przez całą stronę; sekcje są jej przystankami. -->
     <div class="journey" id="journey">
       <div class="guide" aria-hidden="true"><span class="guide__fill" id="guide-fill"></span></div>
+
+      <!-- ── Kwalifikator: trzy pytania zamiast przeglądania cennika ─ -->
+      <section class="stop stop--kw" id="kwalifikator" aria-labelledby="kw-title">
+        <header class="stop__head">
+          <h2 class="stop__title" id="kw-title">Nie wiesz, co wybrać?</h2>
+          <p class="stop__lead">
+            Odpowiedz na trzy pytania, a podpowiem, od czego zacząć i kiedy jest najbliższy wolny termin.
+          </p>
+        </header>
+        <div class="kw" id="kw"></div>
+      </section>
 
       <!-- ── Specjalizacje ──────────────────────────────────────── -->
       <section class="stop" id="specjalizacje" aria-labelledby="specjalizacje-title">
@@ -278,6 +290,15 @@
     </section>
   </main>
 
+  <!-- Na telefonie połowa pacjentów i tak dzwoni — pasek jest zawsze pod ręką. -->
+  <div class="pasek" id="pasek">
+    <a class="pasek__tel" href="tel:+48000000000">
+      <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M6.6 3.5 8 6.8 6.4 8.2a9.5 9.5 0 0 0 5.4 5.4l1.4-1.6 3.3 1.4-.6 2.6c-.1.5-.6.9-1.1.9A13.4 13.4 0 0 1 2.1 4.2c0-.5.4-1 .9-1.1z" /></svg>
+      Zadzwoń
+    </a>
+    <a class="pasek__btn" href="#rezerwacja" data-book>Umów wizytę</a>
+  </div>
+
   <footer class="foot">
     <div class="foot__in">
       <div class="foot__brand">
@@ -315,6 +336,6 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>
   <script src="assets/js/data.js" defer></script>
-  <script src="assets/js/app.js" defer></script>
+  <script src="assets/js/app.js?v=3" defer></script>
 </body>
 </html>
