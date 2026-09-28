@@ -10,8 +10,15 @@
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const LINES = Object.fromEntries(K.linie.map((l) => [l.id, l]));
-  const FIZJO = K.fizjoterapeuta;
+  const TEAM = K.zespol;
+  const OSOBY = Object.fromEntries(TEAM.map((z) => [z.id, z]));
   const GABINET = K.gabinet;
+
+  /** Kto zajmuje się danym problemem. */
+  const osobyLinii = (lid) => TEAM.filter((z) => z.linie.includes(lid));
+  /** „mgr Jan Kowalski" → „Jan Kowalski" tam, gdzie tytuł tylko zajmuje miejsce. */
+  const bezTytulu = (imie) => String(imie).replace(/^(mgr|dr|lek\.?|prof\.?)\s+/i, '');
+  const imieSame = (imie) => bezTytulu(imie).split(' ')[0];
   /* Każdy problem ma własną stronę — to ona odpowiada na pytanie z wyszukiwarki. */
   const PODSTRONY = {
     kregoslup: 'fizjoterapia-kregoslupa',
@@ -124,27 +131,45 @@
 
   const dayLong = (d) => `${DOW_LONG[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]}`;
 
-  /** Wolne godziny w danym dniu. Jeden terapeuta, więc grafik jest jeden. */
-  function slotsFor(d) {
-    const dow = d.getDay();
-    if (!FIZJO.grafik.includes(dow)) return [];
-    const [from, to] = dow === 6 ? K.godzinyWizyt.sobota : K.godzinyWizyt.tydzien;
-    const out = [];
-    for (let h = from; h < to; h++) {
-      const min = h % 2 ? 30 : 0;
-      const at = new Date(d);
-      at.setHours(h, min, 0, 0);
-      if (at - now < 60 * 60 * 1000) continue; // nie wcześniej niż za godzinę
-      if (hash(`${iso(d)}|${h}`) < 0.55) continue; // termin zajęty
-      out.push({ time: `${h}:${String(min).padStart(2, '0')}`, date: iso(d), at });
-    }
-    return out;
+  /** Godziny otwarcia gabinetu danego dnia: suma grafików zespołu. */
+  function godzinyGabinetu(dow) {
+    const zakresy = TEAM.map((z) => z.grafik[dow]).filter(Boolean);
+    if (!zakresy.length) return null;
+    return [Math.min(...zakresy.map((x) => x[0])), Math.max(...zakresy.map((x) => x[1]))];
   }
 
-  /** Wszystkie wolne terminy, opcjonalnie tylko w jednym dniu. */
-  function findSlots({ date } = {}) {
+  /**
+   * Wolne godziny w danym dniu. Każda osoba ma własny grafik, więc jeden termin
+   * może być wolny u kilku osób naraz — slot niesie listę tych, którzy mogą go wziąć.
+   */
+  function slotsFor(d, filtr = {}) {
+    const dow = d.getDay();
+    let osoby = TEAM.filter((z) => z.grafik[dow]);
+    if (filtr.osoba) osoby = osoby.filter((z) => z.id === filtr.osoba);
+    if (filtr.line) osoby = osoby.filter((z) => z.linie.includes(filtr.line));
+    if (!osoby.length) return [];
+
+    const mapa = new Map();
+    osoby.forEach((z) => {
+      const [from, to] = z.grafik[dow];
+      for (let h = from; h < to; h++) {
+        const min = h % 2 ? 30 : 0;
+        const at = new Date(d);
+        at.setHours(h, min, 0, 0);
+        if (at - now < 60 * 60 * 1000) continue; // nie wcześniej niż za godzinę
+        if (hash(`${iso(d)}|${h}|${z.id}`) < 0.5) continue; // u tej osoby zajęte
+        const klucz = `${h}:${String(min).padStart(2, '0')}`;
+        if (!mapa.has(klucz)) mapa.set(klucz, { time: klucz, date: iso(d), at, osoby: [] });
+        mapa.get(klucz).osoby.push(z);
+      }
+    });
+    return [...mapa.values()].sort((a, b) => a.at - b.at);
+  }
+
+  /** Wszystkie wolne terminy, opcjonalnie w jednym dniu, u jednej osoby albo dla problemu. */
+  function findSlots({ date, osoba, line } = {}) {
     const days = date ? [fromIso(date)] : DAYS;
-    return days.flatMap((d) => slotsFor(d)).sort((a, b) => a.at - b.at);
+    return days.flatMap((d) => slotsFor(d, { osoba, line })).sort((a, b) => a.at - b.at);
   }
 
   const nextSlot = (f) => findSlots(f)[0] || null;
@@ -173,7 +198,7 @@
           <span class="board__time">${s.time}</span>
           <span class="board__day">${dayLabel(s.at)}</span>
           <span class="board__line">${esc(GABINET.adres)}${icon('arrow', 'board__go')}</span>
-          <span class="board__who">${esc(FIZJO.imie)}</span>
+          <span class="board__who">${s.osoby.map((z) => esc(imieSame(z.imie))).join(", ")}</span>
         </button></li>`
       )
       .join('');
@@ -237,25 +262,36 @@
 
   /* ── Kto Cię przyjmie ──────────────────────────────────────────────── */
   function renderAbout() {
-    const l = LINES[K.linie[0].id];
-    const s = nextSlot();
-    $('#about').innerHTML = `
-      <figure class="about__photo">
-        <img class="duo" data-duo="${l.id}" src="${FIZJO.zdjecie}" alt="${esc(FIZJO.alt)}" width="720" height="900" loading="lazy" />
-      </figure>
-      <div class="about__body">
-        <h3 class="about__name">${esc(FIZJO.imie)}</h3>
-        <p class="about__role">${esc(FIZJO.rola)}</p>
-        <p class="about__bio">${esc(FIZJO.bio)}</p>
-        <ul class="about__kursy" aria-label="Kursy i certyfikaty">
-          ${FIZJO.kursy.map((k) => `<li>${esc(k)}</li>`).join('')}
-        </ul>
-        <p class="about__meta">Języki: ${FIZJO.jezyki.join(', ')} · Najbliższy termin: <strong>${slotText(s)}</strong></p>
-        <button class="btn btn--ink" type="button" data-book>Umów wizytę ${icon('arrow')}</button>
-      </div>`;
+    $('#about').innerHTML = TEAM.map((z) => {
+      const s = nextSlot({ osoba: z.id });
+      const dni = [1, 2, 3, 4, 5, 6]
+        .filter((d) => z.grafik[d])
+        .map((d) => `${DOW[d]} ${z.grafik[d][0]}–${z.grafik[d][1]}`)
+        .join(' · ');
+      return `<article class="osoba-karta" style="--c:${z.kolor}">
+        <figure class="osoba-karta__foto">
+          <img class="duo" data-duo="${z.linie[0]}" src="${z.zdjecie}" alt="${esc(z.alt)}" width="720" height="900" loading="lazy" />
+        </figure>
+        <div class="osoba-karta__body">
+          <h3 class="osoba-karta__name">${esc(z.imie)}</h3>
+          <p class="osoba-karta__role">${esc(z.rola)}</p>
+          <p class="osoba-karta__bio">${esc(z.bio)}</p>
+          <ul class="osoba-karta__linie" aria-label="Czym się zajmuje">
+            ${z.linie.map((lid) => `<li style="--c:${LINES[lid].kolor}">${esc(LINES[lid].problem)}</li>`).join('')}
+          </ul>
+          <ul class="osoba-karta__kursy" aria-label="Kursy i certyfikaty">
+            ${z.kursy.map((k) => `<li>${esc(k)}</li>`).join('')}
+          </ul>
+          <p class="osoba-karta__grafik">Przyjmuje: ${dni}</p>
+          <p class="osoba-karta__meta">Najbliższy termin: <strong>${slotText(s)}</strong></p>
+          <button class="btn btn--color" type="button" data-start-osoba="${z.id}">
+            Umów do: ${esc(imieSame(z.imie))} ${icon('arrow')}
+          </button>
+        </div>
+      </article>`;
+    }).join('');
   }
 
-  /* ── Cennik, opinie, FAQ, stopka ─────────────────────────────────────── */
   function renderPrices() {
     $('#prices').innerHTML = K.linie
       .map(
@@ -354,6 +390,7 @@
     step: 0,
     line: null,
     service: null,
+    osoba: null, // null = ktokolwiek wolny
     date: null,
     time: null,
     data: { name: '', phone: '', email: '', note: '', first: true, sms: true, consent: false },
@@ -361,6 +398,13 @@
   };
 
   const lineOf = () => LINES[B.line];
+
+  /** Kto ostatecznie przyjmie: wybrana osoba albo pierwsza wolna w tym slocie. */
+  function osobaWizyty() {
+    if (B.osoba && OSOBY[B.osoba]) return OSOBY[B.osoba];
+    const s = findSlots({ date: B.date, line: B.line }).find((x) => x.time === B.time);
+    return (s && s.osoby[0]) || osobyLinii(B.line)[0] || TEAM[0];
+  }
 
   function complete(i) {
     return [!!B.service, !!(B.date && B.time), false][i];
@@ -458,14 +502,31 @@
 
   function viewTime() {
     const l = lineOf();
-    const counts = DAYS.map((d) => findSlots({ date: iso(d) }).length);
-    if (!B.date) {
+    const filtr = { osoba: B.osoba, line: B.line };
+    const dostepni = osobyLinii(B.line);
+    const counts = DAYS.map((d) => findSlots({ date: iso(d), ...filtr }).length);
+    if (!B.date || !counts[DAYS.findIndex((d) => iso(d) === B.date)]) {
       const idx = counts.findIndex((n) => n > 0);
-      if (idx >= 0) B.date = iso(DAYS[idx]);
+      B.date = idx >= 0 ? iso(DAYS[idx]) : null;
+      B.time = null;
     }
-    const slots = B.date ? findSlots({ date: B.date }) : [];
+    const slots = B.date ? findSlots({ date: B.date, ...filtr }) : [];
 
     const body = `
+      ${
+        dostepni.length > 1
+          ? `<div class="kto-wybor" role="group" aria-label="Kto ma przyjąć">
+              <button class="kto-chip${B.osoba ? '' : ' is-on'}" type="button" data-pick-osoba="">Ktokolwiek wolny</button>
+              ${dostepni
+                .map(
+                  (z) => `<button class="kto-chip${B.osoba === z.id ? ' is-on' : ''}" type="button" data-pick-osoba="${z.id}" style="--c:${z.kolor}">
+                    <span class="kto-chip__mark"></span>${esc(bezTytulu(z.imie))}
+                  </button>`
+                )
+                .join('')}
+            </div>`
+          : ''
+      }
       <div class="days" role="group" aria-label="Wybierz dzień">
         ${DAYS.map(
           (d, i) => `<button class="day" type="button" data-pick-date="${iso(d)}" aria-pressed="${B.date === iso(d)}" ${counts[i] ? '' : 'disabled'}
@@ -480,10 +541,19 @@
       ${
         slots.length
           ? `<div class="slots" role="group" aria-label="Wybierz godzinę" style="--c:${l.kolor};--on:${l.naKolorze}">
-            ${slots.map((s) => `<button class="slot" type="button" data-pick-time="${s.time}" aria-pressed="${B.time === s.time}">${s.time}</button>`).join('')}
+            ${slots
+              .map(
+                (s) => `<button class="slot" type="button" data-pick-time="${s.time}" aria-pressed="${B.time === s.time}"
+                  aria-label="${s.time}, przyjmie: ${s.osoby.map((z) => bezTytulu(z.imie)).join(' albo ')}">${s.time}${
+                  !B.osoba && dostepni.length > 1 ? `<em>${s.osoby.map((z) => imieSame(z.imie)).join('/')}</em>` : ''
+                }</button>`
+              )
+              .join('')}
           </div>`
-          : `<div class="empty"><strong>W tym dniu nie ma już wolnych godzin.</strong>
-             Wybierz inny dzień albo zadzwoń: ${esc(K.telefon)}.</div>`
+          : `<div class="empty"><strong>${
+              B.osoba ? `${esc(imieSame(OSOBY[B.osoba].imie))} nie ma tego dnia wolnych godzin.` : 'W tym dniu nie ma już wolnych godzin.'
+            }</strong>
+             Wybierz inny dzień${B.osoba ? ', inną osobę' : ''} albo zadzwoń: ${esc(K.telefon)}.</div>`
       }`;
     return stepShell(1, 'Kiedy Ci pasuje?', body, { nextDisabled: !(B.date && B.time) });
   }
@@ -501,7 +571,7 @@
       <div class="fields">
         ${field('name', 'Imię i nazwisko', 'text', d.name, 'placeholder="Jan Przykładowy"', true, 'name')}
         ${field('phone', 'Telefon', 'tel', d.phone, 'placeholder="+48 000 000 000" inputmode="tel"', false, 'tel')}
-        ${field('email', 'E-mail', 'email', d.email, 'placeholder="adres@email.com"', false, 'email')}
+        ${field('email', 'E-mail <em>(opcjonalnie)</em>', 'email', d.email, 'placeholder="adres@email.com"', false, 'email')}
         <div class="field field--full">
           <label for="f-note">Co Ci dolega? <em>(opcjonalnie)</em></label>
           <textarea id="f-note" name="note" placeholder="Np. ból lędźwi od dwóch tygodni, promieniuje do lewej nogi.">${esc(d.note)}</textarea>
@@ -527,10 +597,12 @@
       <p class="done__code">Numer rezerwacji: <strong>${B.done}</strong></p>
       <dl class="done__list">
         <dt>Wizyta</dt><dd>${esc(svc.nazwa)} · ${svc.minuty} min · ${zl(svc.cena)}</dd>
-        <dt>Prowadzi</dt><dd>${esc(FIZJO.imie)}</dd>
+        <dt>Prowadzi</dt><dd>${esc(osobaWizyty().imie)}</dd>
         <dt>Kiedy</dt><dd>${dayLong(fromIso(B.date))}, ${B.time}</dd>
         <dt>Gdzie</dt><dd>${esc(GABINET.adres)}, ${esc(GABINET.kod)}</dd>
-        <dt>Potwierdzenie</dt><dd>${B.data.sms ? 'SMS na ' + esc(B.data.phone) : 'e-mail na ' + esc(B.data.email)}</dd>
+        <dt>Potwierdzenie</dt><dd>${
+          B.data.sms || !B.data.email.trim() ? 'SMS na ' + esc(B.data.phone) : 'e-mail na ' + esc(B.data.email)
+        }</dd>
       </dl>
       <div class="done__actions">
         <button class="btn btn--color" type="button" data-ics>${icon('calendar')}Dodaj do kalendarza</button>
@@ -589,7 +661,10 @@
     const e = {};
     if (d.name.length < 3) e.name = 'Podaj imię i nazwisko.';
     if (d.phone.replace(/\D/g, '').length < 9) e.phone = 'Podaj numer telefonu — wyślemy na niego przypomnienie.';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)) e.email = 'Sprawdź adres e-mail — brakuje w nim „@” albo domeny.';
+    /* E-mail jest opcjonalny — potwierdzenie i tak idzie SMS-em. Sprawdzamy go
+       tylko wtedy, gdy ktoś go wpisał. */
+    if (d.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email))
+      e.email = 'Sprawdź adres e-mail — brakuje w nim „@” albo domeny.';
     if (!d.consent) e.consent = 'Bez tej zgody nie możemy zapisać wizyty.';
     return e;
   }
@@ -624,7 +699,7 @@
       `DTSTART:${f(start)}`,
       `DTEND:${f(end)}`,
       `SUMMARY:${svc.nazwa} — ${K.nazwa}`,
-      `DESCRIPTION:${FIZJO.imie}. Numer rezerwacji ${B.done}. Zabierz wygodny strój.`,
+      `DESCRIPTION:${osobaWizyty().imie}. Numer rezerwacji ${B.done}. Zabierz wygodny strój.`,
       `LOCATION:${GABINET.adres}\\, ${GABINET.kod}`,
       'END:VEVENT',
       'END:VCALENDAR',
@@ -647,6 +722,7 @@
     }
     /* Kwalifikator zna już usługę — rezerwacja zaczyna się od wyboru terminu. */
     if (pre.service) B.service = pre.service;
+    B.osoba = pre.osoba || null;
     if (pre.date) {
       B.date = pre.date;
       B.time = pre.time;
@@ -665,6 +741,7 @@
     const d = t.dataset;
     if (d.pickLine) {
       B.line = d.pickLine;
+      if (B.osoba && !OSOBY[B.osoba].linie.includes(B.line)) B.osoba = null;
       reconcile();
       renderBooking(false);
       const first = $('[data-pick-service]', $('#booking-main'));
@@ -678,6 +755,10 @@
       renderBooking(false);
       const s = $('.slot', $('#booking-main'));
       s && s.focus();
+    } else if (d.pickOsoba !== undefined) {
+      B.osoba = d.pickOsoba || null;
+      B.time = null;
+      renderBooking(false);
     } else if (d.pickTime) {
       B.time = d.pickTime;
       goto(2);
@@ -690,7 +771,7 @@
     } else if ('ics' in d) {
       downloadIcs();
     } else if ('restart' in d) {
-      Object.assign(B, { step: 0, line: null, service: null, date: null, time: null, done: null });
+      Object.assign(B, { step: 0, line: null, service: null, osoba: null, date: null, time: null, done: null });
       B.data.consent = false;
       renderBooking();
     }
@@ -795,6 +876,10 @@
         return startBooking({ line: u.linia, service: u.id });
       }
 
+      if (d.startOsoba) {
+        const z = OSOBY[d.startOsoba];
+        return startBooking({ line: z.linie[0], osoba: z.id });
+      }
       if (el.matches('.line')) return startBooking({ line: d.line });
       if (d.startLine) return startBooking({ line: d.startLine });
       if (d.slot) {
@@ -932,7 +1017,7 @@
     if (!el) return;
     const teraz = new Date();
     const dow = teraz.getDay();
-    const zakres = dow === 0 ? null : dow === 6 ? K.godzinyWizyt.sobota : K.godzinyWizyt.tydzien;
+    const zakres = godzinyGabinetu(dow);
     const minuty = teraz.getHours() * 60 + teraz.getMinutes();
     const otwarte = zakres && minuty >= zakres[0] * 60 && minuty < zakres[1] * 60;
     el.hidden = false;
@@ -941,12 +1026,13 @@
       el.innerHTML = `<span class="teraz__kropka" aria-hidden="true"></span>Otwarte teraz<em>do ${zakres[1]}:00</em>`;
       return;
     }
-    /* Najbliższy dzień pracy: fizjoterapeuta ma grafik w danych. */
+    /* Najbliższy dzień, w którym ktokolwiek z zespołu przyjmuje. */
     for (let i = 1; i <= 7; i++) {
       const d = new Date(teraz);
       d.setDate(teraz.getDate() + i);
-      if (!FIZJO.grafik.includes(d.getDay())) continue;
-      const od = d.getDay() === 6 ? K.godzinyWizyt.sobota[0] : K.godzinyWizyt.tydzien[0];
+      const g = godzinyGabinetu(d.getDay());
+      if (!g) continue;
+      const od = g[0];
       el.innerHTML = `<span class="teraz__kropka" aria-hidden="true"></span>Zamknięte<em>${i === 1 ? 'jutro' : dayLong(d)} od ${od}:00</em>`;
       return;
     }
@@ -970,7 +1056,9 @@
   initReveals();
 
   const fin = nextSlot();
-  $('#finale-next').textContent = fin ? `${dayLabel(fin.at)}, ${fin.time} — ${FIZJO.imie}` : 'zadzwoń, znajdziemy miejsce';
+  $('#finale-next').textContent = fin
+    ? `${dayLabel(fin.at)}, ${fin.time} — ${fin.osoby.map((z) => imieSame(z.imie)).join(' lub ')}`
+    : 'zadzwoń, znajdziemy miejsce';
 
   // Linie wjeżdżają dopiero, gdy krój jest gotowy — inaczej podpisy przeskoczą.
   const reveal = () => requestAnimationFrame(() => $('#lines').classList.add('is-in'));

@@ -3515,3 +3515,192 @@ svg path {
 .spec__wiecej:hover {
   text-decoration-color: currentColor;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Zespół na stronie i wybór osoby w rezerwacji
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.zespol {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.osoba-karta {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--r-sign);
+  background: var(--paper);
+  overflow: hidden;
+}
+
+.osoba-karta__foto {
+  margin: 0;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+
+.osoba-karta__foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+}
+
+.osoba-karta__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px;
+}
+
+.osoba-karta__name {
+  margin: 0;
+  font-family: var(--f-display);
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.osoba-karta__role {
+  display: inline-flex;
+  align-self: start;
+  margin: 0;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: var(--c);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.osoba-karta__bio {
+  margin: 0;
+  color: var(--ink-2);
+  line-height: 1.6;
+}
+
+.osoba-karta__linie,
+.osoba-karta__kursy {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.osoba-karta__linie li {
+  position: relative;
+  padding: 4px 12px 4px 22px;
+  border-radius: 999px;
+  background: var(--floor);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.osoba-karta__linie li::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  width: 7px;
+  height: 7px;
+  margin-top: -3px;
+  border-radius: 50%;
+  background: var(--c);
+}
+
+.osoba-karta__kursy li {
+  padding: 4px 11px;
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.osoba-karta__grafik,
+.osoba-karta__meta {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.osoba-karta__meta strong {
+  color: var(--ink);
+}
+
+.osoba-karta .btn {
+  align-self: start;
+  margin-top: 4px;
+}
+
+/* ── Wybór osoby w rezerwacji ───────────────────────────────────────── */
+.kto-wybor {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 20px;
+}
+
+.kto-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  background: var(--white, #fff);
+  color: var(--muted);
+  font-family: var(--f-body);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.18s, color 0.18s, background-color 0.18s;
+}
+
+.kto-chip:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.kto-chip.is-on {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: #fff;
+}
+
+.kto-chip__mark {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--c, var(--muted));
+}
+
+/* Godzina mówi, kto ją weźmie. */
+.slots .slot em {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.68rem;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  opacity: 0.7;
+}
+
+@media (max-width: 760px) {
+  .zespol {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .kto-wybor {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+
+  .kto-chip {
+    flex: none;
+  }
+}

@@ -1,7 +1,7 @@
 /*
  * Dane gabinetu demo — JEDYNE miejsce do podmiany treści.
  *
- * Demo pokazuje jednoosobowy gabinet fizjoterapii: jeden terapeuta, jeden adres.
+ * Demo pokazuje gabinet fizjoterapii: zespół i jeden adres.
  * Wszystko tutaj to przykład: nazwisko, adres, telefon, ceny i współrzędne.
  * Żeby przerobić demo na konkretny gabinet, wystarczy edytować ten plik
  * i podmienić zdjęcia w assets/img (te same nazwy plików).
@@ -90,19 +90,50 @@ window.KLINIKA = {
     },
   ],
 
-  /* Jeden fizjoterapeuta — to jego gabinet i jego kalendarz. */
-  fizjoterapeuta: {
-    id: 't1',
-    imie: 'mgr Jan Kowalski',
-    rola: 'Fizjoterapeuta, terapia manualna',
-    zdjecie: 'assets/img/zespol-1.jpg',
-    alt: 'Portret fizjoterapeuty w jasnej koszulce polo.',
-    bio: 'Od dwunastu lat pracuję z bólem kręgosłupa i powrotami do sportu. Certyfikowany terapeuta metody McKenziego, absolwent AWF.',
-    kursy: ['Metoda McKenziego (cert. A–D)', 'Terapia manualna wg Kaltenborna', 'Suche igłowanie', 'Diagnostyka funkcjonalna FMS'],
-    jezyki: ['polski', 'angielski'],
-    /* Dni tygodnia, w które przyjmuje: 1 = poniedziałek, 6 = sobota. */
-    grafik: [1, 2, 3, 4, 5, 6],
-  },
+  /* Zespół. `grafik` to godziny pracy: dzień tygodnia → [od, do], 1 = poniedziałek.
+     `linie` mówią, którymi problemami zajmuje się dana osoba — z tego wynika,
+     kogo pacjent zobaczy przy wybranym problemie. */
+  zespol: [
+    {
+      id: 'z1',
+      imie: 'mgr Jan Kowalski',
+      rola: 'Terapia manualna, kręgosłup',
+      kolor: '#1F5FD6',
+      zdjecie: 'assets/img/zespol-1.jpg',
+      alt: 'Portret fizjoterapeuty w jasnej koszulce polo.',
+      bio: 'Od dwunastu lat pracuję z bólem kręgosłupa i powrotami do pracy po długiej przerwie. Certyfikowany terapeuta metody McKenziego, absolwent AWF.',
+      kursy: ['Metoda McKenziego (cert. A–D)', 'Terapia manualna wg Kaltenborna', 'Suche igłowanie'],
+      jezyki: ['polski', 'angielski'],
+      linie: ['kregoslup', 'biuro', 'uraz'],
+      grafik: { 1: [8, 19], 2: [8, 19], 3: [8, 19], 4: [8, 19], 5: [8, 16] },
+    },
+    {
+      id: 'z2',
+      imie: 'mgr Anna Lewandowska',
+      rola: 'Fizjoterapia sportowa',
+      kolor: '#E8590C',
+      zdjecie: 'assets/img/zespol-2.jpg',
+      alt: 'Portret fizjoterapeutki w ciemnej koszulce sportowej.',
+      bio: 'Pracuję z biegaczami i osobami wracającymi po kontuzjach stawów. Prowadzę testy funkcjonalne, po których wiadomo, kiedy naprawdę można wrócić do treningu.',
+      kursy: ['Diagnostyka funkcjonalna FMS', 'Terapia tkanek miękkich', 'Taping medyczny'],
+      jezyki: ['polski', 'angielski'],
+      linie: ['sport', 'uraz', 'kregoslup'],
+      grafik: { 1: [12, 20], 2: [12, 20], 3: [12, 20], 4: [12, 20], 5: [10, 18], 6: [9, 13] },
+    },
+    {
+      id: 'z3',
+      imie: 'mgr Piotr Zawada',
+      rola: 'Rehabilitacja pooperacyjna',
+      kolor: '#13875A',
+      zdjecie: 'assets/img/zespol-3.jpg',
+      alt: 'Portret fizjoterapeuty przy kozetce w gabinecie.',
+      bio: 'Prowadzę pacjentów po rekonstrukcjach więzadeł i endoprotezach, od zdjęcia ortezy do powrotu do normalnego chodzenia. Współpracuję z operatorami przy ustalaniu tempa.',
+      kursy: ['PNF podstawowy i rozwijający', 'Rehabilitacja po endoprotezoplastyce', 'Terapia blizny'],
+      jezyki: ['polski'],
+      linie: ['uraz', 'kregoslup'],
+      grafik: { 2: [8, 15], 4: [8, 15], 6: [9, 13] },
+    },
+  ],
 
   /* Jeden adres. Współrzędne przykładowe — podmień na swoje. */
   gabinet: {
@@ -111,12 +142,14 @@ window.KLINIKA = {
     kod: '00-001 [Twoje Miasto]',
     lat: 52.2297,
     lng: 21.0122,
-    godziny: [['Pon–Pt', '8:00–19:00'], ['Sobota', '9:00–13:00']],
+    godziny: [['Pon–Czw', '8:00–20:00'], ['Piątek', '8:00–18:00'], ['Sobota', '9:00–13:00']],
     udogodnienia: ['Parking pod budynkiem', 'Winda i podjazd', 'Wejście z poziomu ulicy'],
     dojazd: 'Przystanek tramwajowy 150 m, wjazd na parking od podwórza.',
   },
 
-  godzinyWizyt: { tydzien: [8, 19], sobota: [9, 13] },
+  /* Godziny otwarcia gabinetu liczą się z grafików zespołu — to pole zostaje
+     tylko jako zapasowe, gdyby zespół był pusty. */
+  godzinyWizyt: { tydzien: [8, 20], sobota: [9, 13] },
 
   opinie: [
     {

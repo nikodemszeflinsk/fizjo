@@ -51,15 +51,25 @@
   const DNI = ['niedziela', 'poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota'];
   const MIES = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'];
 
+  /** Kto z zespołu zajmuje się problemem opisanym na tej stronie. */
+  const osoby = K.zespol.filter((z) => z.linie.includes(linia.id));
+
+  /** Godziny, w których ktokolwiek od tego problemu przyjmuje danego dnia. */
+  function godzinyDnia(dow) {
+    const zakresy = osoby.map((z) => z.grafik[dow]).filter(Boolean);
+    if (!zakresy.length) return null;
+    return [Math.min(...zakresy.map((x) => x[0])), Math.max(...zakresy.map((x) => x[1]))];
+  }
+
   function najblizszy() {
     const teraz = new Date();
     for (let i = 0; i < 14; i++) {
       const d = new Date(teraz);
       d.setDate(teraz.getDate() + i);
       d.setHours(0, 0, 0, 0);
-      if (!K.fizjoterapeuta.grafik.includes(d.getDay())) continue;
-      const [od, doG] = d.getDay() === 6 ? K.godzinyWizyt.sobota : K.godzinyWizyt.tydzien;
-      for (let h = od; h < doG; h++) {
+      const zakres = godzinyDnia(d.getDay());
+      if (!zakres) continue;
+      for (let h = zakres[0]; h < zakres[1]; h++) {
         const kiedy = new Date(d);
         kiedy.setHours(h, h % 2 ? 30 : 0, 0, 0);
         if (kiedy - teraz > 2 * 3600 * 1000) return kiedy;
@@ -76,16 +86,32 @@
       : 'Zadzwoń — dobierzemy termin poza grafikiem.';
   }
 
+  /* ── Kto się tym zajmuje ────────────────────────────────────────────── */
+  const ktoBox = $('#pro-kto');
+  if (ktoBox && osoby.length) {
+    ktoBox.innerHTML = osoby
+      .map(
+        (z) => `<article class="pro-osoba" style="--c:${z.kolor}">
+          <img src="${z.zdjecie}" alt="${esc(z.alt)}" width="200" height="200" loading="lazy" />
+          <div>
+            <h3>${esc(z.imie)}</h3>
+            <p class="pro-osoba__rola">${esc(z.rola)}</p>
+            <p class="pro-osoba__bio">${esc(z.bio)}</p>
+            <p class="pro-osoba__grafik">Przyjmuje: ${[1, 2, 3, 4, 5, 6]
+              .filter((d) => z.grafik[d])
+              .map((d) => `${['nd', 'pn', 'wt', 'śr', 'cz', 'pt', 'sb'][d]} ${z.grafik[d][0]}–${z.grafik[d][1]}`)
+              .join(' · ')}</p>
+          </div>
+        </article>`
+      )
+      .join('');
+  }
+
   /* ── Otwarte teraz ──────────────────────────────────────────────────── */
   const el = $('#teraz');
   if (el) {
     const teraz = new Date();
-    const dow = teraz.getDay();
-    const zakres = K.fizjoterapeuta.grafik.includes(dow)
-      ? dow === 6
-        ? K.godzinyWizyt.sobota
-        : K.godzinyWizyt.tydzien
-      : null;
+    const zakres = godzinyDnia(teraz.getDay());
     const minuty = teraz.getHours() * 60 + teraz.getMinutes();
     const otwarte = zakres && minuty >= zakres[0] * 60 && minuty < zakres[1] * 60;
     el.hidden = false;

@@ -98,6 +98,35 @@
   let widok = 'dzis';
   let tydzienPrzesuniecie = 0;
   let filtrPacjentow = 'wszyscy';
+  let filtrZespolu = null; // null = cały zespół
+
+  /* Pasek zespołu pokazuje się tylko wtedy, gdy jest z czego wybierać. */
+  function paskiZespolu() {
+    const zespol = P.zespolAktywny();
+    if (zespol.length < 2) return '';
+    return `<div class="zespol-filtr">
+      <button class="osoba${filtrZespolu ? '' : ' is-on'}" type="button" data-zespol="">Cały zespół</button>
+      ${zespol
+        .map(
+          (z) => `<button class="osoba${filtrZespolu === z.id ? ' is-on' : ''}" type="button" data-zespol="${z.id}" style="--c:${z.kolor}">
+            <span class="osoba__mark">${esc(z.inicjaly)}</span>${esc(krotkieImie(z.imie))}
+          </button>`
+        )
+        .join('')}
+    </div>`;
+  }
+
+  /** „mgr Jan Kowalski” → „Jan Kowalski”; tytuł zjada miejsce w interfejsie. */
+  const krotkieImie = (imie) => String(imie).replace(/^(mgr|dr|lek\.?|prof\.?)\s+/i, '');
+
+  const naleziZespolu = (w) => !filtrZespolu || w.terapeutaId === filtrZespolu;
+
+  /** Znaczek osoby przy wizycie — inicjały w jej kolorze. */
+  function znaczekOsoby(zid, klasa = '') {
+    const z = P.terapeuta(zid);
+    if (!z || P.zespolAktywny().length < 2) return '';
+    return `<span class="kto ${klasa}" style="--c:${z.kolor}" title="${esc(z.imie)}">${esc(z.inicjaly)}</span>`;
+  }
 
   function renderRail() {
     const pilne = zagrozone().length;
@@ -132,10 +161,10 @@
       .filter((x) => x.r && x.r.poziom)
       .sort((a, b) => b.r.punkty - a.r.punkty);
 
-  const wizytyDnia = (isoData) =>
+  const wizytyDnia = (isoData, respektujFiltr = true) =>
     S()
-      .wizyty.filter((w) => w.data === isoData && w.status !== 'odwolana')
-      .sort((a, b) => a.godzina.localeCompare(b.godzina));
+      .wizyty.filter((w) => w.data === isoData && w.status !== 'odwolana' && (!respektujFiltr || naleziZespolu(w)))
+      .sort((a, b) => Number(a.godzina.replace(':', '.')) - Number(b.godzina.replace(':', '.')));
 
   const bezTerminu = () =>
     S().pacjenci.filter((p) => !S().wizyty.some((w) => w.pacjentId === p.id && w.status !== 'odwolana'));
@@ -144,7 +173,7 @@
     const teraz = P.dzis;
     const prefiks = `${teraz.getFullYear()}-${String(teraz.getMonth() + 1).padStart(2, '0')}`;
     return S()
-      .wizyty.filter((w) => w.status === 'odbyta' && w.data.startsWith(prefiks))
+      .wizyty.filter((w) => w.status === 'odbyta' && w.data.startsWith(prefiks) && naleziZespolu(w))
       .reduce((suma, w) => suma + ((P.usluga(w.uslugaId) || {}).cena || 0), 0);
   }
 
@@ -170,9 +199,9 @@
     const dzisIso = P.iso(P.dzis);
     $('#view-date').textContent = dlugaData(P.dzis);
     const wizyty = wizytyDnia(dzisIso);
-    const pilni = zagrozone();
+    const pilni = zagrozone().filter(({ t }) => !filtrZespolu || t.terapeutaId === filtrZespolu);
     const nowi = bezTerminu();
-    const wolne = P.wolneGodziny(dzisIso).length;
+    const wolne = P.wolneGodziny(dzisIso, null, null, filtrZespolu).length;
 
     const kafel = (label, value, foot, klasa = '') =>
       `<article class="tile${klasa}"><p class="tile__label">${label}</p><p class="tile__value">${value}</p><p class="tile__foot">${foot}</p></article>`;
@@ -191,15 +220,21 @@
               ${l ? `<span class="dot" style="--c:${l.kolor}"></span>` : ''}${esc(p.imie)}
             </button>
             <span class="pill ${s.klasa}">${s.tekst}</span>
+            ${znaczekOsoby(w.terapeutaId)}
           </span>
           <span class="wizyta__co">${esc(u ? u.nazwa : '')} · ${w.minuty} min${t ? ` · ${P.odbyte(t.id)} z ${t.planWizyt} wizyt` : ''}</span>
         </span>
         <span class="wizyta__akcje">
-          ${w.status === 'zaplanowana' ? `<button class="btn btn--sm" type="button" data-akcja="status" data-wizyta="${w.id}" data-status="potwierdzona">Potwierdź</button>` : ''}
-          ${w.status !== 'odbyta' ? `<button class="btn btn--sm btn--accent" type="button" data-akcja="status" data-wizyta="${w.id}" data-status="odbyta">Odbyta</button>` : ''}
-          ${w.status !== 'odbyta' ? `<button class="btn btn--sm btn--ghost" type="button" data-akcja="status" data-wizyta="${w.id}" data-status="nieobecnosc">Nie przyszedł</button>` : ''}
-          <button class="btn btn--sm btn--ghost" type="button" data-akcja="przeloz" data-wizyta="${w.id}">Przełóż</button>
-          <button class="btn btn--sm btn--ghost" type="button" data-akcja="odwolaj" data-wizyta="${w.id}">Odwołaj</button>
+          ${
+            /* Wizyty zamkniętej nie przekłada się ani nie odwołuje — można tylko cofnąć omyłkę. */
+            ['odbyta', 'nieobecnosc'].includes(w.status)
+              ? `<button class="btn btn--sm btn--ghost" type="button" data-akcja="status" data-wizyta="${w.id}" data-status="potwierdzona">Cofnij oznaczenie</button>`
+              : `${w.status === 'zaplanowana' ? `<button class="btn btn--sm" type="button" data-akcja="status" data-wizyta="${w.id}" data-status="potwierdzona">Potwierdź</button>` : ''}
+                 <button class="btn btn--sm btn--accent" type="button" data-akcja="status" data-wizyta="${w.id}" data-status="odbyta">Odbyta</button>
+                 <button class="btn btn--sm btn--ghost" type="button" data-akcja="status" data-wizyta="${w.id}" data-status="nieobecnosc">Nie przyszedł</button>
+                 <button class="btn btn--sm btn--ghost" type="button" data-akcja="przeloz" data-wizyta="${w.id}">Przełóż</button>
+                 <button class="btn btn--sm btn--ghost" type="button" data-akcja="odwolaj" data-wizyta="${w.id}">Odwołaj</button>`
+          }
         </span>
       </li>`;
     };
@@ -212,7 +247,9 @@
         <span class="radar__mark" style="--c:${l.kolor};--on:${l.naKolorze}">${inicjaly(p.imie)}</span>
         <div class="radar__body">
           <p class="radar__name">${esc(p.imie)}
-            <span class="radar__meta">${esc(t.etykieta)} · ${P.odbyte(t.id)} z ${t.planWizyt} wizyt${ost ? ` · ostatnia ${wzgledna(ost.data)}` : ''}</span>
+            <span class="radar__meta">${esc(t.etykieta)} · ${P.odbyte(t.id)} z ${t.planWizyt} wizyt${ost ? ` · ostatnia ${wzgledna(ost.data)}` : ''}${
+              P.zespolAktywny().length > 1 && P.terapeuta(t.terapeutaId) ? ` · ${esc(krotkieImie(P.terapeuta(t.terapeutaId).imie))}` : ''
+            }</span>
           </p>
           <p class="radar__why">${r.powody.map((x) => `<span class="why why--${x.typ}">${esc(x.tekst)}</span>`).join('')}</p>
         </div>
@@ -223,11 +260,18 @@
       </li>`;
     };
 
+    const osoba = filtrZespolu ? P.terapeuta(filtrZespolu) : null;
+
     $('#dzis').innerHTML = `
+      ${paskiZespolu()}
       <div class="tiles">
         ${kafel('Wizyty dzisiaj', wizyty.length, wolne ? `${wolne} wolnych godzin` : 'grafik pełny')}
         ${kafel('Nie umówili kolejnej', pilni.length, pilni.length ? 'zadzwoń dziś' : 'wszyscy mają termin', pilni.length ? ' tile--alert' : '')}
-        ${kafel('Terapie w toku', aktywneTerapie().length, `${S().pacjenci.length} osób w kartotece`)}
+        ${kafel(
+          'Terapie w toku',
+          aktywneTerapie().filter((t) => !filtrZespolu || t.terapeutaId === filtrZespolu).length,
+          osoba ? `prowadzi ${esc(krotkieImie(osoba.imie))}` : `${S().pacjenci.length} osób w kartotece`
+        )}
         ${kafel('Przychód w tym miesiącu', zl(przychodMiesiaca()), 'z wizyt oznaczonych jako odbyte', ' tile--ink')}
       </div>
 
@@ -236,7 +280,7 @@
           <header class="card__head card__head--row">
             <div>
               <h2>Dzisiejszy grafik</h2>
-              <p class="card__note">${dlugaData(P.dzis)}</p>
+              <p class="card__note">${dlugaData(P.dzis)}${osoba ? ` · ${esc(krotkieImie(osoba.imie))}` : ''}</p>
             </div>
             <button class="btn btn--sm btn--accent" type="button" data-akcja="nowa-wizyta">${ikona('plus')}Umów</button>
           </header>
@@ -308,8 +352,12 @@
     const zakres = `${dni[0].getDate()}.${String(dni[0].getMonth() + 1).padStart(2, '0')} – ${dni[5].getDate()}.${String(dni[5].getMonth() + 1).padStart(2, '0')}`;
     $('#view-date').textContent = tydzienPrzesuniecie === 0 ? `Bieżący tydzień · ${zakres}` : zakres;
 
-    const godzinyDnia = (d) => S().ustawienia.godziny[d.getDay()];
+    const godzinyDnia = (d) => (filtrZespolu ? P.grafikOsoby(filtrZespolu, P.iso(d)) : P.grafikGabinetu(P.iso(d)));
     const czynne = dni.filter(godzinyDnia);
+    if (!czynne.length) {
+      $('#kalendarz').innerHTML = `${paskiZespolu()}<p class="pusto">W tym tygodniu nikt nie przyjmuje.</p>`;
+      return;
+    }
     const start = Math.min(...czynne.map((d) => godzinyDnia(d)[0]));
     const koniec = Math.max(...czynne.map((d) => godzinyDnia(d)[1]));
     const godziny = Array.from({ length: koniec - start }, (_, i) => start + i);
@@ -322,30 +370,39 @@
       const isoD = P.iso(d);
       if (!godzinyDnia(d)) return `<div class="cal__col cal__col--off"><p class="cal__off">wolne</p></div>`;
       const wizyty = wizytyDnia(isoD);
-      const wolne = P.wolneGodziny(isoD);
-      const blokady = P.blokadyDnia(isoD);
+      const wolne = P.wolneGodziny(isoD, null, null, filtrZespolu);
+      const blokady = P.blokadyDnia(isoD, filtrZespolu);
       return `<div class="cal__col">
         ${godziny.map(() => '<div class="cal__line"></div>').join('')}
         ${blokady
           .map(
             (b) => `<button class="blok" type="button" data-akcja="zdejmij-blokade" data-blokada="${b.id}"
               style="top:${pozycja(`${b.od}:00`) + 1}px;height:${(b.do - b.od) * 52 - 3}px"
-              title="Kliknij, żeby zdjąć blokadę"><span>${esc(b.powod)}</span></button>`
+              title="Kliknij, żeby zdjąć blokadę"><span>${esc(b.powod)}${
+                b.terapeutaId && P.terapeuta(b.terapeutaId) ? ` · ${esc(P.terapeuta(b.terapeutaId).inicjaly)}` : ''
+              }</span></button>`
           )
           .join('')}
         ${wolne
-          .map(
-            (g) => `<button class="wolny" type="button" data-akcja="umow-slot" data-data="${isoD}" data-godzina="${g}"
-              style="top:${pozycja(g) + 1}px" aria-label="Umów wizytę ${krotka(isoD)} o ${g}">${g}</button>`
-          )
+          .map((g) => {
+            const wolni = P.terapeuciWolni(isoD, g, null);
+            return `<button class="wolny" type="button" data-akcja="umow-slot" data-data="${isoD}" data-godzina="${g}"
+              style="top:${pozycja(g) + 1}px"
+              aria-label="Umów wizytę ${krotka(isoD)} o ${g}${wolni.length ? `, wolni: ${wolni.map((z) => z.imie).join(', ')}` : ''}">${g}${
+              P.zespolAktywny().length > 1 ? `<em>${wolni.map((z) => z.inicjaly).join(' ')}</em>` : ''
+            }</button>`;
+          })
           .join('')}
         ${wizyty
           .map((w) => {
             const p = P.pacjent(w.pacjentId);
             const t = w.terapiaId ? P.terapia(w.terapiaId) : null;
             const l = t ? P.linia(t.linia) : { kolor: '#535A61' };
+            const z = P.terapeuta(w.terapeutaId);
+            const wielu = P.zespolAktywny().length > 1;
             return `<button class="event" type="button" data-pacjent="${p.id}" style="--c:${l.kolor};top:${pozycja(w.godzina) + 1}px;height:${Math.max((w.minuty / 60) * 52 - 3, 32)}px">
-              <b>${esc(p.imie)}</b><span>${w.godzina} · ${esc((P.usluga(w.uslugaId) || {}).nazwa || '')}</span>
+              <b>${esc(p.imie)}${wielu && z ? `<i style="--c:${z.kolor}">${esc(z.inicjaly)}</i>` : ''}</b>
+              <span>${w.godzina} · ${esc((P.usluga(w.uslugaId) || {}).nazwa || '')}</span>
             </button>`;
           })
           .join('')}
@@ -353,6 +410,7 @@
     };
 
     $('#kalendarz').innerHTML = `
+      ${paskiZespolu()}
       <div class="cal__bar">
         <div class="cal__nav">
           <button class="btn btn--sm" type="button" data-akcja="tydzien" data-o="-1">← Poprzedni</button>
@@ -392,8 +450,13 @@
       if (filtrPacjentow === 'ryzyko') return t && t.status === 'aktywna' && P.ryzyko(t.id).poziom;
       if (filtrPacjentow === 'bez') return !S().wizyty.some((w) => w.pacjentId === p.id && w.status !== 'odwolana');
       return true;
+    }).filter((p) => {
+      if (!filtrZespolu) return true;
+      const t = P.terapiaPacjenta(p.id);
+      return t ? t.terapeutaId === filtrZespolu : false;
     });
 
+    const wielu = P.zespolAktywny().length > 1;
     const wiersz = (p) => {
       const t = P.terapiaPacjenta(p.id);
       const l = t ? P.linia(t.linia) : null;
@@ -410,6 +473,7 @@
           </span>
         </td>
         <td>${t ? `<span class="who"><span class="dot" style="--c:${l.kolor}"></span>${esc(t.etykieta)}</span>` : '<span class="tag">bez karty terapii</span>'}</td>
+        ${wielu ? `<td>${t && P.terapeuta(t.terapeutaId) ? esc(krotkieImie(P.terapeuta(t.terapeutaId).imie)) : '—'}</td>` : ''}
         <td>${
           t
             ? `<span class="progress"><span class="progress__track"><span class="progress__fill" style="--c:${l.kolor};width:${proc}%"></span></span><b>${zrobione}/${t.planWizyt}</b></span>`
@@ -422,6 +486,7 @@
     };
 
     $('#pacjenci').innerHTML = `
+      ${paskiZespolu()}
       <div class="table__bar">
         <div class="chips">
           ${filtry.map((f) => `<button class="chip" type="button" data-filtr="${f.id}" aria-pressed="${filtrPacjentow === f.id}">${f.nazwa}</button>`).join('')}
@@ -435,10 +500,14 @@
         <table class="table">
           <caption class="visually-hidden">Kartoteka pacjentów</caption>
           <thead><tr>
-            <th scope="col">Pacjent</th><th scope="col">Terapia</th><th scope="col">Wizyty</th>
+            <th scope="col">Pacjent</th><th scope="col">Terapia</th>${wielu ? '<th scope="col">Prowadzi</th>' : ''}<th scope="col">Wizyty</th>
             <th scope="col">Ćwiczenia</th><th scope="col">Ostatnia</th><th scope="col">Następna</th>
           </tr></thead>
-          <tbody>${lista.length ? lista.map(wiersz).join('') : '<tr><td colspan="6" class="pusto">Nikogo tu nie ma. Zmień filtr albo dodaj pacjenta.</td></tr>'}</tbody>
+          <tbody>${
+            lista.length
+              ? lista.map(wiersz).join('')
+              : `<tr><td colspan="${wielu ? 7 : 6}" class="pusto">Nikogo tu nie ma. Zmień filtr albo dodaj pacjenta.</td></tr>`
+          }</tbody>
         </table>
       </div>`;
   }
@@ -569,24 +638,69 @@
     $('#view-date').textContent = 'Gabinet i dane prototypu';
     const godziny = [1, 2, 3, 4, 5, 6, 0]
       .map((d) => {
-        const z = u.godziny[d];
-        return `<tr><td>${DNI[d]}</td><td>${z ? `${z[0]}:00 – ${z[1]}:00` : 'nieczynne'}</td></tr>`;
+        const zakresy = P.zespolAktywny()
+          .map((z) => z.godziny[d])
+          .filter(Boolean);
+        const ile = zakresy.length;
+        const tekst = ile ? `${Math.min(...zakresy.map((x) => x[0]))}:00 – ${Math.max(...zakresy.map((x) => x[1]))}:00` : 'nieczynne';
+        return `<tr><td>${DNI[d]}</td><td>${tekst}</td><td>${ile ? `${ile} ${ile === 1 ? 'osoba' : 'osoby'}` : ''}</td></tr>`;
       })
       .join('');
+    const dniSkrot = { 1: 'pn', 2: 'wt', 3: 'śr', 4: 'cz', 5: 'pt', 6: 'sb', 0: 'nd' };
+    const osobaWiersz = (z) => `<li class="osoba-wiersz${z.aktywny === false ? ' is-off' : ''}">
+      <span class="osoba__mark osoba__mark--duzy" style="--c:${z.kolor}">${esc(z.inicjaly)}</span>
+      <span class="osoba-wiersz__dane">
+        <strong>${esc(z.imie)}</strong>
+        <em>${esc(z.rola || 'Fizjoterapeuta')}</em>
+        <span class="osoba-wiersz__grafik">${
+          [1, 2, 3, 4, 5, 6, 0]
+            .filter((d) => z.godziny[d])
+            .map((d) => `${dniSkrot[d]} ${z.godziny[d][0]}–${z.godziny[d][1]}`)
+            .join(' · ') || 'brak godzin w grafiku'
+        }</span>
+        <span class="osoba-wiersz__linie">${z.linie
+          .map((lid) => {
+            const l = P.linia(lid);
+            return l ? `<span class="tag" style="--c:${l.kolor}">${esc(l.nazwa)}</span>` : '';
+          })
+          .join('')}</span>
+      </span>
+      <span class="osoba-wiersz__akcje">
+        <button class="btn btn--sm" type="button" data-akcja="edytuj-osobe" data-osoba="${z.id}">Edytuj</button>
+        <button class="btn btn--sm btn--ghost" type="button" data-akcja="${z.aktywny === false ? 'wlacz-osobe' : 'wylacz-osobe'}" data-osoba="${z.id}">
+          ${z.aktywny === false ? 'Włącz' : 'Wyłącz z grafiku'}
+        </button>
+      </span>
+    </li>`;
+
     $('#ustawienia').innerHTML = `
       <div class="grid grid--ust">
+        <article class="card card--szeroka">
+          <header class="card__head card__head--row">
+            <div>
+              <h2>Zespół</h2>
+              <p class="card__note">Grafik każdej osoby decyduje o tym, jakie terminy widzi pacjent na stronie</p>
+            </div>
+            <button class="btn btn--sm btn--accent" type="button" data-akcja="nowa-osoba">${ikona('plus')}Dodaj osobę</button>
+          </header>
+          <ul class="osoby">${S().zespol.map(osobaWiersz).join('')}</ul>
+        </article>
+
         <article class="card">
-          <header class="card__head"><h2>Gabinet</h2><p class="card__note">Te dane widzi pacjent w swojej karcie</p></header>
+          <header class="card__head card__head--row">
+            <div><h2>Gabinet</h2><p class="card__note">Te dane widzi pacjent w swojej karcie</p></div>
+            <button class="btn btn--sm" type="button" data-akcja="edytuj-gabinet">Edytuj</button>
+          </header>
           <dl class="dane">
             <div><dt>Nazwa</dt><dd>${esc(u.nazwa)}</dd></div>
-            <div><dt>Terapeuta</dt><dd>${esc(u.terapeuta)}</dd></div>
             <div><dt>Adres</dt><dd>${esc(u.adres)}</dd></div>
             <div><dt>Telefon</dt><dd>${esc(u.telefon)}</dd></div>
+            <div><dt>Krok w grafiku</dt><dd>${u.krokMinut} min</dd></div>
           </dl>
         </article>
 
         <article class="card">
-          <header class="card__head"><h2>Godziny przyjęć</h2><p class="card__note">Z nich liczą się wolne terminy</p></header>
+          <header class="card__head"><h2>Godziny otwarcia</h2><p class="card__note">Suma grafików zespołu</p></header>
           <table class="mini"><tbody>${godziny}</tbody></table>
         </article>
 
@@ -644,6 +758,17 @@
                 <p class="pat__diag">${esc(t.etykieta)}</p>
                 <button class="btn btn--sm btn--ghost" type="button" data-akcja="edytuj-terapie" data-terapia="${t.id}">Edytuj</button>
               </div>
+              ${
+                P.zespolAktywny().length > 1
+                  ? `<p class="pat__prowadzi">Prowadzi
+                      <select class="wybor-osoby" data-akcja="przypisz" data-terapia="${t.id}" aria-label="Kto prowadzi terapię">
+                        ${P.zespolAktywny()
+                          .map((z) => `<option value="${z.id}" ${z.id === t.terapeutaId ? 'selected' : ''}>${esc(z.imie)}</option>`)
+                          .join('')}
+                      </select>
+                    </p>`
+                  : ''
+              }
               ${t.cel ? `<p class="pat__cel">Cel: <strong>${esc(t.cel)}</strong></p>` : ''}
               <div class="pat__bars">
                 <div>
@@ -946,6 +1071,9 @@
       .pacjenci.slice()
       .sort((a, b) => a.imie.localeCompare(b.imie, 'pl'));
     const dni = data ? [data] : [...new Set(P.najblizszeTerminy(300).map((t) => t.data))];
+    /* Gdy pacjent ma terapię, domyślnie proponujemy jej prowadzącego. */
+    const terapiaWstepna = pacjentId ? P.terapiaPacjenta(pacjentId) : null;
+    const terapeutaWstepny = terapiaWstepna ? terapiaWstepna.terapeutaId : null;
 
     modal(
       przekladana ? 'Przełóż wizytę' : 'Umów wizytę',
@@ -964,7 +1092,20 @@
                 <select id="uw-usluga">${S()
                   .uslugi.map((u) => `<option value="${u.id}">${esc(u.nazwa)} · ${u.minuty} min · ${zl(u.cena)}</option>`)
                   .join('')}</select>
-              </div>`
+              </div>
+              ${
+                P.zespolAktywny().length > 1
+                  ? `<div class="field field--full">
+                      <label for="uw-terapeuta">Kto przyjmie</label>
+                      <select id="uw-terapeuta">
+                        <option value="">Ktokolwiek wolny</option>
+                        ${P.zespolAktywny()
+                          .map((z) => `<option value="${z.id}" ${z.id === terapeutaWstepny ? 'selected' : ''}>${esc(z.imie)}</option>`)
+                          .join('')}
+                      </select>
+                    </div>`
+                  : ''
+              }`
         }
         <div class="field field--full">
           <label for="uw-dzien">Dzień</label>
@@ -996,10 +1137,18 @@
   function renderSloty(wybranaGodzina = null) {
     const wybor = $('#uw-dzien');
     if (!wybor) return;
-    const wolne = P.wolneGodziny(wybor.value);
+    const kto = ($('#uw-terapeuta') || {}).value || null;
+    const wolne = P.wolneGodziny(wybor.value, null, null, kto);
     $('#uw-sloty').innerHTML = wolne.length
-      ? wolne.map((g) => `<button class="slot" type="button" data-godz="${g}" aria-pressed="${g === wybranaGodzina}">${g}</button>`).join('')
-      : '<p class="pusto">W tym dniu nie ma już wolnych godzin.</p>';
+      ? wolne
+          .map((g) => {
+            const wolni = P.terapeuciWolni(wybor.value, g, null);
+            return `<button class="slot" type="button" data-godz="${g}" aria-pressed="${g === wybranaGodzina}">${g}${
+              !kto && P.zespolAktywny().length > 1 ? `<em>${wolni.map((z) => z.inicjaly).join(' ')}</em>` : ''
+            }</button>`;
+          })
+          .join('')
+      : '<p class="pusto">W tym dniu nie ma już wolnych godzin dla tej osoby.</p>';
   }
 
   function zapiszWizyte() {
@@ -1012,6 +1161,7 @@
       const wynik = P.akcje.umowSerie({
         pacjentId,
         terapiaId: t && t.status === 'aktywna' ? t.id : null,
+        terapeutaId: ($('#uw-terapeuta') || {}).value || null,
         uslugaId: $('#uw-usluga').value,
         data: $('#uw-dzien').value,
         godzina: wybrana.dataset.godz,
@@ -1032,6 +1182,7 @@
     const wynik = P.akcje.umowWizyte({
       pacjentId,
       terapiaId: t && t.status === 'aktywna' ? t.id : null,
+      terapeutaId: ($('#uw-terapeuta') || {}).value || null,
       data: $('#uw-dzien').value,
       godzina: wybrana.dataset.godz,
       uslugaId: $('#uw-usluga').value,
@@ -1050,6 +1201,127 @@
     toast(`Przełożono na ${krotka(wynik.wizyta.data)}, ${wynik.wizyta.godzina}`, true);
   }
 
+  /* ── Zespół ────────────────────────────────────────────────────────── */
+  const DNI_FORM = [
+    [1, 'poniedziałek'],
+    [2, 'wtorek'],
+    [3, 'środa'],
+    [4, 'czwartek'],
+    [5, 'piątek'],
+    [6, 'sobota'],
+    [0, 'niedziela'],
+  ];
+  const KOLORY_OSOB = ['#1F5FD6', '#E8590C', '#13875A', '#C2255C', '#6741D9', '#0B7285'];
+
+  function formOsoba(zid = null) {
+    const z = zid ? P.terapeuta(zid) : null;
+    const g = z ? z.godziny : { 1: [8, 16], 2: [8, 16], 3: [8, 16], 4: [8, 16], 5: [8, 16] };
+    modal(
+      z ? `Edytuj: ${krotkieImie(z.imie)}` : 'Nowa osoba w zespole',
+      `<div class="form-grid">
+        ${pole('os-imie', 'Imię i nazwisko', 'text', z ? z.imie : '', 'placeholder="np. mgr Anna Nowak"')}
+        ${pole('os-rola', 'Specjalizacja <em>(jedno zdanie)</em>', 'text', z ? z.rola : '', 'placeholder="np. terapia manualna"')}
+      </div>
+
+      <p class="modal__label">Kolor w grafiku</p>
+      <div class="kolory">
+        ${KOLORY_OSOB.map(
+          (k) => `<button class="kolor" type="button" data-kolor="${k}" style="--c:${k}"
+            aria-pressed="${z ? z.kolor === k : k === KOLORY_OSOB[0]}" aria-label="Kolor ${k}"></button>`
+        ).join('')}
+      </div>
+
+      <p class="modal__label">Czym się zajmuje</p>
+      <div class="wybor-linii">
+        ${S()
+          .linie.map(
+            (l) => `<label class="linia-check"><input type="checkbox" data-linia="${l.id}" ${
+              !z || z.linie.includes(l.id) ? 'checked' : ''
+            } /><span style="--c:${l.kolor}">${esc(l.nazwa)}</span></label>`
+          )
+          .join('')}
+      </div>
+
+      <p class="modal__label">Grafik</p>
+      <table class="grafik">
+        <tbody>
+          ${DNI_FORM.map(
+            ([d, nazwa]) => `<tr>
+              <td><label class="linia-check"><input type="checkbox" data-dzien="${d}" ${g[d] ? 'checked' : ''} /><span>${nazwa}</span></label></td>
+              <td><input type="number" data-od="${d}" min="0" max="23" value="${g[d] ? g[d][0] : 8}" aria-label="${nazwa}: od godziny" /></td>
+              <td aria-hidden="true">–</td>
+              <td><input type="number" data-do="${d}" min="1" max="24" value="${g[d] ? g[d][1] : 16}" aria-label="${nazwa}: do godziny" /></td>
+            </tr>`
+          ).join('')}
+        </tbody>
+      </table>
+      <p class="modal__err" id="os-err" hidden></p>`,
+      `<button class="btn btn--ghost" type="button" data-close>Anuluj</button>
+       <button class="btn btn--accent" type="button" data-zapisz="osoba" ${zid ? `data-osoba="${zid}"` : ''}>${z ? 'Zapisz' : 'Dodaj do zespołu'}</button>`
+    );
+  }
+
+  function zapiszOsobe(zid) {
+    const imie = $('#os-imie').value.trim();
+    if (imie.length < 3) return bladModalu('os-err', 'Podaj imię i nazwisko.');
+    const linie = $$('#modal [data-linia]:checked').map((i) => i.dataset.linia);
+    if (!linie.length) return bladModalu('os-err', 'Zaznacz przynajmniej jeden problem, którym ta osoba się zajmuje.');
+
+    const godziny = {};
+    for (const [d] of DNI_FORM) {
+      if (!$(`#modal [data-dzien="${d}"]`).checked) continue;
+      const od = Number($(`#modal [data-od="${d}"]`).value);
+      const doG = Number($(`#modal [data-do="${d}"]`).value);
+      if (!(doG > od)) return bladModalu('os-err', 'W każdym zaznaczonym dniu godzina końca musi być późniejsza niż początku.');
+      godziny[d] = [od, doG];
+    }
+    if (!Object.keys(godziny).length) return bladModalu('os-err', 'Zaznacz przynajmniej jeden dzień pracy.');
+
+    const wybranyKolor = $('#modal [data-kolor][aria-pressed="true"]');
+    const dane = {
+      imie,
+      rola: $('#os-rola').value.trim(),
+      kolor: wybranyKolor ? wybranyKolor.dataset.kolor : KOLORY_OSOB[0],
+      linie,
+      godziny,
+    };
+
+    if (zid) {
+      P.akcje.zapiszTerapeute(zid, dane);
+      schowajModal();
+      return toast('Zapisano dane osoby', true);
+    }
+    const z = P.akcje.dodajTerapeute(dane);
+    schowajModal();
+    toast(`${krotkieImie(z.imie)} dołącza do zespołu`, true);
+  }
+
+  /* ── Dane gabinetu ─────────────────────────────────────────────────── */
+  function formGabinet() {
+    const u = S().ustawienia;
+    modal(
+      'Dane gabinetu',
+      `<p class="modal__info">To, co tu wpiszesz, pacjent zobaczy w swojej karcie i w treści SMS-ów.</p>
+      <div class="form-grid">
+        ${pole('gb-nazwa', 'Nazwa gabinetu', 'text', u.nazwa)}
+        ${pole('gb-telefon', 'Telefon', 'tel', u.telefon)}
+        <div class="field field--full">
+          <label for="gb-adres">Adres</label>
+          <input id="gb-adres" type="text" value="${esc(u.adres)}" />
+        </div>
+        <div class="field">
+          <label for="gb-krok">Co ile minut zaczyna się wizyta</label>
+          <select id="gb-krok">
+            ${[15, 20, 30, 60].map((m) => `<option value="${m}" ${m === u.krokMinut ? 'selected' : ''}>${m} min</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <p class="modal__err" id="gb-err" hidden></p>`,
+      `<button class="btn btn--ghost" type="button" data-close>Anuluj</button>
+       <button class="btn btn--accent" type="button" data-zapisz="gabinet">Zapisz</button>`
+    );
+  }
+
   /* ── Blokada czasu ─────────────────────────────────────────────────── */
   function formBlokada() {
     const dzisIso = P.iso(P.dzis);
@@ -1061,6 +1333,17 @@
         ${pole('bl-dni', 'Ile dni', 'number', '1', 'min="1" max="30"')}
         ${pole('bl-od', 'Od godziny', 'number', '8', 'min="0" max="23"')}
         ${pole('bl-do', 'Do godziny', 'number', '19', 'min="1" max="24"')}
+        ${
+          P.zespolAktywny().length > 1
+            ? `<div class="field field--full">
+                <label for="bl-kto">Kogo dotyczy</label>
+                <select id="bl-kto">
+                  <option value="">Cały gabinet</option>
+                  ${P.zespolAktywny().map((z) => `<option value="${z.id}">${esc(z.imie)}</option>`).join('')}
+                </select>
+              </div>`
+            : ''
+        }
         <div class="field field--full">
           <label for="bl-powod">Powód <em>(widoczny tylko dla Ciebie)</em></label>
           <input id="bl-powod" type="text" placeholder="np. szkolenie, urlop" />
@@ -1084,14 +1367,15 @@
       const d = P.fromIso(data);
       d.setDate(d.getDate() + i);
       const iso = P.iso(d);
+      const kto = ($('#bl-kto') || {}).value || null;
       S()
-        .wizyty.filter((w) => w.data === iso && w.status !== 'odwolana')
+        .wizyty.filter((w) => w.data === iso && w.status !== 'odwolana' && (!kto || w.terapeutaId === kto))
         .forEach((w) => {
           const h = Number(w.godzina.split(':')[0]);
           if (h >= od && h < doG) kolidujace.push(w);
         });
     }
-    P.akcje.dodajBlokade({ data, od, do: doG, powod: $('#bl-powod').value, dni });
+    P.akcje.dodajBlokade({ data, od, do: doG, powod: $('#bl-powod').value, dni, terapeutaId: ($('#bl-kto') || {}).value || null });
     schowajModal();
     toast(
       kolidujace.length
@@ -1244,6 +1528,14 @@
       $('#uw-err').hidden = true;
       return;
     }
+    if (d.kolor) {
+      $$('#modal [data-kolor]').forEach((k) => k.setAttribute('aria-pressed', String(k === el)));
+      return;
+    }
+    if (d.zespol !== undefined) {
+      filtrZespolu = d.zespol || null;
+      return render();
+    }
 
     switch (d.akcja) {
       case 'nowa-wizyta':
@@ -1265,11 +1557,12 @@
       case 'link':
         return formLink(d.terapia);
       case 'status': {
+        const poprzedni = (S().wizyty.find((x) => x.id === d.wizyta) || {}).status;
         P.akcje.zmienStatusWizyty(d.wizyta, d.status);
         const nazwy = {
           odbyta: 'Wizyta oznaczona jako odbyta',
           nieobecnosc: 'Zapisano nieobecność',
-          potwierdzona: 'Wizyta potwierdzona',
+          potwierdzona: poprzedni === 'odbyta' || poprzedni === 'nieobecnosc' ? 'Cofnięto oznaczenie' : 'Wizyta potwierdzona',
         };
         return toast(nazwy[d.status] || 'Zmieniono status wizyty', true);
       }
@@ -1288,6 +1581,19 @@
         return formZamknij(d.terapia);
       case 'blokada':
         return formBlokada();
+      case 'nowa-osoba':
+        return formOsoba();
+      case 'edytuj-osobe':
+        return formOsoba(d.osoba);
+      case 'edytuj-gabinet':
+        return formGabinet();
+      case 'wylacz-osobe': {
+        const wynik = P.akcje.wylaczTerapeute(d.osoba);
+        return toast(wynik.blad ? wynik.blad : `${krotkieImie(wynik.terapeuta.imie)} nie pojawia się już w grafiku`, !wynik.blad);
+      }
+      case 'wlacz-osobe':
+        P.akcje.wlaczTerapeute(d.osoba);
+        return toast('Osoba wróciła do grafiku', true);
       case 'zdejmij-blokade': {
         const b = S().blokady.find((x) => x.id === d.blokada);
         P.akcje.usunBlokade(d.blokada);
@@ -1373,6 +1679,20 @@
         return toast('SMS zapisany w historii pacjenta');
       case 'blokada':
         return zapiszBlokade();
+      case 'osoba':
+        return zapiszOsobe(d.osoba);
+      case 'gabinet': {
+        const nazwa = $('#gb-nazwa').value.trim();
+        if (nazwa.length < 2) return bladModalu('gb-err', 'Podaj nazwę gabinetu.');
+        P.akcje.zapiszUstawienia({
+          nazwa,
+          telefon: $('#gb-telefon').value.trim(),
+          adres: $('#gb-adres').value.trim(),
+          krokMinut: Number($('#gb-krok').value),
+        });
+        schowajModal();
+        return toast('Zapisano dane gabinetu', true);
+      }
       case 'wstaw-na-termin': {
         const wynik = P.akcje.umowWizyte({
           pacjentId: d.pacjentId,
@@ -1397,8 +1717,12 @@
   });
 
   document.addEventListener('change', (e) => {
-    if (e.target.id === 'uw-dzien') renderSloty();
+    if (e.target.id === 'uw-dzien' || e.target.id === 'uw-terapeuta') renderSloty();
     if (e.target.id === 'uw-seria') $('#uw-seria-pola').hidden = !e.target.checked;
+    if (e.target.dataset.akcja === 'przypisz') {
+      P.akcje.przypiszTerapie(e.target.dataset.terapia, e.target.value);
+      toast('Zmieniono prowadzącego terapię', true);
+    }
   });
 
   document.addEventListener('keydown', (e) => {

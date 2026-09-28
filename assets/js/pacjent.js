@@ -111,9 +111,16 @@
 
   function otworzPrzelozenie(wizyta) {
     przekladanaWizyta = wizyta;
-    const dni = [...new Set(P.najblizszeTerminy(300).map((t) => t.data))].slice(0, 14);
+    /* Dni, w których prowadzący ma cokolwiek wolnego. */
+    const dni = [];
+    for (let i = 0; i < 28 && dni.length < 14; i++) {
+      const dzien = P.isoZa(i);
+      if (P.wolneGodziny(dzien, wizyta.minuty || 60, wizyta.id, wizyta.terapeutaId).length) dni.push(dzien);
+    }
     $('#modal-body').innerHTML = `
-      <p class="modal__info">Twój termin: <strong>${krotka(wizyta.data)}, ${wizyta.godzina}</strong>. Wybierz nowy — stary od razu zwolni się dla kogoś innego.</p>
+      <p class="modal__info">Twój termin: <strong>${krotka(wizyta.data)}, ${wizyta.godzina}</strong>${
+        P.terapeuta(wizyta.terapeutaId) ? ` u: ${esc(P.terapeuta(wizyta.terapeutaId).imie)}` : ''
+      }. Wybierz nowy — stary od razu zwolni się dla kogoś innego.</p>
       <div class="field">
         <label for="pz-dzien">Dzień</label>
         <select id="pz-dzien">${dni.map((d) => `<option value="${d}">${krotka(d)}</option>`).join('')}</select>
@@ -128,7 +135,8 @@
 
   function rysujSloty() {
     const dzien = $('#pz-dzien').value;
-    const wolne = P.wolneGodziny(dzien, przekladanaWizyta.minuty || 60, przekladanaWizyta.id);
+    /* Pacjent wraca do tej samej osoby, więc godziny liczymy z jej grafiku. */
+    const wolne = P.wolneGodziny(dzien, przekladanaWizyta.minuty || 60, przekladanaWizyta.id, przekladanaWizyta.terapeutaId);
     $('#pz-sloty').innerHTML = wolne.length
       ? wolne.map((g) => `<button class="slot" type="button" data-godz="${g}" aria-pressed="false">${g}</button>`).join('')
       : '<p class="pusto">W tym dniu nie ma wolnych godzin. Wybierz inny dzień.</p>';

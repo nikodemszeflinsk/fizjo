@@ -11,7 +11,7 @@
   'use strict';
 
   const KLUCZ = 'panel-gabinetu';
-  const WERSJA = 2;
+  const WERSJA = 3;
 
   /* ── Pomocnicze ────────────────────────────────────────────────────── */
   const dzis = new Date();
@@ -39,6 +39,41 @@
       { id: 'sport', nazwa: 'Kontuzja sportowa', kolor: '#E8590C', naKolorze: '#14171A' },
       { id: 'uraz', nazwa: 'Po urazie lub operacji', kolor: '#13875A', naKolorze: '#FFFFFF' },
       { id: 'biuro', nazwa: 'Ból od siedzenia', kolor: '#C2255C', naKolorze: '#FFFFFF' },
+    ];
+
+    /* Zespół. Każda osoba ma własny grafik i własny zestaw problemów,
+       którymi się zajmuje — z tego liczą się wolne terminy. */
+    const zespol = [
+      {
+        id: 'z1',
+        imie: 'mgr Jan Kowalski',
+        inicjaly: 'JK',
+        rola: 'Terapia manualna, kręgosłup',
+        kolor: '#1F5FD6',
+        linie: ['kregoslup', 'biuro', 'uraz'],
+        godziny: { 1: [8, 19], 2: [8, 19], 3: [8, 19], 4: [8, 19], 5: [8, 16] },
+        aktywny: true,
+      },
+      {
+        id: 'z2',
+        imie: 'mgr Anna Lewandowska',
+        inicjaly: 'AL',
+        rola: 'Fizjoterapia sportowa',
+        kolor: '#E8590C',
+        linie: ['sport', 'uraz', 'kregoslup'],
+        godziny: { 1: [12, 20], 2: [12, 20], 3: [12, 20], 4: [12, 20], 5: [10, 18], 6: [9, 13] },
+        aktywny: true,
+      },
+      {
+        id: 'z3',
+        imie: 'mgr Piotr Zawada',
+        inicjaly: 'PZ',
+        rola: 'Rehabilitacja pooperacyjna',
+        kolor: '#13875A',
+        linie: ['uraz', 'kregoslup'],
+        godziny: { 2: [8, 15], 4: [8, 15], 6: [9, 13] },
+        aktywny: true,
+      },
     ];
 
     const uslugi = [
@@ -100,17 +135,61 @@
       { id: 't14', pacjentId: 'p14', linia: 'kregoslup', etykieta: 'Dyskopatia L4-L5', cel: 'Przesiedzieć 8 godzin w pracy bez drętwienia', planWizyt: 6, odstepDni: 7, status: 'aktywna', start: isoZa(-40), cwiczenia: [c('c-koci', '10 powtórzeń', 5), c('c-ptak', '8 na stronę', 4)] },
     ];
 
-    /* Wizyty: odbyte w przeszłości, zaplanowane w przyszłości. */
-    const w = (terapiaId, pacjentId, dni, godzina, uslugaId, status) => ({
-      id: id('w'),
-      pacjentId,
-      terapiaId,
-      data: isoZa(dni),
-      godzina,
-      uslugaId,
-      minuty: uslugi.find((u) => u.id === uslugaId).minuty,
-      status,
+    /* Każda terapia ma prowadzącego — pierwszą osobę z zespołu od tego problemu.
+       W realnym wdrożeniu wybiera go rejestracja albo pacjent przy rezerwacji. */
+    terapie.forEach((t, i) => {
+      const chetni = zespol.filter((z) => z.linie.includes(t.linia));
+      t.terapeutaId = (chetni.length ? chetni[i % chetni.length] : zespol[0]).id;
     });
+
+    /* Wizyty: odbyte w przeszłości, zaplanowane w przyszłości.
+       Wizytę prowadzi terapeuta od tej terapii — a jeśli tego dnia i o tej godzinie
+       nie pracuje, ktoś inny od tego samego problemu. Inaczej grafik by kłamał. */
+    /* Wizyty budujemy po kolei, bo każda kolejna musi omijać te już zajęte. */
+    const juzUmowione = [];
+    const w = (terapiaId, pacjentId, dni, godzina, uslugaId, status) => {
+      const t = terapie.find((x) => x.id === terapiaId);
+      const minuty = uslugi.find((u) => u.id === uslugaId).minuty;
+      const start = Number(godzina.split(':')[0]) * 60 + Number(godzina.split(':')[1] || 0);
+
+      const wGrafiku = (z, dow) => {
+        const g = z.godziny[dow];
+        return g && start >= g[0] * 60 && start + minuty <= g[1] * 60;
+      };
+      const zajety = (z, data) =>
+        juzUmowione.some((x) => {
+          if (x.terapeutaId !== z.id || x.data !== data) return false;
+          const xs = Number(x.godzina.split(':')[0]) * 60 + Number(x.godzina.split(':')[1] || 0);
+          return start < xs + x.minuty && start + minuty > xs;
+        });
+
+      const prowadzacy = zespol.find((z) => z.id === (t || {}).terapeutaId);
+      const kolejnosc = [
+        ...(prowadzacy ? [prowadzacy] : []),
+        ...(t ? zespol.filter((z) => z.linie.includes(t.linia)) : []),
+        ...zespol,
+      ];
+
+      /* Data z przesunięcia może wypaść w dzień, w którym nikt nie pracuje
+         (niedziela, sobotnie popołudnie) albo wszyscy są zajęci. */
+      const kierunek = dni <= 0 ? -1 : 1;
+      let data = isoZa(dni);
+      let kto = zespol[0];
+      for (let krok = 0; krok <= 4; krok++) {
+        const proba = isoZa(dni + krok * kierunek);
+        const dow = fromIso(proba).getDay();
+        const wolny = kolejnosc.find((z) => wGrafiku(z, dow) && !zajety(z, proba));
+        if (wolny) {
+          data = proba;
+          kto = wolny;
+          break;
+        }
+      }
+
+      const nowa = { id: id('w'), pacjentId, terapiaId, terapeutaId: kto.id, data, godzina, uslugaId, minuty, status };
+      juzUmowione.push(nowa);
+      return nowa;
+    };
 
     const wizyty = [
       // dzisiaj
@@ -218,6 +297,7 @@
         godziny: { 1: [8, 19], 2: [8, 19], 3: [8, 19], 4: [8, 19], 5: [8, 19], 6: [9, 13] },
         krokMinut: 30,
       },
+      zespol,
       linie,
       uslugi,
       cwiczeniaBiblioteka,
@@ -250,10 +330,28 @@
         const dane = JSON.parse(surowe);
         if (dane && dane.wersja === WERSJA) return dane;
         /* Starsze dane uzupełniamy o nowe kolekcje, zamiast kasować pracę. */
-        if (dane && dane.wersja === 1) {
-          dane.wersja = WERSJA;
+        if (dane && dane.wersja >= 1 && dane.wersja < WERSJA) {
           dane.blokady = dane.blokady || [];
           dane.wylaczone = dane.wylaczone || [];
+          /* Jednoosobowy gabinet staje się zespołem jednoosobowym. */
+          if (!dane.zespol) {
+            const u = dane.ustawienia;
+            dane.zespol = [
+              {
+                id: 'z1',
+                imie: u.terapeuta,
+                inicjaly: u.inicjaly,
+                rola: 'Fizjoterapeuta',
+                kolor: '#1F5FD6',
+                linie: dane.linie.map((l) => l.id),
+                godziny: u.godziny,
+                aktywny: true,
+              },
+            ];
+            dane.terapie.forEach((t) => (t.terapeutaId = t.terapeutaId || 'z1'));
+            dane.wizyty.forEach((x) => (x.terapeutaId = x.terapeutaId || 'z1'));
+          }
+          dane.wersja = WERSJA;
           return dane;
         }
       }
@@ -336,13 +434,19 @@
   };
   const naGodzine = (min) => `${Math.floor(min / 60)}:${String(min % 60).padStart(2, '0')}`;
 
-  /** Zajęte przedziały dnia: wizyty z ich długością plus blokady. */
-  function zajetePrzedzialy(isoData, pomijajWizyte = null) {
+  /** Zajęte przedziały dnia dla jednej osoby: jej wizyty plus blokady. */
+  function zajetePrzedzialy(isoData, pomijajWizyte = null, terapeutaId = null) {
     const z = stan.wizyty
-      .filter((w) => w.data === isoData && w.status !== 'odwolana' && w.id !== pomijajWizyte)
+      .filter(
+        (w) =>
+          w.data === isoData &&
+          w.status !== 'odwolana' &&
+          w.id !== pomijajWizyte &&
+          (!terapeutaId || w.terapeutaId === terapeutaId)
+      )
       .map((w) => [naMinuty(w.godzina), naMinuty(w.godzina) + (w.minuty || 60)]);
     stan.blokady
-      .filter((b) => b.data === isoData)
+      .filter((b) => b.data === isoData && (!b.terapeutaId || !terapeutaId || b.terapeutaId === terapeutaId))
       .forEach((b) => z.push([b.od * 60, b.do * 60]));
     return z;
   }
@@ -350,29 +454,77 @@
   const koliduje = (start, dlugosc, przedzialy) =>
     przedzialy.some(([a, b]) => start < b && start + dlugosc > a);
 
-  /** Wolne godziny danego dnia: grafik minus wizyty i blokady, bez przeszłości. */
-  function wolneGodziny(isoData, dlugosc = null, pomijajWizyte = null) {
+  const terapeuta = (zid) => stan.zespol.find((z) => z.id === zid) || null;
+  const zespolAktywny = () => stan.zespol.filter((z) => z.aktywny !== false);
+
+  /** Godziny pracy osoby danego dnia; bez wpisu w grafiku — wolne. */
+  function grafikOsoby(zid, isoData) {
+    const z = terapeuta(zid);
+    if (!z) return null;
+    return z.godziny[fromIso(isoData).getDay()] || null;
+  }
+
+  /** Godziny otwarcia gabinetu danego dnia: suma grafików zespołu. */
+  function grafikGabinetu(isoData) {
+    const dzien = fromIso(isoData).getDay();
+    const zakresy = zespolAktywny()
+      .map((z) => z.godziny[dzien])
+      .filter(Boolean);
+    if (!zakresy.length) return null;
+    return [Math.min(...zakresy.map((x) => x[0])), Math.max(...zakresy.map((x) => x[1]))];
+  }
+
+  /**
+   * Wolne godziny danego dnia. Bez `terapeutaId` godzina jest wolna, gdy
+   * może ją wziąć ktokolwiek z zespołu.
+   */
+  function wolneGodziny(isoData, dlugosc = null, pomijajWizyte = null, terapeutaId = null) {
     const d = fromIso(isoData);
-    const zakres = stan.ustawienia.godziny[d.getDay()];
-    if (!zakres) return [];
-    const [od, doGodz] = zakres;
     const krok = stan.ustawienia.krokMinut;
     const trwa = dlugosc || krok;
-    const przedzialy = zajetePrzedzialy(isoData, pomijajWizyte);
     const teraz = new Date();
+    const osoby = terapeutaId ? [terapeuta(terapeutaId)].filter(Boolean) : zespolAktywny();
+    if (!osoby.length) return [];
+
+    const wolneOsob = osoby
+      .map((z) => {
+        const zakres = z.godziny[d.getDay()];
+        if (!zakres) return null;
+        return { zakres, przedzialy: zajetePrzedzialy(isoData, pomijajWizyte, z.id) };
+      })
+      .filter(Boolean);
+    if (!wolneOsob.length) return [];
+
+    const od = Math.min(...wolneOsob.map((x) => x.zakres[0]));
+    const doGodz = Math.max(...wolneOsob.map((x) => x.zakres[1]));
     const out = [];
     for (let min = od * 60; min + trwa <= doGodz * 60; min += krok) {
-      if (koliduje(min, trwa, przedzialy)) continue;
       const kiedy = new Date(d);
       kiedy.setHours(0, min, 0, 0);
       if (kiedy - teraz < 60 * 60 * 1000) continue;
-      out.push(naGodzine(min));
+      const ktos = wolneOsob.some(
+        (x) => min >= x.zakres[0] * 60 && min + trwa <= x.zakres[1] * 60 && !koliduje(min, trwa, x.przedzialy)
+      );
+      if (ktos) out.push(naGodzine(min));
     }
     return out;
   }
 
+  /** Kto z zespołu może wziąć ten termin. */
+  function terapeuciWolni(isoData, godzina, dlugosc = null, pomijajWizyte = null) {
+    const trwa = dlugosc || stan.ustawienia.krokMinut;
+    const min = naMinuty(godzina);
+    const dzien = fromIso(isoData).getDay();
+    return zespolAktywny().filter((z) => {
+      const zakres = z.godziny[dzien];
+      if (!zakres || min < zakres[0] * 60 || min + trwa > zakres[1] * 60) return false;
+      return !koliduje(min, trwa, zajetePrzedzialy(isoData, pomijajWizyte, z.id));
+    });
+  }
+
   /** Blokady danego dnia — panel rysuje z nich paski w kalendarzu. */
-  const blokadyDnia = (isoData) => stan.blokady.filter((b) => b.data === isoData);
+  const blokadyDnia = (isoData, terapeutaId = null) =>
+    stan.blokady.filter((b) => b.data === isoData && (!terapeutaId || !b.terapeutaId || b.terapeutaId === terapeutaId));
 
   /** Najbliższe wolne terminy w kolejnych dniach. */
   function najblizszeTerminy(ile = 5, odDnia = 0) {
@@ -591,6 +743,14 @@
   }
 
   /* ── Akcje ─────────────────────────────────────────────────────────── */
+  const inicjalyZImienia = (imie) =>
+    String(imie)
+      .split(' ')
+      .filter((czesc) => /^[A-ZĄĆĘŁŃÓŚŹŻ]/.test(czesc))
+      .map((czesc) => czesc[0])
+      .join('')
+      .slice(0, 2) || 'XX';
+
   const log = (s, pacjentId, typ, tekst) =>
     s.zdarzenia.unshift({ id: id('z'), pacjentId, kiedy: iso(new Date()), typ, tekst });
 
@@ -610,6 +770,13 @@
         s.pacjenci.unshift(p);
         log(s, p.id, 'pacjent', 'Dodano pacjenta do kartoteki');
         return p;
+      });
+    },
+
+    zapiszUstawienia(dane) {
+      return zmien('Zapisano dane gabinetu', (s) => {
+        Object.assign(s.ustawienia, dane);
+        return s.ustawienia;
       });
     },
 
@@ -665,7 +832,20 @@
     },
 
     /** Seria wizyt co tyle samo dni, o tej samej godzinie. Kolizje omija. */
-    umowSerie({ pacjentId, terapiaId, uslugaId, data, godzina, ile, coIleDni }) {
+    umowSerie({ pacjentId, terapiaId, uslugaId, data, godzina, ile, coIleDni, terapeutaId = null }) {
+      const uslugaSerii = stan.uslugi.find((x) => x.id === uslugaId);
+      const wolniTam = terapeuciWolni(data, godzina, uslugaSerii.minuty);
+      const prowadzacy = terapiaId ? (terapia(terapiaId) || {}).terapeutaId : null;
+      /* Serię prowadzi ten, kto naprawdę może wziąć pierwszy termin — inaczej
+         wszystkie wizyty wylądowałyby poza czyimś grafikiem. */
+      const osoba =
+        terapeutaId ||
+        (wolniTam.some((z) => z.id === prowadzacy) ? prowadzacy : (wolniTam[0] || {}).id) ||
+        prowadzacy ||
+        zespolAktywny()[0].id;
+      if (terapeutaId && !wolniTam.some((z) => z.id === terapeutaId)) {
+        return { blad: `${terapeuta(terapeutaId).imie} ma o tej godzinie zajęte.`, utworzone: [], pominiete: [] };
+      }
       return zmien('Umówiono serię wizyt', (s) => {
         const u = s.uslugi.find((x) => x.id === uslugaId);
         const utworzone = [];
@@ -677,8 +857,10 @@
           /* Kolidujący termin przesuwamy o dzień do przodu, najwyżej o tydzień. */
           while (
             proba < 7 &&
-            (!s.ustawienia.godziny[fromIso(dzienIso).getDay()] ||
-              koliduje(naMinuty(godzina), u.minuty, zajetePrzedzialy(dzienIso)))
+            (!grafikOsoby(osoba, dzienIso) ||
+              naMinuty(godzina) < grafikOsoby(osoba, dzienIso)[0] * 60 ||
+              naMinuty(godzina) + u.minuty > grafikOsoby(osoba, dzienIso)[1] * 60 ||
+              koliduje(naMinuty(godzina), u.minuty, zajetePrzedzialy(dzienIso, null, osoba)))
           ) {
             const d = fromIso(dzienIso);
             d.setDate(d.getDate() + 1);
@@ -688,7 +870,7 @@
           if (proba >= 7) {
             pominiete.push(iso(kursor));
           } else {
-            const w = { id: id('w'), pacjentId, terapiaId, data: dzienIso, godzina, uslugaId, minuty: u.minuty, status: 'zaplanowana' };
+            const w = { id: id('w'), pacjentId, terapiaId, terapeutaId: osoba, data: dzienIso, godzina, uslugaId, minuty: u.minuty, status: 'zaplanowana' };
             s.wizyty.push(w);
             utworzone.push(w);
             kursor = fromIso(dzienIso);
@@ -700,13 +882,13 @@
       });
     },
 
-    dodajBlokade({ data, od, do: doGodz, powod, dni = 1 }) {
+    dodajBlokade({ data, od, do: doGodz, powod, dni = 1, terapeutaId = null }) {
       return zmien('Zablokowano czas', (s) => {
         const dodane = [];
         for (let i = 0; i < dni; i++) {
           const d = fromIso(data);
           d.setDate(d.getDate() + i);
-          const b = { id: id('bl'), data: iso(d), od: Number(od), do: Number(doGodz), powod: (powod || 'Niedostępny').trim() };
+          const b = { id: id('bl'), data: iso(d), od: Number(od), do: Number(doGodz), powod: (powod || 'Niedostępny').trim(), terapeutaId };
           s.blokady.push(b);
           dodane.push(b);
         }
@@ -717,6 +899,68 @@
     usunBlokade(bid) {
       return zmien('Zdjęto blokadę', (s) => {
         s.blokady = s.blokady.filter((b) => b.id !== bid);
+      });
+    },
+
+    dodajTerapeute(dane) {
+      return zmien('Dodano osobę do zespołu', (s) => {
+        const z = {
+          id: id('z'),
+          imie: dane.imie.trim(),
+          inicjaly: dane.inicjaly || inicjalyZImienia(dane.imie),
+          rola: (dane.rola || '').trim(),
+          kolor: dane.kolor || '#535A61',
+          linie: dane.linie && dane.linie.length ? dane.linie : s.linie.map((l) => l.id),
+          godziny: dane.godziny || { 1: [8, 16], 2: [8, 16], 3: [8, 16], 4: [8, 16], 5: [8, 16] },
+          aktywny: true,
+        };
+        s.zespol.push(z);
+        return z;
+      });
+    },
+
+    zapiszTerapeute(zid, dane) {
+      return zmien('Zapisano dane osoby', (s) => {
+        const z = s.zespol.find((x) => x.id === zid);
+        Object.assign(z, dane);
+        if (dane.imie && !dane.inicjaly) z.inicjaly = inicjalyZImienia(dane.imie);
+        return z;
+      });
+    },
+
+    /** Osoby nie kasujemy — jej wizyty i terapie muszą zostać w historii. */
+    wylaczTerapeute(zid) {
+      const przyszle = stan.wizyty.filter(
+        (w) => w.terapeutaId === zid && w.data >= iso(dzis) && ['zaplanowana', 'potwierdzona'].includes(w.status)
+      );
+      if (przyszle.length) {
+        return { blad: `Ta osoba ma jeszcze ${przyszle.length} umówionych wizyt. Przełóż je albo przypisz komuś innemu.` };
+      }
+      return zmien('Wyłączono osobę z grafiku', (s) => {
+        const z = s.zespol.find((x) => x.id === zid);
+        z.aktywny = false;
+        return { terapeuta: z };
+      });
+    },
+
+    wlaczTerapeute(zid) {
+      return zmien('Włączono osobę do grafiku', (s) => {
+        s.zespol.find((x) => x.id === zid).aktywny = true;
+      });
+    },
+
+    /** Przepisanie terapii i przyszłych wizyt na kogoś innego. */
+    przypiszTerapie(tid, terapeutaId) {
+      return zmien('Zmieniono prowadzącego', (s) => {
+        const t = s.terapie.find((x) => x.id === tid);
+        t.terapeutaId = terapeutaId;
+        const dzisIso = iso(dzis);
+        s.wizyty
+          .filter((w) => w.terapiaId === tid && w.data >= dzisIso && w.status !== 'odwolana')
+          .forEach((w) => (w.terapeutaId = terapeutaId));
+        const z = s.zespol.find((x) => x.id === terapeutaId);
+        log(s, t.pacjentId, 'terapia', `Terapię prowadzi teraz ${z.imie}`);
+        return t;
       });
     },
 
@@ -742,13 +986,23 @@
       });
     },
 
-    umowWizyte({ pacjentId, terapiaId, data, godzina, uslugaId }) {
+    umowWizyte({ pacjentId, terapiaId, data, godzina, uslugaId, terapeutaId = null }) {
+      const u = stan.uslugi.find((x) => x.id === uslugaId);
+      /* Bez wskazanej osoby bierzemy pierwszą wolną — najpierw prowadzącego terapię. */
+      const wolni = terapeuciWolni(data, godzina, u.minuty);
+      const prowadzacy = terapiaId ? (terapia(terapiaId) || {}).terapeutaId : null;
+      const wybrany =
+        terapeutaId ||
+        (wolni.some((z) => z.id === prowadzacy) ? prowadzacy : (wolni[0] || {}).id) ||
+        null;
+      if (!wybrany) {
+        return { blad: 'O tej godzinie nikt z zespołu nie jest wolny.' };
+      }
+      if (terapeutaId && !wolni.some((z) => z.id === terapeutaId)) {
+        return { blad: `${terapeuta(terapeutaId).imie} ma o tej godzinie zajęte.` };
+      }
       return zmien('Umówiono wizytę', (s) => {
-        const u = s.uslugi.find((x) => x.id === uslugaId);
-        if (koliduje(naMinuty(godzina), u.minuty, zajetePrzedzialy(data))) {
-          return { blad: 'Ten termin nachodzi na inną wizytę albo na blokadę.' };
-        }
-        const w = { id: id('w'), pacjentId, terapiaId, data, godzina, uslugaId, minuty: u.minuty, status: 'zaplanowana' };
+        const w = { id: id('w'), pacjentId, terapiaId, terapeutaId: wybrany, data, godzina, uslugaId, minuty: u.minuty, status: 'zaplanowana' };
         s.wizyty.push(w);
         log(s, pacjentId, 'wizyta', `Umówiono wizytę: ${data} ${godzina}`);
         return { wizyta: w };
@@ -758,8 +1012,13 @@
     przelozWizyte(wid, data, godzina) {
       return zmien('Przełożono wizytę', (s) => {
         const w = s.wizyty.find((x) => x.id === wid);
-        if (koliduje(naMinuty(godzina), w.minuty || 60, zajetePrzedzialy(data, wid))) {
-          return { blad: 'Ten termin nachodzi na inną wizytę albo na blokadę.' };
+        if (koliduje(naMinuty(godzina), w.minuty || 60, zajetePrzedzialy(data, wid, w.terapeutaId))) {
+          return { blad: `${(terapeuta(w.terapeutaId) || {}).imie || 'Terapeuta'} ma o tej godzinie zajęte.` };
+        }
+        const zakres = grafikOsoby(w.terapeutaId, data);
+        const min = naMinuty(godzina);
+        if (!zakres || min < zakres[0] * 60 || min + (w.minuty || 60) > zakres[1] * 60) {
+          return { blad: `${(terapeuta(w.terapeutaId) || {}).imie || 'Terapeuta'} tego dnia o tej porze nie przyjmuje.` };
         }
         const stara = `${w.data} ${w.godzina}`;
         w.data = data;
@@ -881,6 +1140,11 @@
     najblizszeTerminy,
     ryzyko,
     blokadyDnia,
+    terapeuta,
+    zespolAktywny,
+    grafikOsoby,
+    grafikGabinetu,
+    terapeuciWolni,
     kolejkaWiadomosci,
     kandydaciNaTermin,
     wynikTerapii,
