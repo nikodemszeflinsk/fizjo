@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CRM kliniki — demo · Studio Widok</title>
+  <title>Panel gabinetu — demo · Studio Widok</title>
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
   <meta name="description" content="Demo panelu CRM dla kliniki fizjoterapii: pulpit, kalendarz, kartoteka pacjentów, skrzynka i automatyzacje." />
   <meta name="theme-color" content="#14171A" />
@@ -19,7 +19,7 @@
 
   <!-- Pasek dla leada: to jest demo narzędzia, nie prawdziwy panel kliniki. -->
   <aside class="demo-bar" id="demo-bar">
-    <p><strong>To jest demo CRM</strong> od Studio Widok. Dane pacjentów, wizyt i wiadomości są przykładowe.</p>
+    <p><strong>To jest demo panelu</strong> od Studio Widok. Dane pacjentów, wizyt i wiadomości są przykładowe.</p>
     <a class="demo-bar__link" href="index.html">
       Wróć do oferty
       <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
@@ -47,8 +47,8 @@
 
       <div class="rail__foot">
         <p class="rail__who">
-          <span class="avatar" aria-hidden="true">LR</span>
-          <span>Rejestracja<em>Linia Ruchu</em></span>
+          <span class="avatar" aria-hidden="true">JK</span>
+          <span>mgr Jan Kowalski<em>Linia Ruchu</em></span>
         </p>
       </div>
     </nav>
@@ -60,7 +60,7 @@
       </button>
 
       <div class="top__title">
-        <h1 id="view-title">Pulpit</h1>
+        <h1 id="view-title">Dziś</h1>
         <p id="view-date"></p>
       </div>
 
@@ -79,14 +79,14 @@
 
     <!-- ── Widoki ──────────────────────────────────────────────────────── -->
     <main class="view" id="widok">
-      <section class="panel" id="pulpit" aria-labelledby="view-title">
+      <section class="panel" id="dzis" aria-labelledby="view-title">
         <article class="card card--radar" aria-labelledby="radar-title">
           <header class="card__head card__head--row">
             <div>
-              <h2 id="radar-title" data-ile="0">Radar terapii</h2>
-              <p class="card__note">Pacjenci, którzy wypadają z cyklu. Sygnały pochodzą z kalendarza wizyt i z ankiet SMS wysyłanych po wizycie.</p>
+              <h2 id="radar-title" data-ile="0">Nie umówili kolejnej wizyty</h2>
+              <p class="card__note">Sygnały z kalendarza wizyt i z ankiet SMS wysyłanych po wizycie.</p>
             </div>
-            <button class="btn btn--sm" type="button" data-view="terapie">Wszystkie terapie</button>
+            <button class="btn btn--sm" type="button" data-view="pacjenci">Wszyscy pacjenci</button>
           </header>
           <ul class="radar" id="radar"></ul>
         </article>
@@ -131,6 +131,16 @@
           </article>
 
           <article class="card">
+            <header class="card__head card__head--row">
+              <div>
+                <h2>Nowe zgłoszenia</h2>
+                <p class="card__note" id="inbox-note"></p>
+              </div>
+            </header>
+            <ul class="inbox" id="inbox"></ul>
+          </article>
+
+          <article class="card">
             <header class="card__head">
               <h2>Skąd przychodzą pacjenci</h2>
               <p class="card__note">Ostatnie 30 dni</p>
@@ -138,13 +148,6 @@
             <ul class="sources" id="sources"></ul>
           </article>
         </div>
-      </section>
-
-      <section class="panel" id="terapie" hidden>
-        <div class="table__bar">
-          <p class="cal__hint">Epizod terapii to droga pacjenta od zgłoszenia do wypisu: cel, plan wizyt, ból i ćwiczenia domowe. Wizyta jest tylko zdarzeniem w środku.</p>
-        </div>
-        <div class="board" id="board"></div>
       </section>
 
       <section class="panel" id="kalendarz" hidden>
@@ -166,8 +169,7 @@
             <thead>
               <tr>
                 <th scope="col">Pacjent</th>
-                <th scope="col">Specjalizacja</th>
-                <th scope="col">Terapeuta</th>
+                <th scope="col">Z czym przychodzi</th>
                 <th scope="col">Postęp terapii</th>
                 <th scope="col">Ostatnia wizyta</th>
                 <th scope="col">Następna</th>
@@ -176,19 +178,6 @@
             </thead>
             <tbody id="patients-body"></tbody>
           </table>
-        </div>
-      </section>
-
-      <section class="panel" id="skrzynka" hidden>
-        <div class="grid grid--inbox">
-          <article class="card">
-            <header class="card__head">
-              <h2>Skrzynka</h2>
-              <p class="card__note" id="inbox-note"></p>
-            </header>
-            <ul class="inbox" id="inbox"></ul>
-          </article>
-          <article class="card card--thread" id="thread"></article>
         </div>
       </section>
 

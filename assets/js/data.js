@@ -1,14 +1,15 @@
 /*
- * Dane kliniki demo — JEDYNE miejsce do podmiany treści.
+ * Dane gabinetu demo — JEDYNE miejsce do podmiany treści.
  *
- * Wszystko tutaj to przykład: nazwiska, adresy, telefony, ceny i współrzędne.
+ * Demo pokazuje jednoosobowy gabinet fizjoterapii: jeden terapeuta, jeden adres.
+ * Wszystko tutaj to przykład: nazwisko, adres, telefon, ceny i współrzędne.
  * Żeby przerobić demo na konkretny gabinet, wystarczy edytować ten plik
  * i podmienić zdjęcia w assets/img (te same nazwy plików).
  */
 
 window.KLINIKA = {
   nazwa: 'Linia Ruchu',
-  podtytul: 'Klinika fizjoterapii',
+  podtytul: 'Gabinet fizjoterapii',
   miasto: '[Twoje Miasto]',
   telefon: '+48 000 000 000',
   telefonHref: '+48000000000',
@@ -16,7 +17,8 @@ window.KLINIKA = {
   agencja: 'Studio Widok',
   narzedzie: 'System pozyskiwania pacjentów',
 
-  /* Pięć linii = pięć specjalizacji. Kolor ma znaczenie i nie pojawia się nigdzie indziej. */
+  /* Cztery linie = cztery problemy, z którymi przychodzą pacjenci.
+     Kolor ma znaczenie i nie pojawia się nigdzie indziej. */
   linie: [
     {
       id: 'kregoslup',
@@ -27,7 +29,7 @@ window.KLINIKA = {
       zdjecie: 'assets/img/spec-kregoslup.jpg',
       alt: 'Dłonie fizjoterapeuty uciskające mięśnie wzdłuż kręgosłupa leżącego pacjenta.',
       opis:
-        'Ból krzyża, szyi i pleców, który wraca, promieniuje do nogi albo nie pozwala przespać nocy. Szukamy źródła, a nie tylko miejsca, które boli.',
+        'Ból krzyża, szyi i pleców, który wraca, promieniuje do nogi albo nie pozwala przespać nocy. Szukam źródła, a nie tylko miejsca, które boli.',
       objawy: ['Rwa kulszowa', 'Dyskopatia', 'Ból szyi przy pracy biurowej', 'Sztywność poranna', 'Bóle głowy napięciowe'],
       uslugi: [
         { id: 'k1', nazwa: 'Konsultacja z terapią', minuty: 60, cena: 220 },
@@ -55,13 +57,13 @@ window.KLINIKA = {
     {
       id: 'uraz',
       problem: 'Po urazie lub operacji',
-      specjalizacja: 'Ortopedia i rehabilitacja',
+      specjalizacja: 'Rehabilitacja pooperacyjna',
       kolor: '#13875A',
       naKolorze: '#FFFFFF',
       zdjecie: 'assets/img/spec-uraz.jpg',
       alt: 'Fizjoterapeutka mobilizująca staw skokowy pacjenta po urazie.',
       opis:
-        'Endoprotezy, rekonstrukcje więzadeł, złamania. Prowadzimy od pierwszych dni po zabiegu do pełnej sprawności, w porozumieniu z Twoim ortopedą.',
+        'Endoprotezy, rekonstrukcje więzadeł, złamania. Prowadzę od pierwszych dni po zabiegu do pełnej sprawności, w porozumieniu z Twoim ortopedą.',
       objawy: ['Rekonstrukcja ACL', 'Endoproteza biodra i kolana', 'Po złamaniu', 'Zamrożony bark', 'Blizna po zabiegu'],
       uslugi: [
         { id: 'u1', nazwa: 'Rehabilitacja pooperacyjna', minuty: 60, cena: 210 },
@@ -70,137 +72,49 @@ window.KLINIKA = {
       ],
     },
     {
-      id: 'ciaza',
-      problem: 'Ciąża i połóg',
-      specjalizacja: 'Uroginekologia',
+      id: 'biuro',
+      problem: 'Ból od siedzenia',
+      specjalizacja: 'Terapia dla pracujących przy biurku',
       kolor: '#C2255C',
       naKolorze: '#FFFFFF',
-      zdjecie: 'assets/img/spec-ciaza.jpg',
-      alt: 'Kobieta w zaawansowanej ciąży w stroju sportowym, z dłońmi na brzuchu.',
+      zdjecie: 'assets/img/spec-biuro.jpg',
+      alt: 'Fizjoterapeuta pracujący z napiętym karkiem siedzącego pacjenta.',
       opis:
-        'Ból pleców w ciąży, rozejście mięśni brzucha, nietrzymanie moczu po porodzie. Rozmawiamy spokojnie i konkretnie — to częstsze, niż się mówi.',
-      objawy: ['Rozejście mięśni prostych', 'Nietrzymanie moczu', 'Ból miednicy w ciąży', 'Przygotowanie do porodu', 'Powrót do aktywności po porodzie'],
+        'Kark, barki i nadgarstki po ośmiu godzinach przy monitorze. Terapia plus ustawienie stanowiska, żeby ból nie wracał w poniedziałek.',
+      objawy: ['Napięty kark', 'Drętwienie rąk', 'Ból między łopatkami', 'Nadgarstek przy myszce', 'Bóle głowy od karku'],
       uslugi: [
-        { id: 'c1', nazwa: 'Konsultacja uroginekologiczna', minuty: 60, cena: 250 },
-        { id: 'c2', nazwa: 'Terapia rozejścia mięśni brzucha', minuty: 50, cena: 220 },
-        { id: 'c3', nazwa: 'Przygotowanie do porodu', minuty: 60, cena: 220 },
-      ],
-    },
-    {
-      id: 'dzieci',
-      problem: 'Dziecko',
-      specjalizacja: 'Fizjoterapia dziecięca',
-      kolor: '#F2B705',
-      naKolorze: '#14171A',
-      zdjecie: 'assets/img/spec-dzieci.jpg',
-      alt: 'Fizjoterapeutka przybija piątkę z chłopcem siedzącym na stole terapeutycznym.',
-      opis:
-        'Od niemowląt po nastolatki: asymetria, opóźniony rozwój ruchowy, wady postawy. Terapia wygląda jak zabawa — i działa, bo dziecko chce wracać.',
-      objawy: ['Asymetria u niemowlęcia', 'Wady postawy', 'Płaskostopie', 'Skolioza', 'Opóźniony rozwój ruchowy'],
-      uslugi: [
-        { id: 'd1', nazwa: 'Ocena rozwoju niemowlęcia', minuty: 60, cena: 230 },
-        { id: 'd2', nazwa: 'Terapia wad postawy', minuty: 45, cena: 190 },
-        { id: 'd3', nazwa: 'Terapia NDT-Bobath', minuty: 50, cena: 220 },
+        { id: 'b1', nazwa: 'Konsultacja z oceną stanowiska', minuty: 60, cena: 230 },
+        { id: 'b2', nazwa: 'Terapia karku i barków', minuty: 50, cena: 200 },
+        { id: 'b3', nazwa: 'Masaż leczniczy', minuty: 45, cena: 170 },
       ],
     },
   ],
 
-  /*
-   * Grafik: dni tygodnia 1 = poniedziałek … 6 = sobota.
-   * Dostępność terminów jest generowana deterministycznie z tego grafiku,
-   * więc demo za każdym razem pokazuje wiarygodny, ale spójny kalendarz.
-   */
-  zespol: [
-    {
-      id: 't1',
-      imie: 'mgr Jan Kowalski',
-      rola: 'Fizjoterapeuta, terapia manualna',
-      linie: ['kregoslup', 'uraz'],
-      zdjecie: 'assets/img/zespol-1.jpg',
-      alt: 'Portret fizjoterapeuty w jasnej koszulce polo.',
-      bio: 'Od 12 lat pracuje z bólem kręgosłupa. Certyfikowany terapeuta metody McKenziego.',
-      jezyki: ['polski', 'angielski'],
-      grafik: { centrum: [1, 3, 5], polnoc: [2, 4] },
-    },
-    {
-      id: 't2',
-      imie: 'mgr Tomasz Nowak',
-      rola: 'Fizjoterapeuta sportowy',
-      linie: ['sport', 'uraz'],
-      zdjecie: 'assets/img/zespol-2.jpg',
-      alt: 'Portret fizjoterapeuty sportowego ze skrzyżowanymi rękami.',
-      bio: 'Pracował z drużynami ligowymi. Specjalizuje się w powrocie do sportu po kontuzji kolana.',
-      jezyki: ['polski', 'angielski', 'niemiecki'],
-      grafik: { centrum: [2, 4, 6], poludnie: [1, 3] },
-    },
-    {
-      id: 't3',
-      imie: 'mgr Anna Wiśniewska',
-      rola: 'Fizjoterapeutka, rehabilitacja ortopedyczna',
-      linie: ['uraz', 'kregoslup'],
-      zdjecie: 'assets/img/zespol-3.jpg',
-      alt: 'Portret fizjoterapeutki w turkusowym stroju medycznym.',
-      bio: 'Prowadzi pacjentów po endoprotezach i rekonstrukcjach więzadeł, od pierwszej doby po zabiegu.',
-      jezyki: ['polski'],
-      grafik: { polnoc: [1, 3, 5], poludnie: [2, 4] },
-    },
-    {
-      id: 't4',
-      imie: 'mgr Katarzyna Wójcik',
-      rola: 'Fizjoterapeutka uroginekologiczna',
-      linie: ['ciaza'],
-      zdjecie: 'assets/img/zespol-4.jpg',
-      alt: 'Portret uśmiechniętej fizjoterapeutki w okularach.',
-      bio: 'Pracuje z kobietami w ciąży i po porodzie. Prowadzi też zajęcia przygotowujące do porodu.',
-      jezyki: ['polski', 'angielski'],
-      grafik: { centrum: [1, 2, 4], polnoc: [5] },
-    },
-    {
-      id: 't5',
-      imie: 'mgr Magdalena Kamińska',
-      rola: 'Fizjoterapeutka dziecięca, NDT-Bobath',
-      linie: ['dzieci'],
-      zdjecie: 'assets/img/zespol-5.jpg',
-      alt: 'Portret uśmiechniętej fizjoterapeutki w niebieskiej bluzie.',
-      bio: 'Terapeutka NDT-Bobath. Pracuje z niemowlętami i dziećmi w wieku szkolnym.',
-      jezyki: ['polski'],
-      grafik: { poludnie: [1, 2, 4, 5], polnoc: [3, 6] },
-    },
-  ],
+  /* Jeden fizjoterapeuta — to jego gabinet i jego kalendarz. */
+  fizjoterapeuta: {
+    id: 't1',
+    imie: 'mgr Jan Kowalski',
+    rola: 'Fizjoterapeuta, terapia manualna',
+    zdjecie: 'assets/img/zespol-1.jpg',
+    alt: 'Portret fizjoterapeuty w jasnej koszulce polo.',
+    bio: 'Od dwunastu lat pracuję z bólem kręgosłupa i powrotami do sportu. Certyfikowany terapeuta metody McKenziego, absolwent AWF.',
+    kursy: ['Metoda McKenziego (cert. A–D)', 'Terapia manualna wg Kaltenborna', 'Suche igłowanie', 'Diagnostyka funkcjonalna FMS'],
+    jezyki: ['polski', 'angielski'],
+    /* Dni tygodnia, w które przyjmuje: 1 = poniedziałek, 6 = sobota. */
+    grafik: [1, 2, 3, 4, 5, 6],
+  },
 
-  /* Współrzędne są przykładowe — podmień na adresy gabinetu. */
-  lokalizacje: [
-    {
-      id: 'centrum',
-      nazwa: 'Centrum',
-      adres: 'ul. Przykładowa 1',
-      kod: '00-001 [Twoje Miasto]',
-      lat: 52.2297,
-      lng: 21.0122,
-      godziny: [['Pon–Pt', '7:30–20:00'], ['Sobota', '9:00–14:00']],
-      udogodnienia: ['Parking dla pacjentów', 'Winda i podjazd', 'Poczekalnia dla rodzica z dzieckiem'],
-    },
-    {
-      id: 'polnoc',
-      nazwa: 'Północ',
-      adres: 'ul. Testowa 12',
-      kod: '00-002 [Twoje Miasto]',
-      lat: 52.2712,
-      lng: 20.9836,
-      godziny: [['Pon–Pt', '8:00–19:00'], ['Sobota', '9:00–13:00']],
-      udogodnienia: ['Przystanek tramwajowy 100 m', 'Parter, bez schodów', 'Sala do ćwiczeń'],
-    },
-    {
-      id: 'poludnie',
-      nazwa: 'Południe',
-      adres: 'al. Wzorcowa 5',
-      kod: '00-003 [Twoje Miasto]',
-      lat: 52.1931,
-      lng: 21.0368,
-      godziny: [['Pon–Pt', '8:00–20:00'], ['Sobota', 'nieczynne']],
-      udogodnienia: ['Duży parking', 'Kącik zabaw', 'Winda'],
-    },
-  ],
+  /* Jeden adres. Współrzędne przykładowe — podmień na swoje. */
+  gabinet: {
+    nazwa: 'Gabinet',
+    adres: 'ul. Przykładowa 1',
+    kod: '00-001 [Twoje Miasto]',
+    lat: 52.2297,
+    lng: 21.0122,
+    godziny: [['Pon–Pt', '8:00–19:00'], ['Sobota', '9:00–13:00']],
+    udogodnienia: ['Parking pod budynkiem', 'Winda i podjazd', 'Wejście z poziomu ulicy'],
+    dojazd: 'Przystanek tramwajowy 150 m, wjazd na parking od podwórza.',
+  },
 
   godzinyWizyt: { tydzien: [8, 19], sobota: [9, 13] },
 
@@ -218,43 +132,43 @@ window.KLINIKA = {
       autor: 'Pacjentka, 31 lat',
     },
     {
-      linia: 'ciaza',
+      linia: 'uraz',
       tekst:
-        'Wreszcie ktoś wytłumaczył mi rozejście mięśni bez straszenia. Rezerwacja online o 23:00 — idealne z noworodkiem.',
-      autor: 'Pacjentka, 34 lata',
+        'Po endoprotezie biodra bałem się każdego kroku. Po sześciu tygodniach chodzę bez kuli i wchodzę na piętro.',
+      autor: 'Pacjent, 67 lat',
     },
     {
-      linia: 'dzieci',
+      linia: 'biuro',
       tekst:
-        'Syn czeka na zajęcia jak na plac zabaw. Po pół roku wada postawy jest ledwo widoczna.',
-      autor: 'Mama 9-latka',
+        'Kark bolał mnie codziennie od dwóch lat. Terapia plus ustawienie biurka — po miesiącu problem zniknął.',
+      autor: 'Pacjentka, 34 lata',
     },
   ],
 
   faq: [
     {
       q: 'Czy potrzebuję skierowania?',
-      a: 'Nie. Na wizyty prywatne przyjmujemy bez skierowania. Jeśli masz dokumentację — wyniki rezonansu, RTG, wypis ze szpitala — weź ją ze sobą.',
+      a: 'Nie. Przyjmuję prywatnie, bez skierowania. Jeśli masz dokumentację — wyniki rezonansu, RTG, wypis ze szpitala — weź ją ze sobą.',
     },
     {
       q: 'Jak wygląda pierwsza wizyta?',
-      a: 'Trwa 60 minut: rozmowa o objawach, badanie ruchu, pierwsza terapia i plan dalszego postępowania z ćwiczeniami do domu. Nie musisz się specjalnie przygotowywać.',
+      a: 'Sześćdziesiąt minut: rozmowa o tym, co i od kiedy boli, badanie ruchu, pierwsza terapia i plan na kolejne tygodnie. Wychodzisz z ćwiczeniami do domu.',
     },
     {
       q: 'Co zabrać i w co się ubrać?',
-      a: 'Wygodny strój sportowy, który pozwala odsłonić leczone miejsce, i dokumentację medyczną, jeśli ją masz. Ręczniki zapewniamy.',
+      a: 'Wygodny strój sportowy, w którym da się swobodnie ruszać, oraz dokumentację, jeśli ją masz. Ręczniki czekają na miejscu.',
     },
     {
       q: 'Jak odwołać lub przełożyć wizytę?',
-      a: 'Link do zmiany terminu znajdziesz w SMS-ie z przypomnieniem. Prosimy o informację najpóźniej 24 godziny wcześniej — wtedy termin może trafić do kogoś, kto czeka.',
+      a: 'Link do zmiany terminu znajdziesz w SMS-ie z przypomnieniem. Proszę o informację najpóźniej 24 godziny wcześniej — wtedy termin może trafić do kogoś, kto czeka.',
     },
     {
       q: 'Ile wizyt będę potrzebować?',
-      a: 'Zależy od problemu. Na pierwszej wizycie terapeuta powie, czego się spodziewać — przy większości bólów kręgosłupa poprawę widać po 2–4 spotkaniach.',
+      a: 'Po pierwszej wizycie powiem wprost: zwykle od trzech do ośmiu, zależnie od problemu. Jeśli po dwóch nie widać poprawy, zmieniamy plan albo kieruję dalej.',
     },
     {
-      q: 'Czy wystawiacie faktury i jak można zapłacić?',
-      a: 'Tak, wystawiamy faktury na osobę prywatną i firmę. Płatność kartą, BLIK-iem lub gotówką po wizycie.',
+      q: 'Czy wystawiasz faktury i jak można zapłacić?',
+      a: 'Tak, faktura na życzenie. Płatność kartą, BLIK-iem lub gotówką na miejscu.',
     },
   ],
 };

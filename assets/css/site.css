@@ -886,6 +886,7 @@ svg path {
 
 .specs {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: clamp(48px, 6vw, 88px);
 }
 
@@ -1020,6 +1021,10 @@ svg path {
 .duo[data-duo='uraz'] {
   --duo: url(#duo-uraz);
 }
+.duo[data-duo='biuro'] {
+  --duo: url(#duo-biuro);
+}
+
 .duo[data-duo='ciaza'] {
   --duo: url(#duo-ciaza);
 }
@@ -2496,7 +2501,14 @@ svg path {
   .visit,
   .places,
   .booking {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .spec__text,
+  .spec__photo,
+  .services li,
+  .chips {
+    min-width: 0;
   }
 
   .spec:nth-child(even) .spec__photo {
@@ -2579,6 +2591,10 @@ svg path {
 
   .hero__cta .btn {
     flex: 1 1 100%;
+  }
+
+  .btn {
+    white-space: normal;
   }
 
   /* Linie na telefonie: grube pasy z podpisem w środku — duże cele dotykowe */

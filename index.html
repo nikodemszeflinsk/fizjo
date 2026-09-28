@@ -48,7 +48,7 @@
     <section class="hero" aria-labelledby="h-title">
       <div class="hero__in">
         <div class="hero__copy">
-          <p class="hero__for">Dla gabinetów i klinik fizjoterapii</p>
+          <p class="hero__for">Dla fizjoterapeutów prowadzących własny gabinet</p>
           <h1 class="hero__title" id="h-title">Pacjent wpisuje w Google to, co go boli.<br />Trafia do Ciebie, nie na listę.</h1>
           <p class="hero__lead">
             Budujemy Twoje własne miejsce w wyszukiwarce: wizytówkę w Mapach Google, stronę,
@@ -172,12 +172,22 @@
         <h2 class="h2" id="h-jak">Droga pacjenta do Twojego gabinetu</h2>
         <p class="lead">Trzy kroki, które budujemy zawsze. Reklamy dokładasz wtedy, kiedy chcesz przyspieszyć.</p>
 
+        <div class="five">
+          <p class="five__h">Pacjent decyduje w pięć sekund. Musi zobaczyć cztery rzeczy:</p>
+          <ol class="five__list">
+            <li><strong>Czy leczysz to, co jemu dolega</strong> — podstrona o jego problemie, nie zakładka „oferta”.</li>
+            <li><strong>Gdzie to jest</strong> — adres, dojazd i parking bez szukania.</li>
+            <li><strong>Kiedy jest wolny termin</strong> — konkretne godziny, nie formularz kontaktowy.</li>
+            <li><strong>Że komuś to pomogło</strong> — opinie i efekty terapii przy usłudze.</li>
+          </ol>
+        </div>
+
         <ol class="path" aria-label="Droga pacjenta">
           <li class="path__stop">
             <span class="path__num" aria-hidden="true">1</span>
             <p class="path__verb">Znajdzie Cię</p>
             <p class="path__mod">Wizytówka w Mapach Google</p>
-            <p>Aktualne godziny, usługi, zdjęcia gabinetu i opinie pacjentów. To tutaj ludzie wybierają, zanim w ogóle wejdą na stronę.</p>
+            <p>Aktualne godziny, usługi, zdjęcia gabinetu i opinie. Tu ludzie wybierają, zanim w ogóle wejdą na stronę — a fraza „fizjoterapeuta [miasto]” prowadzi prosto do Ciebie.</p>
           </li>
           <li class="path__stop">
             <span class="path__num" aria-hidden="true">2</span>
@@ -189,7 +199,7 @@
             <span class="path__num" aria-hidden="true">3</span>
             <p class="path__verb">Wróci</p>
             <p class="path__mod">Przypomnienia i opieka nad terapią</p>
-            <p>Potwierdzenie, przypomnienie przed wizytą, prośba o opinię po terapii i sygnał, gdy ktoś wypada z cyklu.</p>
+            <p>Potwierdzenie, przypomnienie przed wizytą, prośba o opinię po terapii i sygnał, gdy ktoś nie umówił kolejnego terminu.</p>
           </li>
           <li class="path__stop path__stop--opt">
             <span class="path__num" aria-hidden="true"><svg class="plus" viewBox="0 0 20 20"><path d="M10 2.6v14.8M2.6 10h14.8" /></svg></span>
@@ -205,12 +215,12 @@
     <section class="band band--paper" id="demo" aria-labelledby="h-demo">
       <div class="band__in">
         <h2 class="h2" id="h-demo">Zobacz, zanim zdecydujesz</h2>
-        <p class="lead">Dwa działające dema na przykładzie fikcyjnej kliniki „Linia Ruchu”. Klikaj do woli, nic się nie zepsuje.</p>
+        <p class="lead">Dwa działające dema na przykładzie fikcyjnego gabinetu „Linia Ruchu”. Klikaj do woli, nic się nie zepsuje.</p>
 
         <div class="proof">
           <div class="proof__text">
             <p class="proof__h">Strona, na której pacjent umawia się w minutę</p>
-            <p>Wybiera, co go boli, potem specjalistę, gabinet i godzinę. Dostaje numer rezerwacji i wizytę w kalendarzu. Najlepiej otwórz to na telefonie.</p>
+            <p>Wybiera, z czym przychodzi, i godzinę z Twojego grafiku. Trzy kroki, numer rezerwacji, wizyta w kalendarzu. Najlepiej otwórz to na telefonie.</p>
             <a class="cta cta--blue" href="demo.html">
               Otwórz demo strony
               <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
@@ -223,8 +233,8 @@
 
         <div class="proof proof--crm" id="crm">
           <div class="proof__text">
-            <p class="proof__h">Panel, który pilnuje terapii za Ciebie</p>
-            <p>Rano widzisz listę pacjentów, którzy wypadają z cyklu, i powód przy każdym: brak kolejnego terminu, brak odpowiedzi w ankiecie o ćwiczenia, ból, który nie spada. Do tego kalendarz zespołu, kartoteka i skrzynka z zapytaniami.</p>
+            <p class="proof__h">Panel do zarządzania wizytami</p>
+            <p>Dzień w jednym ekranie: wizyty, nowe zgłoszenia i lista osób, które nie umówiły kolejnej wizyty — z powodem przy każdej. Do tego kalendarz, kartoteka i przypomnienia, które wychodzą same.</p>
             <a class="cta cta--blue" href="crm.html">
               Otwórz demo panelu
               <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
@@ -248,7 +258,7 @@
           <article class="plan">
             <header class="plan__head">
               <h3>Widoczność</h3>
-              <p class="plan__for">Prowadzisz gabinet sam i chcesz przestać tracić pacjentów po godzinach.</p>
+              <p class="plan__for">Chcesz, żeby pacjenci znaleźli Cię w Google i umówili się sami. Zapisy prowadzisz po swojemu.</p>
             </header>
             <p class="plan__price">1 900 zł <span>wdrożenie</span></p>
             <p class="plan__price plan__price--sub">149 zł <span>miesięcznie za utrzymanie</span></p>
@@ -269,19 +279,19 @@
           <article class="plan plan--main">
             <header class="plan__head">
               <h3>Prowadzenie</h3>
-              <p class="plan__for">Masz zespół i nie chcesz pamiętać o wszystkim. System pamięta za Was.</p>
+              <p class="plan__for">Nie masz rejestracji i nie chcesz pamiętać o wszystkim. Panel pamięta za Ciebie.</p>
             </header>
             <p class="plan__price">2 900 zł <span>wdrożenie</span></p>
             <p class="plan__price plan__price--sub">690 zł <span>miesięcznie za prowadzenie</span></p>
             <ul class="plan__list">
               <li><strong>Wszystko z pakietu Widoczność</strong></li>
-              <li>Panel CRM: kartoteka, terapie, kalendarz zespołu</li>
-              <li>Radar terapii: kto wypada z cyklu i dlaczego</li>
+              <li>Panel gabinetu: dzień, kalendarz, kartoteka pacjentów</li>
+              <li>Lista osób, które nie umówiły kolejnej wizyty</li>
               <li>SMS-y: potwierdzenia, przypomnienia, prośby o opinię</li>
               <li>Ankieta SMS: ból po wizycie, ćwiczenia raz w tygodniu, jedno kliknięcie</li>
               <li>Wynik terapii w karcie pacjenta i wypis na koniec cyklu</li>
               <li>Przypomnienia o kontroli i powrocie po zakończonym cyklu</li>
-              <li>Raport miesięczny i opieka nad kampaniami</li>
+              <li>Podsumowanie miesiąca i opieka nad kampaniami</li>
             </ul>
             <p class="plan__note">Zaczynasz od Widoczności? Przejdziesz wyżej w dowolnym momencie, bez budowania strony od nowa.</p>
             <a class="cta cta--blue plan__cta" href="#kontakt" data-plan="Prowadzenie">Wybieram Prowadzenie</a>

@@ -15,23 +15,12 @@
     { id: 'kregoslup', nazwa: 'Kręgosłup i plecy', kolor: '#1F5FD6', naKolorze: '#FFFFFF' },
     { id: 'sport', nazwa: 'Kontuzja sportowa', kolor: '#E8590C', naKolorze: '#14171A' },
     { id: 'uraz', nazwa: 'Po urazie lub operacji', kolor: '#13875A', naKolorze: '#FFFFFF' },
-    { id: 'ciaza', nazwa: 'Ciąża i połóg', kolor: '#C2255C', naKolorze: '#FFFFFF' },
-    { id: 'dzieci', nazwa: 'Dziecko', kolor: '#F2B705', naKolorze: '#14171A' },
+    { id: 'biuro', nazwa: 'Ból od siedzenia', kolor: '#C2255C', naKolorze: '#FFFFFF' },
   ];
 
-  const zespol = [
-    { id: 't1', imie: 'Jan Kowalski', inicjaly: 'JK', linie: ['kregoslup', 'uraz'] },
-    { id: 't2', imie: 'Tomasz Nowak', inicjaly: 'TN', linie: ['sport', 'uraz'] },
-    { id: 't3', imie: 'Anna Wiśniewska', inicjaly: 'AW', linie: ['uraz', 'kregoslup'] },
-    { id: 't4', imie: 'Katarzyna Wójcik', inicjaly: 'KW', linie: ['ciaza'] },
-    { id: 't5', imie: 'Magdalena Kamińska', inicjaly: 'MK', linie: ['dzieci'] },
-  ];
+  const fizjo = { id: 't1', imie: 'mgr Jan Kowalski', inicjaly: 'JK' };
 
-  const gabinety = [
-    { id: 'centrum', nazwa: 'Centrum' },
-    { id: 'polnoc', nazwa: 'Północ' },
-    { id: 'poludnie', nazwa: 'Południe' },
-  ];
+  const gabinet = { nazwa: 'Gabinet', adres: 'ul. Przykładowa 1' };
 
   const zrodla = [
     { id: 'mapy', nazwa: 'Mapy Google' },
@@ -43,47 +32,47 @@
 
   /* Pacjenci: etap mówi, gdzie pacjent jest w cyklu terapii. */
   const pacjenci = [
-    { id: 'p1', imie: 'Anna Zielińska', linia: 'kregoslup', terapeuta: 't1', gabinet: 'centrum', zrodlo: 'mapy', etap: 'terapia', wizyt: 4, plan: 8, od: -34, ostatnia: -6, nastepna: 0, wartosc: 880, telefon: '+48 600 000 001', email: 'anna.z@przyklad.pl', notatka: 'Rwa kulszowa po lewej. Ćwiczenia domowe robi regularnie, ból z 7 na 3.' },
-    { id: 'p2', imie: 'Marek Wysocki', linia: 'sport', terapeuta: 't2', gabinet: 'centrum', zrodlo: 'reklama', etap: 'terapia', wizyt: 2, plan: 6, od: -12, ostatnia: -3, nastepna: 0, wartosc: 520, telefon: '+48 600 000 002', email: 'm.wysocki@przyklad.pl', notatka: 'Skręcenie stawu skokowego, wraca do biegania. Testy siły w przyszłym tygodniu.' },
-    { id: 'p3', imie: 'Ewa Malinowska', linia: 'ciaza', terapeuta: 't4', gabinet: 'centrum', zrodlo: 'polecenie', etap: 'nowy', wizyt: 0, plan: 4, od: -1, ostatnia: null, nastepna: 0, wartosc: 0, telefon: '+48 600 000 003', email: 'ewa.m@przyklad.pl', notatka: '32. tydzień ciąży. Prosi o wizytę przy windzie, bez schodów.' },
-    { id: 'p4', imie: 'Krzysztof Dąb', linia: 'uraz', terapeuta: 't3', gabinet: 'polnoc', zrodlo: 'strona', etap: 'terapia', wizyt: 6, plan: 10, od: -58, ostatnia: -4, nastepna: 1, wartosc: 1260, telefon: '+48 600 000 004', email: 'k.dab@przyklad.pl', notatka: 'Po rekonstrukcji ACL, 11. tydzień. Zakres zgięcia 125°.' },
-    { id: 'p5', imie: 'Zofia Rutkowska', linia: 'dzieci', terapeuta: 't5', gabinet: 'poludnie', zrodlo: 'polecenie', etap: 'terapia', wizyt: 3, plan: 6, od: -21, ostatnia: -7, nastepna: 1, wartosc: 690, telefon: '+48 600 000 005', email: 'rodzic.zr@przyklad.pl', notatka: 'Wada postawy, 9 lat. Mama prosi o zajęcia po 16:00.' },
-    { id: 'p6', imie: 'Piotr Lewandowski', linia: 'kregoslup', terapeuta: 't1', gabinet: 'centrum', zrodlo: 'mapy', etap: 'zapytanie', wizyt: 0, plan: 0, od: 0, ostatnia: null, nastepna: null, wartosc: 0, telefon: '+48 600 000 006', email: 'p.lewandowski@przyklad.pl', notatka: 'Formularz ze strony o 22:41: ból szyi przy pracy biurowej.' },
-    { id: 'p7', imie: 'Hanna Sobczak', linia: 'uraz', terapeuta: 't3', gabinet: 'polnoc', zrodlo: 'strona', etap: 'zapytanie', wizyt: 0, plan: 0, od: 0, ostatnia: null, nastepna: null, wartosc: 0, telefon: '+48 600 000 007', email: 'h.sobczak@przyklad.pl', notatka: 'Po złamaniu nadgarstka, pyta o termin w tym tygodniu.' },
-    { id: 'p8', imie: 'Robert Jasiński', linia: 'sport', terapeuta: 't2', gabinet: 'poludnie', zrodlo: 'reklama', etap: 'zakonczona', wizyt: 6, plan: 6, od: -76, ostatnia: -14, nastepna: null, wartosc: 1380, telefon: '+48 600 000 008', email: 'r.jasinski@przyklad.pl', notatka: 'Cykl zakończony. Kontrola za 6 tygodni — przypomnienie ustawione.' },
-    { id: 'p9', imie: 'Maria Cichoń', linia: 'kregoslup', terapeuta: 't1', gabinet: 'centrum', zrodlo: 'powrot', etap: 'terapia', wizyt: 1, plan: 5, od: -5, ostatnia: -5, nastepna: 2, wartosc: 220, telefon: '+48 600 000 009', email: 'm.cichon@przyklad.pl', notatka: 'Wraca po roku, ten sam odcinek lędźwiowy.' },
-    { id: 'p10', imie: 'Tadeusz Bąk', linia: 'uraz', terapeuta: 't3', gabinet: 'centrum', zrodlo: 'polecenie', etap: 'terapia', wizyt: 8, plan: 10, od: -63, ostatnia: -2, nastepna: 2, wartosc: 1680, telefon: '+48 600 000 010', email: 't.bak@przyklad.pl', notatka: 'Endoproteza biodra, chodzi bez kuli od 3 tygodni.' },
-    { id: 'p11', imie: 'Julia Ostrowska', linia: 'ciaza', terapeuta: 't4', gabinet: 'centrum', zrodlo: 'mapy', etap: 'zakonczona', wizyt: 4, plan: 4, od: -90, ostatnia: -30, nastepna: null, wartosc: 900, telefon: '+48 600 000 011', email: 'j.ostrowska@przyklad.pl', notatka: 'Po porodzie, prośba o opinię wysłana — wystawiła 5 gwiazdek.' },
-    { id: 'p12', imie: 'Adam Wilk', linia: 'sport', terapeuta: 't2', gabinet: 'centrum', zrodlo: 'reklama', etap: 'nowy', wizyt: 1, plan: 4, od: -2, ostatnia: -2, nastepna: 3, wartosc: 260, telefon: '+48 600 000 012', email: 'a.wilk@przyklad.pl', notatka: 'Bark po siłowni. Diagnostyka wykonana, plan na 4 wizyty.' },
-    { id: 'p13', imie: 'Barbara Nowicka', linia: 'dzieci', terapeuta: 't5', gabinet: 'poludnie', zrodlo: 'polecenie', etap: 'terapia', wizyt: 2, plan: 8, od: -16, ostatnia: -9, nastepna: 4, wartosc: 460, telefon: '+48 600 000 013', email: 'b.nowicka@przyklad.pl', notatka: 'Niemowlę, asymetria ułożeniowa. Terapia NDT-Bobath.' },
-    { id: 'p14', imie: 'Grzegorz Pająk', linia: 'kregoslup', terapeuta: 't1', gabinet: 'polnoc', zrodlo: 'strona', etap: 'ryzyko', wizyt: 2, plan: 6, od: -40, ostatnia: -24, nastepna: null, wartosc: 440, telefon: '+48 600 000 014', email: 'g.pajak@przyklad.pl', notatka: 'Nie umówił kolejnej wizyty od 24 dni. Warto zadzwonić.' },
+    { id: 'p1', imie: 'Anna Zielińska', linia: 'kregoslup', zrodlo: 'mapy', etap: 'terapia', wizyt: 4, plan: 8, od: -34, ostatnia: -6, nastepna: 0, wartosc: 880, telefon: '+48 600 000 001', email: 'anna.z@przyklad.pl', notatka: 'Rwa kulszowa po lewej. Ćwiczenia domowe robi regularnie, ból z 7 na 3.' },
+    { id: 'p2', imie: 'Marek Wysocki', linia: 'sport', zrodlo: 'reklama', etap: 'terapia', wizyt: 2, plan: 6, od: -12, ostatnia: -3, nastepna: 0, wartosc: 520, telefon: '+48 600 000 002', email: 'm.wysocki@przyklad.pl', notatka: 'Skręcenie stawu skokowego, wraca do biegania. Testy siły w przyszłym tygodniu.' },
+    { id: 'p3', imie: 'Ewa Malinowska', linia: 'biuro', zrodlo: 'polecenie', etap: 'nowy', wizyt: 0, plan: 4, od: -1, ostatnia: null, nastepna: 0, wartosc: 0, telefon: '+48 600 000 003', email: 'ewa.m@przyklad.pl', notatka: 'Ból karku i barków po przejściu na pracę zdalną. Prosi o wizyty po 16:00.' },
+    { id: 'p4', imie: 'Krzysztof Dąb', linia: 'uraz', zrodlo: 'strona', etap: 'terapia', wizyt: 6, plan: 10, od: -58, ostatnia: -4, nastepna: 1, wartosc: 1260, telefon: '+48 600 000 004', email: 'k.dab@przyklad.pl', notatka: 'Po rekonstrukcji ACL, 11. tydzień. Zakres zgięcia 125°.' },
+    { id: 'p5', imie: 'Zofia Rutkowska', linia: 'kregoslup', zrodlo: 'polecenie', etap: 'terapia', wizyt: 3, plan: 6, od: -21, ostatnia: -7, nastepna: 1, wartosc: 690, telefon: '+48 600 000 005', email: 'rodzic.zr@przyklad.pl', notatka: 'Wada postawy i ból pleców, 19 lat. Ćwiczenia robi nieregularnie.' },
+    { id: 'p6', imie: 'Piotr Lewandowski', linia: 'kregoslup', zrodlo: 'mapy', etap: 'zapytanie', wizyt: 0, plan: 0, od: 0, ostatnia: null, nastepna: null, wartosc: 0, telefon: '+48 600 000 006', email: 'p.lewandowski@przyklad.pl', notatka: 'Formularz ze strony o 22:41: ból szyi przy pracy biurowej.' },
+    { id: 'p7', imie: 'Hanna Sobczak', linia: 'uraz', zrodlo: 'strona', etap: 'zapytanie', wizyt: 0, plan: 0, od: 0, ostatnia: null, nastepna: null, wartosc: 0, telefon: '+48 600 000 007', email: 'h.sobczak@przyklad.pl', notatka: 'Po złamaniu nadgarstka, pyta o termin w tym tygodniu.' },
+    { id: 'p8', imie: 'Robert Jasiński', linia: 'sport', zrodlo: 'reklama', etap: 'zakonczona', wizyt: 6, plan: 6, od: -76, ostatnia: -14, nastepna: null, wartosc: 1380, telefon: '+48 600 000 008', email: 'r.jasinski@przyklad.pl', notatka: 'Cykl zakończony. Kontrola za 6 tygodni — przypomnienie ustawione.' },
+    { id: 'p9', imie: 'Maria Cichoń', linia: 'kregoslup', zrodlo: 'powrot', etap: 'terapia', wizyt: 1, plan: 5, od: -5, ostatnia: -5, nastepna: 2, wartosc: 220, telefon: '+48 600 000 009', email: 'm.cichon@przyklad.pl', notatka: 'Wraca po roku, ten sam odcinek lędźwiowy.' },
+    { id: 'p10', imie: 'Tadeusz Bąk', linia: 'uraz', zrodlo: 'polecenie', etap: 'terapia', wizyt: 8, plan: 10, od: -63, ostatnia: -2, nastepna: 2, wartosc: 1680, telefon: '+48 600 000 010', email: 't.bak@przyklad.pl', notatka: 'Endoproteza biodra, chodzi bez kuli od 3 tygodni.' },
+    { id: 'p11', imie: 'Julia Ostrowska', linia: 'sport', zrodlo: 'mapy', etap: 'zakonczona', wizyt: 4, plan: 4, od: -90, ostatnia: -30, nastepna: null, wartosc: 900, telefon: '+48 600 000 011', email: 'j.ostrowska@przyklad.pl', notatka: 'Powrót do biegania po rocznej przerwie. Prośba o opinię wysłana — wystawiła 5 gwiazdek.' },
+    { id: 'p12', imie: 'Adam Wilk', linia: 'sport', zrodlo: 'reklama', etap: 'nowy', wizyt: 1, plan: 4, od: -2, ostatnia: -2, nastepna: 3, wartosc: 260, telefon: '+48 600 000 012', email: 'a.wilk@przyklad.pl', notatka: 'Bark po siłowni. Diagnostyka wykonana, plan na 4 wizyty.' },
+    { id: 'p13', imie: 'Barbara Nowicka', linia: 'biuro', zrodlo: 'polecenie', etap: 'terapia', wizyt: 2, plan: 8, od: -16, ostatnia: -9, nastepna: 4, wartosc: 460, telefon: '+48 600 000 013', email: 'b.nowicka@przyklad.pl', notatka: 'Drętwienie prawej ręki przy pracy z myszką. Ustawienie stanowiska poprawione.' },
+    { id: 'p14', imie: 'Grzegorz Pająk', linia: 'kregoslup', zrodlo: 'strona', etap: 'ryzyko', wizyt: 2, plan: 6, od: -40, ostatnia: -24, nastepna: null, wartosc: 440, telefon: '+48 600 000 014', email: 'g.pajak@przyklad.pl', notatka: 'Nie umówił kolejnej wizyty od 24 dni. Warto zadzwonić.' },
   ];
 
   /* Dzisiejszy grafik: godzina, pacjent, usługa, status. */
   const wizytyDzis = [
-    { godz: '8:00', pacjent: 'p1', terapeuta: 't1', gabinet: 'centrum', usluga: 'Terapia manualna', minuty: 50, status: 'zakonczona' },
-    { godz: '9:00', pacjent: 'p10', terapeuta: 't3', gabinet: 'centrum', usluga: 'Rehabilitacja pooperacyjna', minuty: 60, status: 'zakonczona' },
-    { godz: '10:30', pacjent: 'p2', terapeuta: 't2', gabinet: 'centrum', usluga: 'Trening powrotu do sportu', minuty: 60, status: 'trwa' },
-    { godz: '12:00', pacjent: 'p3', terapeuta: 't4', gabinet: 'centrum', usluga: 'Konsultacja uroginekologiczna', minuty: 60, status: 'potwierdzona' },
-    { godz: '13:30', pacjent: 'p9', terapeuta: 't1', gabinet: 'centrum', usluga: 'Konsultacja z terapią', minuty: 60, status: 'potwierdzona' },
-    { godz: '15:00', pacjent: 'p12', terapeuta: 't2', gabinet: 'centrum', usluga: 'Diagnostyka funkcjonalna', minuty: 75, status: 'niepotwierdzona' },
-    { godz: '16:30', pacjent: 'p5', terapeuta: 't5', gabinet: 'poludnie', usluga: 'Terapia wad postawy', minuty: 45, status: 'potwierdzona' },
-    { godz: '18:00', pacjent: 'p4', terapeuta: 't3', gabinet: 'polnoc', usluga: 'Rehabilitacja pooperacyjna', minuty: 60, status: 'potwierdzona' },
+    { godz: '8:00', pacjent: 'p1', usluga: 'Terapia manualna', minuty: 50, status: 'zakonczona' },
+    { godz: '9:00', pacjent: 'p10', usluga: 'Rehabilitacja pooperacyjna', minuty: 60, status: 'zakonczona' },
+    { godz: '10:30', pacjent: 'p2', usluga: 'Trening powrotu do sportu', minuty: 60, status: 'trwa' },
+    { godz: '12:00', pacjent: 'p3', usluga: 'Konsultacja z oceną stanowiska', minuty: 60, status: 'potwierdzona' },
+    { godz: '13:30', pacjent: 'p9', usluga: 'Konsultacja z terapią', minuty: 60, status: 'potwierdzona' },
+    { godz: '15:00', pacjent: 'p12', usluga: 'Diagnostyka funkcjonalna', minuty: 75, status: 'niepotwierdzona' },
+    { godz: '16:30', pacjent: 'p5', usluga: 'Terapia karku i barków', minuty: 45, status: 'potwierdzona' },
+    { godz: '18:00', pacjent: 'p4', usluga: 'Rehabilitacja pooperacyjna', minuty: 60, status: 'potwierdzona' },
   ];
 
   /* Tydzień w kalendarzu: [dzień 0–5, godzina startu, pacjent, terapeuta, minuty]. */
   const tydzien = [
-    [0, 8, 'p1', 't1', 50], [0, 9, 'p10', 't3', 60], [0, 10.5, 'p2', 't2', 60], [0, 12, 'p3', 't4', 60],
-    [0, 13.5, 'p9', 't1', 60], [0, 15, 'p12', 't2', 75], [0, 16.5, 'p5', 't5', 45], [0, 18, 'p4', 't3', 60],
-    [1, 8, 'p4', 't3', 60], [1, 9.5, 'p5', 't5', 45], [1, 11, 'p1', 't1', 50], [1, 13, 'p13', 't5', 45],
-    [1, 15, 'p2', 't2', 60], [1, 17, 'p10', 't3', 60],
-    [2, 8.5, 'p9', 't1', 60], [2, 10, 'p12', 't2', 60], [2, 12, 'p11', 't4', 60], [2, 14, 'p1', 't1', 50],
-    [2, 16, 'p4', 't3', 60], [2, 17.5, 'p13', 't5', 45],
-    [3, 9, 'p10', 't3', 60], [3, 11, 'p2', 't2', 60], [3, 13, 'p3', 't4', 60], [3, 15, 'p5', 't5', 45],
-    [3, 16.5, 'p9', 't1', 60],
-    [4, 8, 'p1', 't1', 50], [4, 10, 'p4', 't3', 60], [4, 12, 'p12', 't2', 75], [4, 14.5, 'p13', 't5', 45],
-    [4, 16, 'p10', 't3', 60], [4, 17.5, 'p2', 't2', 60],
-    [5, 9, 'p5', 't5', 45], [5, 10.5, 'p9', 't1', 60], [5, 12, 'p11', 't4', 60],
+    [0, 8, 'p1', 50], [0, 9, 'p10', 60], [0, 10.5, 'p2', 60], [0, 12, 'p3', 60],
+    [0, 13.5, 'p9', 60], [0, 15, 'p12', 75], [0, 16.5, 'p5', 45], [0, 18, 'p4', 60],
+    [1, 8, 'p4', 60], [1, 9.5, 'p5', 45], [1, 11, 'p1', 50], [1, 13, 'p13', 45],
+    [1, 15, 'p2', 60], [1, 17, 'p10', 60],
+    [2, 8.5, 'p9', 60], [2, 10, 'p12', 60], [2, 12, 'p11', 60], [2, 14, 'p1', 50],
+    [2, 16, 'p4', 60], [2, 17.5, 'p13', 45],
+    [3, 9, 'p10', 60], [3, 11, 'p2', 60], [3, 13, 'p3', 60], [3, 15, 'p5', 45],
+    [3, 16.5, 'p9', 60],
+    [4, 8, 'p1', 50], [4, 10, 'p4', 60], [4, 12, 'p12', 75], [4, 14.5, 'p13', 45],
+    [4, 16, 'p10', 60], [4, 17.5, 'p2', 60],
+    [5, 9, 'p5', 45], [5, 10.5, 'p9', 60], [5, 12, 'p11', 60],
   ];
 
   /* Zadania: to, o czym rejestracja ma pamiętać. */
@@ -133,7 +122,7 @@
      odstepDni: co ile dni powinna odbywać się wizyta wg planu terapeuty. */
   const terapie = {
     p1: {
-      diagnoza: 'Rwa kulszowa, odcinek L5-S1',
+      etykieta: 'Rwa kulszowa, odcinek L5-S1',
       cel: 'Przespać noc bez bólu i wrócić na basen',
       odstepDni: 7,
       compliance: 82,
@@ -141,7 +130,7 @@
       bol: [{ d: -34, v: 7 }, { d: -27, v: 6 }, { d: -20, v: 5 }, { d: -6, v: 3 }],
     },
     p2: {
-      diagnoza: 'Skręcenie stawu skokowego III stopnia',
+      etykieta: 'Skręcenie stawu skokowego III stopnia',
       cel: 'Przebiec 5 km bez obrzęku',
       odstepDni: 5,
       compliance: 61,
@@ -149,15 +138,15 @@
       bol: [{ d: -12, v: 6 }, { d: -8, v: 5 }, { d: -3, v: 4 }],
     },
     p3: {
-      diagnoza: 'Ból obręczy biodrowej, 32. tydzień ciąży',
-      cel: 'Przygotowanie do porodu bez bólu miednicy',
+      etykieta: 'Kark i barki przy pracy zdalnej',
+      cel: 'Przepracować dzień bez bólu karku',
       odstepDni: 7,
       compliance: null,
-      lekarz: 'dr Ewa Dąbrowska, ginekolog',
+      lekarz: null,
       bol: [],
     },
     p4: {
-      diagnoza: 'Stan po rekonstrukcji ACL, 11. tydzień',
+      etykieta: 'Stan po rekonstrukcji ACL, 11. tydzień',
       cel: 'Pełne zgięcie kolana i powrót do treningu',
       odstepDni: 4,
       compliance: 91,
@@ -165,17 +154,17 @@
       bol: [{ d: -58, v: 8 }, { d: -45, v: 6 }, { d: -30, v: 5 }, { d: -14, v: 3 }, { d: -4, v: 2 }],
     },
     p5: {
-      diagnoza: 'Wada postawy, skolioza niskostopniowa',
-      cel: 'Utrzymać korekcję przez cały dzień w szkole',
+      etykieta: 'Wada postawy i ból pleców',
+      cel: 'Przesiedzieć wykłady bez bólu pleców',
       odstepDni: 7,
       compliance: 35,
       lekarz: null,
       bol: [{ d: -21, v: 3 }, { d: -14, v: 3 }, { d: -7, v: 3 }],
     },
-    p6: { diagnoza: 'Ból szyi przy pracy biurowej — zgłoszenie', cel: null, odstepDni: 7, compliance: null, lekarz: null, bol: [] },
-    p7: { diagnoza: 'Stan po złamaniu nadgarstka — zgłoszenie', cel: null, odstepDni: 5, compliance: null, lekarz: 'dr Anna Lis, ortopeda', bol: [] },
+    p6: { etykieta: 'Ból szyi przy pracy biurowej — zgłoszenie', cel: null, odstepDni: 7, compliance: null, lekarz: null, bol: [] },
+    p7: { etykieta: 'Stan po złamaniu nadgarstka — zgłoszenie', cel: null, odstepDni: 5, compliance: null, lekarz: 'dr Anna Lis, ortopeda', bol: [] },
     p8: {
-      diagnoza: 'Kolano biegacza, zespół pasma biodrowo-piszczelowego',
+      etykieta: 'Kolano biegacza, zespół pasma biodrowo-piszczelowego',
       cel: 'Powrót do biegania 10 km',
       odstepDni: 7,
       compliance: 88,
@@ -183,7 +172,7 @@
       bol: [{ d: -76, v: 7 }, { d: -60, v: 5 }, { d: -40, v: 3 }, { d: -20, v: 2 }, { d: -14, v: 1 }],
     },
     p9: {
-      diagnoza: 'Nawracający ból lędźwiowy',
+      etykieta: 'Nawracający ból lędźwiowy',
       cel: 'Wrócić do pracy w ogrodzie bez blokady',
       odstepDni: 7,
       compliance: 55,
@@ -191,7 +180,7 @@
       bol: [{ d: -5, v: 6 }],
     },
     p10: {
-      diagnoza: 'Stan po endoprotezie biodra',
+      etykieta: 'Stan po endoprotezie biodra',
       cel: 'Chodzić 3 km bez kuli i wejść na piętro',
       odstepDni: 5,
       compliance: 76,
@@ -199,7 +188,7 @@
       bol: [{ d: -63, v: 7 }, { d: -48, v: 6 }, { d: -30, v: 4 }, { d: -12, v: 3 }, { d: -2, v: 2 }],
     },
     p11: {
-      diagnoza: 'Rozejście mięśnia prostego brzucha po porodzie',
+      etykieta: 'Powrót do biegania po przerwie',
       cel: 'Wrócić do biegania i ćwiczeń siłowych',
       odstepDni: 10,
       compliance: 80,
@@ -207,7 +196,7 @@
       bol: [{ d: -90, v: 5 }, { d: -70, v: 4 }, { d: -50, v: 2 }, { d: -30, v: 1 }],
     },
     p12: {
-      diagnoza: 'Zespół ciasnoty podbarkowej',
+      etykieta: 'Zespół ciasnoty podbarkowej',
       cel: 'Wycisnąć sztangę nad głowę bez bólu',
       odstepDni: 7,
       compliance: null,
@@ -215,15 +204,15 @@
       bol: [{ d: -2, v: 5 }],
     },
     p13: {
-      diagnoza: 'Asymetria ułożeniowa niemowlęcia',
-      cel: 'Symetryczne obracanie się na oba boki',
+      etykieta: 'Drętwienie ręki przy myszce',
+      cel: 'Przepracować tydzień bez drętwienia ręki',
       odstepDni: 7,
       compliance: 28,
-      lekarz: 'dr Joanna Bąk, pediatra',
+      lekarz: null,
       bol: [],
     },
     p14: {
-      diagnoza: 'Dyskopatia L4-L5',
+      etykieta: 'Dyskopatia L4-L5',
       cel: 'Przesiedzieć 8 godzin w pracy bez drętwienia',
       odstepDni: 7,
       compliance: 20,
@@ -238,8 +227,8 @@
     dzis,
     dzien,
     linie,
-    zespol,
-    gabinety,
+    fizjo,
+    gabinet,
     zrodla,
     pacjenci,
     terapie,
@@ -249,6 +238,6 @@
     automatyzacje,
     skrzynka,
     rezerwacjeTygodnie,
-    klinika: { nazwa: 'Linia Ruchu', uzytkownik: 'Rejestracja — Studio Widok', inicjaly: 'LR' },
+    klinika: { nazwa: 'Linia Ruchu', uzytkownik: 'mgr Jan Kowalski', inicjaly: 'JK' },
   };
 })();

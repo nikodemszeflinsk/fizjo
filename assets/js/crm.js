@@ -12,8 +12,8 @@
   const zl = (n) => `${Math.round(n).toLocaleString('pl-PL')} zł`;
 
   const LINIE = Object.fromEntries(D.linie.map((l) => [l.id, l]));
-  const ZESPOL = Object.fromEntries(D.zespol.map((t) => [t.id, t]));
-  const GABINETY = Object.fromEntries(D.gabinety.map((g) => [g.id, g]));
+  const FIZJO = D.fizjo;
+  const GABINET = D.gabinet;
   const ZRODLA = Object.fromEntries(D.zrodla.map((z) => [z.id, z]));
   const PACJENCI = Object.fromEntries(D.pacjenci.map((p) => [p.id, p]));
 
@@ -27,8 +27,7 @@
   const ETAP = Object.fromEntries(ETAPY.map((e) => [e.id, e.nazwa]));
 
   const ICON = {
-    pulpit: '<path d="M3.5 10.5 10 4l6.5 6.5M5.5 9v7.5h9V9"/>',
-    terapie: '<path d="M2.5 11.5h3l2-5 3 9 2.5-6 1.5 2h3"/>',
+    dzis: '<path d="M2.5 11.5h3l2-5 3 9 2.5-6 1.5 2h3"/>',
     kalendarz: '<path d="M4 5.5h12v11H4ZM4 8.5h12M7.5 3.5v3M12.5 3.5v3"/>',
     pacjenci: '<path d="M7.5 9.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM2.5 17c0-2.8 2.2-5 5-5s5 2.2 5 5M13 4.7a3 3 0 0 1 0 5.6M14.5 12.6c1.8.6 3 2.3 3 4.4"/>',
     skrzynka: '<path d="M3.5 5.5h13v9h-13ZM3.5 6l6.5 5 6.5-5"/>',
@@ -78,11 +77,9 @@
 
   /* ── Nawigacja ─────────────────────────────────────────────────────── */
   const WIDOKI = [
-    { id: 'pulpit', nazwa: 'Pulpit' },
-    { id: 'terapie', nazwa: 'Terapie' },
+    { id: 'dzis', nazwa: 'Dziś' },
     { id: 'kalendarz', nazwa: 'Kalendarz' },
     { id: 'pacjenci', nazwa: 'Pacjenci' },
-    { id: 'skrzynka', nazwa: 'Skrzynka' },
     { id: 'automatyzacje', nazwa: 'Automatyzacje' },
   ];
 
@@ -91,9 +88,9 @@
   function renderRail() {
     const nowe = stanSkrzynki.filter((w) => w.nowa).length;
     $('#rail-list').innerHTML = WIDOKI.map(
-      (w) => `<li><button class="rail__btn" type="button" data-view="${w.id}" aria-current="${w.id === 'pulpit'}">
+      (w) => `<li><button class="rail__btn" type="button" data-view="${w.id}" aria-current="${w.id === 'dzis'}">
         ${ikona(w.id)}${w.nazwa}
-        ${w.id === 'skrzynka' && nowe ? `<span class="rail__badge">${nowe}</span>` : ''}
+        ${w.id === 'dzis' && nowe ? `<span class="rail__badge">${nowe}</span>` : ''}
       </button></li>`
     ).join('');
   }
@@ -108,9 +105,7 @@
         ? 'Bieżący tydzień'
         : id === 'pacjenci'
           ? `${D.pacjenci.length} osób w kartotece`
-          : id === 'terapie'
-            ? `${aktywne().length} terapii w toku`
-            : dlugaData(D.dzis);
+          : dlugaData(D.dzis);
     $('.app').classList.remove('is-open');
     $('#menu').setAttribute('aria-expanded', 'false');
     $('#widok').scrollTo({ top: 0 });
@@ -119,11 +114,9 @@
   /* ── Pulpit: kafle ─────────────────────────────────────────────────── */
   function renderTiles() {
     const doPotwierdzenia = D.wizytyDzis.filter((w) => w.status === 'niepotwierdzona').length;
-    const wToku = aktywne().length;
     const ryzykowne = zagrozone().length;
-    const poprawy = D.pacjenci.map(poprawa).filter((x) => x !== null && x > 0);
-    const srednia = poprawy.length ? (poprawy.reduce((s, x) => s + x, 0) / poprawy.length).toFixed(1) : '—';
-    const przychod = D.pacjenci.reduce((s, p) => s + p.wartosc, 0);
+    const nowe = stanSkrzynki.filter((w) => w.nowa).length;
+    const wToku = aktywne().length;
 
     const kafel = (label, value, foot, klasa = '') => `
       <article class="tile${klasa}">
@@ -133,20 +126,10 @@
       </article>`;
 
     $('#tiles').innerHTML = [
-      kafel('Terapie w toku', wToku, `${D.wizytyDzis.length} wizyt dzisiaj${doPotwierdzenia ? `, ${doPotwierdzenia} bez potwierdzenia` : ''}`),
-      kafel(
-        'Wypadają z cyklu',
-        ryzykowne,
-        ryzykowne ? 'zadzwoń dziś, zanim przepadną' : 'wszystko pod kontrolą',
-        ryzykowne ? ' tile--alert' : ''
-      ),
-      kafel('Średni spadek bólu', srednia === '—' ? '—' : `${srednia} pkt`, 'w skali 0–10, z ankiet po wizycie'),
-      kafel(
-        'Wartość terapii w toku',
-        zl(przychod),
-        `<span class="trend trend--up">${ikona('up')}+14%</span> wobec zeszłego miesiąca`,
-        ' tile--ink'
-      ),
+      kafel('Wizyty dzisiaj', D.wizytyDzis.length, doPotwierdzenia ? `${doPotwierdzenia} bez potwierdzenia` : 'wszystkie potwierdzone'),
+      kafel('Nowe zgłoszenia', nowe, nowe ? 'odpowiedz, zanim pójdą dalej' : 'wszystko odpisane'),
+      kafel('Nie umówili kolejnej', ryzykowne, ryzykowne ? 'zadzwoń dziś' : 'wszyscy mają termin', ryzykowne ? ' tile--alert' : ''),
+      kafel('Terapie w toku', wToku, `${D.pacjenci.length} osób w kartotece`, ' tile--ink'),
     ].join('');
   }
 
@@ -186,7 +169,7 @@
         <span class="visit__time">${w.godz}</span>
         <span class="visit__who"><span class="dot" style="--c:${l.kolor}"></span><span>${esc(p.imie)}</span></span>
         <span class="pill ${s.klasa}">${s.tekst}</span>
-        <span class="visit__what">${esc(w.usluga)} · ${w.minuty} min · ${esc(ZESPOL[w.terapeuta].imie)} · ${esc(GABINETY[w.gabinet].nazwa)}</span>
+        <span class="visit__what">${esc(w.usluga)} · ${w.minuty} min</span>
       </button></li>`;
     }).join('');
   }
@@ -285,7 +268,7 @@
       const linie = godziny.map(() => '<div class="cal__line"></div>').join('');
       const wpisy = D.tydzien
         .filter((w) => w[0] === i)
-        .map(([, start, pid, tid, minuty]) => {
+        .map(([, start, pid, minuty]) => {
           const p = PACJENCI[pid];
           const l = LINIE[p.linia];
           const top = (start - GODZ_OD) * WYS;
@@ -294,7 +277,7 @@
           const dim = filtrLinii !== 'all' && filtrLinii !== p.linia;
           return `<button class="event${dim ? ' is-dim' : ''}" type="button" data-patient="${p.id}" data-line="${p.linia}"
               style="--c:${l.kolor};top:${top + 2}px;height:${h}px">
-            <b>${esc(p.imie)}</b><span>${godz} · ${esc(ZESPOL[tid].inicjaly)}</span>
+            <b>${esc(p.imie)}</b><span>${godz}</span>
           </button>`;
         })
         .join('');
@@ -333,8 +316,7 @@
               </span>
             </span>
           </td>
-          <td><span class="who"><span class="dot" style="--c:${l.kolor}"></span>${esc(l.nazwa)}</span></td>
-          <td>${esc(ZESPOL[p.terapeuta].imie)}<br /><span class="who__sub">${esc(GABINETY[p.gabinet].nazwa)}</span></td>
+          <td><span class="who"><span class="dot" style="--c:${l.kolor}"></span>${esc(p.terapia?.etykieta || l.nazwa)}</span></td>
           <td>
             <span class="progress">
               <span class="progress__track"><span class="progress__fill" style="--c:${l.kolor};width:${postep}%"></span></span>
@@ -350,16 +332,14 @@
   }
 
   /* ── Skrzynka ──────────────────────────────────────────────────────── */
-  let otwartaWiadomosc = stanSkrzynki[0].id;
-
   function renderInbox() {
     const nowe = stanSkrzynki.filter((w) => w.nowa).length;
     $('#inbox-note').textContent = nowe ? `${nowe} nowe wiadomości` : 'wszystko przeczytane';
-    $('#inbox').innerHTML = stanSkrzynki
+    $('#inbox').innerHTML = stanSkrzynki.slice(0, 5)
       .map((w) => {
         const p = PACJENCI[w.pacjent];
         const l = LINIE[p.linia];
-        return `<li class="${w.id === otwartaWiadomosc ? 'is-open' : ''}">
+        return `<li>
           <button type="button" data-msg="${w.id}">
             <span class="inbox__from">
               ${w.nowa ? '<span class="new-dot" aria-label="nowa"></span>' : `<span class="dot" style="--c:${l.kolor}"></span>`}
@@ -375,36 +355,13 @@
     $$('.rail__btn').forEach((b) => b.setAttribute('aria-current', String(!$(`#${b.dataset.view}`).hidden)));
   }
 
-  function renderThread() {
-    const w = stanSkrzynki.find((x) => x.id === otwartaWiadomosc);
-    const p = PACJENCI[w.pacjent];
-    const l = LINIE[p.linia];
-    $('#thread').innerHTML = `
-      <div class="thread__head">
-        <div>
-          <h2>${esc(w.temat)}</h2>
-          <p class="card__note">${esc(p.imie)} · ${esc(w.kanal)} · ${esc(w.czas)}</p>
-        </div>
-        <span class="pill" style="background:${l.kolor};color:${l.naKolorze}">${esc(l.nazwa)}</span>
-      </div>
-      <p class="thread__msg">${esc(w.tresc)}</p>
-      <div class="thread__reply">
-        <label class="visually-hidden" for="reply">Odpowiedź</label>
-        <textarea id="reply" placeholder="Napisz odpowiedź albo zaproponuj termin…"></textarea>
-        <div class="thread__actions">
-          <button class="btn btn--accent" type="button" data-reply>${ikona('sms')}Wyślij odpowiedź</button>
-          <button class="btn" type="button" data-patient="${p.id}">Otwórz kartę pacjenta</button>
-          <button class="btn btn--ghost" type="button" data-call="${esc(p.telefon)}">${ikona('phone')}${esc(p.telefon)}</button>
-        </div>
-      </div>`;
-  }
-
   function otworzWiadomosc(id) {
-    otwartaWiadomosc = id;
     const w = stanSkrzynki.find((x) => x.id === id);
-    if (w) w.nowa = false;
+    if (!w) return;
+    w.nowa = false;
     renderInbox();
-    renderThread();
+    renderTiles();
+    otworzPacjenta(w.pacjent);
   }
 
   /* ── Automatyzacje ─────────────────────────────────────────────────── */
@@ -439,10 +396,10 @@
   function historia(p) {
     const wpisy = [];
     if (p.nastepna !== null && p.nastepna !== undefined)
-      wpisy.push({ kiedy: wzgledna(p.nastepna), co: 'Zaplanowana wizyta', kto: ZESPOL[p.terapeuta].imie });
+      wpisy.push({ kiedy: wzgledna(p.nastepna), co: 'Zaplanowana wizyta', kto: FIZJO.imie });
     if (p.ostatnia !== null && p.ostatnia !== undefined)
-      wpisy.push({ kiedy: wzgledna(p.ostatnia), co: `Wizyta ${p.wizyt} z ${p.plan || '—'}`, kto: ZESPOL[p.terapeuta].imie });
-    if (p.wizyt > 1) wpisy.push({ kiedy: wzgledna(p.ostatnia - 7), co: 'Terapia i ćwiczenia domowe', kto: ZESPOL[p.terapeuta].imie });
+      wpisy.push({ kiedy: wzgledna(p.ostatnia), co: `Wizyta ${p.wizyt} z ${p.plan || '—'}`, kto: FIZJO.imie });
+    if (p.wizyt > 1) wpisy.push({ kiedy: wzgledna(p.ostatnia - 7), co: 'Terapia i ćwiczenia domowe', kto: FIZJO.imie });
     wpisy.push({ kiedy: wzgledna(p.od), co: p.etap === 'zapytanie' ? 'Zapytanie ze strony' : 'Pierwszy kontakt', kto: ZRODLA[p.zrodlo].nazwa });
     return wpisy;
   }
@@ -463,7 +420,7 @@
       ${
         p.terapia && p.terapia.cel
           ? `<div class="pat__epizod">
-              <p class="pat__diag">${esc(p.terapia.diagnoza)}</p>
+              <p class="pat__diag">${esc(p.terapia.etykieta)}</p>
               <p class="pat__cel">Cel terapii: <strong>${esc(p.terapia.cel)}</strong></p>
               <div class="pat__bars">
                 <div>
@@ -493,8 +450,8 @@
       }
 
       <dl class="pat__facts">
-        <div><dt>Terapeuta</dt><dd>${esc(ZESPOL[p.terapeuta].imie)}</dd></div>
-        <div><dt>Gabinet</dt><dd>${esc(GABINETY[p.gabinet].nazwa)}</dd></div>
+        <div><dt>Prowadzi</dt><dd>${esc(FIZJO.imie)}</dd></div>
+        <div><dt>Gabinet</dt><dd>${esc(GABINET.adres)}</dd></div>
         <div><dt>Skierował</dt><dd>${esc(p.terapia?.lekarz || 'bez skierowania')}</dd></div>
         <div><dt>Wartość</dt><dd>${p.wartosc ? zl(p.wartosc) : '—'}</dd></div>
       </dl>
@@ -663,7 +620,7 @@
           <span class="radar__mark" style="--c:${l.kolor};--on:${l.naKolorze}">${inicjaly(p.imie)}</span>
           <div class="radar__body">
             <p class="radar__name">${esc(p.imie)}
-              <span class="radar__meta">${esc(p.terapia?.diagnoza || l.nazwa)} · ${p.wizyt} z ${p.plan || '—'} wizyt${dni !== null ? ` · ostatnia ${dni} dni temu` : ''}</span>
+              <span class="radar__meta">${esc(p.terapia?.etykieta || l.nazwa)} · ${p.wizyt} z ${p.plan || '—'} wizyt${dni !== null ? ` · ostatnia ${dni} dni temu` : ''}</span>
             </p>
             <p class="radar__why">${r.powody.map((x) => `<span class="why why--${x.typ}">${esc(x.tekst)}</span>`).join('')}</p>
           </div>
@@ -672,64 +629,6 @@
             <button class="btn btn--sm btn--ghost" type="button" data-patient="${p.id}">Karta</button>
           </div>
         </li>`;
-      })
-      .join('');
-  }
-
-  /* Tablica terapii: cztery kolumny, od zgłoszenia do wypisu. */
-  function renderBoard() {
-    const kolumny = [
-      { id: 'zagrozone', nazwa: 'Wypadają z cyklu', opis: 'wymagają telefonu dziś' },
-      { id: 'toku', nazwa: 'Idą zgodnie z planem', opis: 'mają termin i robią ćwiczenia' },
-      { id: 'koncowka', nazwa: 'Końcówka cyklu', opis: 'czas na wynik i opinię' },
-      { id: 'zamkniete', nazwa: 'Zakończone', opis: 'kontrola za 6 tygodni' },
-    ];
-    const przydziel = (p) => {
-      if (p.etap === 'zakonczona') return 'zamkniete';
-      if (ryzyko(p).poziom) return 'zagrozone';
-      if (p.plan && p.wizyt / p.plan >= 0.75) return 'koncowka';
-      return 'toku';
-    };
-    const kubelki = Object.fromEntries(kolumny.map((k) => [k.id, []]));
-    D.pacjenci.filter((p) => p.etap !== 'zapytanie').forEach((p) => kubelki[przydziel(p)].push(p));
-
-    $('#board').innerHTML = kolumny
-      .map((k) => {
-        const karty = kubelki[k.id]
-          .map((p) => {
-            const l = LINIE[p.linia];
-            const r = ryzyko(p);
-            const zmiana = poprawa(p);
-            const t = p.terapia || {};
-            return `<article class="epizod${r.poziom ? ` epizod--${r.poziom}` : ''}" tabindex="0" data-patient="${p.id}" style="--c:${l.kolor};--on:${l.naKolorze}">
-              <p class="epizod__who"><span class="dot" style="--c:${l.kolor}"></span>${esc(p.imie)}</p>
-              <p class="epizod__diag">${esc(t.diagnoza || l.nazwa)}</p>
-              ${t.cel ? `<p class="epizod__cel">Cel: ${esc(t.cel)}</p>` : ''}
-              <div class="epizod__progress">
-                <span class="progress__track"><span class="progress__fill" style="--c:${l.kolor};width:${postep(p)}%"></span></span>
-                <b>${p.wizyt}/${p.plan || '—'}</b>
-              </div>
-              <div class="epizod__foot">
-                ${zmiana === null ? '' : krzywaBolu(p, 84, 26)}
-                <span class="epizod__wynik">${
-                  zmiana === null
-                    ? 'brak pomiarów bólu'
-                    : zmiana > 0
-                      ? `ból ${t.bol[0].v} → ${t.bol[t.bol.length - 1].v}`
-                      : `bez poprawy: ${t.bol[t.bol.length - 1].v}/10`
-                }</span>
-              </div>
-              ${r.powody.length ? `<p class="epizod__why">${esc(r.powody[0].tekst)}</p>` : ''}
-            </article>`;
-          })
-          .join('');
-        return `<section class="board__col" aria-labelledby="col-${k.id}">
-          <header class="board__head">
-            <h2 id="col-${k.id}">${k.nazwa} <span>${kubelki[k.id].length}</span></h2>
-            <p>${k.opis}</p>
-          </header>
-          <div class="board__cards">${karty || '<p class="board__empty">Pusto.</p>'}</div>
-        </section>`;
       })
       .join('');
   }
@@ -760,7 +659,7 @@
         return;
       }
       if (d.msg) return otworzWiadomosc(d.msg);
-      if ('reply' in d) {
+      if (false) {
         const pole = $('#reply');
         if (!pole.value.trim()) {
           pole.focus();
@@ -783,14 +682,6 @@
       if (e.key === 'Escape') {
         if (!$('#drawer').hidden) zamknijPacjenta();
         $('#search-out').hidden = true;
-      }
-    });
-
-    $('#board').addEventListener('keydown', (e) => {
-      const karta = e.target.closest('.epizod');
-      if (karta && (e.key === 'Enter' || e.key === ' ')) {
-        e.preventDefault();
-        otworzPacjenta(karta.dataset.patient);
       }
     });
 
@@ -848,7 +739,6 @@
   /* ── Start ─────────────────────────────────────────────────────────── */
   renderRail();
   renderRadar();
-  renderBoard();
   renderTiles();
   renderChart();
   renderVisits();
@@ -860,8 +750,7 @@
   renderPatFilters();
   renderPatients();
   renderInbox();
-  renderThread();
   renderRules();
   podlacz();
-  pokazWidok('pulpit');
+  pokazWidok('dzis');
 })();

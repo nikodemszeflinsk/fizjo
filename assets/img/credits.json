@@ -97,5 +97,14 @@
     "source": "https://images.unsplash.com/photo-1756699197333-b938d9332352?w=720&h=900&fit=crop&crop=faces&q=74&fm=jpg",
     "license": "Unsplash License",
     "alt": "Portret uśmiechniętej kobiety w fartuchu"
+  },
+  {
+    "file": "assets/img/spec-biuro.jpg",
+    "unsplashId": "ENMjfGTcLHM",
+    "author": "DIEGO SÁNCHEZ",
+    "page": "https://unsplash.com/photos/back-view-of-a-young-mans-shoulders-and-head-ENMjfGTcLHM",
+    "source": "Unsplash",
+    "license": "Unsplash License",
+    "alt": "Kark i barki młodego mężczyzny widziane od tyłu."
   }
 ]

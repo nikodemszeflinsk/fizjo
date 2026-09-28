@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Linia Ruchu — klinika fizjoterapii · [Twoje Miasto]</title>
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
-  <meta name="description" content="Fizjoterapia kręgosłupa, sportowa, ortopedyczna, uroginekologiczna i dziecięca. Pięć specjalizacji, trzy lokalizacje, rezerwacja online 24/7." />
+  <meta name="description" content="Fizjoterapia kręgosłupa, sportowa, po urazach i dla pracujących przy biurku. Jeden gabinet, rezerwacja online 24/7." />
   <meta name="theme-color" content="#EDEFEC" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
-  <link rel="stylesheet" href="assets/css/site.css?v=3" />
+  <link rel="stylesheet" href="assets/css/site.css?v=4" />
   <script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
@@ -50,10 +50,10 @@
       <nav class="nav" aria-label="Nawigacja główna">
         <ul>
           <li><a href="#specjalizacje">Specjalizacje</a></li>
-          <li><a href="#zespol">Zespół</a></li>
+          <li><a href="#zespol">O mnie</a></li>
           <li><a href="#pierwsza-wizyta">Pierwsza wizyta</a></li>
           <li><a href="#cennik">Cennik</a></li>
-          <li><a href="#lokalizacje">Lokalizacje</a></li>
+          <li><a href="#lokalizacje">Gabinet</a></li>
         </ul>
       </nav>
 
@@ -77,15 +77,15 @@
             <span>Idź za kolorem.</span>
           </h1>
           <p class="hero__lead">
-            Pięć specjalizacji, jedna klinika. Wybierz swój problem, a zaprowadzimy Cię do właściwego
-            fizjoterapeuty i najbliższego wolnego terminu. Rezerwacja zajmuje mniej niż minutę.
+            Cztery rzeczy, z którymi najczęściej do mnie przychodzicie. Wybierz swoją, a pokażę
+            najbliższy wolny termin. Rezerwacja zajmuje mniej niż minutę.
           </p>
           <div class="hero__cta">
             <a class="btn btn--ink btn--lg" href="#rezerwacja" data-book>Umów wizytę online</a>
             <a class="btn btn--line btn--lg" href="tel:+48000000000">Zadzwoń: <span data-k="telefon">+48 000 000 000</span></a>
           </div>
           <ul class="hero__facts">
-            <li><strong>3 lokalizacje</strong> w <span data-k="miasto">[Twoje Miasto]</span></li>
+            <li><strong>Jeden gabinet</strong> w <span data-k="miasto">[Twoje Miasto]</span></li>
             <li><strong>Bez skierowania</strong>, faktura na żądanie</li>
             <li><strong>4,9 / 5</strong> w opiniach Google <em>(przykład)</em></li>
           </ul>
@@ -116,9 +116,9 @@
       <!-- ── Specjalizacje ──────────────────────────────────────── -->
       <section class="stop" id="specjalizacje" aria-labelledby="specjalizacje-title">
         <header class="stop__head">
-          <h2 class="stop__title" id="specjalizacje-title">Pięć linii leczenia</h2>
+          <h2 class="stop__title" id="specjalizacje-title">Cztery linie leczenia</h2>
           <p class="stop__lead">
-            Każda specjalizacja ma swoich terapeutów, swój sprzęt i swój kolor. Wiesz, dokąd idziesz,
+            Każdy problem ma swój kolor, swój plan i swoją cenę. Wiesz, po co przychodzisz,
             zanim wejdziesz do gabinetu.
           </p>
         </header>
@@ -128,14 +128,13 @@
       <!-- ── Zespół ──────────────────────────────────────────────── -->
       <section class="stop" id="zespol" aria-labelledby="zespol-title">
         <header class="stop__head">
-          <h2 class="stop__title" id="zespol-title">Zespół</h2>
+          <h2 class="stop__title" id="zespol-title">Kto Cię przyjmie</h2>
           <p class="stop__lead">
             Pięcioro fizjoterapeutów z magisterium i kursami specjalistycznymi. Wybierz osobę albo
             linię, a pokażemy najbliższy termin.
           </p>
         </header>
-        <div class="filters" id="team-filters" role="group" aria-label="Filtruj zespół według specjalizacji"></div>
-        <ul class="team" id="team"></ul>
+        <div class="about" id="about"></div>
       </section>
 
       <!-- ── Rezerwacja ──────────────────────────────────────────── -->
@@ -143,7 +142,7 @@
         <header class="stop__head">
           <h2 class="stop__title" id="rezerwacja-title">Umów wizytę</h2>
           <p class="stop__lead">
-            Pięć kroków, każdy możesz cofnąć. Termin jest Twój od razu, a potwierdzenie przyjdzie SMS-em.
+            Trzy kroki, każdy możesz cofnąć. Termin jest Twój od razu, a potwierdzenie przyjdzie SMS-em.
           </p>
         </header>
         <div class="booking" id="booking">
@@ -234,9 +233,9 @@
       <!-- ── Lokalizacje ─────────────────────────────────────────── -->
       <section class="stop" id="lokalizacje" aria-labelledby="lokalizacje-title">
         <header class="stop__head">
-          <h2 class="stop__title" id="lokalizacje-title">Trzy gabinety w <span data-k="miasto">[Twoje Miasto]</span></h2>
+          <h2 class="stop__title" id="lokalizacje-title">Gabinet w <span data-k="miasto">[Twoje Miasto]</span></h2>
           <p class="stop__lead">
-            Kolor przy adresie mówi, które specjalizacje przyjmują w danym gabinecie.
+            Parking pod budynkiem, winda i wejście z poziomu ulicy. Dojazd znajdziesz na mapie.
           </p>
         </header>
         <div class="places">

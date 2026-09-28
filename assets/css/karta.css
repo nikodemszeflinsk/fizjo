@@ -1438,6 +1438,60 @@ svg path {
   color: var(--ink-2);
 }
 
+/* Cztery rzeczy, które pacjent musi zobaczyć od razu. */
+.five {
+  margin-top: clamp(32px, 5vw, 44px);
+  padding: clamp(20px, 3vw, 28px);
+  border-radius: var(--r-sign);
+  background: var(--floor-2);
+}
+
+.band--paper .five {
+  background: var(--floor);
+}
+
+.five__h {
+  font-family: var(--f-display);
+  font-weight: 800;
+  font-size: 1.05rem;
+  margin-bottom: 14px;
+}
+
+.five__list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 28px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: five;
+  font-size: 0.95rem;
+  color: var(--ink-2);
+}
+
+.five__list li {
+  counter-increment: five;
+  position: relative;
+  padding-left: 30px;
+}
+
+.five__list li::before {
+  content: counter(five);
+  position: absolute;
+  left: 0;
+  top: 0.05em;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+  font-family: var(--f-display);
+  font-weight: 800;
+  font-size: 0.75rem;
+}
+
 /* ── Podgląd dema ─────────────────────────────────────────────────────── */
 
 .proof {
@@ -1811,6 +1865,7 @@ svg path {
   .losses,
   .gains,
   .versus,
+  .five__list,
   .plany,
   .proof {
     grid-template-columns: minmax(0, 1fr);
