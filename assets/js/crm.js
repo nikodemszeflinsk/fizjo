@@ -471,7 +471,7 @@
                   <span class="progress__track"><span class="progress__fill" style="--c:${l.kolor};width:${postep(p)}%"></span></span>
                 </div>
                 <div>
-                  <p class="pat__bar-label">Ćwiczenia domowe <b>${typeof p.terapia.compliance === 'number' ? `${p.terapia.compliance}%` : '—'}</b></p>
+                  <p class="pat__bar-label">Ćwiczenia domowe <em>z ankiet SMS</em> <b>${typeof p.terapia.compliance === 'number' ? `${p.terapia.compliance}%` : 'brak odpowiedzi'}</b></p>
                   <span class="progress__track"><span class="progress__fill" style="--c:${l.kolor};width:${p.terapia.compliance || 0}%"></span></span>
                 </div>
               </div>
@@ -479,7 +479,7 @@
                 ${krzywaBolu(p, 200, 46)}
                 <p>${
                   poprawa(p) === null
-                    ? 'Brak pomiarów bólu — wyślij ankietę po najbliższej wizycie.'
+                    ? 'Pacjent nie odpowiedział jeszcze na ankietę — ankieta wychodzi SMS-em po wizycie.'
                     : `Ból ${p.terapia.bol[0].v} → ${p.terapia.bol[p.terapia.bol.length - 1].v} w skali 0–10`
                 }</p>
               </div>
@@ -597,7 +597,7 @@
     }
     if (typeof t.compliance === 'number' && t.compliance < 40) {
       punkty += 1;
-      powody.push({ tekst: `ćwiczenia domowe ${t.compliance}%`, typ: 'cwiczenia' });
+      powody.push({ tekst: `ćwiczenia ${t.compliance}% wg ankiet SMS`, typ: 'cwiczenia' });
     }
     const zmiana = poprawa(p);
     if (zmiana !== null && zmiana < 1 && p.wizyt >= 3) {

@@ -2098,6 +2098,12 @@ svg path {
   color: var(--muted);
 }
 
+.pat__bar-label em {
+  font-style: normal;
+  font-size: 0.78rem;
+  color: var(--faint);
+}
+
 .pat__bar-label b {
   font-family: var(--f-display);
   color: var(--ink);
