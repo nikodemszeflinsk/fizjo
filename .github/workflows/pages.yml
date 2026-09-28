@@ -1,0 +1,44 @@
+# Publikacja na GitHub Pages.
+#
+# Klasyczny „Deploy from a branch" korzysta z wbudowanego pages-build-deployment,
+# który potrafi odmówić bez podania powodu. Ten workflow robi to samo jawnie:
+# bierze całe repozytorium takie, jakie jest (to statyczne HTML/CSS/JS, bez budowania)
+# i wysyła je na Pages. Żeby zadziałał, w Settings → Pages trzeba ustawić
+# Source na „GitHub Actions".
+
+name: Publikacja strony
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Jedno wdrożenie naraz; nowszy push nie przerywa trwającego.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publikacja:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.wdrozenie.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/configure-pages@v5
+
+      - name: Spakuj repozytorium
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Wdróż
+        id: wdrozenie
+        uses: actions/deploy-pages@v4
