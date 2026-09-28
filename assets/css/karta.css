@@ -1276,6 +1276,101 @@ svg path {
   box-shadow: 0 -12px 34px -20px rgba(20, 23, 26, 0.6);
 }
 
+/* ── Teza: lista kontra własne miejsce ───────────────────────────────── */
+
+.band--ink {
+  background: var(--ink);
+  color: #cfd3d6;
+}
+
+.band--ink .h2 {
+  color: #fff;
+}
+
+.band--ink :focus-visible {
+  outline-color: #fff;
+}
+
+.lead--ink {
+  color: #aab1b6;
+}
+
+.fine--ink {
+  margin-top: 22px;
+  color: #8f959b;
+}
+
+.versus {
+  margin-top: 34px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.vs {
+  padding: clamp(20px, 3vw, 28px);
+  border-radius: var(--r-sign);
+}
+
+.vs h3 {
+  font-size: 1.25rem;
+  margin-bottom: 16px;
+}
+
+.vs ul {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+  font-size: 0.95rem;
+}
+
+.vs li {
+  position: relative;
+  padding-left: 26px;
+}
+
+.vs--them {
+  background: rgba(255, 255, 255, 0.05);
+  color: #aab1b6;
+}
+
+.vs--them h3 {
+  color: #cfd3d6;
+}
+
+.vs--them li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 0.66em;
+  width: 13px;
+  height: 2px;
+  border-radius: 2px;
+  background: #6f767d;
+}
+
+.vs--us {
+  background: var(--paper);
+  color: var(--ink-2);
+}
+
+.vs--us h3 {
+  color: var(--ink);
+}
+
+.vs--us li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 0.36em;
+  width: 15px;
+  height: 8px;
+  border-left: 2px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
+  rotate: -45deg;
+}
+
 /* ── Straty ───────────────────────────────────────────────────────────── */
 
 .losses {
@@ -1715,6 +1810,7 @@ svg path {
   .hero__in,
   .losses,
   .gains,
+  .versus,
   .plany,
   .proof {
     grid-template-columns: minmax(0, 1fr);
