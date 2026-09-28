@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/karta.css?v=14" />
+  <link rel="stylesheet" href="assets/css/karta.css?v=19" />
 </head>
 <body>
   <a class="skip" href="#tresc">Przejdź do treści</a>
@@ -32,8 +32,9 @@
       Kanał Pozyskiwania Pacjentów
     </a>
     <nav class="tools__nav" aria-label="Na skróty">
-      <a href="#jak-to-dziala">Jak to działa</a>
+      <a href="#sciezka">Jak to działa</a>
       <a href="#demo">Demo</a>
+      <a href="#funkcje">Funkcje</a>
       <a href="#pakiety">Pakiety</a>
       <a class="tools__cta" href="#kontakt">
         Umów rozmowę
@@ -252,6 +253,97 @@
             </a>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- ── Droga jednego pacjenta ─────────────────────────────────────── -->
+    <section class="band band--ink" id="sciezka" aria-labelledby="h-sciezka">
+      <div class="band__in">
+        <h2 class="h2" id="h-sciezka">Osiem dni z życia jednego pacjenta</h2>
+        <p class="lead">
+          Tak działa cały system, krok po kroku. Po lewej moment, po prawej ekran — raz
+          taki, jaki widzi pacjent, raz taki, jaki widzisz Ty.
+        </p>
+
+        <div class="droga" id="droga">
+          <ol class="droga__kroki" id="droga-kroki" role="tablist" aria-label="Kroki drogi pacjenta"></ol>
+          <div class="droga__scena" id="droga-scena" role="tabpanel" aria-live="polite"></div>
+          <div class="droga__nawigacja">
+            <button class="droga__strzalka" type="button" data-droga-wstecz aria-label="Poprzedni krok">
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16 10H5m4-4-4 4 4 4" /></svg>
+            </button>
+            <button class="droga__strzalka" type="button" data-droga-dalej aria-label="Następny krok">
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Funkcje ────────────────────────────────────────────────────── -->
+    <section class="band band--paper" id="funkcje" aria-labelledby="h-funkcje">
+      <div class="band__in">
+        <h2 class="h2" id="h-funkcje">Co konkretnie dostajesz</h2>
+        <p class="lead">
+          Wszystko poniżej działa w demie, które możesz teraz otworzyć. Jeśli czegoś tu nie ma,
+          to znaczy, że tego nie robimy — a nie, że „do ustalenia”.
+        </p>
+
+        <div class="funkcje">
+          <article class="grupa">
+            <h3 class="grupa__h">Strona, na którą trafia pacjent</h3>
+            <ul class="grupa__lista">
+              <li><b>Osobna strona dla każdego problemu</b> z objawami, przebiegiem terapii i cennikiem — to ona odpowiada na to, co ktoś wpisuje w Google.</li>
+              <li><b>Rezerwacja w trzy kroki</b> z realnymi godzinami z Twojego grafiku, bez formularza „zapytaj o ofertę”.</li>
+              <li><b>Kwalifikator</b>: trzy pytania i pacjent wie, od czego zacząć, zamiast zgadywać z cennika.</li>
+              <li><b>Wybór terapeuty</b> albo pierwszy wolny termin u kogokolwiek z zespołu.</li>
+              <li><b>Mapa, dojazd, parking</b> i sygnał „otwarte teraz” liczony z grafiku.</li>
+              <li><b>Pasek „Zadzwoń”</b> przyklejony na telefonie — bo część pacjentów i tak zadzwoni.</li>
+            </ul>
+          </article>
+
+          <article class="grupa">
+            <h3 class="grupa__h">Widoczność w Google</h3>
+            <ul class="grupa__lista">
+              <li><b>Wizytówka w Mapach</b>: godziny, usługi, zdjęcia, zbieranie opinii.</li>
+              <li><b>Podstrony pod frazy z miastem</b> — tyle stron, ile problemów, każda z własnym tytułem i opisem.</li>
+              <li><b>Dane strukturalne</b> pytań i odpowiedzi, żeby wyszukiwarka rozumiała, co jest na stronie.</li>
+              <li><b>Reklamy Google i Meta</b> jako opcja, włączana i wyłączana w dowolnym momencie.</li>
+            </ul>
+          </article>
+
+          <article class="grupa grupa--panel">
+            <h3 class="grupa__h">Panel gabinetu <span class="grupa__tag">pakiet Prowadzenie</span></h3>
+            <ul class="grupa__lista">
+              <li><b>Ekran „Dziś”</b>: kto przychodzi, kto nie umówił kolejnej wizyty i jedna akcja przy każdym.</li>
+              <li><b>Powód po ludzku</b>, nigdy „ryzyko 78%”: dziewięć dni bez wizyty przy planie co siedem.</li>
+              <li><b>Kalendarz tygodnia</b> z wolnymi godzinami, blokadami na urlop i grafikiem każdej osoby.</li>
+              <li><b>Seria wizyt jednym kliknięciem</b> — sześć terminów co tydzień zamiast sześciu okien.</li>
+              <li><b>Kartoteka</b> z kartą terapii: cel pacjenta, plan wizyt, ćwiczenia, notatka.</li>
+              <li><b>Kolejka wiadomości</b>: przypomnienia i ankiety wynikające z kalendarza, z wyłącznikiem per pacjent.</li>
+              <li><b>Zamknięcie terapii z wynikiem</b> i gotową prośbą o opinię w Google.</li>
+              <li><b>Podsumowanie miesiąca</b>: ilu nowych, skąd przyszli, ile terapii dokończonych.</li>
+              <li><b>Twoje dane zostają Twoje</b> — eksport całej bazy jednym kliknięciem, także przy rozstaniu.</li>
+            </ul>
+          </article>
+
+          <article class="grupa">
+            <h3 class="grupa__h">Karta pacjenta <span class="grupa__tag">pakiet Prowadzenie</span></h3>
+            <ul class="grupa__lista">
+              <li><b>Link z SMS-a, bez logowania i bez aplikacji</b> — otwiera się na telefonie w sekundę.</li>
+              <li><b>Ćwiczenia z rysunkiem</b> i odhaczaniem; to z nich bierze się procent w panelu.</li>
+              <li><b>„Nie mogę, przełóż”</b> — pacjent sam wybiera nowy termin z grafiku swojego terapeuty.</li>
+              <li><b>Jedno pytanie o ból</b> dziennie, jedno kliknięcie.</li>
+              <li><b>Wizyta do kalendarza</b> w telefonie i karta ćwiczeń do druku dla tych bez smartfona.</li>
+            </ul>
+          </article>
+        </div>
+
+        <p class="fine">
+          Czego nie robimy: dokumentacji medycznej, rozliczeń z NFZ, kasy fiskalnej ani układania
+          planów terapii. Fizjoterapeuta wie, jak leczyć — my dowozimy pacjentów i pilnujemy, żeby
+          nie znikali w połowie.
+        </p>
       </div>
     </section>
 
@@ -496,7 +588,8 @@
         <p class="foot__h" id="foot-nav">Na stronie</p>
         <a href="#jak-to-dziala">Jak to działa</a>
         <a href="#demo">Demo</a>
-        <a href="#pakiety">Pakiety</a>
+        <a href="#funkcje">Funkcje</a>
+      <a href="#pakiety">Pakiety</a>
         <a href="#kontakt">Kontakt</a>
       </nav>
 
@@ -621,5 +714,6 @@
       });
     })();
   </script>
+  <script src="assets/js/droga.js?v=2" defer></script>
 </body>
 </html>
