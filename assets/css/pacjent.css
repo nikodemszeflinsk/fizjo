@@ -1,0 +1,484 @@
+/* Karta pacjenta: jedna kolumna, duże pola do kliknięcia, czytana w biegu na telefonie. */
+
+:root {
+  --floor: #edefec;
+  --floor-2: #e2e5e1;
+  --paper: #f8f9f7;
+  --white: #fff;
+  --ink: #14171a;
+  --muted: #535a61;
+  --faint: #5b6168;
+  --hair: rgba(20, 23, 26, 0.12);
+  --hair-2: rgba(20, 23, 26, 0.22);
+  --accent: #1f5fd6;
+  --ok: #13875a;
+
+  --f-display: 'Overpass', 'Arial Narrow', 'Helvetica Neue', Arial, sans-serif;
+  --f-body: 'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --r: 12px;
+  --r-sm: 9px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0 16px 56px;
+  background: var(--floor);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 1rem;
+  line-height: 1.55;
+  -webkit-text-size-adjust: 100%;
+}
+
+h1,
+h2 {
+  font-family: var(--f-display);
+  letter-spacing: -0.015em;
+}
+
+a {
+  color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.karta {
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.wczytywanie {
+  padding: 48px 0;
+  color: var(--faint);
+  text-align: center;
+}
+
+/* ── Nagłówek ───────────────────────────────────────────────────────── */
+.naglowek {
+  position: relative;
+  padding: 34px 0 26px 20px;
+}
+
+.naglowek::before {
+  content: '';
+  position: absolute;
+  top: 34px;
+  bottom: 26px;
+  left: 0;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--c);
+}
+
+.naglowek__gabinet {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.naglowek__h1 {
+  margin: 0;
+  font-size: clamp(1.7rem, 7.5vw, 2.2rem);
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.naglowek__linia {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+/* ── Bloki ──────────────────────────────────────────────────────────── */
+.blok {
+  margin-bottom: 14px;
+  padding: 20px;
+  border-radius: var(--r);
+  background: var(--paper);
+}
+
+.blok h2 {
+  margin: 0 0 4px;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.blok__note {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.blok h2 + .blok__note {
+  margin-bottom: 16px;
+}
+
+.blok--cel {
+  background: var(--ink);
+  color: var(--white);
+}
+
+.cel__label {
+  margin: 0 0 6px;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.cel__tekst {
+  margin: 0;
+  font-family: var(--f-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.blok--brak {
+  margin-top: 48px;
+  text-align: center;
+}
+
+.blok--brak h1 {
+  margin: 0 0 10px;
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.blok--brak p {
+  margin: 0 0 12px;
+  color: var(--muted);
+}
+
+.blok__tel a {
+  font-family: var(--f-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+/* ── Najbliższa wizyta ──────────────────────────────────────────────── */
+.termin {
+  margin-top: 12px;
+}
+
+.termin__kiedy {
+  margin: 0;
+  font-family: var(--f-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.termin__kiedy strong {
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+.termin__kiedy--brak {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.termin__gdzie,
+.termin__kto {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 999px;
+  font-family: var(--f-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn--ink {
+  background: var(--ink);
+  color: var(--white);
+}
+
+/* ── Ćwiczenia ──────────────────────────────────────────────────────── */
+.cw {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cw__btn {
+  display: flex;
+  align-items: start;
+  gap: 13px;
+  width: 100%;
+  padding: 14px;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sm);
+  background: var(--white);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.18s, background-color 0.18s;
+}
+
+.cw__box {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  margin-top: 1px;
+  border: 2px solid var(--hair-2);
+  border-radius: 7px;
+  background: var(--paper);
+  transition: background-color 0.18s, border-color 0.18s;
+}
+
+.cw__box svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: var(--white);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 0.18s var(--ease-out), transform 0.18s var(--ease-out);
+}
+
+.cw__btn[aria-pressed='true'] {
+  border-color: var(--ok);
+  background: rgba(19, 135, 90, 0.07);
+}
+
+.cw__btn[aria-pressed='true'] .cw__box {
+  border-color: var(--ok);
+  background: var(--ok);
+}
+
+.cw__btn[aria-pressed='true'] .cw__box svg {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.cw__btn[aria-pressed='true'] .cw__tresc strong {
+  text-decoration: line-through;
+  text-decoration-color: var(--hair-2);
+}
+
+.cw__tresc {
+  min-width: 0;
+}
+
+.cw__tresc strong {
+  display: block;
+  font-size: 1rem;
+}
+
+.cw__tresc em {
+  display: block;
+  margin-top: 1px;
+  color: var(--accent);
+  font-style: normal;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.cw__opis {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.cw__licznik {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.cw__licznik.is-gotowe {
+  color: var(--ok);
+}
+
+/* ── Tydzień ────────────────────────────────────────────────────────── */
+.tydzien {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  align-items: end;
+  height: 96px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Wiersz 1fr ma określoną wysokość, więc procent na słupku ma się do czego odnieść. */
+.tydzien li {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 6px;
+  height: 100%;
+}
+
+.tydzien__slupek {
+  display: block;
+  align-self: end;
+  height: max(var(--h), 3px);
+  border-radius: 5px 5px 2px 2px;
+  background: var(--c);
+  opacity: 0.85;
+}
+
+.tydzien li:not(.is-dzis) .tydzien__slupek {
+  opacity: 0.45;
+}
+
+.tydzien__dzien {
+  color: var(--faint);
+  font-size: 0.74rem;
+  text-align: center;
+}
+
+.tydzien .is-dzis .tydzien__dzien {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* ── Plan wizyt ─────────────────────────────────────────────────────── */
+.plan__licz {
+  margin: 12px 0 8px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.plan__licz strong {
+  font-family: var(--f-display);
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--ink);
+}
+
+.plan__track {
+  display: block;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--floor-2);
+  overflow: hidden;
+}
+
+.plan__fill {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--c);
+}
+
+/* ── Skala bólu ─────────────────────────────────────────────────────── */
+.skala {
+  display: grid;
+  grid-template-columns: repeat(11, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.skala__btn {
+  padding: 12px 0;
+  border: 1px solid var(--hair-2);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.skala__btn:hover,
+.skala__btn:focus-visible {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--white);
+}
+
+/* ── Stopka ─────────────────────────────────────────────────────────── */
+.stopka {
+  padding: 22px 20px 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.stopka p {
+  margin: 0 0 4px;
+}
+
+.stopka__note {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--hair);
+  color: var(--faint);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+/* ── Komunikat ──────────────────────────────────────────────────────── */
+.toast {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  z-index: 40;
+  padding: 12px 20px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--white);
+  font-size: 0.92rem;
+  font-weight: 700;
+  transform: translate(-50%, 130%);
+  opacity: 0;
+  transition: transform 0.3s var(--ease-out), opacity 0.3s;
+}
+
+.toast.is-on {
+  transform: translate(-50%, 0);
+  opacity: 1;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -925,6 +925,25 @@ svg path {
 
 }
 
+/* Telefon: długa nazwa łamie się przy znaku, a CTA zostaje obok. */
+@media (max-width: 620px) {
+  .tools {
+    flex-wrap: nowrap;
+    gap: 12px;
+  }
+
+  .tools__brand {
+    max-width: 13em;
+    font-size: 0.88rem;
+    line-height: 1.12;
+  }
+
+  .tools__nav a[href='#kontakt'] {
+    padding: 8px 13px;
+    font-size: 0.88rem;
+  }
+}
+
 /* Telefon: dwa pakiety mieszczą się w szerokości ekranu. */
 @media (max-width: 760px) {
   .billing {
@@ -937,7 +956,10 @@ svg path {
     flex-wrap: wrap;
     padding: 6px 10px;
   }
+}
 
+/* Wydruk oferty: to, co ma sens tylko na ekranie, znika z kartki. */
+@media print {
   .tools,
   .skip,
   .form,
@@ -1028,7 +1050,6 @@ svg path {
   .contact {
     margin-top: 22px;
   }
-
 }
 
 /* Kółko z krzyżykiem: bez dosunięcia dla cyfr, żeby znak stał w środku. */

@@ -2150,3 +2150,731 @@ svg path {
     justify-content: flex-start;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Prototyp: siatki, listy z akcjami, formularze, okno dialogowe
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.grid--dzis {
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+}
+
+.grid--dzis > .card:first-child {
+  grid-row: span 2;
+}
+
+.grid--ust {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.pusto {
+  margin: 0;
+  padding: 18px 2px;
+  color: var(--faint);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+/* ── Grafik dnia: wiersz z akcjami ──────────────────────────────────── */
+.wizyty {
+  display: grid;
+  gap: 2px;
+}
+
+.wizyta {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px 14px;
+  padding: 10px;
+  border-radius: var(--r-sm);
+  transition: background-color 0.2s;
+}
+
+.wizyta__tresc {
+  min-width: 0;
+}
+
+.wizyta__naglowek {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+}
+
+.wizyta:hover,
+.wizyta:focus-within {
+  background: var(--floor);
+}
+
+.wizyta__czas {
+  font-family: var(--f-display);
+  font-weight: 800;
+  font-size: 1.05rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.wizyta__kto {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  white-space: nowrap;
+  text-align: left;
+  cursor: pointer;
+}
+
+.wizyta__kto:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.wizyta__co {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+/* Przyciski łamią się w dwa rzędy, żeby opis wizyty miał szerokość na jedną linię. */
+.wizyta__akcje {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 5px;
+  max-width: 290px;
+}
+
+/* ── Proste listy: nowi pacjenci, wizyty i log w karcie ─────────────── */
+.prosta {
+  display: grid;
+  gap: 2px;
+}
+
+.prosta > li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 10px;
+  border-radius: var(--r-sm);
+}
+
+.prosta > li:nth-child(odd) {
+  background: var(--floor);
+}
+
+.prosta__kto {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.prosta__kto:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.prosta em {
+  display: block;
+  color: var(--muted);
+  font-style: normal;
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+.prosta--wizyty > li > span:first-child {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Ćwiczenia w karcie pacjenta ────────────────────────────────────── */
+.cwiczenia {
+  display: grid;
+  gap: 2px;
+  margin-bottom: 12px;
+}
+
+.cwiczenia li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: var(--r-sm);
+  background: var(--floor);
+}
+
+.cwiczenia span {
+  font-weight: 700;
+}
+
+.cwiczenia em {
+  display: block;
+  color: var(--muted);
+  font-style: normal;
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+.cwiczenia b {
+  flex: none;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Karta pacjenta: dodatki prototypu ──────────────────────────────── */
+.pat__epizod-head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.pat__epizod--pusty {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+}
+
+.pat__epizod--pusty p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.pat__bol-txt {
+  margin: 12px 0 0;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.pat__bol-txt strong {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.pat__akcje {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.pat__akcje--male {
+  margin-top: 12px;
+}
+
+.radar__body {
+  min-width: 0;
+}
+
+/* ── Ustawienia ─────────────────────────────────────────────────────── */
+.dane {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.dane > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 9px 10px;
+  border-radius: var(--r-sm);
+}
+
+.dane > div:nth-child(odd) {
+  background: var(--floor);
+}
+
+.dane dt {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.dane dd {
+  margin: 0;
+  font-weight: 700;
+  text-align: right;
+}
+
+.dane__akcje {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.mini {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.mini td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--hair);
+  font-variant-numeric: tabular-nums;
+}
+
+.mini td:first-child {
+  font-weight: 700;
+  font-variant-numeric: normal;
+}
+
+.mini td:not(:first-child) {
+  color: var(--muted);
+  text-align: right;
+}
+
+.mini tr:last-child td {
+  border-bottom: 0;
+}
+
+.table__akcje {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* ── Kalendarz: wolne godziny i dni zamknięte ───────────────────────── */
+.cal__col--off {
+  display: grid;
+  place-items: center;
+  background: repeating-linear-gradient(135deg, transparent 0 7px, var(--floor-2) 7px 8px);
+}
+
+.cal__off {
+  margin: 0;
+  color: var(--faint);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.wolny {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  height: 24px;
+  padding: 0;
+  border: 1px dashed var(--hair-2);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--faint);
+  font: inherit;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 0.15s, background-color 0.15s, color 0.15s;
+}
+
+.cal__col:hover .wolny,
+.wolny:focus-visible {
+  opacity: 1;
+}
+
+/* Bez kursora (dotyk) nie ma najechania — wolne godziny muszą być widoczne od razu. */
+@media (hover: none) {
+  .wolny {
+    opacity: 0.6;
+  }
+}
+
+.wolny:hover,
+.wolny:focus-visible {
+  border-style: solid;
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* ── Okno dialogowe ─────────────────────────────────────────────────── */
+[hidden] {
+  display: none !important;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.modal__veil {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(20, 23, 26, 0.5);
+  animation: veil 0.2s var(--ease-out);
+}
+
+@keyframes veil {
+  from {
+    opacity: 0;
+  }
+}
+
+.modal__box {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(560px, 100%);
+  max-height: min(86vh, 760px);
+  border-radius: var(--r);
+  background: var(--white);
+  box-shadow: 0 30px 70px rgba(20, 23, 26, 0.3);
+  animation: box 0.26s var(--ease-out);
+}
+
+@keyframes box {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal__veil,
+  .modal__box {
+    animation: none;
+  }
+}
+
+.modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--hair);
+}
+
+.modal__head h2 {
+  margin: 0;
+  font-family: var(--f-display);
+  font-weight: 800;
+  font-size: 1.15rem;
+  letter-spacing: -0.01em;
+}
+
+.modal__close {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: var(--floor);
+  cursor: pointer;
+}
+
+.modal__close svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.modal__close:hover {
+  background: var(--floor-2);
+}
+
+.modal__body {
+  padding: 18px 20px;
+  overflow: auto;
+  scrollbar-width: thin;
+}
+
+.modal__foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 20px 18px;
+  border-top: 1px solid var(--hair);
+}
+
+.modal__info {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.modal__body > .modal__info:first-child {
+  margin: 0 0 16px;
+}
+
+.modal__err {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border-radius: var(--r-sm);
+  background: rgba(179, 38, 30, 0.08);
+  color: var(--alert);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.modal__label {
+  margin: 18px 0 8px;
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── Formularze ─────────────────────────────────────────────────────── */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.field--full,
+.form-grid > .modal__info {
+  grid-column: 1 / -1;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.field label em {
+  color: var(--faint);
+  font-style: normal;
+  font-weight: 400;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid var(--hair-2);
+  border-radius: var(--r-sm);
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.92rem;
+}
+
+.field textarea {
+  resize: vertical;
+}
+
+.field input:focus-visible,
+.field select:focus-visible,
+.field textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  border-color: var(--accent);
+}
+
+.field input[readonly],
+.field textarea[readonly] {
+  background: var(--floor);
+  color: var(--muted);
+}
+
+/* ── Wybór godziny ──────────────────────────────────────────────────── */
+.sloty {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.slot {
+  padding: 7px 11px;
+  border: 1px solid var(--hair-2);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.slot:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.slot[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--white);
+  font-weight: 700;
+}
+
+/* ── Wybór ćwiczeń ──────────────────────────────────────────────────── */
+.wybor {
+  display: grid;
+  gap: 2px;
+}
+
+.wybor > li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 9px 10px;
+  border-radius: var(--r-sm);
+}
+
+.wybor > li:nth-child(odd) {
+  background: var(--floor);
+}
+
+.wybor__check {
+  display: flex;
+  align-items: start;
+  gap: 9px;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.wybor__check input {
+  flex: none;
+  width: 17px;
+  height: 17px;
+  margin-top: 2px;
+  accent-color: var(--accent);
+}
+
+.wybor__check strong {
+  display: block;
+  font-size: 0.9rem;
+}
+
+.wybor__check em {
+  display: block;
+  color: var(--muted);
+  font-style: normal;
+  font-size: 0.78rem;
+}
+
+.wybor__ile {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
+.wybor__ile input {
+  padding: 5px 7px;
+  border: 1px solid var(--hair-2);
+  border-radius: 7px;
+  background: var(--white);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.78rem;
+}
+
+.wybor__ile input[type="text"] {
+  width: 110px;
+}
+
+.wybor__ile input[type="number"] {
+  width: 48px;
+  text-align: center;
+}
+
+/* ── Cofnięcie w komunikacie ────────────────────────────────────────── */
+.toast__undo {
+  margin-left: 14px;
+  padding: 5px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--white);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.toast__undo:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* ── Wąskie ekrany ──────────────────────────────────────────────────── */
+@media (max-width: 1080px) {
+  .grid--dzis {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .grid--dzis > .card:first-child {
+    grid-row: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  .wizyta {
+    grid-template-columns: 52px minmax(0, 1fr);
+  }
+
+  .wizyta__naglowek {
+    flex-wrap: wrap;
+    gap: 4px 10px;
+  }
+
+  .wizyta__akcje {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    margin-top: 6px;
+  }
+
+  .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .wybor > li {
+    display: grid;
+    gap: 8px;
+  }
+
+  .wybor__ile {
+    padding-left: 26px;
+  }
+
+  .modal {
+    padding: 0;
+    align-items: end;
+  }
+
+  .modal__box {
+    width: 100%;
+    max-height: 92vh;
+    border-radius: var(--r) var(--r) 0 0;
+  }
+}

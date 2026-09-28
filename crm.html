@@ -5,21 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Panel gabinetu — demo · Studio Widok</title>
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
-  <meta name="description" content="Demo panelu CRM dla kliniki fizjoterapii: pulpit, kalendarz, kartoteka pacjentów, skrzynka i automatyzacje." />
+  <meta name="description" content="Prototyp panelu do zarządzania wizytami w gabinecie fizjoterapii: dzień, kalendarz, pacjenci, karty terapii i ćwiczenia." />
   <meta name="theme-color" content="#14171A" />
   <meta name="robots" content="noindex" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/crm.css?v=1" />
+  <link rel="stylesheet" href="assets/css/crm.css?v=8" />
 </head>
 <body>
   <a class="skip" href="#widok">Przejdź do treści</a>
 
-  <!-- Pasek dla leada: to jest demo narzędzia, nie prawdziwy panel kliniki. -->
   <aside class="demo-bar" id="demo-bar">
-    <p><strong>To jest demo panelu</strong> od Studio Widok. Dane pacjentów, wizyt i wiadomości są przykładowe.</p>
+    <p><strong>Prototyp panelu</strong> od Studio Widok. Zmiany zapisują się w tej przeglądarce; SMS-y i e-maile nie wychodzą na zewnątrz.</p>
     <a class="demo-bar__link" href="index.html">
       Wróć do oferty
       <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
@@ -30,7 +29,6 @@
   </aside>
 
   <div class="app">
-    <!-- ── Lewy tor: nawigacja panelu ──────────────────────────────────── -->
     <nav class="rail" aria-label="Sekcje panelu">
       <a class="rail__brand" href="index.html" aria-label="Studio Widok — oferta">
         <svg class="rail__mark" viewBox="0 0 40 40" aria-hidden="true">
@@ -40,20 +38,19 @@
           <path d="M29 6v28" style="stroke:#C2255C" />
           <path d="M36 6v28" style="stroke:#F2B705" />
         </svg>
-        <span>Linia Ruchu</span>
+        <span id="brand-name">Linia Ruchu</span>
       </a>
 
       <ul class="rail__list" id="rail-list"></ul>
 
       <div class="rail__foot">
         <p class="rail__who">
-          <span class="avatar" aria-hidden="true">JK</span>
-          <span>mgr Jan Kowalski<em>Linia Ruchu</em></span>
+          <span class="avatar" aria-hidden="true" id="rail-inicjaly">JK</span>
+          <span id="rail-terapeuta"></span>
         </p>
       </div>
     </nav>
 
-    <!-- ── Górny pasek: kontekst i szybkie akcje ───────────────────────── -->
     <header class="top">
       <button class="top__menu" type="button" id="menu" aria-label="Menu sekcji" aria-expanded="false">
         <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 6h13M3.5 10h13M3.5 14h13" /></svg>
@@ -67,128 +64,25 @@
       <div class="search">
         <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M9 15.5a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13ZM17 17l-3.4-3.4" /></svg>
         <label class="visually-hidden" for="search">Szukaj pacjenta</label>
-        <input id="search" type="search" placeholder="Szukaj pacjenta, numeru, wizyty…" autocomplete="off" />
+        <input id="search" type="search" placeholder="Szukaj pacjenta albo numeru…" autocomplete="off" />
         <ul class="search__out" id="search-out" hidden></ul>
       </div>
 
-      <button class="btn btn--accent" type="button" id="add-visit">
+      <button class="btn btn--accent" type="button" data-akcja="nowa-wizyta">
         <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4.5v11M4.5 10h11" /></svg>
-        Nowa wizyta
+        Umów wizytę
       </button>
     </header>
 
-    <!-- ── Widoki ──────────────────────────────────────────────────────── -->
     <main class="view" id="widok">
-      <section class="panel" id="dzis" aria-labelledby="view-title">
-        <article class="card card--radar" aria-labelledby="radar-title">
-          <header class="card__head card__head--row">
-            <div>
-              <h2 id="radar-title" data-ile="0">Nie umówili kolejnej wizyty</h2>
-              <p class="card__note">Sygnały z kalendarza wizyt i z ankiet SMS wysyłanych po wizycie.</p>
-            </div>
-            <button class="btn btn--sm" type="button" data-view="pacjenci">Wszyscy pacjenci</button>
-          </header>
-          <ul class="radar" id="radar"></ul>
-        </article>
-
-        <div class="tiles" id="tiles"></div>
-
-        <div class="grid grid--dash">
-          <article class="card card--chart">
-            <header class="card__head">
-              <h2>Rezerwacje tydzień po tygodniu</h2>
-              <p class="card__note">Ostatnie 8 tygodni · online kontra telefon</p>
-            </header>
-            <div class="chart" id="chart"></div>
-            <ul class="legend">
-              <li><span class="legend__key legend__key--online"></span>Rezerwacja online</li>
-              <li><span class="legend__key legend__key--tel"></span>Telefon i rejestracja</li>
-            </ul>
-          </article>
-
-          <article class="card">
-            <header class="card__head">
-              <h2>Dzisiaj w grafiku</h2>
-              <p class="card__note" id="today-note"></p>
-            </header>
-            <ol class="visits" id="visits"></ol>
-          </article>
-
-          <article class="card">
-            <header class="card__head">
-              <h2>Do zrobienia</h2>
-              <p class="card__note">Rejestracja</p>
-            </header>
-            <ul class="tasks" id="tasks"></ul>
-          </article>
-
-          <article class="card">
-            <header class="card__head">
-              <h2>Ścieżka pacjenta</h2>
-              <p class="card__note">Ilu pacjentów jest na którym etapie</p>
-            </header>
-            <ul class="funnel" id="funnel"></ul>
-          </article>
-
-          <article class="card">
-            <header class="card__head card__head--row">
-              <div>
-                <h2>Nowe zgłoszenia</h2>
-                <p class="card__note" id="inbox-note"></p>
-              </div>
-            </header>
-            <ul class="inbox" id="inbox"></ul>
-          </article>
-
-          <article class="card">
-            <header class="card__head">
-              <h2>Skąd przychodzą pacjenci</h2>
-              <p class="card__note">Ostatnie 30 dni</p>
-            </header>
-            <ul class="sources" id="sources"></ul>
-          </article>
-        </div>
-      </section>
-
-      <section class="panel" id="kalendarz" hidden>
-        <div class="cal__bar">
-          <div class="chips" id="cal-filters" role="group" aria-label="Filtruj według specjalizacji"></div>
-          <p class="cal__hint">Kolor paska to specjalizacja, tak samo jak na stronie kliniki.</p>
-        </div>
-        <div class="cal" id="cal"></div>
-      </section>
-
-      <section class="panel" id="pacjenci" hidden>
-        <div class="table__bar">
-          <div class="chips" id="pat-filters" role="group" aria-label="Filtruj według etapu"></div>
-          <p class="table__count" id="pat-count"></p>
-        </div>
-        <div class="table-wrap">
-          <table class="table" id="patients">
-            <caption class="visually-hidden">Kartoteka pacjentów</caption>
-            <thead>
-              <tr>
-                <th scope="col">Pacjent</th>
-                <th scope="col">Z czym przychodzi</th>
-                <th scope="col">Postęp terapii</th>
-                <th scope="col">Ostatnia wizyta</th>
-                <th scope="col">Następna</th>
-                <th scope="col">Wartość</th>
-              </tr>
-            </thead>
-            <tbody id="patients-body"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="panel" id="automatyzacje" hidden>
-        <div class="grid grid--auto" id="rules"></div>
-        <p class="note">W demo przełączniki działają lokalnie — nic nie zostanie wysłane.</p>
-      </section>
+      <section class="panel" id="dzis" aria-labelledby="view-title"></section>
+      <section class="panel" id="kalendarz" hidden></section>
+      <section class="panel" id="pacjenci" hidden></section>
+      <section class="panel" id="ustawienia" hidden></section>
     </main>
   </div>
 
-  <!-- Karta pacjenta: wysuwa się z prawej. -->
+  <!-- Karta pacjenta -->
   <div class="drawer" id="drawer" hidden>
     <div class="drawer__veil" data-close></div>
     <aside class="drawer__panel" role="dialog" aria-modal="true" aria-labelledby="drawer-name">
@@ -199,9 +93,27 @@
     </aside>
   </div>
 
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <!-- Okno dialogowe: umawianie, formularze, potwierdzenia -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal__veil" data-close></div>
+    <div class="modal__box" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <header class="modal__head">
+        <h2 id="modal-title"></h2>
+        <button class="modal__close" type="button" data-close aria-label="Zamknij">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" /></svg>
+        </button>
+      </header>
+      <div class="modal__body" id="modal-body"></div>
+      <footer class="modal__foot" id="modal-foot"></footer>
+    </div>
+  </div>
 
-  <script src="assets/js/crm-data.js"></script>
-  <script src="assets/js/crm.js?v=1"></script>
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <span id="toast-text"></span>
+    <button class="toast__undo" type="button" id="toast-undo" hidden>Cofnij</button>
+  </div>
+
+  <script src="assets/js/store.js?v=1"></script>
+  <script src="assets/js/crm.js?v=5"></script>
 </body>
 </html>
