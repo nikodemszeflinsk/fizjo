@@ -137,9 +137,18 @@
       </button></li>`
     ).join('');
     const u = S().ustawienia;
+    const zespol = P.zespolAktywny();
     $('#brand-name').textContent = u.nazwa;
-    $('#rail-inicjaly').textContent = u.inicjaly;
-    $('#rail-terapeuta').innerHTML = `${esc(u.terapeuta)}<em>${esc(u.nazwa)}</em>`;
+    /* Stopka menu: przy jednej osobie jej nazwisko, przy zespole — ilu ich jest. */
+    if (zespol.length === 1) {
+      $('#rail-inicjaly').textContent = zespol[0].inicjaly;
+      $('#rail-inicjaly').style.background = zespol[0].kolor;
+      $('#rail-terapeuta').innerHTML = `${esc(krotkieImie(zespol[0].imie))}<em>${esc(u.nazwa)}</em>`;
+    } else {
+      $('#rail-inicjaly').textContent = String(zespol.length);
+      $('#rail-inicjaly').style.background = '';
+      $('#rail-terapeuta').innerHTML = `${zespol.length} ${zespol.length < 5 ? 'osoby' : 'osób'} w zespole<em>${esc(u.nazwa)}</em>`;
+    }
   }
 
   function pokazWidok(id) {
@@ -196,6 +205,7 @@
 
   /* ── Widok: Dziś ───────────────────────────────────────────────────── */
   function renderDzis() {
+    if (gabinetPusty()) return renderStart();
     const dzisIso = P.iso(P.dzis);
     $('#view-date').textContent = dlugaData(P.dzis);
     const wizyty = wizytyDnia(dzisIso);
@@ -510,6 +520,138 @@
           }</tbody>
         </table>
       </div>`;
+  }
+
+  /* ── Pierwsze uruchomienie ─────────────────────────────────────────── */
+  /* Pusty gabinet to nie błąd, tylko pierwszy dzień. Zamiast pokazywać zera,
+     panel prowadzi przez trzy rzeczy, bez których nic nie ruszy. */
+  const gabinetPusty = () => !S().pacjenci.length && !S().uruchomiony;
+
+  function renderStart() {
+    const u = S().ustawienia;
+    const z = S().zespol[0] || {};
+    $('#view-date').textContent = 'Zacznijmy od trzech rzeczy';
+    $('#dzis').innerHTML = `
+      <section class="start">
+        <p class="start__kicker">Pierwsze uruchomienie</p>
+        <h2 class="start__h">Twój gabinet jest pusty.<br />Ustawmy go w dwie minuty.</h2>
+        <p class="start__lead">
+          Potem panel zacznie codziennie mówić, kogo masz dzisiaj i do kogo zadzwonić.
+          Wszystko da się później zmienić w Ustawieniach.
+        </p>
+
+        <ol class="start__kroki">
+          <li class="start__krok${u.nazwa && u.telefon ? ' is-ok' : ''}">
+            <span class="start__num">1</span>
+            <div>
+              <h3>Dane gabinetu</h3>
+              <p>Nazwa, telefon i adres. Pacjent zobaczy je w swojej karcie i w SMS-ach.</p>
+              <p class="start__stan">${u.nazwa ? `${esc(u.nazwa)} · ${esc(u.telefon || 'brak telefonu')}` : 'jeszcze nieustawione'}</p>
+            </div>
+          </li>
+          <li class="start__krok${z.imie ? ' is-ok' : ''}">
+            <span class="start__num">2</span>
+            <div>
+              <h3>Kto przyjmuje i kiedy</h3>
+              <p>Godziny pracy decydują o tym, jakie terminy zobaczy pacjent na stronie.</p>
+              <p class="start__stan">${z.imie ? `${esc(z.imie)}` : 'jeszcze nieustawione'}</p>
+            </div>
+          </li>
+          <li class="start__krok">
+            <span class="start__num">3</span>
+            <div>
+              <h3>Pierwszy pacjent</h3>
+              <p>Dodaj kogoś, kogo prowadzisz teraz — reszta panelu ożyje od razu.</p>
+            </div>
+          </li>
+        </ol>
+
+        <div class="start__akcje">
+          <button class="btn btn--accent" type="button" data-akcja="kreator">Ustaw gabinet</button>
+          <button class="btn" type="button" data-akcja="nowy-pacjent">Dodaj pacjenta</button>
+          <button class="btn btn--ghost" type="button" data-akcja="import">Wczytaj kopię zapasową</button>
+        </div>
+
+        <p class="start__stopka">
+          Chcesz najpierw zobaczyć, jak to wygląda z pacjentami?
+          <button class="link-btn" type="button" data-akcja="wczytaj-demo">Wczytaj dane przykładowe</button>
+        </p>
+      </section>`;
+  }
+
+  function formKreator() {
+    const u = S().ustawienia;
+    const z = S().zespol[0] || {};
+    const DNI_KREATOR = [
+      [1, 'poniedziałek'],
+      [2, 'wtorek'],
+      [3, 'środa'],
+      [4, 'czwartek'],
+      [5, 'piątek'],
+      [6, 'sobota'],
+    ];
+    modal(
+      'Ustaw gabinet',
+      `<p class="modal__info">Tyle wystarczy, żeby zacząć. Zespół, cennik i resztę dołożysz w Ustawieniach.</p>
+      <div class="form-grid">
+        ${pole('kr-nazwa', 'Nazwa gabinetu', 'text', u.nazwa || '', 'placeholder="np. Gabinet Fizjoterapii Kowalski"')}
+        ${pole('kr-telefon', 'Telefon', 'tel', u.telefon || '', 'placeholder="+48 600 000 000"')}
+        <div class="field field--full">
+          <label for="kr-adres">Adres</label>
+          <input id="kr-adres" type="text" value="${esc(u.adres || '')}" placeholder="ul. Przykładowa 1, 00-001 Miasto" />
+        </div>
+        ${pole('kr-terapeuta', 'Kto przyjmuje', 'text', z.imie || '', 'placeholder="mgr Jan Kowalski"')}
+        ${pole('kr-rola', 'Specjalizacja <em>(opcjonalnie)</em>', 'text', z.rola || '', 'placeholder="terapia manualna"')}
+      </div>
+
+      <p class="modal__label">Godziny przyjęć</p>
+      <table class="grafik">
+        <tbody>
+          ${DNI_KREATOR.map(([d, nazwa]) => {
+            const g = (z.godziny || { 1: [8, 16], 2: [8, 16], 3: [8, 16], 4: [8, 16], 5: [8, 16] })[d];
+            return `<tr>
+              <td><label class="linia-check"><input type="checkbox" data-dzien="${d}" ${g ? 'checked' : ''} /><span>${nazwa}</span></label></td>
+              <td><input type="number" data-od="${d}" min="0" max="23" value="${g ? g[0] : 8}" aria-label="${nazwa}: od godziny" /></td>
+              <td aria-hidden="true">–</td>
+              <td><input type="number" data-do="${d}" min="1" max="24" value="${g ? g[1] : 16}" aria-label="${nazwa}: do godziny" /></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+      <p class="modal__err" id="kr-err" hidden></p>`,
+      `<button class="btn btn--ghost" type="button" data-close>Anuluj</button>
+       <button class="btn btn--accent" type="button" data-zapisz="kreator">Zapisz i zacznij</button>`
+    );
+  }
+
+  function zapiszKreator() {
+    const nazwa = $('#kr-nazwa').value.trim();
+    const telefon = $('#kr-telefon').value.trim();
+    const terapeuta = $('#kr-terapeuta').value.trim();
+    if (nazwa.length < 2) return bladModalu('kr-err', 'Podaj nazwę gabinetu.');
+    if (telefon.replace(/\D/g, '').length < 9) return bladModalu('kr-err', 'Podaj telefon — pacjent zobaczy go w swojej karcie.');
+    if (terapeuta.length < 3) return bladModalu('kr-err', 'Podaj imię i nazwisko osoby, która przyjmuje.');
+
+    const godziny = {};
+    for (const d of [1, 2, 3, 4, 5, 6]) {
+      if (!$(`#modal [data-dzien="${d}"]`).checked) continue;
+      const od = Number($(`#modal [data-od="${d}"]`).value);
+      const doG = Number($(`#modal [data-do="${d}"]`).value);
+      if (!(doG > od)) return bladModalu('kr-err', 'Godzina końca musi być późniejsza niż początku.');
+      godziny[d] = [od, doG];
+    }
+    if (!Object.keys(godziny).length) return bladModalu('kr-err', 'Zaznacz przynajmniej jeden dzień przyjęć.');
+
+    P.akcje.uruchomGabinet({
+      nazwa,
+      telefon,
+      adres: $('#kr-adres').value,
+      terapeuta,
+      rola: $('#kr-rola').value,
+      godziny,
+    });
+    schowajModal();
+    toast('Gabinet ustawiony. Dodaj pierwszego pacjenta.');
   }
 
   /* ── Widok: Wiadomości ─────────────────────────────────────────────── */
@@ -1581,6 +1723,15 @@
         return formZamknij(d.terapia);
       case 'blokada':
         return formBlokada();
+      case 'kreator':
+        return formKreator();
+      case 'wczytaj-demo': {
+        const byl = window.KONFIGURACJA.tryb;
+        window.KONFIGURACJA.tryb = 'demo';
+        P.akcje.reset();
+        window.KONFIGURACJA.tryb = byl;
+        return toast('Wczytano dane przykładowe');
+      }
       case 'nowa-osoba':
         return formOsoba();
       case 'edytuj-osobe':
@@ -1679,6 +1830,8 @@
         return toast('SMS zapisany w historii pacjenta');
       case 'blokada':
         return zapiszBlokade();
+      case 'kreator':
+        return zapiszKreator();
       case 'osoba':
         return zapiszOsobe(d.osoba);
       case 'gabinet': {
@@ -1758,6 +1911,8 @@
   });
 
   const bar = $('#demo-bar');
+  /* W gabinecie pracującym pasek o prototypie byłby nieprawdą. */
+  if (window.KONFIGURACJA && window.KONFIGURACJA.tryb === 'praca' && bar) bar.remove();
   try {
     if (sessionStorage.getItem('panel-bar-off')) bar.remove();
   } catch (_) {}

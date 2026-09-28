@@ -1,154 +1,99 @@
 /*
- * Dane gabinetu demo — JEDYNE miejsce do podmiany treści.
+ * Dane strony gabinetu.
  *
- * Demo pokazuje gabinet fizjoterapii: zespół i jeden adres.
- * Wszystko tutaj to przykład: nazwisko, adres, telefon, ceny i współrzędne.
- * Żeby przerobić demo na konkretny gabinet, wystarczy edytować ten plik
- * i podmienić zdjęcia w assets/img (te same nazwy plików).
+ * Nazwa, kontakt, zespół, problemy i ceny przychodzą z assets/js/konfiguracja.js —
+ * to jedyny plik do zmiany przy wdrożeniu. Tutaj zostaje treść, która jest treścią
+ * strony, a nie ustawieniem: opisy problemów, opinie i pytania.
  */
 
+const KONF = window.KONFIGURACJA;
+
+/* Opisy problemów i zdjęcia żyją tutaj, bo są treścią strony, nie konfiguracją.
+   Usługi, ceny, kolory i zespół przychodzą z konfiguracji. */
+const TRESCI_PROBLEMOW = {
+  kregoslup: {
+    zdjecie: 'assets/img/spec-kregoslup.jpg',
+    alt: 'Dłonie fizjoterapeuty uciskające mięśnie wzdłuż kręgosłupa leżącego pacjenta.',
+    opis: 'Ból krzyża, rwa kulszowa, dyskopatia. Zaczynamy od badania ruchu, nie od zdjęcia MRI.',
+    objawy: ['Ból promieniuje do nogi', 'Poranna sztywność', 'Boli przy schylaniu'],
+  },
+  sport: {
+    zdjecie: 'assets/img/spec-sport.jpg',
+    alt: 'Fizjoterapeutka testująca zakres ruchu w kolanie u biegacza.',
+    opis: 'Skręcenia, przeciążenia, powrót do treningu po kontuzji. Z testami zamiast zgadywania.',
+    objawy: ['Puchnie po wysiłku', 'Ucieka na nierównym', 'Ból wraca po powrocie do biegania'],
+  },
+  uraz: {
+    zdjecie: 'assets/img/spec-uraz.jpg',
+    alt: 'Fizjoterapeuta asekurujący pacjenta przy ćwiczeniu z taśmą.',
+    opis: 'Po operacji, po złamaniu, po zdjęciu gipsu. Prowadzenie zgodne z protokołem operatora.',
+    objawy: ['Sztywność po unieruchomieniu', 'Kulejesz', 'Blizna ogranicza ruch'],
+  },
+  biuro: {
+    zdjecie: 'assets/img/spec-ciaza.jpg',
+    alt: 'Fizjoterapeutka pokazująca ustawienie barków przy biurku.',
+    opis: 'Kark, barki i głowa po dniu przy komputerze. Terapia plus ustawienie stanowiska pracy.',
+    objawy: ['Ból narasta w ciągu dnia', 'Mrowienie w rękach', 'Ból głowy od potylicy'],
+  },
+};
+
 window.KLINIKA = {
-  nazwa: 'Linia Ruchu',
-  podtytul: 'Gabinet fizjoterapii',
-  miasto: '[Twoje Miasto]',
-  telefon: '+48 000 000 000',
-  telefonHref: '+48000000000',
-  email: 'adres@email.com',
-  agencja: 'Studio Widok',
-  narzedzie: 'System pozyskiwania pacjentów',
+  nazwa: KONF.gabinet.nazwa,
+  podtytul: KONF.gabinet.podtytul,
+  miasto: KONF.gabinet.miasto,
+  telefon: KONF.gabinet.telefon,
+  telefonHref: KONF.gabinet.telefon.replace(/\s/g, ''),
+  email: KONF.gabinet.email,
+  agencja: KONF.agencja.nazwa,
+  narzedzie: KONF.agencja.narzedzie,
 
-  /* Cztery linie = cztery problemy, z którymi przychodzą pacjenci.
-     Kolor ma znaczenie i nie pojawia się nigdzie indziej. */
-  linie: [
-    {
-      id: 'kregoslup',
-      problem: 'Kręgosłup i plecy',
-      specjalizacja: 'Terapia kręgosłupa',
-      kolor: '#1F5FD6',
-      naKolorze: '#FFFFFF',
-      zdjecie: 'assets/img/spec-kregoslup.jpg',
-      alt: 'Dłonie fizjoterapeuty uciskające mięśnie wzdłuż kręgosłupa leżącego pacjenta.',
-      opis:
-        'Ból krzyża, szyi i pleców, który wraca, promieniuje do nogi albo nie pozwala przespać nocy. Szukam źródła, a nie tylko miejsca, które boli.',
-      objawy: ['Rwa kulszowa', 'Dyskopatia', 'Ból szyi przy pracy biurowej', 'Sztywność poranna', 'Bóle głowy napięciowe'],
-      uslugi: [
-        { id: 'k1', nazwa: 'Konsultacja z terapią', minuty: 60, cena: 220 },
-        { id: 'k2', nazwa: 'Terapia manualna', minuty: 50, cena: 200 },
-        { id: 'k3', nazwa: 'Metoda McKenziego', minuty: 50, cena: 200 },
-      ],
-    },
-    {
-      id: 'sport',
-      problem: 'Kontuzja sportowa',
-      specjalizacja: 'Fizjoterapia sportowa',
-      kolor: '#E8590C',
-      naKolorze: '#14171A',
-      zdjecie: 'assets/img/spec-sport.jpg',
-      alt: 'Fizjoterapeuta badający zakres ruchu w kolanie sportowca leżącego na niebieskim ręczniku.',
-      opis:
-        'Skręcona kostka, kolano biegacza, bark po sezonie. Wracasz do treningu z planem, który mówi kiedy i ile — a nie „na wyczucie”.',
-      objawy: ['Skręcenie stawu skokowego', 'Kolano biegacza', 'Naderwanie mięśnia', 'Bark pływaka', 'Zapalenie ścięgna Achillesa'],
-      uslugi: [
-        { id: 's1', nazwa: 'Diagnostyka funkcjonalna', minuty: 75, cena: 260 },
-        { id: 's2', nazwa: 'Terapia tkanek miękkich', minuty: 50, cena: 200 },
-        { id: 's3', nazwa: 'Trening powrotu do sportu', minuty: 60, cena: 180 },
-      ],
-    },
-    {
-      id: 'uraz',
-      problem: 'Po urazie lub operacji',
-      specjalizacja: 'Rehabilitacja pooperacyjna',
-      kolor: '#13875A',
-      naKolorze: '#FFFFFF',
-      zdjecie: 'assets/img/spec-uraz.jpg',
-      alt: 'Fizjoterapeutka mobilizująca staw skokowy pacjenta po urazie.',
-      opis:
-        'Endoprotezy, rekonstrukcje więzadeł, złamania. Prowadzę od pierwszych dni po zabiegu do pełnej sprawności, w porozumieniu z Twoim ortopedą.',
-      objawy: ['Rekonstrukcja ACL', 'Endoproteza biodra i kolana', 'Po złamaniu', 'Zamrożony bark', 'Blizna po zabiegu'],
-      uslugi: [
-        { id: 'u1', nazwa: 'Rehabilitacja pooperacyjna', minuty: 60, cena: 210 },
-        { id: 'u2', nazwa: 'Terapia blizny', minuty: 40, cena: 170 },
-        { id: 'u3', nazwa: 'Kinesiotaping', minuty: 20, cena: 80 },
-      ],
-    },
-    {
-      id: 'biuro',
-      problem: 'Ból od siedzenia',
-      specjalizacja: 'Terapia dla pracujących przy biurku',
-      kolor: '#C2255C',
-      naKolorze: '#FFFFFF',
-      zdjecie: 'assets/img/spec-biuro.jpg',
-      alt: 'Fizjoterapeuta pracujący z napiętym karkiem siedzącego pacjenta.',
-      opis:
-        'Kark, barki i nadgarstki po ośmiu godzinach przy monitorze. Terapia plus ustawienie stanowiska, żeby ból nie wracał w poniedziałek.',
-      objawy: ['Napięty kark', 'Drętwienie rąk', 'Ból między łopatkami', 'Nadgarstek przy myszce', 'Bóle głowy od karku'],
-      uslugi: [
-        { id: 'b1', nazwa: 'Konsultacja z oceną stanowiska', minuty: 60, cena: 230 },
-        { id: 'b2', nazwa: 'Terapia karku i barków', minuty: 50, cena: 200 },
-        { id: 'b3', nazwa: 'Masaż leczniczy', minuty: 45, cena: 170 },
-      ],
-    },
-  ],
+  /* Problem = kolor + usługi z konfiguracji, opis i zdjęcie stąd. */
+  linie: KONF.problemy.map((p) => ({
+    id: p.id,
+    problem: p.problem,
+    specjalizacja: p.specjalizacja,
+    strona: p.strona,
+    kolor: p.kolor,
+    naKolorze: p.naKolorze,
+    uslugi: p.uslugi,
+    ...TRESCI_PROBLEMOW[p.id],
+  })),
 
-  /* Zespół. `grafik` to godziny pracy: dzień tygodnia → [od, do], 1 = poniedziałek.
-     `linie` mówią, którymi problemami zajmuje się dana osoba — z tego wynika,
-     kogo pacjent zobaczy przy wybranym problemie. */
-  zespol: [
-    {
-      id: 'z1',
-      imie: 'mgr Jan Kowalski',
-      rola: 'Terapia manualna, kręgosłup',
-      kolor: '#1F5FD6',
-      zdjecie: 'assets/img/zespol-1.jpg',
-      alt: 'Portret fizjoterapeuty w jasnej koszulce polo.',
-      bio: 'Od dwunastu lat pracuję z bólem kręgosłupa i powrotami do pracy po długiej przerwie. Certyfikowany terapeuta metody McKenziego, absolwent AWF.',
-      kursy: ['Metoda McKenziego (cert. A–D)', 'Terapia manualna wg Kaltenborna', 'Suche igłowanie'],
-      jezyki: ['polski', 'angielski'],
-      linie: ['kregoslup', 'biuro', 'uraz'],
-      grafik: { 1: [8, 19], 2: [8, 19], 3: [8, 19], 4: [8, 19], 5: [8, 16] },
-    },
-    {
-      id: 'z2',
-      imie: 'mgr Anna Lewandowska',
-      rola: 'Fizjoterapia sportowa',
-      kolor: '#E8590C',
-      zdjecie: 'assets/img/zespol-2.jpg',
-      alt: 'Portret fizjoterapeutki w ciemnej koszulce sportowej.',
-      bio: 'Pracuję z biegaczami i osobami wracającymi po kontuzjach stawów. Prowadzę testy funkcjonalne, po których wiadomo, kiedy naprawdę można wrócić do treningu.',
-      kursy: ['Diagnostyka funkcjonalna FMS', 'Terapia tkanek miękkich', 'Taping medyczny'],
-      jezyki: ['polski', 'angielski'],
-      linie: ['sport', 'uraz', 'kregoslup'],
-      grafik: { 1: [12, 20], 2: [12, 20], 3: [12, 20], 4: [12, 20], 5: [10, 18], 6: [9, 13] },
-    },
-    {
-      id: 'z3',
-      imie: 'mgr Piotr Zawada',
-      rola: 'Rehabilitacja pooperacyjna',
-      kolor: '#13875A',
-      zdjecie: 'assets/img/zespol-3.jpg',
-      alt: 'Portret fizjoterapeuty przy kozetce w gabinecie.',
-      bio: 'Prowadzę pacjentów po rekonstrukcjach więzadeł i endoprotezach, od zdjęcia ortezy do powrotu do normalnego chodzenia. Współpracuję z operatorami przy ustalaniu tempa.',
-      kursy: ['PNF podstawowy i rozwijający', 'Rehabilitacja po endoprotezoplastyce', 'Terapia blizny'],
-      jezyki: ['polski'],
-      linie: ['uraz', 'kregoslup'],
-      grafik: { 2: [8, 15], 4: [8, 15], 6: [9, 13] },
-    },
-  ],
+  zespol: KONF.zespol,
 
-  /* Jeden adres. Współrzędne przykładowe — podmień na swoje. */
   gabinet: {
     nazwa: 'Gabinet',
-    adres: 'ul. Przykładowa 1',
-    kod: '00-001 [Twoje Miasto]',
-    lat: 52.2297,
-    lng: 21.0122,
-    godziny: [['Pon–Czw', '8:00–20:00'], ['Piątek', '8:00–18:00'], ['Sobota', '9:00–13:00']],
-    udogodnienia: ['Parking pod budynkiem', 'Winda i podjazd', 'Wejście z poziomu ulicy'],
-    dojazd: 'Przystanek tramwajowy 150 m, wjazd na parking od podwórza.',
+    adres: KONF.gabinet.adres,
+    kod: KONF.gabinet.kod,
+    lat: KONF.gabinet.lat,
+    lng: KONF.gabinet.lng,
+    godziny: (() => {
+      /* Godziny otwarcia liczone z grafików zespołu — jedna prawda zamiast dwóch. */
+      const DNI = ['niedziela', 'poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota'];
+      const SKROT = ['Nd', 'Pon', 'Wt', 'Śr', 'Czw', 'Pt', 'Sob'];
+      const zakresy = [1, 2, 3, 4, 5, 6, 0].map((dzien) => {
+        const g = KONF.zespol.map((z) => z.grafik[dzien]).filter(Boolean);
+        return { dzien, zakres: g.length ? [Math.min(...g.map((x) => x[0])), Math.max(...g.map((x) => x[1]))] : null };
+      });
+      /* Kolejne dni z tymi samymi godzinami scalamy w jeden wiersz. */
+      const out = [];
+      zakresy.forEach(({ dzien, zakres }) => {
+        if (!zakres) return;
+        const tekst = `${zakres[0]}:00–${zakres[1]}:00`;
+        const ostatni = out[out.length - 1];
+        if (ostatni && ostatni.tekst === tekst && ostatni.doDnia === dzien - 1) {
+          ostatni.doDnia = dzien;
+          return;
+        }
+        out.push({ odDnia: dzien, doDnia: dzien, tekst });
+      });
+      return out.map((x) => [x.odDnia === x.doDnia ? DNI[x.odDnia].replace(/^./, (z) => z.toUpperCase()) : `${SKROT[x.odDnia]}–${SKROT[x.doDnia]}`, x.tekst]);
+    })(),
+    udogodnienia: KONF.gabinet.udogodnienia,
+    dojazd: KONF.gabinet.dojazd,
   },
 
-  /* Godziny otwarcia gabinetu liczą się z grafików zespołu — to pole zostaje
-     tylko jako zapasowe, gdyby zespół był pusty. */
+  /* Zapas, gdyby zespół był pusty — normalnie godziny biorą się z grafików. */
   godzinyWizyt: { tydzien: [8, 20], sobota: [9, 13] },
 
   opinie: [

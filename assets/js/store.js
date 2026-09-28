@@ -33,59 +33,63 @@
   const id = (prefiks) => `${prefiks}${Date.now().toString(36)}${(licznik++).toString(36)}`;
 
   /* ── Dane startowe ─────────────────────────────────────────────────── */
-  function daneStartowe() {
-    const linie = [
-      { id: 'kregoslup', nazwa: 'Kręgosłup i plecy', kolor: '#1F5FD6', naKolorze: '#FFFFFF' },
-      { id: 'sport', nazwa: 'Kontuzja sportowa', kolor: '#E8590C', naKolorze: '#14171A' },
-      { id: 'uraz', nazwa: 'Po urazie lub operacji', kolor: '#13875A', naKolorze: '#FFFFFF' },
-      { id: 'biuro', nazwa: 'Ból od siedzenia', kolor: '#C2255C', naKolorze: '#FFFFFF' },
-    ];
+  /* Konfiguracja gabinetu — ten sam plik, z którego czyta strona. */
+  const KONF = window.KONFIGURACJA || {};
+  /* Tryb czytamy przy każdym starcie i resecie, nie raz na zawsze — dzięki temu
+     da się przełączyć gabinet z demo na pracę bez przeładowania kodu. */
+  const tryb = () => (KONF.tryb === 'praca' ? 'praca' : 'demo');
 
-    /* Zespół. Każda osoba ma własny grafik i własny zestaw problemów,
-       którymi się zajmuje — z tego liczą się wolne terminy. */
-    const zespol = [
-      {
-        id: 'z1',
-        imie: 'mgr Jan Kowalski',
-        inicjaly: 'JK',
-        rola: 'Terapia manualna, kręgosłup',
-        kolor: '#1F5FD6',
-        linie: ['kregoslup', 'biuro', 'uraz'],
-        godziny: { 1: [8, 19], 2: [8, 19], 3: [8, 19], 4: [8, 19], 5: [8, 16] },
-        aktywny: true,
+  /** Stałe gabinetu: problemy, cennik, zespół, dane kontaktowe. */
+  function zKonfiguracji() {
+    return {
+      ustawienia: {
+        nazwa: KONF.gabinet.nazwa,
+        adres: `${KONF.gabinet.adres}, ${KONF.gabinet.kod}`,
+        telefon: KONF.gabinet.telefon,
+        email: KONF.gabinet.email,
+        krokMinut: KONF.krokMinut || 30,
       },
-      {
-        id: 'z2',
-        imie: 'mgr Anna Lewandowska',
-        inicjaly: 'AL',
-        rola: 'Fizjoterapia sportowa',
-        kolor: '#E8590C',
-        linie: ['sport', 'uraz', 'kregoslup'],
-        godziny: { 1: [12, 20], 2: [12, 20], 3: [12, 20], 4: [12, 20], 5: [10, 18], 6: [9, 13] },
+      linie: KONF.problemy.map((x) => ({
+        id: x.id,
+        nazwa: x.problem,
+        kolor: x.kolor,
+        naKolorze: x.naKolorze,
+      })),
+      /* Cennik to wszystkie usługi ze wszystkich problemów, spłaszczone. */
+      uslugi: KONF.problemy.flatMap((x) => x.uslugi.map((u) => ({ ...u, linia: x.id }))),
+      zespol: KONF.zespol.map((z) => ({
+        id: z.id,
+        imie: z.imie,
+        inicjaly: z.inicjaly,
+        rola: z.rola,
+        kolor: z.kolor,
+        linie: z.linie,
+        godziny: z.grafik,
         aktywny: true,
-      },
-      {
-        id: 'z3',
-        imie: 'mgr Piotr Zawada',
-        inicjaly: 'PZ',
-        rola: 'Rehabilitacja pooperacyjna',
-        kolor: '#13875A',
-        linie: ['uraz', 'kregoslup'],
-        godziny: { 2: [8, 15], 4: [8, 15], 6: [9, 13] },
-        aktywny: true,
-      },
-    ];
+      })),
+    };
+  }
 
-    const uslugi = [
-      { id: 'u-konsultacja', nazwa: 'Konsultacja z terapią', minuty: 60, cena: 220 },
-      { id: 'u-manualna', nazwa: 'Terapia manualna', minuty: 50, cena: 200 },
-      { id: 'u-sport', nazwa: 'Trening powrotu do sportu', minuty: 60, cena: 180 },
-      { id: 'u-diagnostyka', nazwa: 'Diagnostyka funkcjonalna', minuty: 75, cena: 260 },
-      { id: 'u-pooperacyjna', nazwa: 'Rehabilitacja pooperacyjna', minuty: 60, cena: 210 },
-      { id: 'u-kark', nazwa: 'Terapia karku i barków', minuty: 50, cena: 200 },
-      { id: 'u-stanowisko', nazwa: 'Konsultacja z oceną stanowiska', minuty: 60, cena: 230 },
-    ];
+  /** Pusty gabinet — start przy wdrożeniu u klienta. */
+  function daneCzyste() {
+    const stale = zKonfiguracji();
+    return {
+      wersja: WERSJA,
+      tryb: 'praca',
+      ...stale,
+      cwiczeniaBiblioteka: bibliotekaCwiczen(),
+      pacjenci: [],
+      terapie: [],
+      wizyty: [],
+      odhaczenia: [],
+      bol: [],
+      zdarzenia: [],
+      blokady: [],
+      wylaczone: [],
+    };
+  }
 
+  function bibliotekaCwiczen() {
     /* Biblioteka ćwiczeń — terapeuta wybiera z niej albo dopisuje własne.
        `rysunek` to id sylwetki rysowanej w karcie pacjenta (assets/js/pacjent.js). */
     const cwiczeniaBiblioteka = [
@@ -100,6 +104,14 @@
       { id: 'c-lydka', nazwa: 'Wspięcia na palce', opis: 'Stojąc, unieś się na palce i powoli opuść. Trzymaj się oparcia.', rysunek: 'stanie' },
       { id: 'c-balans', nazwa: 'Stanie na jednej nodze', opis: 'Utrzymaj równowagę 30 sekund, potem z zamkniętymi oczami.', rysunek: 'stanie' },
     ];
+    return cwiczeniaBiblioteka;
+  }
+
+  /* ── Dane demonstracyjne ───────────────────────────────────────────── */
+  function daneStartowe() {
+    const stale = zKonfiguracji();
+    const { linie, uslugi, zespol } = stale;
+    const cwiczeniaBiblioteka = bibliotekaCwiczen();
 
     const pacjenci = [
       { id: 'p1', imie: 'Anna Zielińska', telefon: '+48 600 000 001', email: 'anna.z@przyklad.pl', zrodlo: 'mapy', utworzony: isoZa(-34), notatka: 'Pracuje zdalnie, ćwiczy rano przed pracą.', zgodaSms: true },
@@ -193,57 +205,57 @@
 
     const wizyty = [
       // dzisiaj
-      w('t1', 'p1', 0, '8:00', 'u-manualna', 'odbyta'),
-      w('t10', 'p10', 0, '9:00', 'u-pooperacyjna', 'odbyta'),
-      w('t2', 'p2', 0, '10:30', 'u-sport', 'potwierdzona'),
-      w('t3', 'p3', 0, '12:00', 'u-stanowisko', 'potwierdzona'),
-      w('t9', 'p9', 0, '13:30', 'u-konsultacja', 'potwierdzona'),
-      w('t12', 'p12', 0, '15:00', 'u-diagnostyka', 'zaplanowana'),
-      w('t5', 'p5', 0, '16:30', 'u-manualna', 'potwierdzona'),
-      w('t4', 'p4', 0, '18:00', 'u-pooperacyjna', 'potwierdzona'),
+      w('t1', 'p1', 0, '8:00', 'k2', 'odbyta'),
+      w('t10', 'p10', 0, '9:00', 'u1', 'odbyta'),
+      w('t2', 'p2', 0, '10:30', 's3', 'potwierdzona'),
+      w('t3', 'p3', 0, '12:00', 'b1', 'potwierdzona'),
+      w('t9', 'p9', 0, '13:30', 'k1', 'potwierdzona'),
+      w('t12', 'p12', 0, '15:00', 's1', 'zaplanowana'),
+      w('t5', 'p5', 0, '16:30', 'k2', 'potwierdzona'),
+      w('t4', 'p4', 0, '18:00', 'u1', 'potwierdzona'),
       // najbliższe dni
-      w('t4', 'p4', 1, '8:00', 'u-pooperacyjna', 'potwierdzona'),
-      w('t5', 'p5', 1, '9:30', 'u-manualna', 'zaplanowana'),
-      w('t1', 'p1', 1, '11:00', 'u-manualna', 'potwierdzona'),
-      w('t13', 'p13', 1, '13:00', 'u-kark', 'zaplanowana'),
-      w('t2', 'p2', 1, '15:00', 'u-sport', 'zaplanowana'),
-      w('t9', 'p9', 2, '8:30', 'u-konsultacja', 'zaplanowana'),
-      w('t12', 'p12', 2, '10:00', 'u-diagnostyka', 'zaplanowana'),
-      w('t10', 'p10', 2, '12:00', 'u-pooperacyjna', 'zaplanowana'),
-      w('t4', 'p4', 3, '9:00', 'u-pooperacyjna', 'zaplanowana'),
-      w('t13', 'p13', 4, '14:30', 'u-kark', 'zaplanowana'),
+      w('t4', 'p4', 1, '8:00', 'u1', 'potwierdzona'),
+      w('t5', 'p5', 1, '9:30', 'k2', 'zaplanowana'),
+      w('t1', 'p1', 1, '11:00', 'k2', 'potwierdzona'),
+      w('t13', 'p13', 1, '13:00', 'b2', 'zaplanowana'),
+      w('t2', 'p2', 1, '15:00', 's3', 'zaplanowana'),
+      w('t9', 'p9', 2, '8:30', 'k1', 'zaplanowana'),
+      w('t12', 'p12', 2, '10:00', 's1', 'zaplanowana'),
+      w('t10', 'p10', 2, '12:00', 'u1', 'zaplanowana'),
+      w('t4', 'p4', 3, '9:00', 'u1', 'zaplanowana'),
+      w('t13', 'p13', 4, '14:30', 'b2', 'zaplanowana'),
       // historia
-      w('t1', 'p1', -6, '8:00', 'u-manualna', 'odbyta'),
-      w('t1', 'p1', -13, '8:00', 'u-konsultacja', 'odbyta'),
-      w('t1', 'p1', -20, '9:00', 'u-manualna', 'odbyta'),
-      w('t2', 'p2', -3, '15:00', 'u-sport', 'odbyta'),
-      w('t2', 'p2', -8, '15:00', 'u-diagnostyka', 'odbyta'),
-      w('t4', 'p4', -4, '18:00', 'u-pooperacyjna', 'odbyta'),
-      w('t4', 'p4', -8, '18:00', 'u-pooperacyjna', 'odbyta'),
-      w('t4', 'p4', -12, '17:00', 'u-pooperacyjna', 'odbyta'),
-      w('t4', 'p4', -16, '17:00', 'u-pooperacyjna', 'odbyta'),
-      w('t4', 'p4', -22, '17:00', 'u-konsultacja', 'odbyta'),
-      w('t4', 'p4', -30, '17:00', 'u-konsultacja', 'odbyta'),
-      w('t5', 'p5', -7, '16:30', 'u-manualna', 'odbyta'),
-      w('t5', 'p5', -14, '16:30', 'u-manualna', 'odbyta'),
-      w('t5', 'p5', -21, '16:30', 'u-konsultacja', 'odbyta'),
-      w('t9', 'p9', -5, '13:30', 'u-konsultacja', 'odbyta'),
-      w('t10', 'p10', -2, '9:00', 'u-pooperacyjna', 'odbyta'),
-      w('t10', 'p10', -7, '9:00', 'u-pooperacyjna', 'odbyta'),
-      w('t10', 'p10', -14, '9:00', 'u-pooperacyjna', 'odbyta'),
-      w('t10', 'p10', -21, '9:00', 'u-pooperacyjna', 'odbyta'),
-      w('t10', 'p10', -28, '9:00', 'u-konsultacja', 'odbyta'),
-      w('t10', 'p10', -35, '9:00', 'u-konsultacja', 'odbyta'),
-      w('t10', 'p10', -45, '9:00', 'u-konsultacja', 'odbyta'),
-      w('t10', 'p10', -55, '9:00', 'u-konsultacja', 'odbyta'),
-      w('t12', 'p12', -2, '15:00', 'u-diagnostyka', 'odbyta'),
-      w('t13', 'p13', -9, '13:00', 'u-kark', 'odbyta'),
-      w('t13', 'p13', -16, '13:00', 'u-konsultacja', 'odbyta'),
-      w('t14', 'p14', -24, '11:00', 'u-manualna', 'odbyta'),
-      w('t14', 'p14', -31, '11:00', 'u-konsultacja', 'odbyta'),
-      w('t8', 'p8', -14, '17:00', 'u-sport', 'odbyta'),
-      w('t11', 'p11', -30, '12:00', 'u-konsultacja', 'odbyta'),
-      w('t3', 'p3', -8, '12:00', 'u-stanowisko', 'nieobecnosc'),
+      w('t1', 'p1', -6, '8:00', 'k2', 'odbyta'),
+      w('t1', 'p1', -13, '8:00', 'k1', 'odbyta'),
+      w('t1', 'p1', -20, '9:00', 'k2', 'odbyta'),
+      w('t2', 'p2', -3, '15:00', 's3', 'odbyta'),
+      w('t2', 'p2', -8, '15:00', 's1', 'odbyta'),
+      w('t4', 'p4', -4, '18:00', 'u1', 'odbyta'),
+      w('t4', 'p4', -8, '18:00', 'u1', 'odbyta'),
+      w('t4', 'p4', -12, '17:00', 'u1', 'odbyta'),
+      w('t4', 'p4', -16, '17:00', 'u1', 'odbyta'),
+      w('t4', 'p4', -22, '17:00', 'k1', 'odbyta'),
+      w('t4', 'p4', -30, '17:00', 'k1', 'odbyta'),
+      w('t5', 'p5', -7, '16:30', 'k2', 'odbyta'),
+      w('t5', 'p5', -14, '16:30', 'k2', 'odbyta'),
+      w('t5', 'p5', -21, '16:30', 'k1', 'odbyta'),
+      w('t9', 'p9', -5, '13:30', 'k1', 'odbyta'),
+      w('t10', 'p10', -2, '9:00', 'u1', 'odbyta'),
+      w('t10', 'p10', -7, '9:00', 'u1', 'odbyta'),
+      w('t10', 'p10', -14, '9:00', 'u1', 'odbyta'),
+      w('t10', 'p10', -21, '9:00', 'u1', 'odbyta'),
+      w('t10', 'p10', -28, '9:00', 'k1', 'odbyta'),
+      w('t10', 'p10', -35, '9:00', 'k1', 'odbyta'),
+      w('t10', 'p10', -45, '9:00', 'k1', 'odbyta'),
+      w('t10', 'p10', -55, '9:00', 'k1', 'odbyta'),
+      w('t12', 'p12', -2, '15:00', 's1', 'odbyta'),
+      w('t13', 'p13', -9, '13:00', 'b2', 'odbyta'),
+      w('t13', 'p13', -16, '13:00', 'k1', 'odbyta'),
+      w('t14', 'p14', -24, '11:00', 'k2', 'odbyta'),
+      w('t14', 'p14', -31, '11:00', 'k1', 'odbyta'),
+      w('t8', 'p8', -14, '17:00', 's3', 'odbyta'),
+      w('t11', 'p11', -30, '12:00', 'k1', 'odbyta'),
+      w('t3', 'p3', -8, '12:00', 'b1', 'nieobecnosc'),
     ];
 
     /* Odhaczone ćwiczenia z ostatnich dwóch tygodni — stąd bierze się procent. */
@@ -287,19 +299,8 @@
 
     return {
       wersja: WERSJA,
-      ustawienia: {
-        nazwa: 'Linia Ruchu',
-        terapeuta: 'mgr Jan Kowalski',
-        inicjaly: 'JK',
-        adres: 'ul. Przykładowa 1, 00-001 [Twoje Miasto]',
-        telefon: '+48 000 000 000',
-        /* Godziny pracy: dzień tygodnia → [od, do]. 0 = niedziela. */
-        godziny: { 1: [8, 19], 2: [8, 19], 3: [8, 19], 4: [8, 19], 5: [8, 19], 6: [9, 13] },
-        krokMinut: 30,
-      },
-      zespol,
-      linie,
-      uslugi,
+      tryb: 'demo',
+      ...stale,
       cwiczeniaBiblioteka,
       pacjenci,
       terapie,
@@ -356,7 +357,7 @@
         }
       }
     } catch (_) {}
-    return daneStartowe();
+    return tryb() === 'praca' ? daneCzyste() : daneStartowe();
   }
 
   function zapisz() {
@@ -1086,11 +1087,39 @@
       return true;
     },
 
+    /** Przywraca stan wyjściowy dla bieżącego trybu: demo albo pusty gabinet. */
     reset() {
-      stan = daneStartowe();
+      const praca = tryb() === 'praca';
+      stan = praca ? daneCzyste() : daneStartowe();
       poprzedni = null;
       zapisz();
-      powiadom('Przywrócono dane demonstracyjne');
+      powiadom(praca ? 'Wyczyszczono gabinet' : 'Przywrócono dane demonstracyjne');
+    },
+
+    /** Kreator pierwszego uruchomienia: dane gabinetu i pierwsza osoba naraz. */
+    uruchomGabinet({ nazwa, telefon, adres, email, terapeuta, inicjaly, rola, godziny }) {
+      return zmien('Ustawiono gabinet', (s) => {
+        Object.assign(s.ustawienia, {
+          nazwa: nazwa.trim(),
+          telefon: telefon.trim(),
+          adres: adres.trim(),
+          email: (email || '').trim(),
+        });
+        s.zespol = [
+          {
+            id: 'z1',
+            imie: terapeuta.trim(),
+            inicjaly: inicjaly || inicjalyZImienia(terapeuta),
+            rola: (rola || 'Fizjoterapeuta').trim(),
+            kolor: '#1F5FD6',
+            linie: s.linie.map((l) => l.id),
+            godziny,
+            aktywny: true,
+          },
+        ];
+        s.uruchomiony = iso(new Date());
+        return s.ustawienia;
+      });
     },
 
     eksport() {

@@ -3475,3 +3475,131 @@ svg path {
     flex: none;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Pierwsze uruchomienie
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.start {
+  max-width: 700px;
+  padding: 8px 0;
+}
+
+.start__kicker {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.start__h {
+  margin: 0 0 14px;
+  font-family: var(--f-display);
+  font-size: clamp(1.7rem, 4vw, 2.4rem);
+  font-weight: 900;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+}
+
+.start__lead {
+  max-width: 54ch;
+  margin: 0 0 30px;
+  color: var(--muted);
+  font-size: 1.02rem;
+  line-height: 1.6;
+}
+
+.start__kroki {
+  display: grid;
+  gap: 2px;
+  margin: 0 0 28px;
+}
+
+.start__krok {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 16px;
+  padding: 18px 20px;
+  border-radius: var(--r-sm);
+  background: var(--paper);
+}
+
+.start__num {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--floor-2);
+  color: var(--muted);
+  font-family: var(--f-display);
+  font-weight: 800;
+}
+
+.start__krok.is-ok .start__num {
+  background: var(--ok);
+  color: #fff;
+}
+
+.start__krok.is-ok .start__num::after {
+  content: '✓';
+  font-size: 0.95rem;
+}
+
+.start__krok.is-ok .start__num {
+  font-size: 0;
+}
+
+.start__krok h3 {
+  margin: 4px 0 4px;
+  font-family: var(--f-display);
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.start__krok p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.start__stan {
+  margin-top: 8px !important;
+  color: var(--ink) !important;
+  font-size: 0.85rem !important;
+  font-weight: 700;
+}
+
+.start__krok:not(.is-ok) .start__stan {
+  color: var(--faint) !important;
+  font-weight: 400;
+}
+
+.start__akcje {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.start__stopka {
+  margin: 26px 0 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--hair);
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.link-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
