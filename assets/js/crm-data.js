@@ -127,6 +127,113 @@
     { tydzien: 0, strona: 46, telefon: 15 },
   ];
 
+  /* Epizod terapii — serce systemu. Wizyta jest tylko zdarzeniem w epizodzie.
+     ból: odczyty z ankiety SMS po wizycie (0–10), d = ile dni temu.
+     compliance: ile procent zadanych ćwiczeń pacjent odhaczył w ostatnich 14 dniach.
+     odstepDni: co ile dni powinna odbywać się wizyta wg planu terapeuty. */
+  const terapie = {
+    p1: {
+      diagnoza: 'Rwa kulszowa, odcinek L5-S1',
+      cel: 'Przespać noc bez bólu i wrócić na basen',
+      odstepDni: 7,
+      compliance: 82,
+      lekarz: null,
+      bol: [{ d: -34, v: 7 }, { d: -27, v: 6 }, { d: -20, v: 5 }, { d: -6, v: 3 }],
+    },
+    p2: {
+      diagnoza: 'Skręcenie stawu skokowego III stopnia',
+      cel: 'Przebiec 5 km bez obrzęku',
+      odstepDni: 5,
+      compliance: 61,
+      lekarz: 'dr Marek Zieliński, ortopeda',
+      bol: [{ d: -12, v: 6 }, { d: -8, v: 5 }, { d: -3, v: 4 }],
+    },
+    p3: {
+      diagnoza: 'Ból obręczy biodrowej, 32. tydzień ciąży',
+      cel: 'Przygotowanie do porodu bez bólu miednicy',
+      odstepDni: 7,
+      compliance: null,
+      lekarz: 'dr Ewa Dąbrowska, ginekolog',
+      bol: [],
+    },
+    p4: {
+      diagnoza: 'Stan po rekonstrukcji ACL, 11. tydzień',
+      cel: 'Pełne zgięcie kolana i powrót do treningu',
+      odstepDni: 4,
+      compliance: 91,
+      lekarz: 'dr Piotr Kowal, ortopeda',
+      bol: [{ d: -58, v: 8 }, { d: -45, v: 6 }, { d: -30, v: 5 }, { d: -14, v: 3 }, { d: -4, v: 2 }],
+    },
+    p5: {
+      diagnoza: 'Wada postawy, skolioza niskostopniowa',
+      cel: 'Utrzymać korekcję przez cały dzień w szkole',
+      odstepDni: 7,
+      compliance: 35,
+      lekarz: null,
+      bol: [{ d: -21, v: 3 }, { d: -14, v: 3 }, { d: -7, v: 3 }],
+    },
+    p6: { diagnoza: 'Ból szyi przy pracy biurowej — zgłoszenie', cel: null, odstepDni: 7, compliance: null, lekarz: null, bol: [] },
+    p7: { diagnoza: 'Stan po złamaniu nadgarstka — zgłoszenie', cel: null, odstepDni: 5, compliance: null, lekarz: 'dr Anna Lis, ortopeda', bol: [] },
+    p8: {
+      diagnoza: 'Kolano biegacza, zespół pasma biodrowo-piszczelowego',
+      cel: 'Powrót do biegania 10 km',
+      odstepDni: 7,
+      compliance: 88,
+      lekarz: null,
+      bol: [{ d: -76, v: 7 }, { d: -60, v: 5 }, { d: -40, v: 3 }, { d: -20, v: 2 }, { d: -14, v: 1 }],
+    },
+    p9: {
+      diagnoza: 'Nawracający ból lędźwiowy',
+      cel: 'Wrócić do pracy w ogrodzie bez blokady',
+      odstepDni: 7,
+      compliance: 55,
+      lekarz: null,
+      bol: [{ d: -5, v: 6 }],
+    },
+    p10: {
+      diagnoza: 'Stan po endoprotezie biodra',
+      cel: 'Chodzić 3 km bez kuli i wejść na piętro',
+      odstepDni: 5,
+      compliance: 76,
+      lekarz: 'dr Piotr Kowal, ortopeda',
+      bol: [{ d: -63, v: 7 }, { d: -48, v: 6 }, { d: -30, v: 4 }, { d: -12, v: 3 }, { d: -2, v: 2 }],
+    },
+    p11: {
+      diagnoza: 'Rozejście mięśnia prostego brzucha po porodzie',
+      cel: 'Wrócić do biegania i ćwiczeń siłowych',
+      odstepDni: 10,
+      compliance: 80,
+      lekarz: null,
+      bol: [{ d: -90, v: 5 }, { d: -70, v: 4 }, { d: -50, v: 2 }, { d: -30, v: 1 }],
+    },
+    p12: {
+      diagnoza: 'Zespół ciasnoty podbarkowej',
+      cel: 'Wycisnąć sztangę nad głowę bez bólu',
+      odstepDni: 7,
+      compliance: null,
+      lekarz: null,
+      bol: [{ d: -2, v: 5 }],
+    },
+    p13: {
+      diagnoza: 'Asymetria ułożeniowa niemowlęcia',
+      cel: 'Symetryczne obracanie się na oba boki',
+      odstepDni: 7,
+      compliance: 28,
+      lekarz: 'dr Joanna Bąk, pediatra',
+      bol: [],
+    },
+    p14: {
+      diagnoza: 'Dyskopatia L4-L5',
+      cel: 'Przesiedzieć 8 godzin w pracy bez drętwienia',
+      odstepDni: 7,
+      compliance: 20,
+      lekarz: null,
+      bol: [{ d: -40, v: 6 }, { d: -31, v: 6 }, { d: -24, v: 6 }],
+    },
+  };
+
+  pacjenci.forEach((p) => (p.terapia = terapie[p.id]));
+
   window.CRM = {
     dzis,
     dzien,
@@ -135,6 +242,7 @@
     gabinety,
     zrodla,
     pacjenci,
+    terapie,
     wizytyDzis,
     tydzien,
     zadania,

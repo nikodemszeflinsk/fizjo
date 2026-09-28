@@ -28,6 +28,7 @@
 
   const ICON = {
     pulpit: '<path d="M3.5 10.5 10 4l6.5 6.5M5.5 9v7.5h9V9"/>',
+    terapie: '<path d="M2.5 11.5h3l2-5 3 9 2.5-6 1.5 2h3"/>',
     kalendarz: '<path d="M4 5.5h12v11H4ZM4 8.5h12M7.5 3.5v3M12.5 3.5v3"/>',
     pacjenci: '<path d="M7.5 9.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM2.5 17c0-2.8 2.2-5 5-5s5 2.2 5 5M13 4.7a3 3 0 0 1 0 5.6M14.5 12.6c1.8.6 3 2.3 3 4.4"/>',
     skrzynka: '<path d="M3.5 5.5h13v9h-13ZM3.5 6l6.5 5 6.5-5"/>',
@@ -78,6 +79,7 @@
   /* ── Nawigacja ─────────────────────────────────────────────────────── */
   const WIDOKI = [
     { id: 'pulpit', nazwa: 'Pulpit' },
+    { id: 'terapie', nazwa: 'Terapie' },
     { id: 'kalendarz', nazwa: 'Kalendarz' },
     { id: 'pacjenci', nazwa: 'Pacjenci' },
     { id: 'skrzynka', nazwa: 'Skrzynka' },
@@ -102,7 +104,13 @@
     const w = WIDOKI.find((x) => x.id === id);
     $('#view-title').textContent = w.nazwa;
     $('#view-date').textContent =
-      id === 'kalendarz' ? 'Bieżący tydzień' : id === 'pacjenci' ? `${D.pacjenci.length} osób w kartotece` : dlugaData(D.dzis);
+      id === 'kalendarz'
+        ? 'Bieżący tydzień'
+        : id === 'pacjenci'
+          ? `${D.pacjenci.length} osób w kartotece`
+          : id === 'terapie'
+            ? `${aktywne().length} terapii w toku`
+            : dlugaData(D.dzis);
     $('.app').classList.remove('is-open');
     $('#menu').setAttribute('aria-expanded', 'false');
     $('#widok').scrollTo({ top: 0 });
@@ -111,32 +119,33 @@
   /* ── Pulpit: kafle ─────────────────────────────────────────────────── */
   function renderTiles() {
     const doPotwierdzenia = D.wizytyDzis.filter((w) => w.status === 'niepotwierdzona').length;
-    const noweZapytania = stanSkrzynki.filter((w) => w.nowa).length;
-    const online30 = D.rezerwacjeTygodnie.slice(-4).reduce((s, t) => s + t.strona, 0);
-    const [przedostatni, ostatni] = D.rezerwacjeTygodnie.slice(-2);
-    const wzrost = Math.round(((ostatni.strona - przedostatni.strona) / przedostatni.strona) * 100);
+    const wToku = aktywne().length;
+    const ryzykowne = zagrozone().length;
+    const poprawy = D.pacjenci.map(poprawa).filter((x) => x !== null && x > 0);
+    const srednia = poprawy.length ? (poprawy.reduce((s, x) => s + x, 0) / poprawy.length).toFixed(1) : '—';
     const przychod = D.pacjenci.reduce((s, p) => s + p.wartosc, 0);
 
-    const kafel = (label, value, foot, ink) => `
-      <article class="tile${ink ? ' tile--ink' : ''}">
+    const kafel = (label, value, foot, klasa = '') => `
+      <article class="tile${klasa}">
         <p class="tile__label">${label}</p>
         <p class="tile__value">${value}</p>
         <p class="tile__foot">${foot}</p>
       </article>`;
 
     $('#tiles').innerHTML = [
-      kafel('Wizyty dzisiaj', D.wizytyDzis.length, doPotwierdzenia ? `${doPotwierdzenia} czeka na potwierdzenie` : 'wszystkie potwierdzone'),
-      kafel('Nowe zapytania', noweZapytania, 'ostatnie dziś o 22:41'),
+      kafel('Terapie w toku', wToku, `${D.wizytyDzis.length} wizyt dzisiaj${doPotwierdzenia ? `, ${doPotwierdzenia} bez potwierdzenia` : ''}`),
       kafel(
-        'Rezerwacje online (30 dni)',
-        online30,
-        `<span class="trend trend--up">${ikona('up')}+${wzrost}%</span> tydzień do tygodnia`
+        'Wypadają z cyklu',
+        ryzykowne,
+        ryzykowne ? 'zadzwoń dziś, zanim przepadną' : 'wszystko pod kontrolą',
+        ryzykowne ? ' tile--alert' : ''
       ),
+      kafel('Średni spadek bólu', srednia === '—' ? '—' : `${srednia} pkt`, 'w skali 0–10, z ankiet po wizycie'),
       kafel(
         'Wartość terapii w toku',
         zl(przychod),
         `<span class="trend trend--up">${ikona('up')}+14%</span> wobec zeszłego miesiąca`,
-        true
+        ' tile--ink'
       ),
     ].join('');
   }
@@ -451,10 +460,42 @@
         </div>
       </div>
 
+      ${
+        p.terapia && p.terapia.cel
+          ? `<div class="pat__epizod">
+              <p class="pat__diag">${esc(p.terapia.diagnoza)}</p>
+              <p class="pat__cel">Cel terapii: <strong>${esc(p.terapia.cel)}</strong></p>
+              <div class="pat__bars">
+                <div>
+                  <p class="pat__bar-label">Plan wizyt <b>${p.wizyt} z ${p.plan || '—'}</b></p>
+                  <span class="progress__track"><span class="progress__fill" style="--c:${l.kolor};width:${postep(p)}%"></span></span>
+                </div>
+                <div>
+                  <p class="pat__bar-label">Ćwiczenia domowe <b>${typeof p.terapia.compliance === 'number' ? `${p.terapia.compliance}%` : '—'}</b></p>
+                  <span class="progress__track"><span class="progress__fill" style="--c:${l.kolor};width:${p.terapia.compliance || 0}%"></span></span>
+                </div>
+              </div>
+              <div class="pat__bol" style="--c:${l.kolor}">
+                ${krzywaBolu(p, 200, 46)}
+                <p>${
+                  poprawa(p) === null
+                    ? 'Brak pomiarów bólu — wyślij ankietę po najbliższej wizycie.'
+                    : `Ból ${p.terapia.bol[0].v} → ${p.terapia.bol[p.terapia.bol.length - 1].v} w skali 0–10`
+                }</p>
+              </div>
+              ${
+                ryzyko(p).powody.length
+                  ? `<p class="pat__risk">${ryzyko(p).powody.map((x) => `<span class="why why--${x.typ}">${esc(x.tekst)}</span>`).join('')}</p>`
+                  : ''
+              }
+            </div>`
+          : ''
+      }
+
       <dl class="pat__facts">
         <div><dt>Terapeuta</dt><dd>${esc(ZESPOL[p.terapeuta].imie)}</dd></div>
         <div><dt>Gabinet</dt><dd>${esc(GABINETY[p.gabinet].nazwa)}</dd></div>
-        <div><dt>Postęp terapii</dt><dd>${p.wizyt} / ${p.plan || '—'}</dd></div>
+        <div><dt>Skierował</dt><dd>${esc(p.terapia?.lekarz || 'bez skierowania')}</dd></div>
         <div><dt>Wartość</dt><dd>${p.wartosc ? zl(p.wartosc) : '—'}</dd></div>
       </dl>
 
@@ -519,6 +560,180 @@
       : '<li class="search__empty">Brak pacjenta o takiej nazwie lub numerze.</li>';
   }
 
+
+  /* ── Epizod terapii: postęp, wynik, ryzyko przerwania ───────────────── */
+  const W_TERAPII = ['nowy', 'terapia', 'ryzyko'];
+  const aktywne = () => D.pacjenci.filter((p) => W_TERAPII.includes(p.etap));
+
+  const dniOdWizyty = (p) => (p.ostatnia === null || p.ostatnia === undefined ? null : Math.abs(p.ostatnia));
+  const postep = (p) => (p.plan ? Math.min(Math.round((p.wizyt / p.plan) * 100), 100) : 0);
+
+  /* Poprawa bólu: pierwszy pomiar minus ostatni. Dodatnia liczba to spadek bólu. */
+  function poprawa(p) {
+    const b = p.terapia?.bol || [];
+    if (b.length < 2) return null;
+    return b[0].v - b[b.length - 1].v;
+  }
+
+  /* Ryzyko liczone z reguł, nie z czarnej skrzynki — każdy powód da się wytłumaczyć pacjentowi. */
+  function ryzyko(p) {
+    if (!W_TERAPII.includes(p.etap)) return { punkty: 0, powody: [], poziom: null, akcja: null };
+    const t = p.terapia || {};
+    const odstep = t.odstepDni || 7;
+    const dni = dniOdWizyty(p);
+    const powody = [];
+    let punkty = 0;
+
+    if (p.nastepna === null || p.nastepna === undefined) {
+      punkty += dni !== null && dni > odstep ? 2 : 1;
+      powody.push({ tekst: 'brak kolejnego terminu', typ: 'termin' });
+    }
+    if (dni !== null && dni > odstep * 2) {
+      punkty += 2;
+      powody.push({ tekst: `${dni} dni bez wizyty (plan: co ${odstep})`, typ: 'termin' });
+    } else if (dni !== null && dni > odstep * 1.4) {
+      punkty += 1;
+      powody.push({ tekst: `${dni} dni bez wizyty`, typ: 'termin' });
+    }
+    if (typeof t.compliance === 'number' && t.compliance < 40) {
+      punkty += 1;
+      powody.push({ tekst: `ćwiczenia domowe ${t.compliance}%`, typ: 'cwiczenia' });
+    }
+    const zmiana = poprawa(p);
+    if (zmiana !== null && zmiana < 1 && p.wizyt >= 3) {
+      punkty += 2;
+      powody.push({ tekst: `ból bez poprawy po ${p.wizyt} wizytach`, typ: 'bol' });
+    }
+    if (p.plan && p.wizyt / p.plan < 0.5 && dni !== null && dni > 14) {
+      punkty += 1;
+      powody.push({ tekst: `zrobione ${p.wizyt} z ${p.plan} wizyt`, typ: 'plan' });
+    }
+
+    const poziom = punkty >= 3 ? 'wysokie' : punkty >= 1.5 ? 'srednie' : null;
+    let akcja = null;
+    if (powody.some((r) => r.typ === 'termin')) akcja = { tekst: 'Zadzwoń i umów termin', typ: 'termin' };
+    else if (powody.some((r) => r.typ === 'bol')) akcja = { tekst: 'Zweryfikuj plan z terapeutą', typ: 'bol' };
+    else if (powody.some((r) => r.typ === 'cwiczenia')) akcja = { tekst: 'Zapytaj o ćwiczenia domowe', typ: 'cwiczenia' };
+    return { punkty, powody, poziom, akcja };
+  }
+
+  const zagrozone = () =>
+    aktywne()
+      .map((p) => ({ p, r: ryzyko(p) }))
+      .filter((x) => x.r.poziom)
+      .sort((a, b) => b.r.punkty - a.r.punkty);
+
+  /* Krzywa bólu: im niżej, tym lepiej. Rysowana bez biblioteki. */
+  function krzywaBolu(p, w = 132, h = 36) {
+    const b = p.terapia?.bol || [];
+    if (b.length < 2) return '<span class="spark spark--empty">brak pomiarów</span>';
+    const dni = b.map((x) => x.d);
+    const minD = Math.min(...dni);
+    const maxD = Math.max(...dni);
+    const rozpietosc = maxD - minD || 1;
+    const punkty = b
+      .map((x) => {
+        const px = ((x.d - minD) / rozpietosc) * (w - 4) + 2;
+        const py = h - 2 - (x.v / 10) * (h - 6);
+        return `${px.toFixed(1)},${py.toFixed(1)}`;
+      })
+      .join(' ');
+    const ost = b[b.length - 1];
+    const [lx, ly] = punkty.split(' ').pop().split(',');
+    return `<svg class="spark" style="width:${w}px;height:${h}px" viewBox="0 0 ${w} ${h}" role="img" aria-label="Ból od ${b[0].v} do ${ost.v} w skali 0–10">
+      <polyline points="${punkty}" />
+      <circle cx="${lx}" cy="${ly}" r="3" />
+    </svg>`;
+  }
+
+  function renderRadar() {
+    const wszystkie = zagrozone();
+    const lista = wszystkie.slice(0, 5);
+    const box = $('#radar');
+    $('#radar-title').dataset.ile = wszystkie.length ? `${wszystkie.length} pilne` : 'czysto';
+    if (!lista.length) {
+      box.innerHTML = '<li class="radar__empty">Żadna terapia nie wypada z cyklu. Dobra robota.</li>';
+      return;
+    }
+    box.innerHTML = lista
+      .map(({ p, r }) => {
+        const l = LINIE[p.linia];
+        const dni = dniOdWizyty(p);
+        return `<li class="radar__row radar__row--${r.poziom}">
+          <span class="radar__mark" style="--c:${l.kolor};--on:${l.naKolorze}">${inicjaly(p.imie)}</span>
+          <div class="radar__body">
+            <p class="radar__name">${esc(p.imie)}
+              <span class="radar__meta">${esc(p.terapia?.diagnoza || l.nazwa)} · ${p.wizyt} z ${p.plan || '—'} wizyt${dni !== null ? ` · ostatnia ${dni} dni temu` : ''}</span>
+            </p>
+            <p class="radar__why">${r.powody.map((x) => `<span class="why why--${x.typ}">${esc(x.tekst)}</span>`).join('')}</p>
+          </div>
+          <div class="radar__act">
+            <button class="btn btn--sm btn--accent" type="button" data-call="${esc(p.telefon)}">${r.akcja ? esc(r.akcja.tekst) : 'Zadzwoń'}</button>
+            <button class="btn btn--sm btn--ghost" type="button" data-patient="${p.id}">Karta</button>
+          </div>
+        </li>`;
+      })
+      .join('');
+  }
+
+  /* Tablica terapii: cztery kolumny, od zgłoszenia do wypisu. */
+  function renderBoard() {
+    const kolumny = [
+      { id: 'zagrozone', nazwa: 'Wypadają z cyklu', opis: 'wymagają telefonu dziś' },
+      { id: 'toku', nazwa: 'Idą zgodnie z planem', opis: 'mają termin i robią ćwiczenia' },
+      { id: 'koncowka', nazwa: 'Końcówka cyklu', opis: 'czas na wynik i opinię' },
+      { id: 'zamkniete', nazwa: 'Zakończone', opis: 'kontrola za 6 tygodni' },
+    ];
+    const przydziel = (p) => {
+      if (p.etap === 'zakonczona') return 'zamkniete';
+      if (ryzyko(p).poziom) return 'zagrozone';
+      if (p.plan && p.wizyt / p.plan >= 0.75) return 'koncowka';
+      return 'toku';
+    };
+    const kubelki = Object.fromEntries(kolumny.map((k) => [k.id, []]));
+    D.pacjenci.filter((p) => p.etap !== 'zapytanie').forEach((p) => kubelki[przydziel(p)].push(p));
+
+    $('#board').innerHTML = kolumny
+      .map((k) => {
+        const karty = kubelki[k.id]
+          .map((p) => {
+            const l = LINIE[p.linia];
+            const r = ryzyko(p);
+            const zmiana = poprawa(p);
+            const t = p.terapia || {};
+            return `<article class="epizod${r.poziom ? ` epizod--${r.poziom}` : ''}" tabindex="0" data-patient="${p.id}" style="--c:${l.kolor};--on:${l.naKolorze}">
+              <p class="epizod__who"><span class="dot" style="--c:${l.kolor}"></span>${esc(p.imie)}</p>
+              <p class="epizod__diag">${esc(t.diagnoza || l.nazwa)}</p>
+              ${t.cel ? `<p class="epizod__cel">Cel: ${esc(t.cel)}</p>` : ''}
+              <div class="epizod__progress">
+                <span class="progress__track"><span class="progress__fill" style="--c:${l.kolor};width:${postep(p)}%"></span></span>
+                <b>${p.wizyt}/${p.plan || '—'}</b>
+              </div>
+              <div class="epizod__foot">
+                ${zmiana === null ? '' : krzywaBolu(p, 84, 26)}
+                <span class="epizod__wynik">${
+                  zmiana === null
+                    ? 'brak pomiarów bólu'
+                    : zmiana > 0
+                      ? `ból ${t.bol[0].v} → ${t.bol[t.bol.length - 1].v}`
+                      : `bez poprawy: ${t.bol[t.bol.length - 1].v}/10`
+                }</span>
+              </div>
+              ${r.powody.length ? `<p class="epizod__why">${esc(r.powody[0].tekst)}</p>` : ''}
+            </article>`;
+          })
+          .join('');
+        return `<section class="board__col" aria-labelledby="col-${k.id}">
+          <header class="board__head">
+            <h2 id="col-${k.id}">${k.nazwa} <span>${kubelki[k.id].length}</span></h2>
+            <p>${k.opis}</p>
+          </header>
+          <div class="board__cards">${karty || '<p class="board__empty">Pusto.</p>'}</div>
+        </section>`;
+      })
+      .join('');
+  }
+
   /* ── Zdarzenia ─────────────────────────────────────────────────────── */
   function podlacz() {
     document.addEventListener('click', (e) => {
@@ -568,6 +783,14 @@
       if (e.key === 'Escape') {
         if (!$('#drawer').hidden) zamknijPacjenta();
         $('#search-out').hidden = true;
+      }
+    });
+
+    $('#board').addEventListener('keydown', (e) => {
+      const karta = e.target.closest('.epizod');
+      if (karta && (e.key === 'Enter' || e.key === ' ')) {
+        e.preventDefault();
+        otworzPacjenta(karta.dataset.patient);
       }
     });
 
@@ -624,6 +847,8 @@
 
   /* ── Start ─────────────────────────────────────────────────────────── */
   renderRail();
+  renderRadar();
+  renderBoard();
   renderTiles();
   renderChart();
   renderVisits();

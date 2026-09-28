@@ -80,6 +80,17 @@
     <!-- ── Widoki ──────────────────────────────────────────────────────── -->
     <main class="view" id="widok">
       <section class="panel" id="pulpit" aria-labelledby="view-title">
+        <article class="card card--radar" aria-labelledby="radar-title">
+          <header class="card__head card__head--row">
+            <div>
+              <h2 id="radar-title" data-ile="0">Radar terapii</h2>
+              <p class="card__note">Pacjenci, którzy wypadają z cyklu. Jedna uratowana terapia to kilka wizyt.</p>
+            </div>
+            <button class="btn btn--sm" type="button" data-view="terapie">Wszystkie terapie</button>
+          </header>
+          <ul class="radar" id="radar"></ul>
+        </article>
+
         <div class="tiles" id="tiles"></div>
 
         <div class="grid grid--dash">
@@ -127,6 +138,13 @@
             <ul class="sources" id="sources"></ul>
           </article>
         </div>
+      </section>
+
+      <section class="panel" id="terapie" hidden>
+        <div class="table__bar">
+          <p class="cal__hint">Epizod terapii to droga pacjenta od zgłoszenia do wypisu: cel, plan wizyt, ból i ćwiczenia domowe. Wizyta jest tylko zdarzeniem w środku.</p>
+        </div>
+        <div class="board" id="board"></div>
       </section>
 
       <section class="panel" id="kalendarz" hidden>
