@@ -988,7 +988,7 @@
           <button class="btn btn--color btn--lg" type="button" data-kw-umow="${u.id}">Umów ten termin</button>
           <button class="back" type="button" data-kw-reset>Zacznij od nowa</button>
         </div>
-        <p class="kw__uwaga">To podpowiedź, nie diagnoza. Na wizycie sprawdzam, czy kierunek jest właściwy — jeśli nie, mówię to wprost.</p>
+        <p class="kw__uwaga">To podpowiedź, nie diagnoza. Na wizycie sprawdzamy, czy kierunek jest właściwy — jeśli nie, mówimy to wprost.</p>
       </div>`;
       return;
     }
