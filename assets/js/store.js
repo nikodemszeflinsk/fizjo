@@ -102,18 +102,19 @@
 
   function bibliotekaCwiczen() {
     /* Biblioteka ćwiczeń — terapeuta wybiera z niej albo dopisuje własne.
-       Przy wdrożeniu do każdego ćwiczenia podpina się nagranie z gabinetu. */
+       `powtorzenia` i `razy` to domyślne wartości podstawiane przy układaniu
+       planu; `material` to odnośnik do nagrania z gabinetu, jeśli już jest. */
     const cwiczeniaBiblioteka = [
-      { id: 'c-koci', nazwa: 'Koci grzbiet', opis: 'W klęku podpartym zaokrąglaj i prostuj plecy, powoli, bez bólu.' },
-      { id: 'c-mostek', nazwa: 'Mostek biodrowy', opis: 'Leżąc na plecach unieś biodra, zatrzymaj na 3 sekundy, opuść.' },
-      { id: 'c-ptak', nazwa: 'Ptak-pies', opis: 'W klęku podpartym wyprostuj przeciwną rękę i nogę, utrzymaj 5 sekund.' },
-      { id: 'c-rotacja', nazwa: 'Rotacja odcinka piersiowego', opis: 'Siedząc, obróć tułów w bok i zatrzymaj oddech na 2 sekundy.' },
-      { id: 'c-lopatki', nazwa: 'Ściąganie łopatek', opis: 'Siedząc prosto, ściągnij łopatki do siebie i w dół, przytrzymaj 5 sekund.' },
-      { id: 'c-kark', nazwa: 'Rozciąganie karku', opis: 'Delikatnie przyciągnij ucho do barku, wytrzymaj 20 sekund na stronę.' },
-      { id: 'c-nadgarstek', nazwa: 'Mobilizacja nadgarstka', opis: 'Zegnij i wyprostuj nadgarstek, potem krążenia w obie strony.' },
-      { id: 'c-przysiad', nazwa: 'Przysiad przy ścianie', opis: 'Plecy na ścianie, zejdź do kąta prostego i wytrzymaj.' },
-      { id: 'c-lydka', nazwa: 'Wspięcia na palce', opis: 'Stojąc, unieś się na palce i powoli opuść. Trzymaj się oparcia.' },
-      { id: 'c-balans', nazwa: 'Stanie na jednej nodze', opis: 'Utrzymaj równowagę 30 sekund, potem z zamkniętymi oczami.' },
+      { id: 'c-koci', nazwa: 'Koci grzbiet', opis: 'W klęku podpartym zaokrąglaj i prostuj plecy, powoli, bez bólu.', powtorzenia: '10 powtórzeń', razy: 5, material: { url: 'https://linia-ruchu.pl/nagrania/koci-grzbiet', opis: 'Nagranie z gabinetu, 40 sekund' } },
+      { id: 'c-mostek', nazwa: 'Mostek biodrowy', opis: 'Leżąc na plecach unieś biodra, zatrzymaj na 3 sekundy, opuść.', powtorzenia: '3 serie po 10', razy: 5, material: null },
+      { id: 'c-ptak', nazwa: 'Ptak-pies', opis: 'W klęku podpartym wyprostuj przeciwną rękę i nogę, utrzymaj 5 sekund.', powtorzenia: '8 na stronę', razy: 4, material: null },
+      { id: 'c-rotacja', nazwa: 'Rotacja odcinka piersiowego', opis: 'Siedząc, obróć tułów w bok i zatrzymaj oddech na 2 sekundy.', powtorzenia: '10 na stronę', razy: 5, material: null },
+      { id: 'c-lopatki', nazwa: 'Ściąganie łopatek', opis: 'Siedząc prosto, ściągnij łopatki do siebie i w dół, przytrzymaj 5 sekund.', powtorzenia: '12 powtórzeń', razy: 5, material: null },
+      { id: 'c-kark', nazwa: 'Rozciąganie karku', opis: 'Delikatnie przyciągnij ucho do barku, wytrzymaj 20 sekund na stronę.', powtorzenia: '20 sekund na stronę', razy: 6, material: null },
+      { id: 'c-nadgarstek', nazwa: 'Mobilizacja nadgarstka', opis: 'Zegnij i wyprostuj nadgarstek, potem krążenia w obie strony.', powtorzenia: '15 powtórzeń', razy: 5, material: null },
+      { id: 'c-przysiad', nazwa: 'Przysiad przy ścianie', opis: 'Plecy na ścianie, zejdź do kąta prostego i wytrzymaj.', powtorzenia: '3 serie po 30 sekund', razy: 4, material: null },
+      { id: 'c-lydka', nazwa: 'Wspięcia na palce', opis: 'Stojąc, unieś się na palce i powoli opuść. Trzymaj się oparcia.', powtorzenia: '3 serie po 15', razy: 5, material: null },
+      { id: 'c-balans', nazwa: 'Stanie na jednej nodze', opis: 'Utrzymaj równowagę 30 sekund, potem z zamkniętymi oczami.', powtorzenia: '30 sekund na nogę', razy: 5, material: null },
     ];
     return cwiczeniaBiblioteka;
   }
@@ -419,6 +420,14 @@
           dane.wiadomosciWlasne = dane.wiadomosciWlasne || [];
           dane.terminyWiadomosci = dane.terminyWiadomosci || {};
           dane.wyslaneWiadomosci = dane.wyslaneWiadomosci || [];
+          /* Biblioteka ćwiczeń dostała domyślne wartości i miejsce na materiał. */
+          const wzorce = Object.fromEntries(bibliotekaCwiczen().map((c) => [c.id, c]));
+          (dane.cwiczeniaBiblioteka || []).forEach((c) => {
+            const w = wzorce[c.id];
+            if (c.powtorzenia === undefined) c.powtorzenia = w ? w.powtorzenia : '10 powtórzeń';
+            if (c.razy === undefined) c.razy = w ? w.razy : 5;
+            if (c.material === undefined) c.material = w ? w.material : null;
+          });
           /* Pytanie o ćwiczenia raz w tygodniu stało się przypomnieniem w dni
              ćwiczeń — stary „dzień" zostaje pierwszym dniem nowej listy. */
           const naDni = (u) => {
@@ -511,6 +520,23 @@
   const usluga = (uid) => stan.uslugi.find((u) => u.id === uid);
   const linia = (lid) => stan.linie.find((l) => l.id === lid);
   const cwiczenie = (cid) => stan.cwiczeniaBiblioteka.find((c) => c.id === cid);
+
+  /** Ćwiczenia do wyboru przy układaniu planu — bez wycofanych z użycia. */
+  const cwiczeniaDoWyboru = () => stan.cwiczeniaBiblioteka.filter((c) => !c.wycofane);
+
+  /**
+   * Gdzie to ćwiczenie jest używane. Bez tego nie da się bezpiecznie usuwać:
+   * pozycja wypisana z biblioteki nadal siedzi w planach i w odhaczeniach,
+   * a pacjent z zamkniętego cyklu ma ją na wypisie.
+   */
+  function uzycieCwiczenia(cid) {
+    const terapie = stan.terapie.filter((t) => t.cwiczenia.some((x) => x.cwiczenieId === cid));
+    return {
+      terapie: terapie.length,
+      aktywne: terapie.filter((t) => t.status === 'aktywna').length,
+      odhaczenia: stan.odhaczenia.filter((o) => o.cwiczenieId === cid).length,
+    };
+  }
 
   /* ── Rozpoznawanie osoby, która już tu jest ──────────────────────── */
   /* Pacjent wraca po roku i wpisuje numer bez spacji, a nazwisko przez „o”
@@ -1569,6 +1595,64 @@
       });
     },
 
+    /* ── Biblioteka ćwiczeń ──────────────────────────────────────────── */
+    dodajCwiczenieDoBiblioteki(dane) {
+      return zmien('Dodano ćwiczenie', (s) => {
+        const c = {
+          id: id('cw'),
+          nazwa: String(dane.nazwa || '').trim(),
+          opis: String(dane.opis || '').trim(),
+          powtorzenia: String(dane.powtorzenia || '').trim() || '10 powtórzeń',
+          razy: Number(dane.razy) || 5,
+          material: dane.material && dane.material.url ? { url: dane.material.url.trim(), opis: (dane.material.opis || '').trim() } : null,
+          wlasne: true,
+        };
+        s.cwiczeniaBiblioteka.push(c);
+        return c;
+      });
+    },
+
+    zmienCwiczenieWBibliotece(cid, dane) {
+      return zmien('Zapisano ćwiczenie', (s) => {
+        const c = s.cwiczeniaBiblioteka.find((x) => x.id === cid);
+        if (!c) return null;
+        c.nazwa = String(dane.nazwa || c.nazwa).trim();
+        c.opis = String(dane.opis || '').trim();
+        c.powtorzenia = String(dane.powtorzenia || '').trim() || c.powtorzenia;
+        c.razy = Number(dane.razy) || c.razy;
+        c.material = dane.material && dane.material.url ? { url: dane.material.url.trim(), opis: (dane.material.opis || '').trim() } : null;
+        return c;
+      });
+    },
+
+    /**
+     * Ćwiczenie używane w planach zostaje w danych, tylko znika z listy wyboru —
+     * inaczej zniknęłoby też z kart pacjentów i z wypisów sprzed lat.
+     * Nieużywane kasujemy naprawdę.
+     */
+    usunCwiczenieZBiblioteki(cid) {
+      const uzycie = uzycieCwiczenia(cid);
+      const wycofane = uzycie.terapie > 0 || uzycie.odhaczenia > 0;
+      zmien(wycofane ? 'Wycofano ćwiczenie z listy' : 'Usunięto ćwiczenie', (s) => {
+        if (wycofane) {
+          const c = s.cwiczeniaBiblioteka.find((x) => x.id === cid);
+          if (c) c.wycofane = true;
+          return c;
+        }
+        s.cwiczeniaBiblioteka = s.cwiczeniaBiblioteka.filter((x) => x.id !== cid);
+        return null;
+      });
+      return { wycofane, ...uzycie };
+    },
+
+    przywrocCwiczenie(cid) {
+      return zmien('Przywrócono ćwiczenie', (s) => {
+        const c = s.cwiczeniaBiblioteka.find((x) => x.id === cid);
+        if (c) delete c.wycofane;
+        return c;
+      });
+    },
+
     ustawCwiczenia(tid, cwiczenia) {
       return zmien('Zmieniono plan ćwiczeń', (s) => {
         const t = s.terapie.find((x) => x.id === tid);
@@ -1781,6 +1865,8 @@
     usluga,
     linia,
     cwiczenie,
+    cwiczeniaDoWyboru,
+    uzycieCwiczenia,
     terapiaPacjenta,
     podobniPacjenci,
     nowyPacjent,

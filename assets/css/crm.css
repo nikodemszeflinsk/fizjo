@@ -4650,3 +4650,234 @@ tr.is-cicho td:first-child {
 .prosta__pilne {
   color: var(--warn);
 }
+
+/* ── Biblioteka ćwiczeń ───────────────────────────────────────────────── */
+/* Lista, z której układa się plany. Widać tu wszystko, co zobaczy pacjent,
+   i to, gdzie ćwiczenie już siedzi — bo od tego zależy, czy wolno je usunąć. */
+.cwb {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cwb__poz {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px 18px;
+  align-items: start;
+  padding: 14px 16px;
+  border-radius: var(--r-sm);
+  background: var(--floor);
+}
+
+.cwb__poz.is-off {
+  background: transparent;
+  border: 1px dashed var(--hair-2);
+}
+
+.cwb__poz.is-off .cwb__tresc strong {
+  color: var(--muted);
+}
+
+.cwb__tresc {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.cwb__tresc strong {
+  font-size: 1rem;
+}
+
+.cwb__znak {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--floor-2);
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  vertical-align: 2px;
+}
+
+.cwb__opis {
+  color: var(--ink-2);
+  font-size: 0.9rem;
+  font-style: normal;
+  line-height: 1.45;
+}
+
+.cwb__opis--brak {
+  color: var(--warn);
+}
+
+.cwb__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.cwb__material {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.cwb__material:hover {
+  text-decoration: underline;
+}
+
+.cwb__material svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.cwb__material--brak {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.cwb__akcje {
+  display: flex;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+@media (max-width: 620px) {
+  .cwb__poz {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ── Podgląd ćwiczenia w kreatorze ────────────────────────────────────── */
+/* To, co terapeuta wpisuje, pacjent czyta dosłownie — więc pokazujemy mu to
+   w tej samej formie, zanim zapisze. */
+.cw-podglad {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) 96px;
+  gap: 12px;
+  align-items: start;
+  margin-top: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sm);
+  background: #fff;
+}
+
+.cw-podglad__box {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--hair-2);
+  border-radius: 6px;
+}
+
+.cw-podglad__tresc {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.cw-podglad__tresc strong {
+  font-size: 1rem;
+}
+
+.cw-podglad__tresc em {
+  color: var(--accent);
+  font-size: 0.86rem;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.cw-podglad__opis {
+  margin-top: 3px;
+  color: var(--ink-2);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.cw-podglad__material {
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  padding: 12px 8px;
+  border: 1px dashed var(--hair-2);
+  border-radius: 9px;
+  background: var(--floor);
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.cw-podglad__material--jest {
+  border-style: solid;
+  border-color: var(--accent);
+  background: rgba(31, 95, 214, 0.08);
+  color: var(--accent);
+  text-transform: none;
+}
+
+.cw-podglad__material svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+/* ── Dopisanie ćwiczenia bez wychodzenia z planu ──────────────────────── */
+.cw-dopisz {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--hair);
+}
+
+.cw-dopisz__pola {
+  margin-top: 12px;
+  padding: 14px 16px;
+  border-radius: var(--r-sm);
+  background: var(--floor);
+}
+
+.cw-dopisz__akcje {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.wybor__material {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 3px;
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.wybor__material svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}

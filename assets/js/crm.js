@@ -59,6 +59,7 @@
     ankiety: '<path d="M4 16.5V9M10 16.5V4.5M16 16.5v-5M2.5 16.5h15"/>',
     druk: '<path d="M6 8V3.5h8V8M5 8h10v6h-2v3H7v-3H5Z"/>',
     blokada: '<path d="M6.5 9V6.5a3.5 3.5 0 0 1 7 0V9M4.5 9h11v7.5h-11Z"/>',
+    film: '<path d="M2.5 5.5h15v9h-15ZM8.5 8l4 2.5-4 2.5Z"/>',
   };
   const ikona = (n) => `<svg viewBox="0 0 20 20" aria-hidden="true">${ICON[n]}</svg>`;
 
@@ -1211,6 +1212,37 @@
   }
 
   /* ── Widok: Ustawienia ─────────────────────────────────────────────── */
+  /** Jedno ćwiczenie w bibliotece: co mówi pacjentowi i gdzie już siedzi. */
+  function cwiczenieWiersz(c) {
+    const u = P.uzycieCwiczenia(c.id);
+    const gdzie = u.terapie
+      ? `${u.terapie} ${u.terapie === 1 ? 'plan' : 'planów'}${u.aktywne ? `, w tym ${u.aktywne} w toku` : ''}`
+      : 'w żadnym planie';
+    return `<li class="cwb__poz${c.wycofane ? ' is-off' : ''}">
+      <span class="cwb__tresc">
+        <strong>${esc(c.nazwa)}${c.wycofane ? '<span class="cwb__znak">wycofane</span>' : ''}</strong>
+        ${c.opis ? `<em class="cwb__opis">${esc(c.opis)}</em>` : '<em class="cwb__opis cwb__opis--brak">bez opisu dla pacjenta</em>'}
+        <span class="cwb__meta">
+          <span>${esc(c.powtorzenia || '')}${c.razy ? ` · ${c.razy}× w tygodniu` : ''}</span>
+          <span>${gdzie}</span>
+          ${
+            c.material && c.material.url
+              ? `<a class="cwb__material" href="${esc(c.material.url)}" target="_blank" rel="noopener">${ikona('film')}${esc(c.material.opis || 'nagranie')}</a>`
+              : '<span class="cwb__material cwb__material--brak">bez nagrania</span>'
+          }
+        </span>
+      </span>
+      <span class="cwb__akcje">
+        <button class="btn btn--sm" type="button" data-akcja="edytuj-cwiczenie" data-cw-id="${c.id}">Edytuj</button>
+        ${
+          c.wycofane
+            ? `<button class="btn btn--sm btn--ghost" type="button" data-akcja="przywroc-cwiczenie" data-cw-id="${c.id}">Przywróć</button>`
+            : `<button class="btn btn--sm btn--ghost" type="button" data-akcja="usun-cwiczenie" data-cw-id="${c.id}">Usuń</button>`
+        }
+      </span>
+    </li>`;
+  }
+
   function renderUstawienia() {
     const u = S().ustawienia;
     $('#view-date').textContent = 'Gabinet i dane prototypu';
@@ -1280,6 +1312,23 @@
         <article class="card">
           <header class="card__head"><h2>Godziny otwarcia</h2><p class="card__note">Suma grafików zespołu</p></header>
           <table class="mini"><tbody>${godziny}</tbody></table>
+        </article>
+
+        <article class="card card--szeroka">
+          <header class="card__head card__head--row">
+            <div>
+              <h2>Ćwiczenia</h2>
+              <p class="card__note">Z tej listy układasz plan pacjentowi. Opis i nagranie trafiają prosto do jego karty.</p>
+            </div>
+            <button class="btn btn--sm btn--accent" type="button" data-akcja="nowe-cwiczenie">${ikona('plus')}Dodaj ćwiczenie</button>
+          </header>
+          <ul class="cwb">${
+            S().cwiczeniaBiblioteka.length
+              ? S()
+                  .cwiczeniaBiblioteka.map(cwiczenieWiersz)
+                  .join('')
+              : '<li class="pusto">Biblioteka jest pusta. Dodaj pierwsze ćwiczenie.</li>'
+          }</ul>
         </article>
 
         <article class="card">
@@ -1979,27 +2028,161 @@
     );
   }
 
+  /**
+   * Kreator ćwiczenia. To, co tu wpiszesz, pacjent zobaczy dosłownie w swojej
+   * karcie — dlatego pod polami stoi podgląd dokładnie w tej formie.
+   */
+  function formCwiczenieBiblioteka(cid = null) {
+    const c = cid ? P.cwiczenie(cid) : null;
+    const u = cid ? P.uzycieCwiczenia(cid) : null;
+    modal(
+      c ? `Ćwiczenie: ${c.nazwa}` : 'Nowe ćwiczenie',
+      `${
+        u && u.terapie
+          ? `<p class="modal__info">To ćwiczenie jest w ${u.terapie} ${u.terapie === 1 ? 'planie' : 'planach'}${
+              u.aktywne ? `, w tym ${u.aktywne} w toku` : ''
+            }. Zmiana opisu albo nagrania wejdzie od razu do kart tych pacjentów.</p>`
+          : ''
+      }
+      <div class="form-grid">
+        ${pole('cw-nazwa', 'Nazwa', 'text', c ? c.nazwa : '', 'placeholder="np. Koci grzbiet"')}
+        <div class="field field--full">
+          <label for="cw-opis">Jak je wykonać <em>(tekst dla pacjenta)</em></label>
+          <textarea id="cw-opis" rows="2" placeholder="W klęku podpartym zaokrąglaj i prostuj plecy, powoli, bez bólu.">${esc(c ? c.opis || '' : '')}</textarea>
+        </div>
+        ${pole('cw-pow', 'Domyślne powtórzenia', 'text', c ? c.powtorzenia || '' : '10 powtórzeń', 'placeholder="10 powtórzeń"')}
+        ${pole('cw-razy', 'Domyślnie razy w tygodniu', 'number', String(c ? c.razy || 5 : 5), 'min="1" max="7"')}
+      </div>
+
+      <p class="modal__label">Materiał</p>
+      <div class="form-grid">
+        ${pole('cw-material', 'Odnośnik do nagrania', 'url', c && c.material ? c.material.url : '', 'placeholder="https://…"')}
+        ${pole('cw-material-opis', 'Podpis pod nagraniem', 'text', c && c.material ? c.material.opis || '' : '', 'placeholder="np. Nagranie z gabinetu, 40 sekund"')}
+      </div>
+      <p class="modal__info">Wklej odnośnik do filmu — z YouTube, z dysku albo z Waszej strony. Bez niego pacjent zobaczy w tym miejscu ramkę z napisem „nagranie gabinetu”.</p>
+
+      <p class="modal__label">Tak zobaczy to pacjent</p>
+      <div class="cw-podglad" id="cw-podglad"></div>
+      <p class="modal__err" id="cw-err" hidden></p>`,
+      `<button class="btn btn--ghost" type="button" data-close>Anuluj</button>
+       <button class="btn btn--accent" type="button" data-zapisz="cwiczenie-biblioteka" ${cid ? `data-cw-id="${cid}"` : ''}>${
+         c ? 'Zapisz zmiany' : 'Dodaj do biblioteki'
+       }</button>`
+    );
+    podgladCwiczenia();
+  }
+
+  /** Podgląd pozycji tak, jak wygląda w karcie pacjenta. */
+  function podgladCwiczenia() {
+    const out = $('#cw-podglad');
+    if (!out) return;
+    const nazwa = $('#cw-nazwa').value.trim() || 'Nazwa ćwiczenia';
+    const opis = $('#cw-opis').value.trim();
+    const pow = $('#cw-pow').value.trim() || '10 powtórzeń';
+    const razy = Number($('#cw-razy').value) || 5;
+    const material = $('#cw-material').value.trim();
+    const podpis = $('#cw-material-opis').value.trim();
+    out.innerHTML = `
+      <span class="cw-podglad__box" aria-hidden="true"></span>
+      <span class="cw-podglad__tresc">
+        <strong>${esc(nazwa)}</strong>
+        <em>${esc(pow)} · ${razy}× w tygodniu</em>
+        ${opis ? `<span class="cw-podglad__opis">${esc(opis)}</span>` : ''}
+      </span>
+      <span class="cw-podglad__material${material ? ' cw-podglad__material--jest' : ''}">
+        ${material ? `${ikona('film')}${esc(podpis || 'obejrzyj nagranie')}` : 'nagranie<br />gabinetu'}
+      </span>`;
+  }
+
+  function zapiszCwiczenieBiblioteka(cid) {
+    const nazwa = $('#cw-nazwa').value.trim();
+    if (nazwa.length < 3) return bladModalu('cw-err', 'Podaj nazwę ćwiczenia.');
+    const url = $('#cw-material').value.trim();
+    if (url && !/^https?:\/\//i.test(url)) return bladModalu('cw-err', 'Odnośnik musi zaczynać się od http:// albo https://');
+    const dane = {
+      nazwa,
+      opis: $('#cw-opis').value.trim(),
+      powtorzenia: $('#cw-pow').value.trim(),
+      razy: Number($('#cw-razy').value),
+      material: url ? { url, opis: $('#cw-material-opis').value.trim() } : null,
+    };
+    if (cid) P.akcje.zmienCwiczenieWBibliotece(cid, dane);
+    else P.akcje.dodajCwiczenieDoBiblioteki(dane);
+    schowajModal();
+    toast(cid ? `Zapisano: ${nazwa}` : `Dodano ćwiczenie: ${nazwa}`, true);
+  }
+
+  function usunCwiczenieZPytaniem(cid) {
+    const c = P.cwiczenie(cid);
+    const u = P.uzycieCwiczenia(cid);
+    if (!u.terapie && !u.odhaczenia) {
+      P.akcje.usunCwiczenieZBiblioteki(cid);
+      return toast(`Usunięto: ${c.nazwa}`, true);
+    }
+    modal(
+      `Usunąć „${c.nazwa}”?`,
+      `<p class="modal__info">
+        To ćwiczenie jest w ${u.terapie} ${u.terapie === 1 ? 'planie' : 'planach'}${
+          u.aktywne ? `, w tym ${u.aktywne} w toku` : ''
+        }, i ma ${u.odhaczenia} ${u.odhaczenia === 1 ? 'odhaczenie' : 'odhaczeń'} od pacjentów.
+      </p>
+      <p class="modal__info">
+        Dlatego nie kasujemy go z danych — zniknąłby z kart pacjentów i z wypisów.
+        Wycofujemy go z listy, z której układasz nowe plany. Tam, gdzie już jest, zostaje.
+      </p>`,
+      `<button class="btn btn--ghost" type="button" data-close>Zostaw</button>
+       <button class="btn btn--accent" type="button" data-zapisz="wycofaj-cwiczenie" data-cw-id="${cid}">Wycofaj z listy</button>`
+    );
+  }
+
+  /** Jedna pozycja na liście wyboru ćwiczeń, z wartościami z biblioteki. */
+  function wyborCwiczenia(c, w) {
+    return `<li>
+      <label class="wybor__check"><input type="checkbox" data-cw="${c.id}" ${w ? 'checked' : ''} /><span>
+        <strong>${esc(c.nazwa)}${c.wycofane ? '<span class="cwb__znak">wycofane</span>' : ''}</strong>
+        <em>${esc(c.opis || 'bez opisu')}</em>
+        ${c.material && c.material.url ? `<span class="wybor__material">${ikona('film')}${esc(c.material.opis || 'nagranie')}</span>` : ''}
+      </span></label>
+      <span class="wybor__ile">
+        <input type="text" data-cw-pow="${c.id}" value="${esc(w ? w.powtorzenia : c.powtorzenia || '10 powtórzeń')}" aria-label="Powtórzenia: ${esc(c.nazwa)}" />
+        <input type="number" data-cw-razy="${c.id}" value="${w ? w.razyWTygodniu : c.razy || 5}" min="1" max="7" aria-label="Razy w tygodniu: ${esc(c.nazwa)}" />
+        <span>×/tydz.</span>
+      </span>
+    </li>`;
+  }
+
   function formCwiczenia(tid) {
     const t = P.terapia(tid);
     const wybrane = Object.fromEntries(t.cwiczenia.map((c) => [c.cwiczenieId, c]));
+    /* Wycofane ćwiczenia znikają z listy, chyba że ten pacjent już je ma —
+       wtedy trzeba je widać, żeby dało się je świadomie zdjąć. */
+    const lista = S().cwiczeniaBiblioteka.filter((c) => !c.wycofane || wybrane[c.id]);
     modal(
       'Ćwiczenia domowe',
-      `<p class="modal__info">Zaznacz ćwiczenia i ustaw, ile razy w tygodniu pacjent ma je robić. Zobaczy je w swojej karcie pod linkiem i tam je odhaczy.</p>
-      <ul class="wybor">
-        ${S()
-          .cwiczeniaBiblioteka.map((c) => {
-            const w = wybrane[c.id];
-            return `<li>
-              <label class="wybor__check"><input type="checkbox" data-cw="${c.id}" ${w ? 'checked' : ''} /><span><strong>${esc(c.nazwa)}</strong><em>${esc(c.opis || '')}</em></span></label>
-              <span class="wybor__ile">
-                <input type="text" data-cw-pow="${c.id}" value="${esc(w ? w.powtorzenia : '10 powtórzeń')}" aria-label="Powtórzenia: ${esc(c.nazwa)}" />
-                <input type="number" data-cw-razy="${c.id}" value="${w ? w.razyWTygodniu : 5}" min="1" max="7" aria-label="Razy w tygodniu: ${esc(c.nazwa)}" />
-                <span>×/tydz.</span>
-              </span>
-            </li>`;
-          })
-          .join('')}
-      </ul>`,
+      `<p class="modal__info">Zaznacz ćwiczenia i ustaw, ile razy w tygodniu pacjent ma je robić. Zobaczy je w swojej karcie pod linkiem i tam je odhaczy — razem z opisem i nagraniem z biblioteki.</p>
+      <ul class="wybor" id="cw-lista">
+        ${lista.map((c) => wyborCwiczenia(c, wybrane[c.id])).join('')}
+      </ul>
+
+      <div class="cw-dopisz">
+        <button class="link-btn" type="button" data-akcja="cw-dopisz">${ikona('plus')}Dopisz własne ćwiczenie</button>
+        <div class="cw-dopisz__pola" id="cw-dopisz-pola" hidden>
+          <div class="form-grid">
+            ${pole('cwd-nazwa', 'Nazwa', 'text', '', 'placeholder="np. Rozciąganie pasma IT"')}
+            ${pole('cwd-pow', 'Powtórzenia', 'text', '10 powtórzeń')}
+          </div>
+          <div class="field field--full">
+            <label for="cwd-opis">Jak je wykonać <em>(tekst dla pacjenta)</em></label>
+            <textarea id="cwd-opis" rows="2"></textarea>
+          </div>
+          <div class="cw-dopisz__akcje">
+            <button class="btn btn--sm btn--accent" type="button" data-akcja="cw-dopisz-zapisz">Dodaj do planu i do biblioteki</button>
+            <button class="link-btn" type="button" data-akcja="cw-dopisz-anuluj">Rezygnuję</button>
+          </div>
+          <p class="modal__info">Trafi też do biblioteki, więc następnym razem będzie już na liście. Nagranie dorzucisz później w Ustawieniach.</p>
+        </div>
+      </div>
+      <p class="modal__err" id="cwp-err" hidden></p>`,
       `<button class="btn btn--ghost" type="button" data-close>Anuluj</button>
        <button class="btn btn--accent" type="button" data-zapisz="cwiczenia" data-terapia="${tid}">Zapisz plan</button>`
     );
@@ -2790,6 +2973,44 @@
         return formNowyPacjent(d.imie || '');
       case 'nowa-terapia':
         return formNowaTerapia(d.pacjentId);
+      case 'nowe-cwiczenie':
+        return formCwiczenieBiblioteka();
+      case 'cw-dopisz':
+        $('#cw-dopisz-pola').hidden = false;
+        e.target.closest('.cw-dopisz').querySelector('.link-btn').hidden = true;
+        $('#cwd-nazwa').focus();
+        return;
+      case 'cw-dopisz-anuluj':
+        $('#cw-dopisz-pola').hidden = true;
+        $('.cw-dopisz > .link-btn').hidden = false;
+        return;
+      case 'cw-dopisz-zapisz': {
+        const nazwa = $('#cwd-nazwa').value.trim();
+        if (nazwa.length < 3) return bladModalu('cwp-err', 'Podaj nazwę ćwiczenia.');
+        const nowe = P.akcje.dodajCwiczenieDoBiblioteki({
+          nazwa,
+          opis: $('#cwd-opis').value.trim(),
+          powtorzenia: $('#cwd-pow').value.trim(),
+          razy: 5,
+        });
+        /* Dopisujemy wiersz zamiast przerysowywać okno — zaznaczenia zostają. */
+        $('#cw-lista').insertAdjacentHTML('beforeend', wyborCwiczenia(nowe, { powtorzenia: nowe.powtorzenia, razyWTygodniu: nowe.razy }));
+        $('#cw-dopisz-pola').hidden = true;
+        $('.cw-dopisz > .link-btn').hidden = false;
+        $('#cwd-nazwa').value = '';
+        $('#cwd-opis').value = '';
+        $('#cwp-err').hidden = true;
+        return toast(`Dodano ćwiczenie: ${nazwa}`);
+      }
+      case 'edytuj-cwiczenie':
+        return formCwiczenieBiblioteka(d.cwId);
+      case 'usun-cwiczenie':
+        return usunCwiczenieZPytaniem(d.cwId);
+      case 'przywroc-cwiczenie': {
+        const c = P.cwiczenie(d.cwId);
+        P.akcje.przywrocCwiczenie(d.cwId);
+        return toast(`Przywrócono: ${c.nazwa}`, true);
+      }
       case 'edytuj-terapie':
         return formEdytujTerapie(d.terapia);
       case 'cwiczenia':
@@ -2944,6 +3165,14 @@
     switch (d.zapisz) {
       case 'pacjent':
         return zapiszNowegoPacjenta();
+      case 'cwiczenie-biblioteka':
+        return zapiszCwiczenieBiblioteka(d.cwId || null);
+      case 'wycofaj-cwiczenie': {
+        const c = P.cwiczenie(d.cwId);
+        P.akcje.usunCwiczenieZBiblioteki(d.cwId);
+        schowajModal();
+        return toast(`Wycofano z listy: ${c.nazwa}`, true);
+      }
       case 'terapia':
         return zapiszNowaTerapie(d.pacjentId);
       case 'edycja-terapii':
@@ -3078,6 +3307,7 @@
 
   document.addEventListener('input', (e) => {
     if (e.target.id === 'rw-szablon') podgladSzablonu();
+    if (['cw-nazwa', 'cw-opis', 'cw-pow', 'cw-razy', 'cw-material', 'cw-material-opis'].includes(e.target.id)) podgladCwiczenia();
     /* Podpowiedź o dublecie odnawia się przy pisaniu, a nie dopiero przy zapisie —
        lepiej zobaczyć „ten numer już tu jest" przed wypełnieniem reszty. */
     if (['np-imie', 'np-tel', 'np-mail'].includes(e.target.id)) {

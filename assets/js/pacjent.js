@@ -24,11 +24,23 @@
   /* ── Miejsce na materiał ćwiczenia ─────────────────────────────────── */
   /* W demie stoi tu ramka zastępcza. Przy wdrożeniu wchodzi w nią nagranie
      albo zdjęcie z gabinetu — to, co terapeuta pokazuje pacjentowi na wizycie. */
-  const miejsceNaMaterial = () => `
-    <span class="cw__material" aria-hidden="true">
+  /**
+   * Materiał do ćwiczenia. Gdy gabinet podpiął nagranie, pokazujemy odnośnik;
+   * gdy jeszcze nie — ramkę z zapowiedzią, żeby było wiadomo, co się tu pojawi.
+   */
+  const miejsceNaMaterial = (def) => {
+    const m = def && def.material;
+    if (m && m.url) {
+      return `<span class="cw__material cw__material--jest">
+        <svg viewBox="0 0 64 48" aria-hidden="true"><rect x="1" y="1" width="62" height="46" rx="7" /><path d="M26 17.5v13l11.5-6.5Z" /></svg>
+        <span>${esc(m.opis || 'obejrzyj nagranie')}</span>
+      </span>`;
+    }
+    return `<span class="cw__material" aria-hidden="true">
       <svg viewBox="0 0 64 48"><rect x="1" y="1" width="62" height="46" rx="7" /><path d="M26 17.5v13l11.5-6.5Z" /></svg>
       <span>nagranie<br />gabinetu</span>
     </span>`;
+  };
 
   /* ── Komunikat ─────────────────────────────────────────────────────── */
   let toastT;
@@ -280,8 +292,12 @@
             ${t.cwiczenia
               .map((c) => {
                 const def = P.cwiczenie(c.cwiczenieId);
+                const m = def && def.material && def.material.url ? def.material : null;
                 return `<tr>
-                  <td><strong>${esc(def ? def.nazwa : c.cwiczenieId)}</strong><em>${esc(def ? def.opis : '')}</em></td>
+                  <td><strong>${esc(def ? def.nazwa : c.cwiczenieId)}</strong><em>${esc(def ? def.opis : '')}</em>${
+                    /* Na papierze nie da się kliknąć — drukujemy adres nagrania. */
+                    m ? `<em class="druk__link">Nagranie: ${esc(m.url.replace(/^https?:\/\//, ''))}</em>` : ''
+                  }</td>
                   <td>${esc(c.powtorzenia)}<em>${c.razyWTygodniu}× w tygodniu</em></td>
                   ${dni.map(() => '<td class="druk__kratka"></td>').join('')}
                 </tr>`;
@@ -385,6 +401,7 @@
                   const zrobione = P.stan.odhaczenia.some(
                     (o) => o.terapiaId === t.id && o.cwiczenieId === c.cwiczenieId && o.data === dzisIso
                   );
+                  const m = def && def.material && def.material.url ? def.material : null;
                   return `<li>
                     <button class="cw__btn" type="button" data-cw="${c.cwiczenieId}" aria-pressed="${zrobione}">
                       <span class="cw__box" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 10.5 8.5 14 15 6.5" /></svg></span>
@@ -393,8 +410,16 @@
                         <em>${esc(c.powtorzenia)} · ${c.razyWTygodniu}× w tygodniu</em>
                         ${def && def.opis ? `<span class="cw__opis">${esc(def.opis)}</span>` : ''}
                       </span>
-                      ${miejsceNaMaterial()}
+                      ${m ? '' : miejsceNaMaterial(def)}
                     </button>
+                    ${
+                      m
+                        ? `<a class="cw__nagranie" href="${esc(m.url)}" target="_blank" rel="noopener">
+                            <svg viewBox="0 0 64 48" aria-hidden="true"><rect x="1" y="1" width="62" height="46" rx="7" /><path d="M26 17.5v13l11.5-6.5Z" /></svg>
+                            <span>${esc(m.opis || 'Obejrzyj nagranie')}</span>
+                          </a>`
+                        : ''
+                    }
                   </li>`;
                 })
                 .join('')}</ul>
