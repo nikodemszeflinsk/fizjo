@@ -3823,3 +3823,684 @@ svg path {
   font-weight: 700;
   white-space: nowrap;
 }
+
+/* ══ Oferta po rozmowie ═══════════════════════════════════════════════
+   Osobny dokument, nie podstrona serwisu: bez nawigacji, czytany raz,
+   od góry do dołu, najczęściej na telefonie zaraz po odłożeniu słuchawki. */
+.ofr-body {
+  background: var(--floor);
+}
+
+.ofr-pasek {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  flex-wrap: wrap;
+  padding: 12px clamp(20px, 5vw, 56px);
+  background: var(--ink);
+  color: #e9ecea;
+}
+
+.ofr-pasek__marka {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--f-display);
+  font-size: 1.02rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.ofr-pasek__co {
+  color: #aab1b6;
+  font-size: 0.86rem;
+}
+
+/* ── Otwarcie ───────────────────────────────────────────────────────── */
+.ofr-hero {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: clamp(40px, 7vw, 76px) clamp(20px, 5vw, 56px) clamp(36px, 5vw, 60px);
+}
+
+.ofr-hero__dla {
+  display: inline-block;
+  margin: 0 0 20px;
+  padding: 6px 15px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.ofr-hero__h1 {
+  max-width: 19ch;
+  margin: 0;
+  font-family: var(--f-display);
+  font-size: clamp(2.2rem, 6vw, 4.1rem);
+  font-weight: 900;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+
+.ofr-hero__lead {
+  max-width: 62ch;
+  margin: 26px 0 0;
+  color: var(--ink-2);
+  font-size: clamp(1.05rem, 2.1vw, 1.22rem);
+  line-height: 1.62;
+}
+
+.ofr-hero__lead--druga {
+  margin-top: 16px;
+}
+
+.ofr-hero__cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.ofr-hero__uwaga {
+  max-width: 62ch;
+  margin: 20px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+/* ── Wspólny blok ───────────────────────────────────────────────────── */
+.ofr-blok {
+  border-top: 1px solid var(--hair);
+  padding: clamp(46px, 6vw, 82px) 0;
+}
+
+.ofr-blok--paper {
+  border-top: 0;
+  background: var(--paper);
+}
+
+.ofr-blok--ink {
+  border-top: 0;
+  background: var(--ink);
+  color: #e9ecea;
+}
+
+.ofr-blok__in {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 5vw, 56px);
+}
+
+.ofr-blok__in--waski {
+  max-width: 860px;
+}
+
+.ofr-kicker {
+  margin: 0 0 12px;
+  color: var(--accent);
+  font-family: var(--f-display);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ofr-kicker--jasny {
+  color: #7fa8ee;
+}
+
+.ofr-h2 {
+  max-width: 24ch;
+  margin: 0;
+  font-family: var(--f-display);
+  font-size: clamp(1.7rem, 3.6vw, 2.7rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+
+.ofr-h2--duzy {
+  max-width: 20ch;
+  font-size: clamp(2rem, 4.6vw, 3.2rem);
+}
+
+.ofr-lead {
+  max-width: 64ch;
+  margin: 18px 0 0;
+  color: var(--ink-2);
+  font-size: 1.05rem;
+  line-height: 1.62;
+}
+
+.ofr-lead--jasny {
+  color: #cfd3d6;
+}
+
+.ofr-fine {
+  max-width: 76ch;
+  margin: 26px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.ofr-fine--jasny {
+  color: #aab1b6;
+}
+
+.ofr-fine a {
+  color: inherit;
+}
+
+/* ── Lista problemów ────────────────────────────────────────────────── */
+.ofr-lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 22px 28px;
+  margin: 34px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ofr-lista li {
+  padding-top: 16px;
+  border-top: 3px solid var(--ink);
+  color: var(--ink-2);
+  font-size: 0.97rem;
+  line-height: 1.6;
+}
+
+.ofr-lista strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--ink);
+  font-family: var(--f-display);
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+/* ── Zestawienie ────────────────────────────────────────────────────── */
+.ofr-vs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+  margin-top: 36px;
+}
+
+.ofr-vs__kol {
+  padding: clamp(20px, 3vw, 30px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--r-sign);
+}
+
+.ofr-vs__kol--my {
+  border-color: var(--accent);
+  background: rgba(31, 95, 214, 0.14);
+}
+
+.ofr-vs__kol h3 {
+  margin: 0 0 16px;
+  font-family: var(--f-display);
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+}
+
+.ofr-vs__kol ul {
+  display: grid;
+  gap: 11px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ofr-vs__kol li {
+  position: relative;
+  padding-left: 26px;
+  color: #cfd3d6;
+  font-size: 0.96rem;
+  line-height: 1.5;
+}
+
+.ofr-vs__kol li::before {
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 13px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.4);
+  content: '';
+}
+
+.ofr-vs__kol--my li::before {
+  top: 0.4em;
+  width: 13px;
+  height: 7px;
+  border-left: 2px solid #7fa8ee;
+  border-bottom: 2px solid #7fa8ee;
+  background: none;
+  rotate: -45deg;
+}
+
+/* ── Trzy kroki ─────────────────────────────────────────────────────── */
+.ofr-kroki {
+  display: grid;
+  gap: 26px;
+  margin: 36px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ofr-kroki li {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  gap: 0 20px;
+  align-items: start;
+}
+
+.ofr-kroki__num {
+  display: grid;
+  place-items: center;
+  grid-row: span 2;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+  font-family: var(--f-display);
+  font-size: 1.4rem;
+  font-weight: 900;
+}
+
+.ofr-kroki h3 {
+  margin: 12px 0 0;
+  font-family: var(--f-display);
+  font-size: clamp(1.15rem, 2.2vw, 1.45rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.ofr-kroki p {
+  max-width: 70ch;
+  margin: 8px 0 0;
+  grid-column: 2;
+  color: var(--ink-2);
+  font-size: 1rem;
+  line-height: 1.62;
+}
+
+@media (max-width: 620px) {
+  .ofr-kroki li {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ofr-kroki__num {
+    grid-row: auto;
+    width: 44px;
+    height: 44px;
+    font-size: 1.15rem;
+  }
+
+  .ofr-kroki p {
+    grid-column: 1;
+  }
+}
+
+/* ── Dwa podglądy ───────────────────────────────────────────────────── */
+.ofr-podglad {
+  display: grid;
+  grid-template-columns: minmax(180px, 250px) minmax(0, 1fr);
+  gap: 18px;
+  align-items: end;
+  margin-top: 40px;
+}
+
+.ofr-podglad__kadr {
+  display: block;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.ofr-podglad__kadr img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sign);
+  background: var(--paper);
+  transition: border-color 0.2s var(--ease-out), transform 0.2s var(--ease-out);
+}
+
+.ofr-podglad__kadr:hover img {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.ofr-podglad__kadr span {
+  display: block;
+  margin-top: 10px;
+  font-size: 0.88rem;
+}
+
+@media (max-width: 760px) {
+  .ofr-podglad {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ── Pilotaż ────────────────────────────────────────────────────────── */
+.ofr-pilot {
+  background: var(--ink);
+  color: #e9ecea;
+  padding: clamp(50px, 7vw, 96px) 0;
+}
+
+.ofr-ceny {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 18px;
+  margin-top: 38px;
+}
+
+.ofr-cena {
+  padding: clamp(22px, 3vw, 32px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--r-sign);
+}
+
+.ofr-cena--pilot {
+  border-color: var(--accent);
+  background: rgba(31, 95, 214, 0.16);
+}
+
+.ofr-cena__znak {
+  display: inline-block;
+  margin: 0 0 14px;
+  padding: 5px 13px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ofr-cena__znak--cichy {
+  background: rgba(255, 255, 255, 0.14);
+  color: #aab1b6;
+}
+
+.ofr-cena h3 {
+  margin: 0 0 14px;
+  font-family: var(--f-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.ofr-cena__kwota {
+  margin: 0;
+  font-family: var(--f-display);
+  font-size: clamp(1.7rem, 3.4vw, 2.2rem);
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+
+.ofr-cena__kwota span {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #aab1b6;
+  letter-spacing: 0;
+}
+
+.ofr-cena__kwota em {
+  display: block;
+  margin-top: 2px;
+  color: #aab1b6;
+  font-family: var(--f-body);
+  font-size: 0.88rem;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-decoration: line-through;
+}
+
+.ofr-cena__kwota--sub {
+  margin-top: 12px;
+  font-size: clamp(1.3rem, 2.4vw, 1.6rem);
+}
+
+.ofr-cena__lista {
+  display: grid;
+  gap: 9px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ofr-cena__lista li {
+  position: relative;
+  padding-left: 24px;
+  color: #cfd3d6;
+  font-size: 0.94rem;
+  line-height: 1.5;
+}
+
+.ofr-cena__lista li::before {
+  position: absolute;
+  left: 0;
+  top: 0.38em;
+  width: 12px;
+  height: 6px;
+  border-left: 2px solid #7fa8ee;
+  border-bottom: 2px solid #7fa8ee;
+  content: '';
+  rotate: -45deg;
+}
+
+.ofr-cena__stopka {
+  margin: 18px 0 0;
+  color: #aab1b6;
+  font-size: 0.86rem;
+}
+
+/* ── Co za co ───────────────────────────────────────────────────────── */
+.ofr-umowa {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px 36px;
+  margin-top: 40px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.ofr-umowa h3 {
+  margin: 0 0 14px;
+  font-family: var(--f-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+}
+
+.ofr-umowa ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ofr-umowa li {
+  position: relative;
+  padding-left: 22px;
+  color: #cfd3d6;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.ofr-umowa li::before {
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 11px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.45);
+  content: '';
+}
+
+/* ── Zakres ─────────────────────────────────────────────────────────── */
+.ofr-zakres {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 18px;
+  margin-top: 36px;
+}
+
+.ofr-zakres > article {
+  padding: clamp(20px, 3vw, 30px);
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sign);
+  background: var(--paper);
+}
+
+.ofr-zakres > article.ofr-zakres--main {
+  border-color: var(--accent);
+  background: #fff;
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.ofr-zakres h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 0 0 16px;
+  font-family: var(--f-display);
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.ofr-zakres__tag {
+  padding: 3px 11px;
+  border-radius: 999px;
+  background: var(--floor-2);
+  color: var(--muted);
+  font-family: var(--f-body);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ofr-zakres__tag--pilot {
+  background: var(--accent);
+  color: #fff;
+}
+
+.ofr-zakres ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ofr-zakres li {
+  position: relative;
+  padding-left: 24px;
+  color: var(--ink-2);
+  font-size: 0.96rem;
+  line-height: 1.55;
+}
+
+.ofr-zakres li::before {
+  position: absolute;
+  left: 0;
+  top: 0.38em;
+  width: 12px;
+  height: 6px;
+  border-left: 2px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
+  content: '';
+  rotate: -45deg;
+}
+
+.ofr-zakres__cena {
+  margin: 22px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--hair);
+  font-family: var(--f-display);
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.ofr-zakres__cena--pilot {
+  color: var(--accent);
+}
+
+/* ── Etapy wdrożenia ────────────────────────────────────────────────── */
+.ofr-etapy {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 22px 18px;
+  margin: 34px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ofr-etapy li {
+  padding-top: 14px;
+  border-top: 4px solid var(--ink);
+  color: var(--ink-2);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.ofr-etapy strong {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--ink);
+  font-family: var(--f-display);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+/* ── Zamknięcie ─────────────────────────────────────────────────────── */
+.ofr-koniec {
+  background: var(--ink);
+  color: #e9ecea;
+  padding: clamp(50px, 7vw, 96px) 0;
+}
+
+.ofr-koniec__kontakt {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.ofr-koniec .cta--line {
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #fff;
+}
+
+.ofr-koniec .cta--line:hover {
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.ofr-koniec :focus-visible,
+.ofr-pilot :focus-visible,
+.ofr-blok--ink :focus-visible {
+  outline-color: #fff;
+}

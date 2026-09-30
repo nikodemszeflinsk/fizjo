@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /fizjo/oferta-pilotaz.html
+Disallow: /oferta-pilotaz.html
