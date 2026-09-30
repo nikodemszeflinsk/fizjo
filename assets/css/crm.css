@@ -4362,3 +4362,290 @@ svg path {
   font-size: 0.82rem;
   font-variant-numeric: tabular-nums;
 }
+
+/* ── Zamknięty cykl w karcie ──────────────────────────────────────────── */
+.pat__epizod--zamkniety {
+  background: var(--floor);
+}
+
+.pat__zamkniety {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--floor-2);
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  vertical-align: 2px;
+  white-space: nowrap;
+}
+
+/* Ostrzeżenie o tym, co zniknie — czytane zanim ktoś kliknie, nie po. */
+.modal__ostrzezenie {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: var(--r-sm);
+  background: rgba(178, 106, 0, 0.12);
+  color: var(--ink-2);
+}
+
+/* ── Dni ćwiczeń ──────────────────────────────────────────────────────── */
+.dni-cw {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.dni-cw legend {
+  padding: 0;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.dni-cw__lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.dni-cw__dzien input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.dni-cw__dzien span {
+  display: grid;
+  place-items: center;
+  min-width: 46px;
+  padding: 9px 10px;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sm);
+  background: #fff;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.dni-cw__dzien input:checked + span {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+
+.dni-cw__dzien input:focus-visible + span {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.dni-cw__info {
+  margin: 9px 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.wiad-lista__reszta {
+  margin: 10px 0 20px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+/* ── Ankiety ──────────────────────────────────────────────────────────── */
+/* Ból i odhaczenia obok siebie, żeby dało się przejechać wzrokiem po liście
+   i zobaczyć, kto naprawdę pracuje między wizytami. */
+.bol-kol {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 9px;
+}
+
+.iskra {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 30px;
+}
+
+.iskra i {
+  display: block;
+  width: 7px;
+  min-height: 3px;
+  border-radius: 2px 2px 0 0;
+  background: var(--accent);
+}
+
+.iskra i:last-child {
+  background: var(--ink);
+}
+
+.iskra__teraz {
+  font-size: 1.02rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.iskra__teraz span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 400;
+}
+
+.tyg {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 30px;
+}
+
+.tyg i {
+  display: flex;
+  align-items: flex-end;
+  width: 15px;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--floor-2);
+}
+
+.tyg i b {
+  display: block;
+  width: 100%;
+  min-height: 2px;
+  border-radius: 3px;
+  background: var(--accent);
+}
+
+.trend--stoi {
+  color: var(--warn);
+}
+
+.ank__akcje {
+  white-space: nowrap;
+}
+
+.ank__akcje .btn {
+  margin-left: 6px;
+}
+
+/* Kto nie odesłał niczego — widać to zanim się przeczyta wiersz. */
+tr.is-cicho td:first-child {
+  box-shadow: inset 3px 0 0 var(--warn);
+}
+
+.card__note--stopka {
+  margin: 0;
+  padding: 14px 18px 18px;
+}
+
+.trend--pierwszy {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.chips--kolejka {
+  margin: 0 0 16px;
+}
+
+/* ── Ten pacjent już tu jest ──────────────────────────────────────────── */
+.dubel {
+  margin: 14px 0 0;
+  padding: 14px 16px;
+  border: 1px solid rgba(178, 106, 0, 0.35);
+  border-radius: var(--r-sm);
+  background: rgba(178, 106, 0, 0.08);
+}
+
+.dubel__h {
+  margin: 0 0 10px;
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.dubel__lista {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dubel__lista li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--r-sm);
+  background: #fff;
+}
+
+.dubel__kto {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.dubel__kto strong {
+  font-size: 0.95rem;
+}
+
+.dubel__kto em {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-style: normal;
+}
+
+.dubel__powod {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--floor-2);
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.dubel__powod--pewny {
+  background: rgba(178, 106, 0, 0.16);
+  color: var(--warn);
+}
+
+.dubel__stopka {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 620px) {
+  .dubel__lista li {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Pierwszorazowy pacjent — warto wiedzieć, zanim wejdzie do gabinetu. */
+.znak-nowy {
+  display: inline-block;
+  margin-left: 7px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: 2px;
+}
+
+.prosta__pilne {
+  color: var(--warn);
+}

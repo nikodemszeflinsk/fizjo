@@ -56,6 +56,7 @@
     link: '<path d="M8.5 11.5a3 3 0 0 0 4.2 0l2.3-2.3a3 3 0 1 0-4.2-4.2l-.9.9M11.5 8.5a3 3 0 0 0-4.2 0L5 10.8a3 3 0 1 0 4.2 4.2l.9-.9"/>',
     wiadomosci: '<path d="M3.5 4.5h13v9h-8l-4 3v-3h-1Z"/>',
     miesiac: '<path d="M3.5 16.5v-6M8 16.5V6M12.5 16.5v-9M17 16.5V3.5"/>',
+    ankiety: '<path d="M4 16.5V9M10 16.5V4.5M16 16.5v-5M2.5 16.5h15"/>',
     druk: '<path d="M6 8V3.5h8V8M5 8h10v6h-2v3H7v-3H5Z"/>',
     blokada: '<path d="M6.5 9V6.5a3.5 3.5 0 0 1 7 0V9M4.5 9h11v7.5h-11Z"/>',
   };
@@ -70,6 +71,13 @@
     clearTimeout(toastT);
     toastT = setTimeout(() => $('#toast').classList.remove('is-on'), cofalne ? 6000 : 3600);
   }
+
+  /* <input type="time"> przyjmuje tylko HH:MM, a reguły trzymamy po ludzku
+     („9:00"). Bez dopełnienia zera pole otwierało się puste. */
+  const naZegar = (g) => {
+    const [h, m] = String(g || '').split(':');
+    return h ? `${String(h).padStart(2, '0')}:${(m || '00').padStart(2, '0')}` : '';
+  };
 
   /* ── Okno dialogowe ────────────────────────────────────────────────── */
   function modal(tytul, tresc, stopka = '') {
@@ -91,6 +99,7 @@
     { id: 'dzis', nazwa: 'Dziś' },
     { id: 'kalendarz', nazwa: 'Kalendarz' },
     { id: 'pacjenci', nazwa: 'Pacjenci' },
+    { id: 'ankiety', nazwa: 'Ankiety' },
     { id: 'wiadomosci', nazwa: 'Wiadomości' },
     { id: 'miesiac', nazwa: 'Miesiąc' },
     { id: 'ustawienia', nazwa: 'Ustawienia' },
@@ -98,6 +107,7 @@
   let widok = 'dzis';
   let tydzienPrzesuniecie = 0;
   let filtrPacjentow = 'wszyscy';
+  let filtrWiadomosci = 'wszystkie';
   let filtrZespolu = null; // null = cały zespół
 
   /* Pasek zespołu pokazuje się tylko wtedy, gdy jest z czego wybierać. */
@@ -178,6 +188,23 @@
   const bezTerminu = () =>
     S().pacjenci.filter((p) => !S().wizyty.some((w) => w.pacjentId === p.id && w.status !== 'odwolana'));
 
+  /**
+   * Pacjenci, którzy jeszcze u Was nie byli — ci bez żadnego terminu i ci,
+   * którzy właśnie zarezerwowali sami przez stronę. Jedni wymagają telefonu,
+   * drudzy tylko tego, żeby o nich wiedzieć przed ich pierwszym wejściem.
+   */
+  const nowiPacjenci = () =>
+    S()
+      .pacjenci.filter((p) => P.nowyPacjent(p.id))
+      .map((p) => ({
+        p,
+        wizyta: S()
+          .wizyty.filter((w) => w.pacjentId === p.id && w.status !== 'odwolana' && w.data >= P.iso(P.dzis))
+          .sort((a, b) => (a.data + a.godzina).localeCompare(b.data + b.godzina))[0],
+      }))
+      .filter(({ p, wizyta }) => !filtrZespolu || !wizyta || wizyta.terapeutaId === filtrZespolu || !P.terapiaPacjenta(p.id))
+      .sort((a, b) => String(b.p.utworzony).localeCompare(String(a.p.utworzony)));
+
   function przychodMiesiaca() {
     const teraz = P.dzis;
     const prefiks = `${teraz.getFullYear()}-${String(teraz.getMonth() + 1).padStart(2, '0')}`;
@@ -210,7 +237,7 @@
     $('#view-date').textContent = dlugaData(P.dzis);
     const wizyty = wizytyDnia(dzisIso);
     const pilni = zagrozone().filter(({ t }) => !filtrZespolu || t.terapeutaId === filtrZespolu);
-    const nowi = bezTerminu();
+    const nowi = nowiPacjenci();
     const wolne = P.wolneGodziny(dzisIso, null, null, filtrZespolu).length;
 
     const kafel = (label, value, foot, klasa = '') =>
@@ -307,20 +334,32 @@
 
         <article class="card">
           <header class="card__head">
-            <h2>Nowi bez wizyty</h2>
-            <p class="card__note">W kartotece, ale jeszcze bez żadnego terminu</p>
+            <h2>Nowi pacjenci</h2>
+            <p class="card__note">Jeszcze u Was nie byli — ani razu</p>
           </header>
           ${
             nowi.length
               ? `<ul class="prosta">${nowi
                   .map(
-                    (p) => `<li>
-                      <button class="prosta__kto" type="button" data-pacjent="${p.id}">${esc(p.imie)}<em>${esc(p.telefon)} · dodany ${wzgledna(p.utworzony)}</em></button>
-                      <button class="btn btn--sm btn--accent" type="button" data-akcja="umow" data-pacjent-id="${p.id}">Umów</button>
+                    ({ p, wizyta }) => `<li>
+                      <button class="prosta__kto" type="button" data-pacjent="${p.id}">
+                        ${esc(p.imie)}<span class="znak-nowy">nowy</span>
+                        <em>${esc(p.telefon)} · ${ZRODLA[p.zrodlo] || 'inne'} · ${wzgledna(p.utworzony)}</em>
+                        <em>${
+                          wizyta
+                            ? `pierwsza wizyta ${wzgledna(wizyta.data)}, ${wizyta.godzina}`
+                            : '<b class="prosta__pilne">bez terminu</b>'
+                        }</em>
+                      </button>
+                      ${
+                        wizyta
+                          ? `<button class="btn btn--sm" type="button" data-akcja="w-kalendarzu" data-data="${wizyta.data}">W kalendarzu</button>`
+                          : `<button class="btn btn--sm btn--accent" type="button" data-akcja="umow" data-pacjent-id="${p.id}">Umów</button>`
+                      }
                     </li>`
                   )
                   .join('')}</ul>`
-              : '<p class="pusto">Wszyscy pacjenci mają umówioną wizytę.</p>'
+              : '<p class="pusto">Każdy w kartotece był już na wizycie.</p>'
           }
         </article>
 
@@ -479,7 +518,7 @@
         <td>
           <span class="who">
             <span class="who__mark" style="--c:${l ? l.kolor : '#535A61'};--on:${l ? l.naKolorze : '#fff'}">${inicjaly(p.imie)}</span>
-            <span><span class="who__name">${esc(p.imie)}</span><span class="who__sub">${esc(p.telefon)} · ${ZRODLA[p.zrodlo] || 'inne'}</span></span>
+            <span><span class="who__name">${esc(p.imie)}${P.nowyPacjent(p.id) ? '<span class="znak-nowy">nowy</span>' : ''}</span><span class="who__sub">${esc(p.telefon)} · ${ZRODLA[p.zrodlo] || 'inne'}</span></span>
           </span>
         </td>
         <td>${t ? `<span class="who"><span class="dot" style="--c:${l.kolor}"></span>${esc(t.etykieta)}</span>` : '<span class="tag">bez karty terapii</span>'}</td>
@@ -670,7 +709,7 @@
       return `${d === 1 ? 'dzień' : `${d} dni`} przed wizytą, o ${u.godzina}`;
     }
     if (def.kiedy === 'poWizycie') return `w dniu wizyty, o ${u.godzina}`;
-    if (def.kiedy === 'tydzien') return `w ${DNI_PELNE[u.dzien === undefined ? 1 : u.dzien]}, o ${u.godzina}`;
+    if (def.kiedy === 'dniTygodnia') return `${opisDni(u.dni)}, o ${u.godzina}`;
     if (def.kiedy === 'poTerapii') {
       const d = u.dniPo || 1;
       return `${d === 1 ? 'dzień' : `${d} dni`} po zamknięciu terapii, o ${u.godzina}`;
@@ -679,14 +718,19 @@
   }
 
   function renderWiadomosci() {
-    const kolejka = P.kolejkaWiadomosci(7);
+    const wszystkie = P.kolejkaWiadomosci(7);
+    /* Przypomnienie o ćwiczeniach idzie codziennie, więc samo potrafi zająć
+       całą kolejkę. Filtr nie chowa niczego na stałe — pozwala tylko spojrzeć
+       na jeden rodzaj naraz, zamiast przewijać przez wszystkie. */
+    if (filtrWiadomosci !== 'wszystkie' && !wszystkie.some((w) => w.typ === filtrWiadomosci)) filtrWiadomosci = 'wszystkie';
+    const kolejka = filtrWiadomosci === 'wszystkie' ? wszystkie : wszystkie.filter((w) => w.typ === filtrWiadomosci);
     const pojda = kolejka.filter((w) => !w.usunieta && !w.wylaczonaRodzaj && !w.wylaczonaPacjent);
     $('#view-date').textContent = `${pojda.length} ${pojda.length === 1 ? 'wiadomość' : 'wiadomości'} wyjdzie w ciągu siedmiu dni`;
 
     const rodzaj = (typ) => {
       const def = P.TYPY_WIADOMOSCI[typ];
       const u = P.ustawieniaRodzaju(typ);
-      const ile = kolejka.filter((w) => w.typ === typ && !w.usunieta && !w.wylaczonaPacjent).length;
+      const ile = wszystkie.filter((w) => w.typ === typ && !w.usunieta && !w.wylaczonaPacjent).length;
       return `<article class="rodzaj${u.wlaczona ? '' : ' is-off'}">
         <div class="rodzaj__gora">
           <div>
@@ -771,10 +815,55 @@
         W prototypie nic nie wychodzi na zewnątrz. W działającym systemie SMS-y są wliczone
         w abonament do 200 miesięcznie.
       </p>
+      <div class="chips chips--kolejka">
+        <button class="chip" type="button" data-filtr-wiad="wszystkie" aria-pressed="${filtrWiadomosci === 'wszystkie'}">Wszystkie · ${wszystkie.length}</button>
+        ${Object.entries(P.TYPY_WIADOMOSCI)
+          .map(([typ, def]) => {
+            const ile = wszystkie.filter((w) => w.typ === typ).length;
+            return ile
+              ? `<button class="chip" type="button" data-filtr-wiad="${typ}" aria-pressed="${filtrWiadomosci === typ}">${esc(def.nazwa)} · ${ile}</button>`
+              : '';
+          })
+          .join('')}
+      </div>
       ${dni.length ? dni.map(grupa).join('') : '<p class="pusto">Na najbliższy tydzień nie ma nic do wysłania.</p>'}`;
   }
 
   /* ── Ustawienia rodzaju wiadomości ─────────────────────────────────── */
+  const DNI_KOLEJNOSC = [1, 2, 3, 4, 5, 6, 0];
+  const DNI_SKROT = { 1: 'pn', 2: 'wt', 3: 'śr', 4: 'cz', 5: 'pt', 6: 'sb', 0: 'nd' };
+
+  /**
+   * Dni, w które pacjent ma ćwiczyć. Nie pytamy „ile razy w tygodniu", tylko
+   * które to dni — bo przypomnienie musi wiedzieć, kiedy dokładnie wyjść.
+   */
+  function wybieraczDni(idBazowe, wybrane) {
+    const dni = Array.isArray(wybrane) && wybrane.length ? wybrane.map(Number) : [1, 2, 3, 4, 5];
+    return `<fieldset class="dni-cw field--full">
+      <legend>W które dni ćwiczy</legend>
+      <div class="dni-cw__lista">
+        ${DNI_KOLEJNOSC.map(
+          (d) => `<label class="dni-cw__dzien">
+            <input type="checkbox" name="${idBazowe}" value="${d}" ${dni.includes(d) ? 'checked' : ''} />
+            <span>${DNI_SKROT[d]}</span>
+          </label>`
+        ).join('')}
+      </div>
+      <p class="dni-cw__info">Przypomnienie idzie tylko w zaznaczone dni — i tylko wtedy, gdy pacjent jeszcze nie odhaczył ćwiczeń.</p>
+    </fieldset>`;
+  }
+
+  const odczytajDni = (idBazowe) =>
+    [...document.querySelectorAll(`input[name="${idBazowe}"]:checked`)].map((x) => Number(x.value));
+
+  const opisDni = (dni) => {
+    const lista = Array.isArray(dni) && dni.length ? dni.map(Number) : [1, 2, 3, 4, 5];
+    if (lista.length === 7) return 'codziennie';
+    const uporzadkowane = DNI_KOLEJNOSC.filter((d) => lista.includes(d));
+    if (uporzadkowane.join() === [1, 2, 3, 4, 5].join()) return 'od poniedziałku do piątku';
+    return uporzadkowane.map((d) => DNI_SKROT[d]).join(', ');
+  };
+
   function formRodzaj(typ) {
     const def = P.TYPY_WIADOMOSCI[typ];
     const u = P.ustawieniaRodzaju(typ);
@@ -789,14 +878,7 @@
             </select>
           </div>`;
       }
-      if (def.kiedy === 'tydzien') {
-        return `<div class="field">
-            <label for="rw-dzien">Dzień tygodnia</label>
-            <select id="rw-dzien">
-              ${[1, 2, 3, 4, 5, 6, 0].map((d) => `<option value="${d}" ${d === (u.dzien === undefined ? 1 : u.dzien) ? 'selected' : ''}>${DNI_PELNE[d]}</option>`).join('')}
-            </select>
-          </div>`;
-      }
+      if (def.kiedy === 'dniTygodnia') return wybieraczDni('rw-dni-cw', u.dni);
       if (def.kiedy === 'poTerapii') {
         return `<div class="field">
             <label for="rw-po">Ile dni po zamknięciu terapii</label>
@@ -815,7 +897,7 @@
       <p class="modal__label">Kiedy wychodzi</p>
       <div class="form-grid">
         ${kiedyPola()}
-        ${pole('rw-godzina', 'O której', 'time', u.godzina)}
+        ${pole('rw-godzina', 'O której', 'time', naZegar(u.godzina))}
       </div>
 
       <p class="modal__label">Treść</p>
@@ -850,6 +932,7 @@
       adres: S().ustawienia.adres,
       kiedy: 'jutro',
       godzina: '9:30',
+      cwiczenia: '3 ćwiczenia',
       link: 'linia-ruchu.pl/k/4821',
     };
     const tekst = pole.value.replace(/\{(\w+)\}/g, (calosc, k) => (dane[k] !== undefined ? dane[k] : calosc));
@@ -861,8 +944,12 @@
     if (szablon.length < 10) return bladModalu('rw-err', 'Treść jest za krótka.');
     const dane = { godzina: $('#rw-godzina').value, szablon };
     if ($('#rw-dni')) dane.dniPrzed = Number($('#rw-dni').value);
-    if ($('#rw-dzien')) dane.dzien = Number($('#rw-dzien').value);
     if ($('#rw-po')) dane.dniPo = Number($('#rw-po').value);
+    if (document.querySelector('[name="rw-dni-cw"]')) {
+      const dni = odczytajDni('rw-dni-cw');
+      if (!dni.length) return bladModalu('rw-err', 'Zaznacz przynajmniej jeden dzień ćwiczeń.');
+      dane.dni = dni;
+    }
     P.akcje.zapiszRodzajWiadomosci(typ, dane);
     schowajModal();
     toast('Zapisano ustawienia wiadomości', true);
@@ -969,16 +1056,7 @@
             </select>
           </div>`;
       }
-      if (def.kiedy === 'tydzien') {
-        return `<div class="field">
-            <label for="pp-dzien">Dzień tygodnia</label>
-            <select id="pp-dzien">
-              ${[1, 2, 3, 4, 5, 6, 0]
-                .map((d) => `<option value="${d}" ${d === (u.dzien === undefined ? 1 : u.dzien) ? 'selected' : ''}>${DNI_PELNE[d]}</option>`)
-                .join('')}
-            </select>
-          </div>`;
-      }
+      if (def.kiedy === 'dniTygodnia') return wybieraczDni('pp-dni-cw', u.dni);
       if (def.kiedy === 'poTerapii') {
         return `<div class="field">
             <label for="pp-po">Ile dni po terapii</label>
@@ -1001,7 +1079,7 @@
 
       <div class="form-grid">
         ${kiedyPole()}
-        ${pole('pp-godzina', 'O której', 'time', u.godzina)}
+        ${pole('pp-godzina', 'O której', 'time', naZegar(u.godzina))}
       </div>
 
       <p class="podglad" id="pp-podglad"></p>
@@ -1038,7 +1116,7 @@
       <p class="modal__label">Kiedy wyjdzie</p>
       <div class="form-grid">
         ${pole('ew-data', 'Dzień', 'date', w.data, `min="${P.iso(P.dzis)}"`)}
-        ${pole('ew-godzina', 'Godzina', 'time', w.godzina)}
+        ${pole('ew-godzina', 'Godzina', 'time', naZegar(w.godzina))}
       </div>
       ${w.przesunieta ? '<p class="modal__info">Ten termin jest już przesunięty ręcznie — reguła gabinetu mówi co innego.</p>' : ''}
 
@@ -1235,7 +1313,7 @@
       return `${d === 1 ? 'dzień' : `${d} dni`} przed wizytą, ${u.godzina}`;
     }
     if (def.kiedy === 'poWizycie') return `w dniu wizyty, ${u.godzina}`;
-    if (def.kiedy === 'tydzien') return `${DNI_PELNE[u.dzien === undefined ? 1 : u.dzien]}, ${u.godzina}`;
+    if (def.kiedy === 'dniTygodnia') return `${opisDni(u.dni)}, ${u.godzina}`;
     if (def.kiedy === 'poTerapii') {
       const d = u.dniPo || 1;
       return `${d === 1 ? 'dzień' : `${d} dni`} po terapii, ${u.godzina}`;
@@ -1412,17 +1490,29 @@
       <div class="pat__head">
         <span class="pat__mark" style="--c:${l ? l.kolor : '#535A61'};--on:${l ? l.naKolorze : '#fff'}">${inicjaly(p.imie)}</span>
         <div>
-          <h2 class="pat__name" id="drawer-name">${esc(p.imie)}</h2>
-          <p class="pat__sub">${esc(p.telefon)} · ${ZRODLA[p.zrodlo] || 'inne'}</p>
+          <h2 class="pat__name" id="drawer-name">${esc(p.imie)}${
+            P.nowyPacjent(p.id) ? '<span class="znak-nowy">nowy</span>' : ''
+          }</h2>
+          <p class="pat__sub">${esc(p.telefon)} · ${ZRODLA[p.zrodlo] || 'inne'}${
+            P.nowyPacjent(p.id) ? ' · jeszcze u Was nie był' : ''
+          }</p>
         </div>
       </div>
 
       ${
         t
-          ? `<div class="pat__epizod">
+          ? `<div class="pat__epizod${t.status !== 'aktywna' ? ' pat__epizod--zamkniety' : ''}">
               <div class="pat__epizod-head">
-                <p class="pat__diag">${esc(t.etykieta)}</p>
-                <button class="btn btn--sm btn--ghost" type="button" data-akcja="edytuj-terapie" data-terapia="${t.id}">Edytuj</button>
+                <p class="pat__diag">${esc(t.etykieta)}${
+                  t.status !== 'aktywna'
+                    ? `<span class="pat__zamkniety">zamknięty${t.koniec ? ` ${krotka(t.koniec)}` : ''}</span>`
+                    : ''
+                }</p>
+                ${
+                  t.status === 'aktywna'
+                    ? `<button class="btn btn--sm btn--ghost" type="button" data-akcja="edytuj-terapie" data-terapia="${t.id}">Edytuj</button>`
+                    : `<button class="btn btn--sm btn--accent" type="button" data-akcja="nowa-terapia" data-pacjent-id="${p.id}">${ikona('plus')}Zacznij nowy cykl</button>`
+                }
               </div>
               ${
                 P.zespolAktywny().length > 1
@@ -1510,7 +1600,7 @@
           ? `<div class="pat__block">
               <h3>Historia kontaktu</h3>
               <ul class="prosta prosta--log">${zdarzenia
-                .map((z) => `<li><span>${esc(z.tekst)}<em>${krotka(z.kiedy)}</em></span></li>`)
+                .map((z) => `<li><span>${esc(z.tekst)}<em>${krotka(z.kiedy)}${z.godzina ? `, ${z.godzina}` : ''}</em></span></li>`)
                 .join('')}</ul>
             </div>`
           : ''
@@ -1529,7 +1619,22 @@
           if (!kolejka.length) {
             return '<p class="pusto">W najbliższych trzech tygodniach nic do tego pacjenta nie wyjdzie.</p>';
           }
-          return `<ul class="wiad-lista">${kolejka.map(wiadomoscWKarcie).join('')}</ul>`;
+          /* Przypomnienie o ćwiczeniach powtarza się w każdy dzień ćwiczeń, więc
+             w karcie pokazujemy dwa najbliższe i jedno zdanie o reszcie. Inaczej
+             lista wiadomości byłaby ścianą tego samego zdania. */
+          const powtarzalne = kolejka.filter((w) => w.typ === 'ankieta-cwiczenia');
+          const ukryte = Math.max(powtarzalne.length - 2, 0);
+          const pokazane = kolejka.filter(
+            (w) => w.typ !== 'ankieta-cwiczenia' || powtarzalne.indexOf(w) < 2
+          );
+          return `<ul class="wiad-lista">${pokazane.map(wiadomoscWKarcie).join('')}</ul>
+            ${
+              ukryte
+                ? `<p class="wiad-lista__reszta">I tak samo w każdy kolejny dzień ćwiczeń — ${ukryte} ${
+                    ukryte === 1 ? 'wiadomość' : 'wiadomości'
+                  } w najbliższych trzech tygodniach. Dzień, w którym pacjent sam odhaczy ćwiczenia, wypada z kolejki.</p>`
+                : ''
+            }`;
         })()}
 
         <p class="wiad-naglowek">Co i kiedy do niego wychodzi</p>
@@ -1595,7 +1700,13 @@
         <button class="btn btn--accent" type="button" data-akcja="umow" data-pacjent-id="${p.id}">${ikona('plus')}Umów wizytę</button>
         <button class="btn" type="button" data-akcja="przypomnienie" data-pacjent-id="${p.id}">${ikona('sms')}Wyślij przypomnienie</button>
         <a class="btn btn--ghost" href="tel:${esc(String(p.telefon).replace(/\s/g, ''))}">${ikona('phone')}${esc(p.telefon)}</a>
-        ${t && t.status === 'aktywna' ? `<button class="btn btn--ghost" type="button" data-akcja="zakoncz" data-terapia="${t.id}">Zamknij terapię z wynikiem</button>` : ''}
+        ${
+          t && t.status === 'aktywna'
+            ? `<button class="btn btn--ghost" type="button" data-akcja="zakoncz" data-terapia="${t.id}">Zamknij terapię z wynikiem</button>`
+            : t
+              ? `<button class="btn btn--ghost" type="button" data-akcja="nowa-terapia" data-pacjent-id="${p.id}">${ikona('plus')}Zacznij nowy cykl</button>`
+              : ''
+        }
       </div>`;
   }
 
@@ -1623,6 +1734,48 @@
     el.hidden = false;
   }
 
+  /* ── Ten pacjent już tu jest ───────────────────────────────────────── */
+  /* Numer wpisany bez spacji i nazwisko bez ogonków to wciąż ta sama osoba.
+     Zamiast pozwolić na drugą kartę, pokazujemy tę, która już istnieje —
+     w tym samym oknie, żeby nikt nie tracił tego, co zdążył wpisać. */
+  function trafieniaHtml(trafienia, akcja) {
+    const pewne = trafienia.some((x) => x.pewny);
+    return `<p class="dubel__h">${
+      pewne ? 'Ta osoba jest już w kartotece' : 'Ktoś o bardzo podobnych danych już tu jest'
+    }</p>
+      <ul class="dubel__lista">
+        ${trafienia
+          .map(({ pacjent: p, powod, pewny }) => {
+            const t = P.terapiaPacjenta(p.id);
+            return `<li>
+              <span class="dubel__kto">
+                <strong>${esc(p.imie)}</strong>
+                <em>${esc(p.telefon)}${p.email ? ` · ${esc(p.email)}` : ''}</em>
+                <em>${t ? esc(t.etykieta) : 'bez karty terapii'} · ${ZRODLA[p.zrodlo] || 'inne'}</em>
+              </span>
+              <span class="dubel__powod${pewny ? ' dubel__powod--pewny' : ''}">${esc(powod)}</span>
+              <button class="btn btn--sm btn--accent" type="button" data-akcja="${akcja}" data-pacjent-id="${p.id}">To ta osoba</button>
+            </li>`;
+          })
+          .join('')}
+      </ul>
+      <p class="dubel__stopka">${
+        pewne
+          ? 'Porównujemy numer bez spacji i adres bez wielkich liter — ten sam numer to ta sama osoba, więc drugiej karty nie założymy. Zmień numer, jeśli to jednak ktoś inny.'
+          : 'Porównujemy nazwisko bez ogonków, więc „Stępień” i „Stepien” to dla panelu jedna osoba. Jeśli to naprawdę ktoś inny, kliknij zapis jeszcze raz.'
+      }</p>`;
+  }
+
+  /** Sprawdza wpisane dane i wypełnia ramkę pod polami. Zwraca liczbę trafień. */
+  function sprawdzDublet(idRamki, dane, akcja) {
+    const ramka = $(idRamki);
+    if (!ramka) return 0;
+    const trafienia = dane.imie.trim().length > 2 || String(dane.telefon).replace(/\D/g, '').length >= 7 ? P.podobniPacjenci(dane) : [];
+    ramka.innerHTML = trafienia.length ? trafieniaHtml(trafienia, akcja) : '';
+    ramka.hidden = !trafienia.length;
+    return trafienia.length;
+  }
+
   function formNowyPacjent(imieWstepne = '') {
     modal(
       'Nowy pacjent',
@@ -1639,65 +1792,143 @@
           <textarea id="np-notatka" rows="2"></textarea>
         </div>
       </div>
+      <div class="dubel" id="np-dubel" hidden></div>
       <p class="modal__err" id="np-err" hidden></p>`,
       `<button class="btn btn--ghost" type="button" data-close>Anuluj</button>
        <button class="btn btn--accent" type="button" data-zapisz="pacjent">Dodaj pacjenta</button>`
     );
+    if (imieWstepne) sprawdzDubletNowego();
   }
+
+  const sprawdzDubletUmawiania = () =>
+    sprawdzDublet('#uw-dubel', { imie: $('#uw-imie').value, telefon: $('#uw-tel').value, email: '' }, 'uw-wez-istniejacego');
+
+  const sprawdzDubletNowego = () =>
+    sprawdzDublet(
+      '#np-dubel',
+      { imie: $('#np-imie').value, telefon: $('#np-tel').value, email: $('#np-mail').value },
+      'otworz-istniejacego'
+    );
 
   function zapiszNowegoPacjenta() {
     const imie = $('#np-imie').value.trim();
     const tel = $('#np-tel').value.trim();
     if (imie.length < 3) return bladModalu('np-err', 'Podaj imię i nazwisko.');
     if (tel.replace(/\D/g, '').length < 9) return bladModalu('np-err', 'Podaj numer telefonu — bez niego nie wyślesz pacjentowi linku ani przypomnienia.');
-    const p = P.akcje.dodajPacjenta({
+    const dane = {
       imie,
       telefon: tel,
       email: $('#np-mail').value.trim(),
       zrodlo: $('#np-zrodlo').value,
       notatka: $('#np-notatka').value.trim(),
-    });
+    };
+    /* Ten sam numer to zawsze ta sama osoba — tu nie ma czego rozstrzygać.
+       Przy samej zbieżności nazwiska pytamy raz i pozwalamy przejść dalej. */
+    const trafienia = P.podobniPacjenci(dane);
+    const pewne = trafienia.filter((x) => x.pewny);
+    if (pewne.length) {
+      sprawdzDubletNowego();
+      return bladModalu('np-err', `${pewne[0].pacjent.imie} ma już kartę — ${pewne[0].powod}. Otwórz ją zamiast zakładać drugą.`);
+    }
+    if (trafienia.length && !potwierdzonyDubel) {
+      potwierdzonyDubel = true;
+      sprawdzDubletNowego();
+      return bladModalu('np-err', 'Sprawdź, czy to nie ta sama osoba. Jeśli jednak inna — kliknij „Dodaj pacjenta” jeszcze raz.');
+    }
+    const p = P.akcje.dodajPacjenta(dane);
+    potwierdzonyDubel = false;
     schowajModal();
     toast(`Dodano pacjenta: ${p.imie}`, true);
     otworzPacjenta(p.id);
   }
 
+  /* Drugie kliknięcie „Dodaj” znaczy: wiem, że podobny istnieje, to jednak ktoś inny. */
+  let potwierdzonyDubel = false;
+
+  /**
+   * Nowa karta terapii. Gdy pacjent już u nas był, podpowiadamy to, co było
+   * ostatnio — wraca zwykle z tym samym problemem, a przepisywanie wszystkiego
+   * od nowa jest jedynym powodem, dla którego ktoś zakładałby drugi profil.
+   */
   function formNowaTerapia(pacjentId) {
     const p = P.pacjent(pacjentId);
+    const poprzednia = S()
+      .terapie.filter((t) => t.pacjentId === pacjentId)
+      .sort((a, b) => String(b.koniec || b.start).localeCompare(String(a.koniec || a.start)))[0];
+    const wznowienie = !!poprzednia;
+    const cwPoprzednie = poprzednia ? poprzednia.cwiczenia || [] : [];
     modal(
-      `Karta terapii — ${p.imie}`,
-      `<div class="form-grid">
+      wznowienie ? `Nowy cykl — ${p.imie}` : `Karta terapii — ${p.imie}`,
+      `${
+        wznowienie
+          ? `<p class="modal__info">Poprzedni cykl: <strong>${esc(poprzednia.etykieta)}</strong>${
+              poprzednia.koniec ? `, zamknięty ${krotka(poprzednia.koniec)}` : ''
+            }${
+              poprzednia.wynik && poprzednia.wynik.bolStart !== null && poprzednia.wynik.bolKoniec !== null
+                ? ` · ból ${poprzednia.wynik.bolStart} → ${poprzednia.wynik.bolKoniec}`
+                : ''
+            }. Historia, notatki i numer zostają — zakładamy tylko nowy cykl.</p>`
+          : ''
+      }
+      <div class="form-grid">
         <div class="field">
           <label for="nt-linia">Rodzaj problemu</label>
-          <select id="nt-linia">${S().linie.map((l) => `<option value="${l.id}">${l.nazwa}</option>`).join('')}</select>
+          <select id="nt-linia">${S()
+            .linie.map((l) => `<option value="${l.id}" ${poprzednia && poprzednia.linia === l.id ? 'selected' : ''}>${l.nazwa}</option>`)
+            .join('')}</select>
         </div>
-        ${pole('nt-etykieta', 'Krótki opis terapii', 'text', '', 'placeholder="np. ból karku przy pracy przy biurku"')}
+        ${pole(
+          'nt-etykieta',
+          'Krótki opis terapii',
+          'text',
+          poprzednia ? poprzednia.etykieta : '',
+          'placeholder="np. ból karku przy pracy przy biurku"'
+        )}
         <div class="field field--full">
           <label for="nt-cel">Cel pacjenta <em>(jego słowami)</em></label>
           <input id="nt-cel" type="text" placeholder="np. przespać noc bez bólu" />
         </div>
-        ${pole('nt-plan', 'Zaplanowana liczba wizyt', 'number', '6', 'min="1" max="30"')}
-        ${pole('nt-odstep', 'Co ile dni wizyta', 'number', '7', 'min="1" max="30"')}
+        ${pole('nt-plan', 'Zaplanowana liczba wizyt', 'number', String(poprzednia ? poprzednia.planWizyt : 6), 'min="1" max="30"')}
+        ${pole('nt-odstep', 'Co ile dni wizyta', 'number', String(poprzednia ? poprzednia.odstepDni : 7), 'min="1" max="30"')}
       </div>
+      ${
+        cwPoprzednie.length
+          ? `<label class="seria__check">
+              <input type="checkbox" id="nt-cwiczenia" checked />
+              <span><strong>Przenieś plan ćwiczeń z poprzedniego cyklu</strong><em>${cwPoprzednie
+                .map((x) => esc((P.cwiczenie(x.cwiczenieId) || {}).nazwa || x.cwiczenieId))
+                .join(', ')}</em></span>
+            </label>`
+          : ''
+      }
       <p class="modal__err" id="nt-err" hidden></p>
       <p class="modal__info">Bez opisu badania i dokumentacji medycznej — panel trzyma tylko to, co potrzebne do prowadzenia wizyt.</p>`,
       `<button class="btn btn--ghost" type="button" data-close>Anuluj</button>
-       <button class="btn btn--accent" type="button" data-zapisz="terapia" data-pacjent-id="${pacjentId}">Załóż kartę</button>`
+       <button class="btn btn--accent" type="button" data-zapisz="terapia" data-pacjent-id="${pacjentId}">${
+         wznowienie ? 'Zacznij nowy cykl' : 'Załóż kartę'
+       }</button>`
     );
   }
 
   function zapiszNowaTerapie(pacjentId) {
     const etykieta = $('#nt-etykieta').value.trim();
     if (etykieta.length < 3) return bladModalu('nt-err', 'Napisz krótko, czego dotyczy terapia.');
+    const przenies = $('#nt-cwiczenia') && $('#nt-cwiczenia').checked;
+    const poprzednia = przenies
+      ? S()
+          .terapie.filter((t) => t.pacjentId === pacjentId)
+          .sort((a, b) => String(b.koniec || b.start).localeCompare(String(a.koniec || a.start)))[0]
+      : null;
     P.akcje.dodajTerapie(pacjentId, {
       linia: $('#nt-linia').value,
       etykieta,
       cel: $('#nt-cel').value.trim(),
       planWizyt: Number($('#nt-plan').value) || 6,
       odstepDni: Number($('#nt-odstep').value) || 7,
+      cwiczenia: poprzednia ? poprzednia.cwiczenia.map((x) => ({ ...x })) : [],
     });
     schowajModal();
-    toast('Założono kartę terapii', true);
+    toast(poprzednia ? 'Zaczęto nowy cykl' : 'Założono kartę terapii', true);
   }
 
   function formEdytujTerapie(tid) {
@@ -1821,6 +2052,7 @@
                   ${pole('uw-imie', 'Imię i nazwisko', 'text', '', 'placeholder="Jan Przykładowy"')}
                   ${pole('uw-tel', 'Telefon', 'tel', '', 'placeholder="600 000 000"')}
                 </div>
+                <div class="dubel" id="uw-dubel" hidden></div>
                 <button class="link-btn" type="button" data-akcja="uw-anuluj-nowy">Wybiorę z listy</button>
               </div>
               <div class="field field--full">
@@ -1901,7 +2133,14 @@
       const tel = $('#uw-tel').value.trim();
       if (imie.length < 3) return bladModalu('uw-err', 'Podaj imię i nazwisko nowego pacjenta.');
       if (tel.replace(/\D/g, '').length < 9) return bladModalu('uw-err', 'Podaj telefon nowego pacjenta.');
-      pacjentId = P.akcje.dodajPacjenta({ imie, telefon: tel, zrodlo: 'inne' }).id;
+      const dane = { imie, telefon: tel, zrodlo: 'inne' };
+      /* Ten sam numer to zawsze ta sama osoba — nie zakładamy jej drugi raz. */
+      const pewne = P.podobniPacjenci(dane).filter((x) => x.pewny);
+      if (pewne.length) {
+        sprawdzDubletUmawiania();
+        return bladModalu('uw-err', `${pewne[0].pacjent.imie} ma już kartę — ${pewne[0].powod}. Wybierz ją zamiast zakładać drugą.`);
+      }
+      pacjentId = P.akcje.dodajPacjenta(dane).id;
     }
     const t = P.terapiaPacjenta(pacjentId);
 
@@ -2221,6 +2460,10 @@
       (poprawa !== null && poprawa > 0 ? `Ból spadł z ${w.bolStart} na ${w.bolKoniec} w skali 0–10. ` : '') +
       `Jeśli było warto, opinia w Mapach Google bardzo pomaga innym trafić do gabinetu: [link do wizytówki]`;
 
+    const doZdjecia = P.wizytyTerapii(tid).filter(
+      (w) => w.data >= P.iso(P.dzis) && ['zaplanowana', 'potwierdzona'].includes(w.status)
+    ).length;
+
     modal(
       'Zamknij terapię',
       `<p class="modal__info">${esc(p.imie)} · ${esc(t.etykieta)}</p>
@@ -2241,7 +2484,14 @@
       </div>
       <p class="modal__label">Prośba o opinię — gotowa do wysłania</p>
       <div class="field field--full"><textarea id="zk-opinia" rows="4" readonly>${esc(tekst)}</textarea></div>
-      <label class="seria__check"><input type="checkbox" id="zk-wyslij" checked /><span><strong>Zapisz prośbę o opinię</strong><em>Trafi do historii pacjenta i do kolejki wiadomości na jutro.</em></span></label>`,
+      <label class="seria__check"><input type="checkbox" id="zk-wyslij" checked /><span><strong>Zapisz prośbę o opinię</strong><em>Trafi do historii pacjenta i do kolejki wiadomości na jutro.</em></span></label>
+      ${
+        doZdjecia
+          ? `<p class="modal__info modal__ostrzezenie">Zamknięcie zdejmie z kalendarza ${doZdjecia} ${
+              doZdjecia === 1 ? 'umówioną wizytę' : 'umówione wizyty'
+            } tego pacjenta i przypomnienia o nich. Jeśli któraś ma się odbyć, przenieś ją najpierw do nowego cyklu.</p>`
+          : ''
+      }`,
       `<button class="btn btn--ghost" type="button" data-close>Anuluj</button>
        <button class="btn btn--accent" type="button" data-zapisz="zamknij-terapie" data-terapia="${tid}">Zamknij terapię</button>`
     );
@@ -2294,11 +2544,128 @@
   }
 
   /* ── Render ────────────────────────────────────────────────────────── */
+  /* ── Ankiety: co pacjenci odsyłają między wizytami ─────────────────── */
+  /* Osobny widok, bo te odpowiedzi to jedyne, co wiesz o pacjencie między
+     wizytami — a rozsiane po kartach nie dawały się ze sobą porównać. */
+  function renderAnkiety() {
+    if (gabinetPusty()) return renderStart();
+    const wiersze = P.przegladAnkiet().filter((w) => !filtrZespolu || w.terapeutaId === filtrZespolu);
+    $('#view-date').textContent = 'Odpowiedzi z ostatnich czterech tygodni';
+
+    if (!wiersze.length) {
+      $('#ankiety').innerHTML = `${paskiZespolu()}
+        <div class="card"><p class="pusto">Nie ma terapii w toku, więc nie ma o co pytać.</p></div>`;
+      return;
+    }
+
+    const zOdczytami = wiersze.filter((w) => w.bolOstatni !== null);
+    const wDol = zOdczytami.filter((w) => w.bolKierunek > 0).length;
+    const milczacy = wiersze.filter((w) => w.milczy);
+    const zCwiczeniami = wiersze.filter((w) => w.maCwiczenia && w.zadaneWTygodniu);
+    const zrobione = zCwiczeniami.reduce((s, w) => s + w.zrobioneWTygodniu, 0);
+    const zadane = zCwiczeniami.reduce((s, w) => s + w.zadaneWTygodniu, 0);
+
+    const kafel = (label, value, foot, klasa = '') =>
+      `<article class="tile${klasa}"><p class="tile__label">${label}</p><p class="tile__value">${value}</p><p class="tile__foot">${foot}</p></article>`;
+
+    const iskra = (w) => {
+      if (!w.odczyty.length) return '<span class="tag">brak odczytów</span>';
+      const ostatnie = w.odczyty.slice(-6);
+      return `<span class="iskra" role="img" aria-label="Kolejne oceny bólu: ${ostatnie.map((o) => o.wartosc).join(', ')}">
+        ${ostatnie
+          .map((o) => `<i style="height:${Math.max(o.wartosc, 0.4) * 10}%" title="${krotka(o.data)}: ${o.wartosc} z 10"></i>`)
+          .join('')}
+      </span><b class="iskra__teraz">${w.bolOstatni}<span>/10</span></b>`;
+    };
+
+    const kierunek = (w) => {
+      if (w.bolKierunek === null) return w.odczyty.length === 1 ? '<span class="trend trend--pierwszy">pierwszy odczyt</span>' : '';
+      if (w.bolKierunek > 0) return `<span class="trend trend--up">w dół o ${w.bolKierunek}</span>`;
+      if (w.bolKierunek === 0) return '<span class="trend trend--stoi">bez zmiany</span>';
+      return `<span class="trend trend--down">w górę o ${Math.abs(w.bolKierunek)}</span>`;
+    };
+
+    const tygodnie = (w) =>
+      w.tygodnie.length
+        ? `<span class="tyg" role="img" aria-label="Odhaczenia w kolejnych tygodniach: ${w.tygodnie
+            .map((t) => `${t.etykieta} ${t.zrobione} z ${t.zadane}`)
+            .join('; ')}">${w.tygodnie
+            .map(
+              (t) =>
+                `<i title="${t.etykieta}: ${t.zrobione} z ${t.zadane}"><b style="height:${
+                  t.zadane ? Math.min(Math.round((t.zrobione / t.zadane) * 100), 100) : 0
+                }%"></b></i>`
+            )
+            .join('')}</span>`
+        : '<span class="tag">bez ćwiczeń</span>';
+
+    const wiersz = (w) => {
+      const l = P.linia(w.linia);
+      return `<tr data-pacjent="${w.pacjentId}"${w.milczy ? ' class="is-cicho"' : ''}>
+        <td>
+          <span class="who">
+            <span class="who__mark" style="--c:${l ? l.kolor : '#535A61'};--on:${l ? l.naKolorze : '#fff'}">${inicjaly(w.imie)}</span>
+            <span><span class="who__name">${esc(w.imie)}</span><span class="who__sub">${esc(w.etykieta)}</span></span>
+          </span>
+        </td>
+        <td><span class="bol-kol">${iskra(w)}</span>${kierunek(w)}</td>
+        <td>${w.bolKiedy ? krotka(w.bolKiedy) : '<span class="tag">nigdy</span>'}</td>
+        <td>${tygodnie(w)}</td>
+        <td>${
+          w.maCwiczenia && w.zadaneWTygodniu
+            ? `<b>${w.zrobioneWTygodniu}</b> z ${w.zadaneWTygodniu}`
+            : '<span class="tag">—</span>'
+        }</td>
+        <td class="ank__akcje">
+          <button class="btn btn--sm btn--ghost" type="button" data-akcja="napisz" data-pacjent-id="${w.pacjentId}">Napisz</button>
+          <button class="btn btn--sm" type="button" data-pacjent="${w.pacjentId}">Karta</button>
+        </td>
+      </tr>`;
+    };
+
+    $('#ankiety').innerHTML = `${paskiZespolu()}
+
+      <div class="tiles">
+        ${kafel('Odpowiedziało o bólu', zOdczytami.length, `z ${wiersze.length} osób w terapii`)}
+        ${kafel('Ból spada', wDol, zOdczytami.length ? `z ${zOdczytami.length}, które odpowiedziały` : 'brak odczytów')}
+        ${kafel(
+          'Ćwiczenia w tym tygodniu',
+          zadane ? `${Math.round((zrobione / zadane) * 100)}%` : '—',
+          `${zrobione} z ${zadane} zadanych`
+        )}
+        ${kafel(
+          'Milczą',
+          milczacy.length,
+          milczacy.length ? 'ani bólu, ani ćwiczeń' : 'każdy coś odesłał',
+          milczacy.length ? ' tile--alert' : ''
+        )}
+      </div>
+
+      <div class="card card--szeroka">
+        <div class="card__head">
+          <h2>Kto co odesłał</h2>
+          <p class="card__note">Na górze ci, do których warto zadzwonić najpierw: milczący, potem ból, który nie spada.</p>
+        </div>
+        <div class="table-wrap">
+          <table class="table">
+            <caption class="visually-hidden">Odpowiedzi pacjentów z ankiet</caption>
+            <thead><tr>
+              <th scope="col">Pacjent</th><th scope="col">Ból po wizytach</th><th scope="col">Ostatnia odpowiedź</th>
+              <th scope="col">Ćwiczenia, 4 tygodnie</th><th scope="col">Ten tydzień</th><th scope="col"><span class="visually-hidden">Akcje</span></th>
+            </tr></thead>
+            <tbody>${wiersze.map(wiersz).join('')}</tbody>
+          </table>
+        </div>
+        <p class="card__note card__note--stopka">Wszystko tutaj pochodzi z tego, co pacjent kliknął w swojej karcie. Pusto znaczy, że nie odpowiedział — niczego nie dopowiadamy za niego.</p>
+      </div>`;
+  }
+
   function render() {
     renderRail();
     if (widok === 'dzis') renderDzis();
     if (widok === 'kalendarz') renderKalendarz();
     if (widok === 'pacjenci') renderPacjenci();
+    if (widok === 'ankiety') renderAnkiety();
     if (widok === 'wiadomosci') renderWiadomosci();
     if (widok === 'miesiac') renderMiesiac();
     if (widok === 'ustawienia') renderUstawienia();
@@ -2327,6 +2694,10 @@
     if (d.pacjent) {
       $('#search-out').hidden = true;
       return otworzPacjenta(d.pacjent);
+    }
+    if (d.filtrWiad) {
+      filtrWiadomosci = d.filtrWiad;
+      return renderWiadomosci();
     }
     if (d.filtr) {
       filtrPacjentow = d.filtr;
@@ -2378,6 +2749,23 @@
       case 'karta-pacjenta':
         schowajModal();
         return otworzPacjenta(d.pacjentId);
+      case 'otworz-istniejacego':
+        schowajModal();
+        toast('Otwarta karta, która już była w kartotece');
+        return otworzPacjenta(d.pacjentId);
+      case 'uw-wez-istniejacego': {
+        /* Zostajemy w oknie umawiania — tylko zamiast nowego profilu
+           wskazujemy ten, który już jest. */
+        $('#uw-pacjent').value = d.pacjentId;
+        $('#uw-nowy-pola').hidden = true;
+        $('#uw-pacjent').closest('.field').hidden = false;
+        $('#uw-dubel').hidden = true;
+        $('#uw-err').hidden = true;
+        $('#uw-imie').value = '';
+        $('#uw-tel').value = '';
+        renderSloty();
+        return toast(`Umawiamy do istniejącej karty: ${P.pacjent(d.pacjentId).imie}`);
+      }
       case 'uw-nowy': {
         $('#uw-nowy-pola').hidden = false;
         $('#uw-pacjent').closest('.field').hidden = true;
@@ -2597,8 +2985,12 @@
       case 'pora-pacjenta': {
         const dane = { godzina: $('#pp-godzina').value };
         if ($('#pp-dni')) dane.dniPrzed = Number($('#pp-dni').value);
-        if ($('#pp-dzien')) dane.dzien = Number($('#pp-dzien').value);
         if ($('#pp-po')) dane.dniPo = Number($('#pp-po').value);
+        if (document.querySelector('[name="pp-dni-cw"]')) {
+          const dni = odczytajDni('pp-dni-cw');
+          if (!dni.length) return bladModalu('pp-err', 'Zaznacz przynajmniej jeden dzień ćwiczeń.');
+          dane.dni = dni;
+        }
         if (!dane.godzina) return bladModalu('pp-err', 'Podaj godzinę.');
         P.akcje.ustawWiadomoscPacjenta(d.pacjentId, d.typ, dane);
         schowajModal();
@@ -2686,11 +3078,18 @@
 
   document.addEventListener('input', (e) => {
     if (e.target.id === 'rw-szablon') podgladSzablonu();
+    /* Podpowiedź o dublecie odnawia się przy pisaniu, a nie dopiero przy zapisie —
+       lepiej zobaczyć „ten numer już tu jest" przed wypełnieniem reszty. */
+    if (['np-imie', 'np-tel', 'np-mail'].includes(e.target.id)) {
+      potwierdzonyDubel = false;
+      sprawdzDubletNowego();
+    }
+    if (['uw-imie', 'uw-tel'].includes(e.target.id)) sprawdzDubletUmawiania();
   });
 
   document.addEventListener('change', (e) => {
     if (e.target.id === 'uw-dzien' || e.target.id === 'uw-terapeuta') renderSloty();
-    if (['pp-dni', 'pp-dzien', 'pp-po', 'pp-godzina'].includes(e.target.id)) {
+    if (['pp-dni', 'pp-po', 'pp-godzina'].includes(e.target.id) || e.target.name === 'pp-dni-cw') {
       const przycisk = $('[data-zapisz="pora-pacjenta"]');
       if (przycisk) {
         /* Podgląd liczymy na zapisanych danych, więc pokazujemy tylko zmianę pory. */

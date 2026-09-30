@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/karta.css?v=22" />
+  <link rel="stylesheet" href="assets/css/karta.css?v=25" />
 </head>
 <body>
   <a class="skip" href="#tresc">Przejdź do treści</a>
@@ -74,10 +74,11 @@
           <li><a href="#r4">Kalendarz i blokowanie czasu</a></li>
           <li><a href="#r5">Karta pacjenta</a></li>
           <li><a href="#r6">Co odpowiedział pacjent</a></li>
-          <li><a href="#r7">Wiadomości do pacjentów</a></li>
-          <li><a href="#r8">Zamknięcie terapii i wypis</a></li>
-          <li><a href="#r9">Podsumowanie miesiąca</a></li>
-          <li><a href="#r10">Rzeczy, które warto wiedzieć</a></li>
+          <li><a href="#r7">Zakładka Ankiety: wszyscy naraz</a></li>
+          <li><a href="#r8">Wiadomości do pacjentów</a></li>
+          <li><a href="#r9">Zamknięcie terapii i wypis</a></li>
+          <li><a href="#r10">Podsumowanie miesiąca</a></li>
+          <li><a href="#r11">Rzeczy, które warto wiedzieć</a></li>
       </ol>
     </nav>
     <section class="inst-r" id="r1">
@@ -114,6 +115,7 @@
             <li>Po wizycie klikasz <b>Odbyta</b> — dopiero wtedy wchodzi do przychodu i do postępu terapii.</li>
             <li>Kto nie przyszedł, dostaje <b>Nie przyszedł</b>; to też jest informacja, nie kara.</li>
             <li>Po prawej bierzesz nazwiska z listy „nie umówili kolejnej wizyty” i dzwonisz. Przycisk <b>Umów termin</b> jest obok.</li>
+            <li>Niżej, w <b>Nowych pacjentach</b>, są ci, którzy jeszcze u Was nie byli — razem z tymi, którzy w nocy zarezerwowali sami przez stronę.</li>
           </ol>
           <p class="inst-uwaga"><strong>Pomyłka nic nie kosztuje.</strong> Po każdej zmianie na dole pojawia się pasek z przyciskiem <b>Cofnij</b>, a status wizyty zawsze da się zmienić z jej karty.</p>
         </div>
@@ -135,16 +137,17 @@
           <p class="inst-r__lead">Wizytę umówisz z trzech miejsc: przyciskiem <b>Umów wizytę</b> u góry, klikając wolną godzinę w kalendarzu albo z karty pacjenta. Wszędzie otwiera się to samo okno.</p>
           <ol class="inst-kroki">
             <li>Wybierasz pacjenta z listy. Jeśli go tam nie ma, klikasz <b>Nowy pacjent</b> w tym samym oknie — nie musisz nigdzie wychodzić.</li>
+            <li>Gdyby ta osoba już u Was była, panel powie to od razu pod polami i jednym kliknięciem przeskoczy na jej kartę.</li>
             <li>Wybierasz usługę; czas trwania i cena podstawiają się same z cennika.</li>
             <li>Wskazujesz osobę z zespołu albo zostawiasz „ktokolwiek wolny”.</li>
             <li>Klikasz godzinę z podpowiedzianych. Pokazują się tylko te naprawdę wolne.</li>
           </ol>
-          <p class="inst-uwaga"><strong>Cała seria naraz:</strong> zaznacz <b>umów od razu całą serię</b>, podaj liczbę wizyt i odstęp w dniach. Panel rozłoży terminy i sam ominie dni wolne oraz zajęte godziny. Sześć wizyt co tydzień to wtedy jedno okno, nie sześć.</p>
+          <p class="inst-uwaga"><strong>Cała seria naraz:</strong> zaznacz <b>umów od razu całą serię</b>, podaj liczbę wizyt i odstęp w dniach. Panel rozłoży terminy i sam ominie dni wolne oraz zajęte godziny. Sześć wizyt co tydzień to wtedy jedno okno, nie sześć. <strong>Tego samego numeru nie zapisze dwa razy</strong> — nawet gdy raz wpiszecie go ze spacjami, a raz bez.</p>
         </div>
         <figure class="inst-r__obraz">
           <a class="of-blok__lupa" href="assets/img/zrzuty/panel-seria.jpg" target="_blank" rel="noopener"
             aria-label="Otwórz zrzut w pełnym rozmiarze">
-            <img src="assets/img/zrzuty/panel-seria.jpg" alt="Okno umawiania z zaznaczoną serią." width="1120" height="1396" loading="lazy" />
+            <img src="assets/img/zrzuty/panel-seria.jpg" alt="Okno umawiania z zaznaczoną serią." width="1120" height="1520" loading="lazy" />
             <span class="of-blok__powieksz">Powiększ</span>
           </a>
           <figcaption>Okno umawiania z zaznaczoną serią.</figcaption>
@@ -228,25 +231,24 @@
       <div class="inst-r__in">
         <div>
           <p class="inst-r__num">Rozdział 07</p>
-          <h2 class="inst-r__h">Wiadomości do pacjentów</h2>
-          <p class="inst-r__lead">Wiadomości układają się same z kalendarza: przypomnienie dzień przed wizytą, pytanie o ból wieczorem po wizycie, pytanie o ćwiczenia raz w tygodniu, prośba o opinię po zamkniętej terapii. Ty decydujesz tylko, co wychodzi, kiedy i w jakich słowach.</p>
+          <h2 class="inst-r__h">Zakładka Ankiety: wszyscy naraz</h2>
+          <p class="inst-r__lead">Karta odpowiada na pytanie o jedną osobę. Zakładka <b>Ankiety</b> odpowiada na pytanie o cały gabinet: kto pracuje między wizytami, u kogo ból nie schodzi i kto przestał odpowiadać. Wszystko w jednej tabeli, pacjent po pacjencie.</p>
           <ol class="inst-kroki">
-            <li>W karcie pacjenta, w bloku <b>Wiadomości</b>, widzisz konkretne SMS-y: datę, godzinę i treść.</li>
-            <li><b>Edytuj</b> zmienia jedną wiadomość — resztę zostawia w spokoju.</li>
-            <li><b>Nie wysyłaj</b> wyjmuje pojedynczy SMS z kolejki, bez wyłączania całego rodzaju.</li>
-            <li>Przy każdej wiadomości ustawisz też inny termin albo wyślesz ją od razu.</li>
-            <li>Niżej, w <b>Co i kiedy do niego wychodzi</b>, wyłączasz całe rodzaje i ustawiasz porę — dla tej jednej osoby.</li>
-            <li>To samo dla całego gabinetu zmienisz w zakładce <b>Wiadomości</b>; przyciskiem <b>Napisz</b> wyślesz też SMS poza wszystkimi regułami.</li>
+            <li>Cztery liczby u góry: ilu odpowiedziało o bólu, u ilu spada, ile ćwiczeń zrobiono w tym tygodniu i ilu milczy.</li>
+            <li>Kolejność w tabeli jest ułożona pod telefony: najpierw milczący, potem ból bez poprawy, potem zaniedbane ćwiczenia.</li>
+            <li>Słupki przy bólu to kolejne odczyty, a te przy ćwiczeniach — cztery ostatnie tygodnie.</li>
+            <li>Przyciskiem <b>Napisz</b> wysyłasz SMS-a od razu z tabeli; <b>Karta</b> otwiera pełną kartę.</li>
+            <li>Przy zespole zawęzisz tabelę do jednej osoby paskiem u góry.</li>
           </ol>
-          <p class="inst-uwaga"><strong>Zgoda pacjenta jest ważniejsza niż ustawienia.</strong> Kto nie zgodził się na SMS-y, nie dostanie nic — panel napisze to wprost w jego karcie.</p>
+          <p class="inst-uwaga"><strong>Pomarańczowa kreska z lewej to cisza.</strong> Pacjent, który nie odesłał ani jednej odpowiedzi, zwykle nie ćwiczy — i to on najczęściej przerywa terapię w połowie.</p>
         </div>
         <figure class="inst-r__obraz">
-          <a class="of-blok__lupa" href="assets/img/zrzuty/panel-wiadomosci-karta.jpg" target="_blank" rel="noopener"
+          <a class="of-blok__lupa" href="assets/img/zrzuty/panel-ankiety.jpg" target="_blank" rel="noopener"
             aria-label="Otwórz zrzut w pełnym rozmiarze">
-            <img src="assets/img/zrzuty/panel-wiadomosci-karta.jpg" alt="Konkretne wiadomości u góry, rodzaje do włączania niżej." width="856" height="1744" loading="lazy" />
+            <img src="assets/img/zrzuty/panel-ankiety.jpg" alt="Zakładka „Ankiety”. Cały gabinet w jednej tabeli." width="1400" height="1021" loading="lazy" />
             <span class="of-blok__powieksz">Powiększ</span>
           </a>
-          <figcaption>Konkretne wiadomości u góry, rodzaje do włączania niżej.</figcaption>
+          <figcaption>Zakładka „Ankiety”. Cały gabinet w jednej tabeli.</figcaption>
         </figure>
       </div>
     </section>
@@ -254,15 +256,45 @@
       <div class="inst-r__in">
         <div>
           <p class="inst-r__num">Rozdział 08</p>
+          <h2 class="inst-r__h">Wiadomości do pacjentów</h2>
+          <p class="inst-r__lead">Wiadomości układają się same z kalendarza: przypomnienie dzień przed wizytą, pytanie o ból wieczorem po wizycie, przypomnienie o ćwiczeniach w każdy dzień ćwiczeń, prośba o opinię po zamkniętej terapii. Ty decydujesz tylko, co wychodzi, kiedy i w jakich słowach.</p>
+          <ol class="inst-kroki">
+            <li>W karcie pacjenta, w bloku <b>Wiadomości</b>, widzisz konkretne SMS-y: datę, godzinę i treść.</li>
+            <li><b>Edytuj</b> zmienia jedną wiadomość — resztę zostawia w spokoju.</li>
+            <li><b>Nie wysyłaj</b> wyjmuje pojedynczy SMS z kolejki, bez wyłączania całego rodzaju.</li>
+            <li>Przy każdej wiadomości ustawisz też inny termin albo wyślesz ją od razu.</li>
+            <li>Niżej, w <b>Co i kiedy do niego wychodzi</b>, wyłączasz całe rodzaje i ustawiasz porę — dla tej jednej osoby.</li>
+            <li>Przy przypomnieniu o ćwiczeniach zaznaczasz dni tygodnia, w które ta osoba ma ćwiczyć; SMS idzie tylko w te dni.</li>
+            <li>To samo dla całego gabinetu zmienisz w zakładce <b>Wiadomości</b>; przyciskiem <b>Napisz</b> wyślesz też SMS poza wszystkimi regułami.</li>
+            <li>W kolejce siedmiu dni przyciski u góry zawężają listę do jednego rodzaju — przydaje się, bo przypomnień o ćwiczeniach jest najwięcej.</li>
+          </ol>
+          <p class="inst-uwaga"><strong>Przypomnienie milknie samo.</strong> W dniu, w którym pacjent odhaczy wszystkie ćwiczenia, SMS do niego nie pójdzie. A kto nie zgodził się na wiadomości, nie dostanie nic — niezależnie od ustawień; panel napisze to wprost w jego karcie.</p>
+        </div>
+        <figure class="inst-r__obraz">
+          <a class="of-blok__lupa" href="assets/img/zrzuty/panel-wiadomosci-karta.jpg" target="_blank" rel="noopener"
+            aria-label="Otwórz zrzut w pełnym rozmiarze">
+            <img src="assets/img/zrzuty/panel-wiadomosci-karta.jpg" alt="Konkretne wiadomości u góry, rodzaje do włączania niżej." width="856" height="2234" loading="lazy" />
+            <span class="of-blok__powieksz">Powiększ</span>
+          </a>
+          <figcaption>Konkretne wiadomości u góry, rodzaje do włączania niżej.</figcaption>
+        </figure>
+      </div>
+    </section>
+    <section class="inst-r" id="r9">
+      <div class="inst-r__in">
+        <div>
+          <p class="inst-r__num">Rozdział 09</p>
           <h2 class="inst-r__h">Zamknięcie terapii i wypis</h2>
           <p class="inst-r__lead">Kiedy cykl się kończy, zamykasz go w karcie pacjenta. Panel zamraża wynik: ile wizyt się odbyło, o ile spadł ból, ile ćwiczeń zostało zrobionych i ile dni to trwało. Pacjent dostaje z tego wypis.</p>
           <ol class="inst-kroki">
             <li>W karcie klikasz <b>Zamknij terapię</b> i wybierasz powód: plan zrealizowany, poprawa przed planem albo przerwana.</li>
             <li>Liczby wyliczają się z przebiegu terapii — nie trzeba niczego wpisywać ręcznie.</li>
+            <li>Okno mówi wprost, ile umówionych wizyt zniknie z kalendarza; przypomnienia o nich znikają razem z nimi.</li>
             <li>Notatki oznaczone jako widoczne trafiają na wypis jako zalecenia „na dalej”.</li>
             <li>Po zamknięciu panel proponuje prośbę o opinię w Google, z gotową treścią.</li>
+            <li>Gdy ta sama osoba wróci — za miesiąc albo za trzy lata — klikasz w jej karcie <b>Zacznij nowy cykl</b>.</li>
           </ol>
-          <p class="inst-uwaga"><strong>Wypis to najlepszy moment na polecenie.</strong> Pacjent z czarno na białym wypisanym „ból 7 → 1” pokazuje to znajomym — dlatego ta sama kartka ma na dole przycisk rezerwacji.</p>
+          <p class="inst-uwaga"><strong>Wracający pacjent nie zakłada się od nowa.</strong> Nowy cykl dziedziczy problem, plan wizyt i — jeśli chcesz — ćwiczenia z poprzedniego razu. Numer, notatki i cała historia zostają w tej samej karcie, więc widać, z czym ta osoba była u Was wcześniej.</p>
         </div>
         <figure class="inst-r__obraz">
           <a class="of-blok__lupa" href="assets/img/zrzuty/pacjent-wypis.jpg" target="_blank" rel="noopener"
@@ -274,10 +306,10 @@
         </figure>
       </div>
     </section>
-    <section class="inst-r" id="r9">
+    <section class="inst-r" id="r10">
       <div class="inst-r__in">
         <div>
-          <p class="inst-r__num">Rozdział 09</p>
+          <p class="inst-r__num">Rozdział 10</p>
           <h2 class="inst-r__h">Podsumowanie miesiąca</h2>
           <p class="inst-r__lead">Zakładka <b>Miesiąc</b> odpowiada na jedno pytanie: czy to się kręci. Ilu nowych pacjentów, skąd przyszli, ile wizyt się odbyło, ile terapii dokończonych i o ile spadł ból u tych, którzy dotrwali do końca.</p>
           <ol class="inst-kroki">
@@ -297,10 +329,10 @@
         </figure>
       </div>
     </section>
-    <section class="inst-r inst-r--bez-obrazu" id="r10">
+    <section class="inst-r inst-r--bez-obrazu" id="r11">
       <div class="inst-r__in">
         <div>
-          <p class="inst-r__num">Rozdział 10</p>
+          <p class="inst-r__num">Rozdział 11</p>
           <h2 class="inst-r__h">Rzeczy, które warto wiedzieć</h2>
           <p class="inst-r__lead">Kilka drobiazgów, które oszczędzają najwięcej czasu, a nie mieszczą się w żadnym z poprzednich rozdziałów.</p>
           <ol class="inst-kroki">

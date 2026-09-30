@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/karta.css?v=22" />
+  <link rel="stylesheet" href="assets/css/karta.css?v=25" />
 </head>
 <body>
   <a class="skip" href="#tresc">Przejdź do treści</a>
@@ -66,7 +66,7 @@
           <ul class="hero__facts">
             <li><strong>Rezerwacja działa o 23:00</strong>, kiedy pacjent szuka pomocy</li>
             <li><strong>Pacjent zostaje Twój</strong> — dane, opinie i baza są w Twoich rękach</li>
-            <li><strong>Cztery tygodnie</strong> od rozmowy do startu</li>
+            <li><strong>Dziesięć dni roboczych</strong> od rozmowy do pierwszej rezerwacji</li>
             <li><strong>Bez umowy na lata</strong>, pierwsze 30 dni bez zobowiązania</li>
           </ul>
         </div>
@@ -140,8 +140,7 @@
     <!-- ── Co zyskujesz ───────────────────────────────────────────────── -->
     <section class="band band--paper" aria-labelledby="h-zyski">
       <div class="band__in">
-        <h2 class="h2" id="h-zyski">Co z tego masz</h2>
-        <p class="lead">Konkretnie: więcej wypełnionych godzin, mniej przerwanych terapii i spokojniejszy dzień w gabinecie.</p>
+        <h2 class="h2" id="h-zyski">Więcej wypełnionych godzin, mniej przerwanych terapii i spokojniejszy dzień w gabinecie.</h2>
         <div class="gains">
           <article class="gain">
             <p class="gain__num">1</p>
@@ -274,22 +273,29 @@
     <!-- ── Droga jednego pacjenta ─────────────────────────────────────── -->
     <section class="band band--ink" id="sciezka" aria-labelledby="h-sciezka">
       <div class="band__in">
-        <h2 class="h2" id="h-sciezka">Osiem dni z życia jednego pacjenta</h2>
+        <h2 class="h2" id="h-sciezka">Od „boli mnie krzyż” o 21:47 do opinii, która przyprowadzi następnego</h2>
         <p class="lead">
-          Tak działa cały system, krok po kroku. Po lewej moment, po prawej ekran — raz
-          taki, jaki widzi pacjent, raz taki, jaki widzisz Ty.
+          Droga jednego pacjenta w siedmiu ekranach — raz takich, jakie widzi on,
+          raz takich, jakie widzisz Ty. <strong>Klikaj po kolei albo zostaw: przesuwają się same.</strong>
         </p>
 
         <div class="droga" id="droga">
           <ol class="droga__kroki" id="droga-kroki" role="tablist" aria-label="Kroki drogi pacjenta"></ol>
           <div class="droga__scena" id="droga-scena" role="tabpanel" aria-live="polite"></div>
           <div class="droga__nawigacja">
-            <button class="droga__strzalka" type="button" data-droga-wstecz aria-label="Poprzedni krok">
-              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16 10H5m4-4-4 4 4 4" /></svg>
-            </button>
-            <button class="droga__strzalka" type="button" data-droga-dalej aria-label="Następny krok">
-              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
-            </button>
+            <p class="droga__licznik">
+              <span id="droga-licznik">Ekran 1 z 7</span>
+              <span class="droga__pasek" aria-hidden="true"><i id="droga-pasek"></i></span>
+            </p>
+            <div class="droga__przyciski">
+              <button class="droga__strzalka" type="button" data-droga-wstecz aria-label="Poprzedni ekran">
+                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16 10H5m4-4-4 4 4 4" /></svg>
+              </button>
+              <button class="droga__strzalka droga__strzalka--dalej" type="button" data-droga-dalej>
+                Następny ekran
+                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -335,7 +341,7 @@
               <li><b>Kalendarz tygodnia</b> z wolnymi godzinami, blokadami na urlop i grafikiem każdej osoby.</li>
               <li><b>Seria wizyt jednym kliknięciem</b> — sześć terminów co tydzień zamiast sześciu okien.</li>
               <li><b>Kartoteka</b> z kartą terapii: cel pacjenta, plan wizyt, ćwiczenia, notatka.</li>
-              <li><b>Kolejka wiadomości</b>: przypomnienia i ankiety wynikające z kalendarza, z wyłącznikiem per pacjent.</li>
+              <li><b>Kolejka wiadomości</b>: przypomnienia i ankiety wynikające z kalendarza i z planu ćwiczeń, z wyłącznikiem dla każdego pacjenta.</li>
               <li><b>Zamknięcie terapii z wynikiem</b> i gotową prośbą o opinię w Google.</li>
               <li><b>Podsumowanie miesiąca</b>: ilu nowych, skąd przyszli, ile terapii dokończonych.</li>
               <li><b>Twoje dane zostają Twoje</b> — eksport całej bazy jednym kliknięciem, także przy rozstaniu.</li>
@@ -348,7 +354,7 @@
               <li><b>Link z SMS-a, bez logowania i bez aplikacji</b> — otwiera się na telefonie w sekundę.</li>
               <li><b>Ćwiczenia z rysunkiem</b> i odhaczaniem; to z nich bierze się procent w panelu.</li>
               <li><b>„Nie mogę, przełóż”</b> — pacjent sam wybiera nowy termin z grafiku swojego terapeuty.</li>
-              <li><b>Jedno pytanie o ból</b> dziennie, jedno kliknięcie.</li>
+              <li><b>Jedno pytanie o ból</b> po wizycie i przypomnienie w dni ćwiczeń — obsługa to jedno kliknięcie.</li>
               <li><b>Wizyta do kalendarza</b> w telefonie i karta ćwiczeń do druku dla tych bez smartfona.</li>
             </ul>
           </article>
@@ -374,7 +380,7 @@
               <h3>Widoczność</h3>
               <p class="plan__for">Chcesz, żeby pacjenci znaleźli Cię w Google i umówili się sami. Zapisy prowadzisz po swojemu.</p>
             </header>
-            <p class="plan__price">1 900 zł <span>wdrożenie</span></p>
+            <p class="plan__price">2 900 zł <span>wdrożenie</span></p>
             <p class="plan__price plan__price--sub">149 zł <span>miesięcznie za utrzymanie</span></p>
             <ul class="plan__list">
               <li>Strona z rezerwacją online na Twoich danych</li>
@@ -395,14 +401,14 @@
               <h3>Prowadzenie</h3>
               <p class="plan__for">Nie masz rejestracji i nie chcesz pamiętać o wszystkim. Panel pamięta za Ciebie.</p>
             </header>
-            <p class="plan__price">2 900 zł <span>wdrożenie</span></p>
-            <p class="plan__price plan__price--sub">690 zł <span>miesięcznie za prowadzenie</span></p>
+            <p class="plan__price">3 900 zł <span>wdrożenie</span></p>
+            <p class="plan__price plan__price--sub">379 zł <span>miesięcznie za prowadzenie</span></p>
             <ul class="plan__list">
               <li><strong>Wszystko z pakietu Widoczność</strong></li>
               <li>Panel gabinetu: dzień, kalendarz, kartoteka pacjentów</li>
               <li>Lista osób, które nie umówiły kolejnej wizyty</li>
               <li>SMS-y: potwierdzenia, przypomnienia, prośby o opinię</li>
-              <li>Ankieta SMS: ból po wizycie, ćwiczenia raz w tygodniu, jedno kliknięcie</li>
+              <li>Ankieta SMS: ból po wizycie i ćwiczenia w każdy dzień ćwiczeń, jedno kliknięcie</li>
               <li>Wynik terapii w karcie pacjenta i wypis na koniec cyklu</li>
               <li>Przypomnienia o kontroli i powrocie po zakończonym cyklu</li>
               <li>Podsumowanie miesiąca: ilu nowych pacjentów i skąd przyszli</li>
@@ -440,8 +446,8 @@
               </label>
               <label class="range">
                 <span class="range__label">Miesięczny koszt systemu</span>
-                <input type="range" min="100" max="5000" step="10" value="690" data-calc="koszt" />
-                <output data-out="koszt">690 zł</output>
+                <input type="range" min="100" max="5000" step="10" value="379" data-calc="koszt" />
+                <output data-out="koszt">379 zł</output>
               </label>
               <label class="range">
                 <span class="range__label">Ilu na dziesięciu przerywa terapię w połowie</span>
@@ -460,7 +466,7 @@
               </div>
               <div>
                 <dt>Koszt miesięczny</dt>
-                <dd data-res="koszt">690 zł</dd>
+                <dd data-res="koszt">379 zł</dd>
               </div>
               <div class="calc__wide">
                 <dt>Nowych pacjentów miesięcznie, żeby koszt się zwrócił</dt>
@@ -479,14 +485,44 @@
     <!-- ── Wdrożenie ──────────────────────────────────────────────────── -->
     <section class="band band--paper" aria-labelledby="h-wdrozenie">
       <div class="band__in">
-        <h2 class="h2" id="h-wdrozenie">Cztery tygodnie od rozmowy do startu</h2>
-        <p class="lead">Twojej pracy w tym jest najwyżej dwie godziny. Resztę robimy my.</p>
+        <h2 class="h2" id="h-wdrozenie">Dziesięć dni od rozmowy do pierwszej rezerwacji</h2>
+        <p class="lead">Twojej pracy w tym jest jedna rozmowa i jedno przeczytanie tekstów. Resztę robimy my — i nie czekamy z niczym na nic.</p>
         <ol class="timeline">
-          <li><strong>Tydzień 1</strong> Rozmowa: godziny pracy terapeutów, usługi z cenami, zdjęcia i teksty.</li>
-          <li><strong>Tydzień 2</strong> Strona i rezerwacja online, podpięte pod Wasz kalendarz zapisów.</li>
-          <li><strong>Tydzień 3</strong> Wizytówka Google, zbieranie opinii, przypomnienia dla pacjentów.</li>
-          <li><strong>Tydzień 4</strong> Start systemu i pierwszy raport. Reklamy, gdy zechcesz.</li>
+          <li>
+            <strong>Dzień 1 · Rozmowa</strong>
+            Piętnaście minut przez telefon. Spływają z tego godziny przyjęć każdej osoby,
+            lista usług z cenami i czasami, cztery problemy, z którymi przychodzi do Was najwięcej ludzi,
+            oraz dostępy do domeny i wizytówki, jeśli już je macie.
+          </li>
+          <li>
+            <strong>Dni 2–4 · Strona i rezerwacja</strong>
+            Stawiamy stronę na Waszych danych: podstrona dla każdego problemu, zespół ze zdjęciami,
+            cennik i rezerwacja licząca wolne godziny z Waszego grafiku. Teksty piszemy my,
+            Wy tylko czytacie i mówicie, co się nie zgadza.
+          </li>
+          <li>
+            <strong>Dni 5–6 · Wizytówka i wyszukiwarka</strong>
+            Porządkujemy wizytówkę w Mapach Google: usługi, godziny, zdjęcia, prawidłowa kategoria
+            i zbieranie opinii. Podstrony dostają tytuły i opisy pod to, co ludzie naprawdę wpisują.
+          </li>
+          <li>
+            <strong>Dni 7–8 · Panel i wiadomości</strong>
+            Wpisujemy Wasz zespół, cennik i pierwszych pacjentów, ustawiamy przypomnienia,
+            pytania o ból i o ćwiczenia. Przechodzimy przez panel na żywo — godzina na Waszym sprzęcie,
+            na Waszych przypadkach. <span class="timeline__tag">pakiet Prowadzenie</span>
+          </li>
+          <li>
+            <strong>Dzień 9 · Próba</strong>
+            Umawiamy testową wizytę z telefonu, sprawdzamy SMS-a, kartę pacjenta i to,
+            czy termin trafia tam, gdzie ma. Poprawiamy, co zgrzyta.
+          </li>
+          <li>
+            <strong>Dzień 10 · Start</strong>
+            Strona idzie na Waszą domenę i od tego dnia przyjmuje rezerwacje o każdej porze.
+            Pierwsze podsumowanie dostajecie po miesiącu. Reklamy — wtedy, kiedy zechcecie.
+          </li>
         </ol>
+        <p class="fine">Dziesięć dni roboczych liczymy od momentu, w którym mamy zdjęcia i dostępy. Jeśli czegoś brakuje, mówimy o tym w dniu pierwszym, a nie w dziewiątym.</p>
       </div>
     </section>
 
@@ -610,7 +646,7 @@
       </nav>
 
       <div class="foot__col">
-        <p class="foot__h">Studio Widok</p>
+        <p class="foot__h"><a class="foot__marka" href="https://studio-widok.pl" rel="noopener">Studio Widok</a></p>
         <a href="tel:+48783480341">+48 783 480 341</a>
         <a href="mailto:kontakt@studio-widok.pl">kontakt@studio-widok.pl</a>
         <a href="https://studio-widok.pl" rel="noopener">studio-widok.pl</a>
@@ -627,11 +663,11 @@
     </div>
 
     <div class="foot__base">
-      <p>© <span id="rok">2026</span> Studio Widok</p>
+      <p>© <span id="rok">2026</span> <a href="https://studio-widok.pl" rel="noopener">Studio Widok</a></p>
       <p>Demo przedstawia fikcyjną klinikę „Linia Ruchu”; dane, ceny i nazwiska są przykładowe. Zdjęcia: <a href="https://unsplash.com" rel="noopener">Unsplash</a>.</p>
     </div>
 
-    <p class="foot__word" aria-hidden="true">Studio Widok<span>.</span></p>
+    <a class="foot__word" href="https://studio-widok.pl" rel="noopener" aria-label="studio-widok.pl">Studio Widok<span>.</span></a>
   </footer>
 
   <script>
@@ -708,6 +744,6 @@
       });
     })();
   </script>
-  <script src="assets/js/droga.js?v=2" defer></script>
+  <script src="assets/js/droga.js?v=4" defer></script>
 </body>
 </html>

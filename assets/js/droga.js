@@ -168,9 +168,12 @@
     system: 'Robi system',
   };
 
+  const CO_ILE = 7000; // ile jeden ekran zostaje na wierzchu
   let aktywny = 0;
   let sam = true; // dopóki nikt nie kliknął, kroki przesuwają się same
-  let zegar;
+  let zegar = null;
+  let wstrzymane = false; // kursor albo fokus stoi na sekcji
+  let widoczne = false; // sekcja jest w kadrze
 
   function render() {
     const lista = box.querySelector('#droga-kroki');
@@ -192,15 +195,70 @@
     scena.classList.remove('is-wchodzi');
     void scena.offsetWidth; // wymuszenie powtórki animacji
     if (!wolniej) scena.classList.add('is-wchodzi');
+
+    const licznik = box.querySelector('#droga-licznik');
+    if (licznik) licznik.textContent = `Ekran ${aktywny + 1} z ${KROKI.length}`;
+    zaplanuj();
+  }
+
+  /**
+   * Pokaz przesuwa się sam, ale tylko dopóki nikt go nie dotknął i dopóki
+   * kursor nie stoi na sekcji — inaczej slajd uciekałby w połowie czytania.
+   * Pasek nad przyciskami pokazuje, ile zostało do przeskoku.
+   */
+  function zaplanuj() {
+    clearTimeout(zegar);
+    zegar = null;
+    const pasek = box.querySelector('#droga-pasek');
+    if (pasek) {
+      pasek.style.transition = 'none';
+      pasek.style.width = '0%';
+    }
+    if (!sam || wstrzymane || !widoczne || wolniej) return;
+    if (pasek) {
+      void pasek.offsetWidth;
+      pasek.style.transition = `width ${CO_ILE}ms linear`;
+      pasek.style.width = '100%';
+    }
+    zegar = setTimeout(() => {
+      /* Po pełnym obrocie zatrzymujemy się — nikt nie chce oglądać karuzeli
+         w kółko, a kto chce dalej, ma przyciski. */
+      if (aktywny + 1 >= KROKI.length) return zatrzymaj();
+      idzDo(aktywny + 1);
+    }, CO_ILE);
+  }
+
+  function zatrzymaj() {
+    sam = false;
+    clearTimeout(zegar);
+    zegar = null;
+    const pasek = box.querySelector('#droga-pasek');
+    if (pasek) {
+      pasek.style.transition = 'none';
+      pasek.style.width = '0%';
+    }
+    box.classList.add('is-reczny');
   }
 
   function idzDo(i, reczne = false) {
     aktywny = (i + KROKI.length) % KROKI.length;
-    if (reczne) {
-      sam = false;
-      clearInterval(zegar);
-    }
-    render();
+    if (reczne) zatrzymaj();
+    /* Kursor albo fokus na sekcji = pauza. Slajd nie ucieka w połowie zdania. */
+  ['mouseenter', 'focusin'].forEach((z) =>
+    box.addEventListener(z, () => {
+      wstrzymane = true;
+      zaplanuj();
+    })
+  );
+  ['mouseleave', 'focusout'].forEach((z) =>
+    box.addEventListener(z, () => {
+      if (box.contains(document.activeElement) || box.matches(':hover')) return;
+      wstrzymane = false;
+      zaplanuj();
+    })
+  );
+
+  render();
   }
 
   box.querySelector('#droga-kroki').innerHTML = KROKI.map(
@@ -241,16 +299,13 @@
     new IntersectionObserver(
       (wpisy) => {
         wpisy.forEach((w) => {
-          if (w.isIntersecting && sam && !zegar) {
-            zegar = setInterval(() => (sam ? idzDo(aktywny + 1) : clearInterval(zegar)), 7000);
-          }
-          if (!w.isIntersecting && zegar) {
-            clearInterval(zegar);
-            zegar = null;
-          }
+          widoczne = w.isIntersecting;
+          zaplanuj();
         });
       },
       { threshold: 0.35 }
     ).observe(box);
+  } else {
+    widoczne = false;
   }
 })();

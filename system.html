@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/karta.css?v=22" />
+  <link rel="stylesheet" href="assets/css/karta.css?v=25" />
 </head>
 <body>
   <a class="skip" href="#tresc">Przejdź do treści</a>
@@ -320,8 +320,8 @@
           <p class="of-blok__lead">Po lewej dzisiejszy grafik z jednym kliknięciem przy każdej wizycie. Po prawej ludzie, którzy właśnie wypadają z terapii. Do tego nowi pacjenci bez kolejnego terminu i to, skąd przyszli. Bez szukania po zakładkach.</p>
           <ul class="of-blok__punkty">
             <li>Potwierdź, odbyta, nie przyszedł, przełóż, odwołaj — wszystko z listy</li>
+            <li>Kto zarezerwował w nocy przez stronę, leży rano w „Nowych pacjentach” z podpisem <b>nowy</b></li>
             <li>Każdą zmianę cofniesz jednym kliknięciem, więc nie ma czego się bać</li>
-            <li>Wizyta już zamknięta nie proponuje przekładania, bo to nie miałoby sensu</li>
           </ul>
         </div>
         <figure class="of-blok__obraz">
@@ -413,7 +413,7 @@
         <figure class="of-blok__obraz of-blok__obraz--waski">
           <a class="of-blok__lupa" href="assets/img/zrzuty/panel-seria.jpg" target="_blank" rel="noopener"
             aria-label="Otwórz zrzut w pełnym rozmiarze: Okno umawiania wizyty z zaznaczoną opcją „umów od razu całą serię”, liczbą wizyt i odstępem w dniach.">
-            <img src="assets/img/zrzuty/panel-seria.jpg" alt="Okno umawiania wizyty z zaznaczoną opcją „umów od razu całą serię”, liczbą wizyt i odstępem w dniach." width="1120" height="1396" loading="lazy" />
+            <img src="assets/img/zrzuty/panel-seria.jpg" alt="Okno umawiania wizyty z zaznaczoną opcją „umów od razu całą serię”, liczbą wizyt i odstępem w dniach." width="1120" height="1520" loading="lazy" />
             <span class="of-blok__powieksz">Powiększ</span>
           </a>
           <figcaption>Jedno okno zamiast sześciu.</figcaption>
@@ -429,7 +429,9 @@
           <ul class="of-blok__punkty">
             <li>Postęp liczy się z wizyt, które faktycznie się odbyły</li>
             <li>Notatka zostaje u Ciebie albo, jeśli zdecydujesz, trafia do karty pacjenta</li>
-            <li>Przycisk, który wysyła pacjentowi link do jego karty</li>
+            <li>Historia kontaktu z datą i godziną — wiadomo, kiedy dokładnie co poszło</li>
+            <li>Gdy pacjent wraca po latach, zaczynasz nowy cykl na tej samej karcie, zamiast zakładać go od nowa</li>
+            <li>Tej samej osoby nie da się wpisać dwa razy — panel rozpozna numer bez spacji i nazwisko bez ogonków</li>
           </ul>
         </div>
         <figure class="of-blok__obraz of-blok__obraz--waski">
@@ -468,22 +470,21 @@
       <div class="of-blok__in">
         <div class="of-blok__text">
           <p class="of-blok__num">08</p>
-          <h2 class="of-blok__h">Wiadomości prowadzisz z karty pacjenta</h2>
-          <p class="of-blok__lead">W karcie widzisz konkretne SMS-y, które do tej osoby wyjdą: kiedy, o której i w jakich słowach. Każdy możesz poprawić, przesunąć, wysłać od razu albo wyjąć z kolejki. Niżej jest lista rodzajów wiadomości — tu decydujesz raz, a nie przy każdym pacjencie osobno.</p>
+          <h2 class="of-blok__h">Wszystkie odpowiedzi pacjentów w jednej tabeli</h2>
+          <p class="of-blok__lead">Osobna zakładka zbiera to, co ludzie odsyłają między wizytami: kolejne oceny bólu i odhaczone ćwiczenia tydzień po tygodniu, każdy pacjent w jednym wierszu. Na górze ci, do których warto zadzwonić najpierw — milczący i ci, u których ból nie schodzi.</p>
           <ul class="of-blok__punkty">
-            <li>Jeden włącznik na rodzaj wiadomości: przypomnienie, pytanie o ból, pytanie o ćwiczenia, prośba o opinię</li>
-            <li>Porę ustawiasz dla całego gabinetu albo inaczej dla jednej osoby</li>
-            <li>Treść piszesz raz; imię, godzina i adres wchodzą same</li>
-            <li>Pacjent bez zgody na SMS nie dostanie nic, niezależnie od ustawień</li>
+            <li>Jeden rzut oka mówi, kto pracuje między wizytami, a kto tylko przychodzi</li>
+            <li>Przy każdym wierszu przycisk, żeby napisać albo otworzyć kartę</li>
+            <li>Kto nie odpowiedział, ma napisane „brak odczytów” — nie wstawiamy tam żadnej liczby</li>
           </ul>
         </div>
-        <figure class="of-blok__obraz of-blok__obraz--waski">
-          <a class="of-blok__lupa" href="assets/img/zrzuty/panel-wiadomosci-karta.jpg" target="_blank" rel="noopener"
-            aria-label="Otwórz zrzut w pełnym rozmiarze: Blok wiadomości w karcie pacjenta: trzy zaplanowane SMS-y z przyciskami edycji i lista rodzajów wiadomości z włącznikami.">
-            <img src="assets/img/zrzuty/panel-wiadomosci-karta.jpg" alt="Blok wiadomości w karcie pacjenta: trzy zaplanowane SMS-y z przyciskami edycji i lista rodzajów wiadomości z włącznikami." width="856" height="1744" loading="lazy" />
+        <figure class="of-blok__obraz">
+          <a class="of-blok__lupa" href="assets/img/zrzuty/panel-ankiety.jpg" target="_blank" rel="noopener"
+            aria-label="Otwórz zrzut w pełnym rozmiarze: Zakładka Ankiety: cztery liczby u góry i tabela pacjentów z wykresami bólu oraz odhaczonych ćwiczeń.">
+            <img src="assets/img/zrzuty/panel-ankiety.jpg" alt="Zakładka Ankiety: cztery liczby u góry i tabela pacjentów z wykresami bólu oraz odhaczonych ćwiczeń." width="1400" height="1021" loading="lazy" />
             <span class="of-blok__powieksz">Powiększ</span>
           </a>
-          <figcaption>Konkretne wiadomości u góry, rodzaje do włączania niżej.</figcaption>
+          <figcaption>Zakładka „Ankiety”. Cztery tygodnie odpowiedzi każdego pacjenta.</figcaption>
         </figure>
       </div>
     </section>
@@ -491,6 +492,30 @@
       <div class="of-blok__in">
         <div class="of-blok__text">
           <p class="of-blok__num">09</p>
+          <h2 class="of-blok__h">Wiadomości prowadzisz z karty pacjenta</h2>
+          <p class="of-blok__lead">W karcie widzisz konkretne SMS-y, które do tej osoby wyjdą: kiedy, o której i w jakich słowach. Każdy możesz poprawić, przesunąć, wysłać od razu albo wyjąć z kolejki. Niżej jest lista rodzajów wiadomości — tu decydujesz raz, a nie przy każdym pacjencie osobno.</p>
+          <ul class="of-blok__punkty">
+            <li>Jeden włącznik na rodzaj wiadomości: przypomnienie o wizycie, pytanie o ból, przypomnienie o ćwiczeniach, prośba o opinię</li>
+            <li>Przypomnienie o ćwiczeniach idzie w każdy dzień ćwiczeń — i milknie w dniu, w którym pacjent sam je odhaczy</li>
+            <li>Porę i dni ustawiasz dla całego gabinetu albo inaczej dla jednej osoby</li>
+            <li>Treść piszesz raz; imię, godzina i adres wchodzą same</li>
+            <li>Pacjent bez zgody na SMS nie dostanie nic, niezależnie od ustawień</li>
+          </ul>
+        </div>
+        <figure class="of-blok__obraz of-blok__obraz--waski">
+          <a class="of-blok__lupa" href="assets/img/zrzuty/panel-wiadomosci-karta.jpg" target="_blank" rel="noopener"
+            aria-label="Otwórz zrzut w pełnym rozmiarze: Blok wiadomości w karcie pacjenta: trzy zaplanowane SMS-y z przyciskami edycji i lista rodzajów wiadomości z włącznikami.">
+            <img src="assets/img/zrzuty/panel-wiadomosci-karta.jpg" alt="Blok wiadomości w karcie pacjenta: trzy zaplanowane SMS-y z przyciskami edycji i lista rodzajów wiadomości z włącznikami." width="856" height="2234" loading="lazy" />
+            <span class="of-blok__powieksz">Powiększ</span>
+          </a>
+          <figcaption>Konkretne wiadomości u góry, rodzaje do włączania niżej.</figcaption>
+        </figure>
+      </div>
+    </section>
+    <section class="of-blok of-blok--odwrocony">
+      <div class="of-blok__in">
+        <div class="of-blok__text">
+          <p class="of-blok__num">10</p>
           <h2 class="of-blok__h">A jak wolisz, całą kolejkę widzisz naraz</h2>
           <p class="of-blok__lead">Osobna zakładka pokazuje wszystko, co wyjdzie w najbliższych dniach, dzień po dniu i pacjent po pacjencie. Przydaje się w poniedziałek rano, kiedy chcesz jednym rzutem oka sprawdzić, co tydzień ma do powiedzenia Twoim pacjentom.</p>
           <ul class="of-blok__punkty">
@@ -508,10 +533,10 @@
         </figure>
       </div>
     </section>
-    <section class="of-blok of-blok--odwrocony">
+    <section class="of-blok">
       <div class="of-blok__in">
         <div class="of-blok__text">
-          <p class="of-blok__num">10</p>
+          <p class="of-blok__num">11</p>
           <h2 class="of-blok__h">Notatki, które nie są dokumentacją medyczną</h2>
           <p class="of-blok__lead">Dwa zdania, żeby pamiętać: o czym pogadać na następnej wizycie, czego ta osoba ma unikać, co ustaliliście. Domyślnie zostają u Ciebie. Jednym kliknięciem wpuszczasz je do karty, którą pacjent otwiera z SMS-a.</p>
           <ul class="of-blok__punkty">
@@ -529,10 +554,10 @@
         </figure>
       </div>
     </section>
-    <section class="of-blok">
+    <section class="of-blok of-blok--odwrocony">
       <div class="of-blok__in">
         <div class="of-blok__text">
-          <p class="of-blok__num">11</p>
+          <p class="of-blok__num">12</p>
           <h2 class="of-blok__h">Raz w miesiącu widzisz, co naprawdę się wydarzyło</h2>
           <p class="of-blok__lead">Ilu przyszło nowych pacjentów i skąd, ile wizyt się odbyło, ile terapii dokończyłeś i o ile spadł ból u tych, którzy dotrwali do końca. Jedna strona, którą da się przeczytać przy kawie.</p>
           <ul class="of-blok__punkty">
@@ -550,10 +575,10 @@
         </figure>
       </div>
     </section>
-    <section class="of-blok of-blok--odwrocony">
+    <section class="of-blok">
       <div class="of-blok__in">
         <div class="of-blok__text">
-          <p class="of-blok__num">12</p>
+          <p class="of-blok__num">13</p>
           <h2 class="of-blok__h">Rośniesz? Dokładasz osobę i jej godziny</h2>
           <p class="of-blok__lead">Każdy terapeuta ma własny grafik, własny kolor i własny zestaw problemów. To z tych grafików liczą się wolne terminy — i te same terminy widzi pacjent na stronie. Nie ma dwóch kalendarzy do pilnowania.</p>
           <ul class="of-blok__punkty">
@@ -599,6 +624,16 @@
   <script>
     /* Przełącznik perspektywy. Bez JS obie sekcje zostają widoczne. */
     (function () {
+      /* Nagłówek zawija się na wąskich ekranach, więc jego wysokość mierzymy,
+         zamiast zgadywać — inaczej przełącznik wchodziłby pod pasek. */
+      var pasek = document.querySelector('.tools');
+      function zmierz() {
+        document.documentElement.style.setProperty('--pasek', pasek.offsetHeight + 'px');
+      }
+      zmierz();
+      addEventListener('resize', zmierz);
+      if (document.fonts) document.fonts.ready.then(zmierz);
+
       var taby = [].slice.call(document.querySelectorAll('.of-przel__btn'));
       function pokaz(id, zapiszHash) {
         taby.forEach(function (t) {
@@ -611,7 +646,7 @@
       taby.forEach(function (t) {
         t.addEventListener('click', function () {
           pokaz(t.id, true);
-          window.scrollTo({ top: document.querySelector('.of-przel').offsetTop - 8, behavior: 'smooth' });
+          window.scrollTo({ top: document.querySelector('.of-przel').offsetTop - pasek.offsetHeight - 8, behavior: 'smooth' });
         });
       });
       var z = location.hash.replace('#', '');

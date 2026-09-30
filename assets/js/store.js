@@ -139,6 +139,8 @@
       { id: 'p12', imie: 'Adam Wilk', telefon: '+48 600 000 012', email: 'a.wilk@przyklad.pl', zrodlo: 'reklama', utworzony: isoZa(-2), notatka: 'Bark po siłowni, trenuje cztery razy w tygodniu.', zgodaSms: true },
       { id: 'p13', imie: 'Barbara Nowicka', telefon: '+48 600 000 013', email: 'b.nowicka@przyklad.pl', zrodlo: 'polecenie', utworzony: isoZa(-16), notatka: 'Praca z myszką osiem godzin dziennie.', zgodaSms: true },
       { id: 'p14', imie: 'Grzegorz Pająk', telefon: '+48 600 000 014', email: 'g.pajak@przyklad.pl', zrodlo: 'strona', utworzony: isoZa(-40), notatka: 'Nie umówił kolejnej wizyty, nie odbiera od dwóch dni.', zgodaSms: true },
+      /* Ten wpadł sam, przez rezerwację na stronie, i jeszcze go nie znacie. */
+      { id: 'p15', imie: 'Michał Stępień', telefon: '+48 600 000 015', email: 'm.stepien@przyklad.pl', zrodlo: 'strona', utworzony: isoZa(0), notatka: 'Rezerwacja online, wybrał termin sam.', zgodaSms: true },
     ];
 
     const c = (idc, ile, razy) => ({ cwiczenieId: idc, powtorzenia: ile, razyWTygodniu: razy });
@@ -276,6 +278,9 @@
       w('t11', 'p11', -55, '12:00', 's3', 'odbyta'),
       w('t11', 'p11', -30, '12:00', 's3', 'odbyta'),
       w('t3', 'p3', -8, '12:00', 'b1', 'nieobecnosc'),
+      /* Rezerwacja ze strony, zrobiona wczoraj wieczorem. Bez karty terapii —
+         ta powstaje dopiero na pierwszej wizycie. */
+      w(null, 'p15', 1, '12:00', 'k1', 'zaplanowana'),
     ];
 
     /* Odhaczone ćwiczenia z ostatnich dwóch tygodni — stąd bierze się procent. */
@@ -340,9 +345,13 @@
     domknij('t11', 'poprawa przed planem');
 
     const zdarzenia = [
-      { id: id('z'), pacjentId: 'p1', kiedy: isoZa(-1), typ: 'sms', tekst: 'Przypomnienie o wizycie — symulacja' },
-      { id: id('z'), pacjentId: 'p11', kiedy: isoZa(-29), typ: 'opinia', tekst: 'Wystawiła opinię w Mapach Google (5/5)' },
-      { id: id('z'), pacjentId: 'p8', kiedy: isoZa(-14), typ: 'terapia', tekst: 'Cykl terapii zakończony' },
+      { id: id('z'), pacjentId: 'p1', kiedy: isoZa(-1), godzina: '18:00', typ: 'sms', tekst: 'Przypomnienie o wizycie — symulacja' },
+      { id: id('z'), pacjentId: 'p1', kiedy: isoZa(-1), godzina: '19:12', typ: 'ankieta', tekst: 'Pacjent ocenił ból na 3/10' },
+      { id: id('z'), pacjentId: 'p1', kiedy: isoZa(-6), godzina: '8:52', typ: 'wizyta', tekst: 'Wizyta odbyta: 8:00' },
+      { id: id('z'), pacjentId: 'p1', kiedy: isoZa(-6), godzina: '9:05', typ: 'cwiczenia', tekst: 'Plan ćwiczeń: 3 ćwiczenia' },
+      { id: id('z'), pacjentId: 'p11', kiedy: isoZa(-29), godzina: '11:40', typ: 'opinia', tekst: 'Wystawiła opinię w Mapach Google (5/5)' },
+      { id: id('z'), pacjentId: 'p8', kiedy: isoZa(-14), godzina: '10:18', typ: 'terapia', tekst: 'Cykl terapii zakończony' },
+      { id: id('z'), pacjentId: 'p15', kiedy: isoZa(-1), godzina: '21:12', typ: 'pacjent', tekst: 'Rezerwacja przez stronę — wybrał termin sam' },
     ];
 
     return {
@@ -410,6 +419,18 @@
           dane.wiadomosciWlasne = dane.wiadomosciWlasne || [];
           dane.terminyWiadomosci = dane.terminyWiadomosci || {};
           dane.wyslaneWiadomosci = dane.wyslaneWiadomosci || [];
+          /* Pytanie o ćwiczenia raz w tygodniu stało się przypomnieniem w dni
+             ćwiczeń — stary „dzień" zostaje pierwszym dniem nowej listy. */
+          const naDni = (u) => {
+            if (!u || !u['ankieta-cwiczenia']) return;
+            const stare = u['ankieta-cwiczenia'];
+            if (stare.dzien !== undefined && !stare.dni) {
+              stare.dni = [Number(stare.dzien)];
+              delete stare.dzien;
+            }
+          };
+          naDni(dane.wiadomosci);
+          Object.values(dane.wiadomosciPacjenta || {}).forEach(naDni);
           /* Jedna notatka w polu pacjenta staje się pierwszą notatką w karcie. */
           if (!dane.notatki) {
             dane.notatki = [];
@@ -491,6 +512,84 @@
   const linia = (lid) => stan.linie.find((l) => l.id === lid);
   const cwiczenie = (cid) => stan.cwiczeniaBiblioteka.find((c) => c.id === cid);
 
+  /* ── Rozpoznawanie osoby, która już tu jest ──────────────────────── */
+  /* Pacjent wraca po roku i wpisuje numer bez spacji, a nazwisko przez „o”
+     zamiast „ó”. Bez porównywania uproszczonych form kartoteka zapełnia się
+     tą samą osobą w trzech wersjach — i każda ma własną historię. */
+  const OGONKI = { ą: 'a', ć: 'c', ę: 'e', ł: 'l', ń: 'n', ó: 'o', ś: 's', ź: 'z', ż: 'z' };
+
+  const bezOgonkow = (s) =>
+    String(s || '')
+      .toLowerCase()
+      .replace(/[ąćęłńóśźż]/g, (z) => OGONKI[z]);
+
+  /** Dziewięć cyfr numeru, bez spacji, myślników i kierunkowego. */
+  const kluczTelefonu = (t) => String(t || '').replace(/\D/g, '').replace(/^0+/, '').replace(/^48(?=\d{9}$)/, '').slice(-9);
+
+  /** Imię i nazwisko bez ogonków, znaków i kolejności — „Kowalska Anna” = „Anna Kowalska”. */
+  const kluczImienia = (s) =>
+    bezOgonkow(s)
+      .replace(/[^a-z0-9]+/g, ' ')
+      .trim()
+      .split(' ')
+      .filter(Boolean)
+      .sort()
+      .join(' ');
+
+  const kluczMaila = (s) => String(s || '').trim().toLowerCase();
+
+  /** Odległość edycyjna do jednego błędu — dalej nie liczymy, bo i tak odrzucimy. */
+  function bliskie(a, b) {
+    if (a === b) return true;
+    if (Math.abs(a.length - b.length) > 1) return false;
+    let i = 0;
+    let j = 0;
+    let roznice = 0;
+    while (i < a.length && j < b.length) {
+      if (a[i] === b[j]) {
+        i++;
+        j++;
+        continue;
+      }
+      if (++roznice > 1) return false;
+      if (a.length > b.length) i++;
+      else if (a.length < b.length) j++;
+      else {
+        i++;
+        j++;
+      }
+    }
+    return roznice + (a.length - i) + (b.length - j) <= 1;
+  }
+
+  /**
+   * Kto w kartotece może być tą samą osobą. Numer i e-mail są rozstrzygające,
+   * imię i nazwisko to już tylko podejrzenie — dlatego każdy wynik niesie
+   * powód, a decyzję podejmuje człowiek przy biurku, nie panel.
+   */
+  function podobniPacjenci(dane, pomijajId = null) {
+    const tel = kluczTelefonu(dane.telefon);
+    const mail = kluczMaila(dane.email);
+    const imie = kluczImienia(dane.imie);
+    const out = [];
+    stan.pacjenci.forEach((p) => {
+      if (p.id === pomijajId) return;
+      const pTel = kluczTelefonu(p.telefon);
+      const pMail = kluczMaila(p.email);
+      const pImie = kluczImienia(p.imie);
+      if (tel && tel.length >= 7 && pTel === tel) return out.push({ pacjent: p, powod: 'ten sam numer telefonu', pewny: true });
+      if (mail && pMail === mail) return out.push({ pacjent: p, powod: 'ten sam adres e-mail', pewny: true });
+      if (imie && pImie === imie) return out.push({ pacjent: p, powod: 'to samo imię i nazwisko', pewny: false });
+      if (imie && imie.length > 6 && bliskie(imie, pImie)) {
+        out.push({ pacjent: p, powod: 'imię i nazwisko różni się jedną literą', pewny: false });
+      }
+    });
+    return out.sort((a, b) => Number(b.pewny) - Number(a.pewny));
+  }
+
+  /** Pacjent, który jeszcze u nas nie był — żadnej odbytej wizyty. */
+  const nowyPacjent = (pid) => !stan.wizyty.some((w) => w.pacjentId === pid && w.status === 'odbyta');
+
   const terapiaPacjenta = (pid) =>
     stan.terapie.filter((t) => t.pacjentId === pid).sort((a, b) => (a.status === 'aktywna' ? -1 : 1))[0] || null;
 
@@ -527,6 +626,91 @@
   }
 
   const bolTerapii = (tid) => stan.bol.filter((b) => b.terapiaId === tid).sort((a, b) => a.data.localeCompare(b.data));
+
+  /**
+   * Odhaczenia w kolejnych tygodniach wstecz: ile pacjent zrobił i ile miał
+   * zrobić. Z tego samego liczenia korzysta karta pacjenta i widok ankiet,
+   * żeby nigdzie nie wyszły dwie różne prawdy o tej samej osobie.
+   */
+  function tygodnieCwiczen(tid, ile = 4) {
+    const t = terapia(tid);
+    if (!t || !t.cwiczenia.length) return [];
+    const naTydzien = t.cwiczenia.reduce((s, c) => s + (c.razyWTygodniu || 0), 0);
+    const out = [];
+    for (let i = ile - 1; i >= 0; i--) {
+      const koniec = new Date(dzis);
+      koniec.setDate(dzis.getDate() - i * 7);
+      const poczatek = new Date(koniec);
+      poczatek.setDate(koniec.getDate() - 6);
+      const od = iso(poczatek);
+      const doKiedy = iso(koniec);
+      out.push({
+        od,
+        doKiedy,
+        zrobione: stan.odhaczenia.filter((o) => o.terapiaId === tid && o.data >= od && o.data <= doKiedy).length,
+        zadane: naTydzien,
+        etykieta: i === 0 ? 'ten tydzień' : `−${i} tydz.`,
+      });
+    }
+    return out;
+  }
+
+  /**
+   * Wszystko, co pacjenci odesłali między wizytami, w jednym miejscu.
+   * Kolejność: najpierw ci, o których trzeba się zatroszczyć — milczący
+   * i ci, u których ból nie spada.
+   */
+  function przegladAnkiet() {
+    const wiersze = stan.terapie
+      .filter((t) => t.status === 'aktywna')
+      .map((t) => {
+        const p = pacjent(t.pacjentId);
+        if (!p) return null;
+        const odczyty = bolTerapii(t.id);
+        const pierwszy = odczyty.length ? odczyty[0].wartosc : null;
+        const ostatni = odczyty.length ? odczyty[odczyty.length - 1].wartosc : null;
+        const tygodnie = tygodnieCwiczen(t.id);
+        const biezacy = tygodnie.length ? tygodnie[tygodnie.length - 1] : null;
+        const ostatnieOdhaczenie = stan.odhaczenia
+          .filter((o) => o.terapiaId === t.id)
+          .map((o) => o.data)
+          .sort()
+          .pop() || null;
+        const milczy = !odczyty.length && !ostatnieOdhaczenie;
+        /* Jeden odczyt nie jest żadnym kierunkiem — „bez zmiany" przy pierwszej
+           odpowiedzi brzmiałoby jak zarzut wobec kogoś, kto właśnie zaczął. */
+        const kierunek = odczyty.length < 2 ? null : pierwszy - ostatni;
+        return {
+          terapiaId: t.id,
+          pacjentId: p.id,
+          imie: p.imie,
+          linia: t.linia,
+          etykieta: t.etykieta,
+          terapeutaId: t.terapeutaId,
+          odczyty,
+          bolPierwszy: pierwszy,
+          bolOstatni: ostatni,
+          bolKierunek: kierunek,
+          bolKiedy: odczyty.length ? odczyty[odczyty.length - 1].data : null,
+          tygodnie,
+          zadaneWTygodniu: biezacy ? biezacy.zadane : 0,
+          zrobioneWTygodniu: biezacy ? biezacy.zrobione : 0,
+          ostatnieOdhaczenie,
+          maCwiczenia: t.cwiczenia.length > 0,
+          milczy,
+        };
+      })
+      .filter(Boolean);
+
+    /* Kolejność ma odpowiadać na pytanie „do kogo zadzwonić najpierw". */
+    const waga = (w) => {
+      if (w.milczy) return 0;
+      if (w.bolKierunek !== null && w.bolKierunek <= 0) return 1;
+      if (w.maCwiczenia && w.zadaneWTygodniu && w.zrobioneWTygodniu / w.zadaneWTygodniu < 0.5) return 2;
+      return 3;
+    };
+    return wiersze.sort((a, b) => waga(a) - waga(b) || a.imie.localeCompare(b.imie, 'pl'));
+  }
 
   /** Minuty od północy — wspólna miara dla godzin, wizyt i blokad. */
   const naMinuty = (g) => {
@@ -709,12 +893,12 @@
       pola: ['imie', 'gabinet', 'link'],
     },
     'ankieta-cwiczenia': {
-      nazwa: 'Tygodniowe pytanie o ćwiczenia',
-      opis: 'Raz w tygodniu do wszystkich, którzy mają zadane ćwiczenia.',
-      kiedy: 'tydzien',
-      domyslne: { wlaczona: true, dzien: 1, godzina: '9:00' },
-      szablon: '{imie}, jak poszły ćwiczenia w minionym tygodniu? Odhacz je tutaj: {link}',
-      pola: ['imie', 'gabinet', 'link'],
+      nazwa: 'Przypomnienie o ćwiczeniach',
+      opis: 'Idzie w każdy dzień, w który pacjent ma ćwiczyć — i tylko wtedy, gdy jeszcze nie odhaczył.',
+      kiedy: 'dniTygodnia',
+      domyslne: { wlaczona: true, dni: [1, 2, 3, 4, 5], godzina: '9:00' },
+      szablon: '{imie}, dziś dzień ćwiczeń — {cwiczenia}. Odhacz je tutaj: {link}',
+      pola: ['imie', 'cwiczenia', 'gabinet', 'link'],
     },
     opinia: {
       nazwa: 'Prośba o opinię w Google',
@@ -840,17 +1024,34 @@
         dodaj(w.pacjentId, w.terapiaId, 'ankieta-bol', dzisIso, daneWspolne(p), 'wizyta odbyta dzisiaj');
       });
 
-    /* Pytanie o ćwiczenia: w dniu tygodnia ustawionym dla tego pacjenta. */
+    /* Ćwiczenia: w każdy dzień ćwiczeń tego pacjenta, a nie raz w tygodniu.
+       Dzień, w którym odhaczył już wszystko, pomijamy — przypominanie komuś
+       o czymś, co właśnie zrobił, jest najszybszym sposobem na wypisanie się. */
     stan.terapie
       .filter((t) => t.status === 'aktywna' && t.cwiczenia.length)
       .forEach((t) => {
         const p = pacjent(t.pacjentId);
         if (!p) return;
         const u = ustawieniaRodzaju('ankieta-cwiczenia', t.pacjentId);
-        const cel = u.dzien === undefined ? 1 : Number(u.dzien);
-        const dzien = new Date(dzis);
-        dzien.setDate(dzis.getDate() + ((cel - dzis.getDay() + 7) % 7 || 7));
-        dodaj(t.pacjentId, t.id, 'ankieta-cwiczenia', iso(dzien), daneWspolne(p), `${t.cwiczenia.length} zadanych ćwiczeń`);
+        const dni = Array.isArray(u.dni) && u.dni.length ? u.dni.map(Number) : [1, 2, 3, 4, 5];
+        const ile = t.cwiczenia.length;
+        const opisCwiczen = ile === 1 ? 'jedno ćwiczenie' : `${ile} ćwiczenia`;
+        for (let i = 0; i <= dniDoPrzodu; i++) {
+          const dzien = new Date(dzis);
+          dzien.setDate(dzis.getDate() + i);
+          if (!dni.includes(dzien.getDay())) continue;
+          const data = iso(dzien);
+          const odhaczoneDzis = stan.odhaczenia.filter((o) => o.terapiaId === t.id && o.data === data).length;
+          if (odhaczoneDzis >= ile) continue;
+          dodaj(
+            t.pacjentId,
+            t.id,
+            'ankieta-cwiczenia',
+            data,
+            { ...daneWspolne(p), cwiczenia: opisCwiczen },
+            odhaczoneDzis ? `${odhaczoneDzis} z ${ile} już odhaczone` : `${opisCwiczen} na dzisiaj`
+          );
+        }
       });
 
     /* Prośba o opinię: tyle dni po zamknięciu cyklu, ile ustawił gabinet. */
@@ -987,8 +1188,14 @@
       .join('')
       .slice(0, 2) || 'XX';
 
+  /** Godzina teraz, w formacie takim samym jak godziny wizyt. */
+  const terazGodzina = () => {
+    const d = new Date();
+    return `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
+  };
+
   const log = (s, pacjentId, typ, tekst) =>
-    s.zdarzenia.unshift({ id: id('z'), pacjentId, kiedy: iso(new Date()), typ, tekst });
+    s.zdarzenia.unshift({ id: id('z'), pacjentId, kiedy: iso(new Date()), godzina: terazGodzina(), typ, tekst });
 
   const akcje = {
     dodajPacjenta(dane) {
@@ -1052,7 +1259,12 @@
       });
     },
 
-    /** Zamknięcie cyklu zamraża liczby — potem okno 14 dni by je przesunęło. */
+    /**
+     * Zamknięcie cyklu zamraża liczby — potem okno 14 dni by je przesunęło.
+     * Zabiera też ze sobą to, co nie ma już prawa się wydarzyć: umówione dalej
+     * wizyty i przypomnienia o nich. Inaczej pacjent po zamkniętej terapii
+     * dostałby SMS o wizycie, której nikt nie zamierza odbyć.
+     */
     zakonczTerapie(tid, powod = 'plan zrealizowany') {
       const wynik = wynikTerapii(tid);
       return zmien('Zakończono terapię', (s) => {
@@ -1061,8 +1273,29 @@
         t.koniec = iso(new Date());
         t.powodZakonczenia = powod;
         t.wynik = wynik;
+
+        const dzisIso = iso(dzis);
+        const doOdwolania = s.wizyty.filter(
+          (w) => w.terapiaId === tid && w.data >= dzisIso && ['zaplanowana', 'potwierdzona'].includes(w.status)
+        );
+        doOdwolania.forEach((w) => {
+          w.status = 'odwolana';
+          w.odwolanaZZamknieciem = true;
+        });
+        /* Z kolejki znikają też ślady po tych wizytach: własne terminy,
+           poprawione treści i oznaczenia wysłania. */
+        doOdwolania.forEach((w) => {
+          const klucz = `przypomnienie-${w.pacjentId}-`;
+          Object.keys(s.terminyWiadomosci || {}).forEach((k) => k.startsWith(klucz) && delete s.terminyWiadomosci[k]);
+          Object.keys(s.nadpisaneWiadomosci || {}).forEach((k) => k.startsWith(klucz) && delete s.nadpisaneWiadomosci[k]);
+        });
+        s.wiadomosciWlasne = (s.wiadomosciWlasne || []).filter(
+          (w) => !(w.pacjentId === t.pacjentId && w.data >= dzisIso)
+        );
+
         const spadek = wynik.bolStart !== null && wynik.bolKoniec !== null ? `, ból ${wynik.bolStart} → ${wynik.bolKoniec}` : '';
-        log(s, t.pacjentId, 'terapia', `Cykl zakończony po ${wynik.wizytyOdbyte} wizytach${spadek}`);
+        const zdjete = doOdwolania.length ? `, zdjęto ${doOdwolania.length} umówionych wizyt` : '';
+        log(s, t.pacjentId, 'terapia', `Cykl zakończony po ${wynik.wizytyOdbyte} wizytach${spadek}${zdjete}`);
         return t;
       });
     },
@@ -1549,12 +1782,17 @@
     linia,
     cwiczenie,
     terapiaPacjenta,
+    podobniPacjenci,
+    nowyPacjent,
+    kluczTelefonu,
     wizytyTerapii,
     odbyte,
     nastepnaWizyta,
     ostatniaWizyta,
     compliance,
     bolTerapii,
+    tygodnieCwiczen,
+    przegladAnkiet,
     wolneGodziny,
     najblizszeTerminy,
     ryzyko,
