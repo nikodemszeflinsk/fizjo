@@ -3676,14 +3676,28 @@ svg path {
 }
 
 .inst-uwaga {
-  margin: 20px 0 0;
-  padding: 14px 18px;
-  border-left: 3px solid var(--accent);
-  border-radius: 0 var(--r-sign) var(--r-sign) 0;
+  margin: 22px 0 0;
+  padding: 15px 19px 16px;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sign);
   background: var(--paper);
   color: var(--ink-2);
   font-size: 0.94rem;
   line-height: 1.6;
+}
+
+/* Nadpis zamiast kolorowego paska z boku — ta sama forma, co numer rozdziału
+   i nagłówek spisu, więc notka nie wygląda na doklejoną z innej strony. */
+.inst-uwaga::before {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--accent);
+  content: 'Dobrze wiedzie\0107';
+  font-family: var(--f-display);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .inst-uwaga strong {
