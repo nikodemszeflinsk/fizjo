@@ -3424,3 +3424,296 @@ svg path {
     transform: none;
   }
 }
+
+/* ── Przełącznik perspektywy na stronie systemu ─────────────────────── */
+.of-przel {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  max-width: var(--wrap, 1200px);
+  margin: 0 auto;
+  padding: 0 clamp(20px, 5vw, 56px);
+  background: var(--floor);
+}
+
+.of-przel__btn {
+  display: block;
+  padding: 18px 20px 16px;
+  border: 0;
+  border-bottom: 3px solid var(--hair);
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.18s var(--ease-out), border-color 0.18s var(--ease-out);
+}
+
+.of-przel__btn:hover {
+  color: var(--ink);
+}
+
+.of-przel__btn[aria-selected='true'] {
+  border-bottom-color: var(--accent);
+  color: var(--ink);
+}
+
+.of-przel__co {
+  display: block;
+  font-family: var(--f-display);
+  font-size: clamp(1.05rem, 2.4vw, 1.4rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.of-przel__opis {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.86rem;
+  line-height: 1.4;
+}
+
+@media (max-width: 620px) {
+  .of-przel__opis {
+    display: none;
+  }
+}
+
+/* Bez JS obie perspektywy są widoczne — przełącznik tylko je zawęża. */
+.of-widok[hidden] {
+  display: none;
+}
+
+.of-widok__wstep {
+  max-width: var(--wrap, 1200px);
+  margin: 0 auto;
+  padding: 26px clamp(20px, 5vw, 56px) 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.of-widok__wstep strong {
+  color: var(--ink);
+}
+
+/* ── Znacznik pakietu przy sekcji ───────────────────────────────────── */
+.of-pakiet {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 12px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.of-pakiet::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ── Instrukcja panelu ──────────────────────────────────────────────── */
+.inst-spis {
+  max-width: var(--wrap, 1200px);
+  margin: 0 auto;
+  padding: 0 clamp(20px, 5vw, 56px) 40px;
+}
+
+.inst-spis__h {
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.inst-spis ol {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  counter-reset: spis;
+  list-style: none;
+}
+
+.inst-spis li {
+  counter-increment: spis;
+}
+
+.inst-spis a {
+  display: flex;
+  gap: 12px;
+  padding: 13px 16px;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sign);
+  background: var(--paper);
+  color: var(--ink);
+  font-weight: 500;
+  text-decoration: none;
+  transition: border-color 0.18s var(--ease-out), transform 0.18s var(--ease-out);
+}
+
+.inst-spis a::before {
+  content: counter(spis, decimal-leading-zero);
+  color: var(--accent);
+  font-family: var(--f-display);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.inst-spis a:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.inst-r {
+  border-top: 1px solid var(--hair);
+}
+
+.inst-r__in {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+  gap: clamp(28px, 5vw, 64px);
+  align-items: start;
+  max-width: var(--wrap, 1200px);
+  margin: 0 auto;
+  padding: 46px clamp(20px, 5vw, 56px);
+}
+
+.inst-r--bez-obrazu .inst-r__in {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Rozdział bez zrzutu trzyma tę samą lewą krawędź, tylko węższy tekst. */
+.inst-r--bez-obrazu .inst-r__lead,
+.inst-r--bez-obrazu .inst-kroki,
+.inst-r--bez-obrazu .inst-uwaga {
+  max-width: 76ch;
+}
+
+@media (max-width: 900px) {
+  .inst-r__in {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.inst-r__num {
+  margin: 0 0 8px;
+  color: var(--accent);
+  font-family: var(--f-display);
+  font-size: 0.9rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+}
+
+.inst-r__h {
+  margin: 0;
+  font-family: var(--f-display);
+  font-size: clamp(1.5rem, 3.2vw, 2.1rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.inst-r__lead {
+  max-width: 58ch;
+  margin: 14px 0 0;
+  color: var(--ink-2);
+  font-size: 1.02rem;
+  line-height: 1.65;
+}
+
+.inst-kroki {
+  margin: 22px 0 0;
+  padding: 0;
+  counter-reset: krok;
+  list-style: none;
+}
+
+.inst-kroki li {
+  position: relative;
+  margin-bottom: 11px;
+  padding-left: 38px;
+  color: var(--ink-2);
+  line-height: 1.55;
+  counter-increment: krok;
+}
+
+.inst-kroki li::before {
+  position: absolute;
+  top: 1px;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+  content: counter(krok);
+  font-family: var(--f-display);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.inst-kroki b {
+  color: var(--ink);
+}
+
+.inst-uwaga {
+  margin: 20px 0 0;
+  padding: 14px 18px;
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--r-sign) var(--r-sign) 0;
+  background: var(--paper);
+  color: var(--ink-2);
+  font-size: 0.94rem;
+  line-height: 1.6;
+}
+
+.inst-uwaga strong {
+  color: var(--ink);
+}
+
+.inst-r__obraz {
+  margin: 0;
+  position: sticky;
+  top: 90px;
+}
+
+.inst-r__obraz img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sign);
+  background: var(--paper);
+}
+
+.inst-r__obraz figcaption {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .inst-r__obraz {
+    position: static;
+  }
+}

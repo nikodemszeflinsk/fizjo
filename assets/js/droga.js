@@ -120,7 +120,7 @@
       kto: 'gabinet',
       tytul: 'Nie umówił kolejnej wizyty. Dowiadujesz się rano, nie za miesiąc.',
       opis:
-        'Panel nie podaje „ryzyka 78%”. Podaje powód: dziewięć dni bez wizyty przy planie co siedem i ćwiczenia odhaczone w połowie. Obok jest telefon i wolny termin.',
+        'Przy nazwisku stoi powód: dziewięć dni bez wizyty, a plan był co siedem, i ćwiczenia odhaczone w połowie. Obok telefon i najbliższy wolny termin — jeden klik i jest umówiony.',
       scena: `
         <div class="mini mini--panel">
           <p class="mini__nad">Panel · Dziś</p>

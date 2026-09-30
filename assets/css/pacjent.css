@@ -483,33 +483,50 @@ a {
   }
 }
 
-/* ── Rysunek przy ćwiczeniu ─────────────────────────────────────────── */
+/* ── Miejsce na materiał ćwiczenia ──────────────────────────────────── */
 .cw__btn {
   position: relative;
-  padding-right: 92px;
+  padding-right: 104px;
 }
 
-.cw__rys {
+.cw__material {
   position: absolute;
   top: 12px;
   right: 10px;
-  width: 72px;
-  height: 64px;
-  fill: none;
-  stroke: var(--muted);
-  stroke-width: 2.4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  opacity: 0.85;
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  width: 84px;
+  padding: 10px 6px;
+  border: 1px dashed var(--hair-2);
+  border-radius: 9px;
+  background: var(--floor);
+  color: var(--faint);
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+  text-align: center;
+  text-transform: uppercase;
 }
 
-.cw__rys .podloga {
+.cw__material svg {
+  width: 30px;
+  height: 22px;
+  fill: none;
   stroke: var(--hair-2);
   stroke-width: 2;
+  stroke-linejoin: round;
 }
 
-.cw__btn[aria-pressed='true'] .cw__rys {
-  stroke: var(--ok);
+.cw__material svg path {
+  fill: var(--hair-2);
+  stroke: none;
+}
+
+.cw__btn[aria-pressed='true'] .cw__material {
+  border-color: rgba(19, 135, 90, 0.4);
+  background: rgba(19, 135, 90, 0.07);
 }
 
 /* ── Akcje przy terminie ────────────────────────────────────────────── */
@@ -739,20 +756,16 @@ a {
   }
 
   .cw__btn {
+    flex-wrap: wrap;
     padding-right: 14px;
   }
 
-  .cw__rys {
+  .cw__material {
     position: static;
-    display: block;
     width: 100%;
-    max-width: 120px;
-    height: 56px;
-    margin-top: 10px;
-  }
-
-  .cw__btn {
-    flex-wrap: wrap;
+    max-width: none;
+    margin-top: 12px;
+    padding: 18px 10px;
   }
 }
 
@@ -878,4 +891,107 @@ a {
   .druk {
     padding: 0;
   }
+}
+
+/* ── Notatki od terapeuty ───────────────────────────────────────────── */
+.blok--od-terapeuty {
+  border-left: 0;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px var(--hair);
+}
+
+.od-terapeuty {
+  display: grid;
+  gap: 12px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.od-terapeuty li {
+  padding: 14px 16px;
+  border-radius: var(--r-sm);
+  background: var(--floor);
+}
+
+.od-terapeuty p {
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.6;
+}
+
+.od-terapeuty em {
+  display: block;
+  margin-top: 7px;
+  color: var(--faint);
+  font-style: normal;
+  font-size: 0.78rem;
+}
+
+/* ── Wypis po zakończonej terapii ───────────────────────────────────── */
+.wypis__liczby {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px;
+  margin-top: 14px;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+}
+
+.wypis__liczby > div {
+  padding: 16px;
+  background: var(--white);
+}
+
+.wypis__liczby span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.wypis__liczby b {
+  display: block;
+  margin: 4px 0 2px;
+  font-family: var(--f-display);
+  font-size: 1.6rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.wypis__liczby em {
+  color: var(--faint);
+  font-style: normal;
+  font-size: 0.78rem;
+}
+
+.wypis__cw {
+  display: grid;
+  gap: 6px;
+  margin: 14px 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.wypis__cw li {
+  padding: 12px 14px;
+  border-radius: var(--r-sm);
+  background: var(--white);
+  border: 1px solid var(--hair);
+}
+
+.wypis__cw strong {
+  display: block;
+  font-size: 0.98rem;
+}
+
+.wypis__cw em {
+  display: block;
+  margin-top: 2px;
+  color: var(--accent);
+  font-style: normal;
+  font-size: 0.82rem;
+  font-weight: 700;
 }

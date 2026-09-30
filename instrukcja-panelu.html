@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jak korzystać z panelu gabinetu · Studio Widok</title>
+  <meta name="description" content="Instrukcja panelu krok po kroku: dzień, kalendarz, karta pacjenta, wiadomości, zamknięcie terapii i podsumowanie miesiąca." />
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#14171A" />
+
+  <meta property="og:title" content="Jak korzystać z panelu gabinetu" />
+  <meta property="og:description" content="Instrukcja panelu krok po kroku: dzień, kalendarz, karta pacjenta, wiadomości, zamknięcie terapii i podsumowanie miesiąca." />
+  <meta property="og:type" content="website" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/karta.css?v=21" />
+</head>
+<body>
+  <a class="skip" href="#tresc">Przejdź do treści</a>
+
+  <header class="tools">
+    <a class="tools__brand" href="index.html" aria-label="Kanał Pozyskiwania Pacjentów — strona główna">
+      <svg class="tools__mark" viewBox="0 0 40 40" aria-hidden="true">
+        <path d="M8 6v20a8 8 0 0 1-3 6" style="stroke:#1F5FD6" />
+        <path d="M15 6v28" style="stroke:#E8590C" />
+        <path d="M22 6v28" style="stroke:#13875A" />
+        <path d="M29 6v28" style="stroke:#C2255C" />
+        <path d="M36 6v28" style="stroke:#F2B705" />
+      </svg>
+      Kanał Pozyskiwania Pacjentów
+    </a>
+    <nav class="tools__nav" aria-label="Na skróty">
+      <a href="index.html#sciezka">Jak to działa</a>
+      <a href="system.html">System od środka</a>
+      <a href="index.html#pakiety">Pakiety</a>
+      <a class="tools__cta" href="index.html#kontakt">
+        Umów rozmowę
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
+      </a>
+    </nav>
+  </header>
+
+  <main id="tresc">
+    <nav class="okruchy okruchy--oferta" aria-label="Ścieżka">
+      <a href="index.html">Oferta</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">Instrukcja panelu</span>
+    </nav>
+
+    <section class="of-hero">
+      <p class="of-hero__kicker">Pakiet Prowadzenie</p>
+      <h1 class="of-hero__h1">Jak korzystać<br />z panelu gabinetu.</h1>
+      <p class="of-hero__lead">
+        Panel ma tyle funkcji, ile potrzeba, i ani jednej więcej. Poniżej każda z nich, po kolei,
+        z tym co robisz i po co. Dziesięć rozdziałów, kwadrans czytania — a i tak przy wdrożeniu
+        przechodzimy to razem, na Twoich pacjentach.
+      </p>
+      <div class="of-hero__cta">
+        <a class="cta cta--blue" href="crm.html">Otwórz demo panelu<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></a>
+        <a class="cta cta--line" href="system.html">Zobacz, co widzi pacjent</a>
+        <a class="cta cta--line" href="index.html#kontakt">Umów rozmowę</a>
+      </div>
+      <p class="of-hero__uwaga">Najlepiej czytać z otwartym demem obok — wszystko, co tu opisujemy, da się w nim kliknąć.</p>
+    </section>
+
+    <nav class="inst-spis" aria-label="Spis rozdziałów">
+      <p class="inst-spis__h">W tej instrukcji</p>
+      <ol>
+          <li><a href="#r1">Pierwsze wejście</a></li>
+          <li><a href="#r2">Rano: zakładka „Dziś”</a></li>
+          <li><a href="#r3">Umawianie wizyty</a></li>
+          <li><a href="#r4">Kalendarz i blokowanie czasu</a></li>
+          <li><a href="#r5">Karta pacjenta</a></li>
+          <li><a href="#r6">Co odpowiedział pacjent</a></li>
+          <li><a href="#r7">Wiadomości do pacjentów</a></li>
+          <li><a href="#r8">Zamknięcie terapii i wypis</a></li>
+          <li><a href="#r9">Podsumowanie miesiąca</a></li>
+          <li><a href="#r10">Rzeczy, które warto wiedzieć</a></li>
+      </ol>
+    </nav>
+    <section class="inst-r" id="r1">
+      <div class="inst-r__in">
+        <div>
+          <p class="inst-r__num">Rozdział 01</p>
+          <h2 class="inst-r__h">Pierwsze wejście</h2>
+          <p class="inst-r__lead">Panel otwiera się w przeglądarce, tak samo jak poczta — nie trzeba niczego instalować ani nosić ze sobą. Za pierwszym razem zadajemy trzy pytania: jak nazywa się gabinet, kto przyjmuje i w jakich godzinach. Od tego momentu wszystko liczy się z tych godzin.</p>
+          <ol class="inst-kroki">
+            <li>Wpisujesz nazwę gabinetu, adres i telefon — to samo, co zobaczy pacjent w SMS-ie.</li>
+            <li>Dodajesz osoby, które przyjmują, i zaznaczasz ich dni oraz godziny.</li>
+            <li>Zaznaczasz, kto jakimi problemami się zajmuje — po tym strona dobiera wolne terminy.</li>
+          </ol>
+          <p class="inst-uwaga"><strong>Nie musisz trafić za pierwszym razem.</strong> Wszystko z tego kreatora zmienisz później w zakładce <b>Ustawienia</b>, a przy wdrożeniu i tak przechodzimy to razem.</p>
+        </div>
+        <figure class="inst-r__obraz">
+          <a class="of-blok__lupa" href="assets/img/zrzuty/panel-zespol.jpg" target="_blank" rel="noopener"
+            aria-label="Otwórz zrzut w pełnym rozmiarze">
+            <img src="assets/img/zrzuty/panel-zespol.jpg" alt="Godziny i zakres problemów każdej osoby. To z tego biorą się wolne terminy na stronie." width="1400" height="588" loading="lazy" />
+            <span class="of-blok__powieksz">Powiększ</span>
+          </a>
+          <figcaption>Godziny i zakres problemów każdej osoby. To z tego biorą się wolne terminy na stronie.</figcaption>
+        </figure>
+      </div>
+    </section>
+    <section class="inst-r" id="r2">
+      <div class="inst-r__in">
+        <div>
+          <p class="inst-r__num">Rozdział 02</p>
+          <h2 class="inst-r__h">Rano: zakładka „Dziś”</h2>
+          <p class="inst-r__lead">Jeden ekran, od którego zaczynasz dzień. Po lewej dzisiejsze wizyty, po prawej ludzie wymagający telefonu. U góry cztery liczby. To wszystko, co jest potrzebne przed pierwszym pacjentem.</p>
+          <ol class="inst-kroki">
+            <li>Przechodzisz listę dzisiejszych wizyt i klikasz <b>Potwierdź</b> przy tych, z którymi rozmawiałeś.</li>
+            <li>Po wizycie klikasz <b>Odbyta</b> — dopiero wtedy wchodzi do przychodu i do postępu terapii.</li>
+            <li>Kto nie przyszedł, dostaje <b>Nie przyszedł</b>; to też jest informacja, nie kara.</li>
+            <li>Po prawej bierzesz nazwiska z listy „nie umówili kolejnej wizyty” i dzwonisz. Przycisk <b>Umów termin</b> jest obok.</li>
+          </ol>
+          <p class="inst-uwaga"><strong>Pomyłka nic nie kosztuje.</strong> Po każdej zmianie na dole pojawia się pasek z przyciskiem <b>Cofnij</b>, a status wizyty zawsze da się zmienić z jej karty.</p>
+        </div>
+        <figure class="inst-r__obraz">
+          <a class="of-blok__lupa" href="assets/img/zrzuty/panel-dzis.jpg" target="_blank" rel="noopener"
+            aria-label="Otwórz zrzut w pełnym rozmiarze">
+            <img src="assets/img/zrzuty/panel-dzis.jpg" alt="Zakładka „Dziś”: grafik po lewej, telefony do wykonania po prawej." width="1400" height="972" loading="lazy" />
+            <span class="of-blok__powieksz">Powiększ</span>
+          </a>
+          <figcaption>Zakładka „Dziś”: grafik po lewej, telefony do wykonania po prawej.</figcaption>
+        </figure>
+      </div>
+    </section>
+    <section class="inst-r" id="r3">
+      <div class="inst-r__in">
+        <div>
+          <p class="inst-r__num">Rozdział 03</p>
+          <h2 class="inst-r__h">Umawianie wizyty</h2>
+          <p class="inst-r__lead">Wizytę umówisz z trzech miejsc: przyciskiem <b>Umów wizytę</b> u góry, klikając wolną godzinę w kalendarzu albo z karty pacjenta. Wszędzie otwiera się to samo okno.</p>
+          <ol class="inst-kroki">
+            <li>Wybierasz pacjenta z listy. Jeśli go tam nie ma, klikasz <b>Nowy pacjent</b> w tym samym oknie — nie musisz nigdzie wychodzić.</li>
+            <li>Wybierasz usługę; czas trwania i cena podstawiają się same z cennika.</li>
+            <li>Wskazujesz osobę z zespołu albo zostawiasz „ktokolwiek wolny”.</li>
+            <li>Klikasz godzinę z podpowiedzianych. Pokazują się tylko te naprawdę wolne.</li>
+          </ol>
+          <p class="inst-uwaga"><strong>Cała seria naraz:</strong> zaznacz <b>umów od razu całą serię</b>, podaj liczbę wizyt i odstęp w dniach. Panel rozłoży terminy i sam ominie dni wolne oraz zajęte godziny. Sześć wizyt co tydzień to wtedy jedno okno, nie sześć.</p>
+        </div>
+        <figure class="inst-r__obraz">
+          <a class="of-blok__lupa" href="assets/img/zrzuty/panel-seria.jpg" target="_blank" rel="noopener"
+            aria-label="Otwórz zrzut w pełnym rozmiarze">
+            <img src="assets/img/zrzuty/panel-seria.jpg" alt="Okno umawiania z zaznaczoną serią." width="1120" height="1396" loading="lazy" />
+            <span class="of-blok__powieksz">Powiększ</span>
+          </a>
+          <figcaption>Okno umawiania z zaznaczoną serią.</figcaption>
+        </figure>
+      </div>
+    </section>
+    <section class="inst-r" id="r4">
+      <div class="inst-r__in">
+        <div>
+          <p class="inst-r__num">Rozdział 04</p>
+          <h2 class="inst-r__h">Kalendarz i blokowanie czasu</h2>
+          <p class="inst-r__lead">Zakładka <b>Kalendarz</b> pokazuje tydzień całego zespołu. Kolor paska to rodzaj problemu, inicjały to osoba. Puste miejsca są klikalne — klikasz i od razu umawiasz.</p>
+          <ol class="inst-kroki">
+            <li>Strzałkami u góry przechodzisz między tygodniami.</li>
+            <li>Klikasz wizytę, żeby otworzyć jej kartę: przełożyć, odwołać albo zmienić status.</li>
+            <li>Klikasz wolną godzinę, żeby umówić kogoś w to miejsce.</li>
+            <li>Przyciskiem <b>Zablokuj czas</b> wycinasz urlop, szkolenie albo wyjazd — na jedną osobę lub na cały gabinet.</li>
+          </ol>
+          <p class="inst-uwaga"><strong>Zablokowany czas znika ze strony natychmiast.</strong> Pacjent nie zobaczy tej godziny jako wolnej, więc nie trzeba niczego odwoływać ani nikomu tłumaczyć.</p>
+        </div>
+        <figure class="inst-r__obraz">
+          <a class="of-blok__lupa" href="assets/img/zrzuty/panel-kalendarz.jpg" target="_blank" rel="noopener"
+            aria-label="Otwórz zrzut w pełnym rozmiarze">
+            <img src="assets/img/zrzuty/panel-kalendarz.jpg" alt="Tydzień zespołu. Zakreskowany pas to zablokowany czas." width="1400" height="972" loading="lazy" />
+            <span class="of-blok__powieksz">Powiększ</span>
+          </a>
+          <figcaption>Tydzień zespołu. Zakreskowany pas to zablokowany czas.</figcaption>
+        </figure>
+      </div>
+    </section>
+    <section class="inst-r" id="r5">
+      <div class="inst-r__in">
+        <div>
+          <p class="inst-r__num">Rozdział 05</p>
+          <h2 class="inst-r__h">Karta pacjenta</h2>
+          <p class="inst-r__lead">Klikasz nazwisko w dowolnym miejscu panelu i z prawej strony wysuwa się karta. Jest w niej wszystko o tej osobie — i wszystko, co możesz z nią zrobić, bez wracania do innych zakładek.</p>
+          <ol class="inst-kroki">
+            <li>U góry: cel terapii jej słowami, postęp wizyt i procent zrobionych ćwiczeń.</li>
+            <li>Niżej: ćwiczenia domowe, które możesz dodać, zmienić albo zdjąć.</li>
+            <li><b>Wizyty</b> — umówisz kolejną, przełożysz, odwołasz albo oznaczysz status, nie zamykając karty.</li>
+            <li><b>Wiadomości</b> — konkretne SMS-y, które do tej osoby wyjdą, i rodzaje, które możesz wyłączyć.</li>
+            <li><b>Notatki</b> — dwa zdania do zapamiętania; decydujesz, czy zostają u Ciebie, czy widzi je pacjent.</li>
+            <li>Przyciskiem u góry wysyłasz pacjentowi link do jego własnej karty.</li>
+          </ol>
+          <p class="inst-uwaga"><strong>To nie jest dokumentacja medyczna.</strong> Karta ma pomóc prowadzić terapię i pilnować, żeby pacjent nie zniknął w połowie. Wywiad, badanie i dokumentację prowadzisz tam, gdzie prowadzisz je dzisiaj.</p>
+        </div>
+        <figure class="inst-r__obraz">
+          <a class="of-blok__lupa" href="assets/img/zrzuty/panel-karta-pacjenta.jpg" target="_blank" rel="noopener"
+            aria-label="Otwórz zrzut w pełnym rozmiarze">
+            <img src="assets/img/zrzuty/panel-karta-pacjenta.jpg" alt="Karta wysuwa się z boku i nie zasłania reszty panelu." width="900" height="1917" loading="lazy" />
+            <span class="of-blok__powieksz">Powiększ</span>
+          </a>
+          <figcaption>Karta wysuwa się z boku i nie zasłania reszty panelu.</figcaption>
+        </figure>
+      </div>
+    </section>
+    <section class="inst-r" id="r6">
+      <div class="inst-r__in">
+        <div>
+          <p class="inst-r__num">Rozdział 06</p>
+          <h2 class="inst-r__h">Co odpowiedział pacjent</h2>
+          <p class="inst-r__lead">W karcie, pod planem terapii, jest blok <b>Co odpowiada pacjent</b>. Zbiera to, co ta osoba klikała w telefonie między wizytami: ból po każdej wizycie i odhaczone ćwiczenia tydzień po tygodniu.</p>
+          <ol class="inst-kroki">
+            <li>Lista odczytów bólu pokazuje kolejne oceny i to, w którą stronę idzie.</li>
+            <li>Tabela tygodni pokazuje, ile z zadanych ćwiczeń odhaczył w każdym z ostatnich czterech tygodni.</li>
+            <li>Jeśli niczego nie odesłał, jest to napisane wprost — nie zastępujemy tego wyliczoną liczbą.</li>
+          </ol>
+          <p class="inst-uwaga"><strong>Zajrzyj tu przed wizytą.</strong> Jedno spojrzenie i wiesz, czy rozmawiacie o postępie, czy o tym, dlaczego ćwiczenia stanęły w trzecim tygodniu.</p>
+        </div>
+        <figure class="inst-r__obraz">
+          <a class="of-blok__lupa" href="assets/img/zrzuty/panel-odpowiedzi.jpg" target="_blank" rel="noopener"
+            aria-label="Otwórz zrzut w pełnym rozmiarze">
+            <img src="assets/img/zrzuty/panel-odpowiedzi.jpg" alt="Ból po wizytach i odhaczenia tydzień po tygodniu." width="856" height="1273" loading="lazy" />
+            <span class="of-blok__powieksz">Powiększ</span>
+          </a>
+          <figcaption>Ból po wizytach i odhaczenia tydzień po tygodniu.</figcaption>
+        </figure>
+      </div>
+    </section>
+    <section class="inst-r" id="r7">
+      <div class="inst-r__in">
+        <div>
+          <p class="inst-r__num">Rozdział 07</p>
+          <h2 class="inst-r__h">Wiadomości do pacjentów</h2>
+          <p class="inst-r__lead">Wiadomości układają się same z kalendarza: przypomnienie dzień przed wizytą, pytanie o ból wieczorem po wizycie, pytanie o ćwiczenia raz w tygodniu, prośba o opinię po zamkniętej terapii. Ty decydujesz tylko, co wychodzi, kiedy i w jakich słowach.</p>
+          <ol class="inst-kroki">
+            <li>W karcie pacjenta, w bloku <b>Wiadomości</b>, widzisz konkretne SMS-y: datę, godzinę i treść.</li>
+            <li><b>Edytuj</b> zmienia jedną wiadomość — resztę zostawia w spokoju.</li>
+            <li><b>Nie wysyłaj</b> wyjmuje pojedynczy SMS z kolejki, bez wyłączania całego rodzaju.</li>
+            <li>Przy każdej wiadomości ustawisz też inny termin albo wyślesz ją od razu.</li>
+            <li>Niżej, w <b>Co i kiedy do niego wychodzi</b>, wyłączasz całe rodzaje i ustawiasz porę — dla tej jednej osoby.</li>
+            <li>To samo dla całego gabinetu zmienisz w zakładce <b>Wiadomości</b>; przyciskiem <b>Napisz</b> wyślesz też SMS poza wszystkimi regułami.</li>
+          </ol>
+          <p class="inst-uwaga"><strong>Zgoda pacjenta jest ważniejsza niż ustawienia.</strong> Kto nie zgodził się na SMS-y, nie dostanie nic — panel napisze to wprost w jego karcie.</p>
+        </div>
+        <figure class="inst-r__obraz">
+          <a class="of-blok__lupa" href="assets/img/zrzuty/panel-wiadomosci-karta.jpg" target="_blank" rel="noopener"
+            aria-label="Otwórz zrzut w pełnym rozmiarze">
+            <img src="assets/img/zrzuty/panel-wiadomosci-karta.jpg" alt="Konkretne wiadomości u góry, rodzaje do włączania niżej." width="856" height="1744" loading="lazy" />
+            <span class="of-blok__powieksz">Powiększ</span>
+          </a>
+          <figcaption>Konkretne wiadomości u góry, rodzaje do włączania niżej.</figcaption>
+        </figure>
+      </div>
+    </section>
+    <section class="inst-r" id="r8">
+      <div class="inst-r__in">
+        <div>
+          <p class="inst-r__num">Rozdział 08</p>
+          <h2 class="inst-r__h">Zamknięcie terapii i wypis</h2>
+          <p class="inst-r__lead">Kiedy cykl się kończy, zamykasz go w karcie pacjenta. Panel zamraża wynik: ile wizyt się odbyło, o ile spadł ból, ile ćwiczeń zostało zrobionych i ile dni to trwało. Pacjent dostaje z tego wypis.</p>
+          <ol class="inst-kroki">
+            <li>W karcie klikasz <b>Zamknij terapię</b> i wybierasz powód: plan zrealizowany, poprawa przed planem albo przerwana.</li>
+            <li>Liczby wyliczają się z przebiegu terapii — nie trzeba niczego wpisywać ręcznie.</li>
+            <li>Notatki oznaczone jako widoczne trafiają na wypis jako zalecenia „na dalej”.</li>
+            <li>Po zamknięciu panel proponuje prośbę o opinię w Google, z gotową treścią.</li>
+          </ol>
+          <p class="inst-uwaga"><strong>Wypis to najlepszy moment na polecenie.</strong> Pacjent z czarno na białym wypisanym „ból 7 → 1” pokazuje to znajomym — dlatego ta sama kartka ma na dole przycisk rezerwacji.</p>
+        </div>
+        <figure class="inst-r__obraz">
+          <a class="of-blok__lupa" href="assets/img/zrzuty/pacjent-wypis.jpg" target="_blank" rel="noopener"
+            aria-label="Otwórz zrzut w pełnym rozmiarze">
+            <img src="assets/img/zrzuty/pacjent-wypis.jpg" alt="To, co po zamknięciu cyklu widzi pacjent w swoim telefonie." width="420" height="980" loading="lazy" />
+            <span class="of-blok__powieksz">Powiększ</span>
+          </a>
+          <figcaption>To, co po zamknięciu cyklu widzi pacjent w swoim telefonie.</figcaption>
+        </figure>
+      </div>
+    </section>
+    <section class="inst-r" id="r9">
+      <div class="inst-r__in">
+        <div>
+          <p class="inst-r__num">Rozdział 09</p>
+          <h2 class="inst-r__h">Podsumowanie miesiąca</h2>
+          <p class="inst-r__lead">Zakładka <b>Miesiąc</b> odpowiada na jedno pytanie: czy to się kręci. Ilu nowych pacjentów, skąd przyszli, ile wizyt się odbyło, ile terapii dokończonych i o ile spadł ból u tych, którzy dotrwali do końca.</p>
+          <ol class="inst-kroki">
+            <li>Sprawdzasz źródła pacjentów — to mówi, czy pracuje strona, mapy, polecenia czy reklama.</li>
+            <li>Patrzysz na liczbę dokończonych terapii; ona decyduje o przychodzie bardziej niż liczba nowych.</li>
+            <li>To samo podsumowanie dostajesz raz w miesiącu mailem, więc nie musisz tu zaglądać.</li>
+          </ol>
+          <p class="inst-uwaga"><strong>Spadek bólu to materiał na stronę.</strong> Liczba policzona z zamkniętych terapii jest uczciwa i da się ją pokazać pacjentom — w przeciwieństwie do ankiety zadowolenia.</p>
+        </div>
+        <figure class="inst-r__obraz">
+          <a class="of-blok__lupa" href="assets/img/zrzuty/panel-miesiac.jpg" target="_blank" rel="noopener"
+            aria-label="Otwórz zrzut w pełnym rozmiarze">
+            <img src="assets/img/zrzuty/panel-miesiac.jpg" alt="Miesiąc w liczbach, z podziałem na źródła pacjentów." width="1400" height="972" loading="lazy" />
+            <span class="of-blok__powieksz">Powiększ</span>
+          </a>
+          <figcaption>Miesiąc w liczbach, z podziałem na źródła pacjentów.</figcaption>
+        </figure>
+      </div>
+    </section>
+    <section class="inst-r inst-r--bez-obrazu" id="r10">
+      <div class="inst-r__in">
+        <div>
+          <p class="inst-r__num">Rozdział 10</p>
+          <h2 class="inst-r__h">Rzeczy, które warto wiedzieć</h2>
+          <p class="inst-r__lead">Kilka drobiazgów, które oszczędzają najwięcej czasu, a nie mieszczą się w żadnym z poprzednich rozdziałów.</p>
+          <ol class="inst-kroki">
+            <li><b>Cofnij</b> pojawia się po każdej zmianie statusu, przełożeniu i odwołaniu wizyty.</li>
+            <li>Nazwisko pacjenta jest klikalne wszędzie — w kalendarzu, w kolejce wiadomości, w podsumowaniu.</li>
+            <li>Cennik, usługi i czasy trwania zmienisz w <b>Ustawieniach</b>; strona przejmuje je od razu.</li>
+            <li>Całą bazę wyeksportujesz jednym przyciskiem. Dane pacjentów są Twoje, także gdy się rozstaniemy.</li>
+            <li>Panel działa na tablecie w gabinecie tak samo jak na komputerze w rejestracji.</li>
+          </ol>
+          <p class="inst-uwaga"><strong>Nie zostajesz z tym sam.</strong> W pakiecie Prowadzenie odbieramy telefon i poprawiamy, co trzeba — łącznie z wpisaniem Twoich godzin, cennika i pierwszych pacjentów przy starcie.</p>
+        </div>
+      </div>
+    </section>
+    <section class="of-finale">
+      <div class="of-finale__in">
+        <h2 class="of-finale__h">Sprawdź to na żywo</h2>
+        <p>
+          Demo panelu jest otwarte i pełne przykładowych pacjentów. Oznacz wizytę jako odbytą,
+          umów serię, wyłącz jeden rodzaj SMS-ów, zamknij terapię i zobacz wypis. Niczego nie
+          zepsujesz — dane zostają w Twojej przeglądarce i nigdzie nie wychodzą.
+        </p>
+        <div class="of-hero__cta">
+          <a class="cta cta--blue" href="crm.html">Otwórz demo panelu<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></a>
+          <a class="cta cta--line" href="index.html#kontakt">Umów rozmowę</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="of-stopka">
+    <p><strong>Studio Widok</strong> · system pozyskiwania pacjentów dla gabinetów fizjoterapii</p>
+    <p><a href="tel:+48783480341">783 480 341</a> · <a href="mailto:kontakt@studio-widok.pl">kontakt@studio-widok.pl</a> · <a href="https://studio-widok.pl">studio-widok.pl</a></p>
+    <p class="of-stopka__note">Zrzuty pochodzą z działającego dema. Dane gabinetu, nazwiska i ceny są przykładowe.</p>
+  </footer>
+</body>
+</html>

@@ -130,6 +130,9 @@
   };
 
   const dayLong = (d) => `${DOW_LONG[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]}`;
+  /* Biernik dla zdań typu „do zobaczenia w środę". */
+  const DOW_BIERNIK = ['niedzielę', 'poniedziałek', 'wtorek', 'środę', 'czwartek', 'piątek', 'sobotę'];
+  const dayWhen = (d) => `w ${DOW_BIERNIK[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]}`;
 
   /** Godziny otwarcia gabinetu danego dnia: suma grafików zespołu. */
   function godzinyGabinetu(dow) {
@@ -505,11 +508,12 @@
     const filtr = { osoba: B.osoba, line: B.line };
     const dostepni = osobyLinii(B.line);
     const counts = DAYS.map((d) => findSlots({ date: iso(d), ...filtr }).length);
-    if (!B.date || !counts[DAYS.findIndex((d) => iso(d) === B.date)]) {
-      const idx = counts.findIndex((n) => n > 0);
-      B.date = idx >= 0 ? iso(DAYS[idx]) : null;
-      B.time = null;
-    }
+    /* Po zmianie osoby zostajemy na wybranym dniu, nawet jeśli nic w nim nie ma.
+       Ciche przeskoczenie na inny termin dezorientuje bardziej niż pusty dzień
+       z wyjaśnieniem. Pierwsze wejście ustawia najbliższy dzień z wolnym. */
+    const najblizszyWolny = counts.findIndex((n) => n > 0);
+    if (!B.date) B.date = najblizszyWolny >= 0 ? iso(DAYS[najblizszyWolny]) : null;
+    if (B.date && !counts[DAYS.findIndex((d) => iso(d) === B.date)]) B.time = null;
     const slots = B.date ? findSlots({ date: B.date, ...filtr }) : [];
 
     const body = `
@@ -553,7 +557,11 @@
           : `<div class="empty"><strong>${
               B.osoba ? `${esc(imieSame(OSOBY[B.osoba].imie))} nie ma tego dnia wolnych godzin.` : 'W tym dniu nie ma już wolnych godzin.'
             }</strong>
-             Wybierz inny dzień${B.osoba ? ', inną osobę' : ''} albo zadzwoń: ${esc(K.telefon)}.</div>`
+             ${
+               najblizszyWolny >= 0
+                 ? `Najbliższy wolny termin${B.osoba ? ' u tej osoby' : ''}: <button class="empty__skok" type="button" data-pick-date="${iso(DAYS[najblizszyWolny])}">${dayLong(DAYS[najblizszyWolny])}</button>.`
+                 : `Zadzwoń, dobierzemy termin: ${esc(K.telefon)}.`
+             }</div>`
       }`;
     return stepShell(1, 'Kiedy Ci pasuje?', body, { nextDisabled: !(B.date && B.time) });
   }
@@ -593,7 +601,9 @@
     const svc = SERVICES[B.service];
     return `<div class="done step is-entering" style="--c:${l.kolor};--on:${l.naKolorze}">
       <div class="done__mark">${icon('check')}</div>
-      <h3 class="done__title" tabindex="-1">Do zobaczenia ${dayLabel(fromIso(B.date)) === 'jutro' ? 'jutro' : dayLong(fromIso(B.date))}.</h3>
+      <h3 class="done__title" tabindex="-1">Do zobaczenia ${
+        dayLabel(fromIso(B.date)) === 'jutro' ? 'jutro' : dayWhen(fromIso(B.date))
+      }.</h3>
       <p class="done__code">Numer rezerwacji: <strong>${B.done}</strong></p>
       <dl class="done__list">
         <dt>Wizyta</dt><dd>${esc(svc.nazwa)} · ${svc.minuty} min · ${zl(svc.cena)}</dd>
@@ -985,7 +995,7 @@
           <div><dt>Najbliższy termin</dt><dd>${slot ? `${dayLong(slot.at)}, ${slot.time}` : 'zadzwoń, dobierzemy termin'}</dd></div>
         </dl>
         <div class="kw__akcje">
-          <button class="btn btn--color btn--lg" type="button" data-kw-umow="${u.id}">Umów ten termin</button>
+          <button class="btn btn--color btn--lg" type="button" data-kw-umow="${u.id}">Wybierz termin</button>
           <button class="back" type="button" data-kw-reset>Zacznij od nowa</button>
         </div>
         <p class="kw__uwaga">To podpowiedź, nie diagnoza. Na wizycie sprawdzamy, czy kierunek jest właściwy — jeśli nie, mówimy to wprost.</p>

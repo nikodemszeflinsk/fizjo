@@ -729,8 +729,10 @@
 
     const wiersz = (w) => {
       const p = P.pacjent(w.pacjentId);
-      const nieidzie = w.usunieta || w.wylaczonaRodzaj || w.wylaczonaPacjent;
-      const powod = w.usunieta
+      const nieidzie = w.wyslana || w.usunieta || w.wylaczonaRodzaj || w.wylaczonaPacjent;
+      const powod = w.wyslana
+        ? 'wysłana wcześniej, ręcznie'
+        : w.usunieta
         ? 'usunięta z kolejki'
         : w.wylaczonaRodzaj
           ? 'ten rodzaj jest wyłączony'
@@ -866,6 +868,32 @@
     toast('Zapisano ustawienia wiadomości', true);
   }
 
+  /* ── Notatka w karcie ──────────────────────────────────────────────── */
+  function formNotatkaKarty(pacjentId, nid = null) {
+    const n = nid ? (S().notatki || []).find((x) => x.id === nid) : null;
+    const t = P.terapiaPacjenta(pacjentId);
+    modal(
+      n ? 'Edytuj notatkę' : 'Nowa notatka',
+      `<div class="field field--full">
+        <label for="nk-tekst">Treść</label>
+        <textarea id="nk-tekst" rows="4" placeholder="Co warto pamiętać przy następnej wizycie.">${esc(n ? n.tekst : '')}</textarea>
+      </div>
+
+      <label class="seria__check">
+        <input type="checkbox" id="nk-dla-pacjenta" ${n && n.dlaPacjenta ? 'checked' : ''} />
+        <span>
+          <strong>Pokaż tę notatkę pacjentowi</strong>
+          <em>Trafi do jego karty pod linkiem z SMS-a, nad ćwiczeniami. Bez zaznaczenia zostaje tylko u Ciebie.</em>
+        </span>
+      </label>
+
+      <p class="modal__info">Panel nie jest dokumentacją medyczną — notatki trzymaj operacyjne: o czym pamiętać, co ustalić, czego unikać.</p>
+      <p class="modal__err" id="nk-err" hidden></p>`,
+      `<button class="btn btn--ghost" type="button" data-close>Anuluj</button>
+       <button class="btn btn--accent" type="button" data-zapisz="notatka-karty" data-pacjent-id="${pacjentId}" ${nid ? `data-notatka="${nid}"` : ''} ${t ? `data-terapia="${t.id}"` : ''}>Zapisz</button>`
+    );
+  }
+
   /* ── Wiadomość napisana ręcznie ────────────────────────────────────── */
   function formNapisz(pacjentId) {
     const pac = P.pacjent(pacjentId);
@@ -903,7 +931,8 @@
       </div>
       <p class="modal__err" id="nw-err" hidden></p>`,
       `<button class="btn btn--ghost" type="button" data-close>Anuluj</button>
-       <button class="btn btn--accent" type="button" data-zapisz="napisz" data-pacjent-id="${pacjentId}">Zaplanuj wysyłkę</button>`
+       <button class="btn" type="button" data-zapisz="napisz-teraz" data-pacjent-id="${pacjentId}">Wyślij teraz</button>
+       <button class="btn btn--accent" type="button" data-zapisz="napisz" data-pacjent-id="${pacjentId}">Zaplanuj</button>`
     );
     /* Gotowce trzymamy przy oknie, żeby klik mógł je wstawić bez szukania. */
     $('#modal').dataset.gotowce = JSON.stringify(gotowce);
@@ -996,22 +1025,33 @@
 
   /* ── Edycja jednej wiadomości ──────────────────────────────────────── */
   function formWiadomosc(wid) {
-    const w = P.kolejkaWiadomosci(14).find((x) => x.id === wid);
+    const w = P.kolejkaWiadomosci(30).find((x) => x.id === wid);
     if (!w) return;
-    const p = P.pacjent(w.pacjentId);
+    const pac = P.pacjent(w.pacjentId);
     modal(
-      'Edytuj tę wiadomość',
+      'Ta jedna wiadomość',
       `<p class="modal__info">
-        Do: <strong>${esc(p.imie)}</strong> · ${esc(p.telefon)}<br />
-        Wyjdzie ${krotka(w.data)} o ${w.godzina} — ${esc(w.powod)}.
+        Do: <strong>${esc(pac.imie)}</strong> · ${esc(pac.telefon)}<br />
+        Powód: ${esc(w.powod)}.
       </p>
+
+      <p class="modal__label">Kiedy wyjdzie</p>
+      <div class="form-grid">
+        ${pole('ew-data', 'Dzień', 'date', w.data, `min="${P.iso(P.dzis)}"`)}
+        ${pole('ew-godzina', 'Godzina', 'time', w.godzina)}
+      </div>
+      ${w.przesunieta ? '<p class="modal__info">Ten termin jest już przesunięty ręcznie — reguła gabinetu mówi co innego.</p>' : ''}
+
+      <p class="modal__label">Treść</p>
       <div class="field field--full">
-        <label for="ew-tresc">Treść</label>
+        <label for="ew-tresc" class="visually-hidden">Treść wiadomości</label>
         <textarea id="ew-tresc" rows="4">${esc(w.tresc)}</textarea>
       </div>
-      <p class="modal__info">Zmiana dotyczy tylko tej jednej wiadomości. Szablon dla pozostałych zostaje bez zmian.</p>`,
+      <p class="modal__info">Zmiany dotyczą tylko tej jednej wiadomości. Reguła i szablon zostają bez zmian.</p>
+      <p class="modal__err" id="ew-err" hidden></p>`,
       `<button class="btn btn--ghost" type="button" data-close>Anuluj</button>
-       ${w.wlasnaTresc ? `<button class="btn" type="button" data-zapisz="wiadomosc-domyslna" data-wid="${wid}">Wróć do szablonu</button>` : ''}
+       ${w.wlasnaTresc || w.przesunieta ? `<button class="btn" type="button" data-zapisz="wiadomosc-domyslna" data-wid="${wid}">Wróć do reguły</button>` : ''}
+       <button class="btn" type="button" data-zapisz="wyslij-teraz" data-wid="${wid}">Wyślij teraz</button>
        <button class="btn btn--accent" type="button" data-zapisz="wiadomosc" data-wid="${wid}">Zapisz</button>`
     );
   }
@@ -1205,8 +1245,10 @@
 
   /** Jedna konkretna wiadomość w karcie pacjenta. */
   function wiadomoscWKarcie(w) {
-    const nieidzie = w.usunieta || w.wylaczonaRodzaj || w.wylaczonaPacjent;
-    const powod = w.usunieta
+    const nieidzie = w.wyslana || w.usunieta || w.wylaczonaRodzaj || w.wylaczonaPacjent;
+    const powod = w.wyslana
+      ? 'wysłana wcześniej, ręcznie'
+      : w.usunieta
       ? 'usunięta z kolejki'
       : w.wylaczonaRodzaj
         ? 'rodzaj wyłączony w gabinecie'
@@ -1224,6 +1266,7 @@
           ${w.recznaWiadomosc ? '<span class="kolejka__znak">ręczna</span>' : ''}
           ${w.wlasnaTresc ? '<span class="kolejka__znak">zmieniona</span>' : ''}
           ${w.wlasnyHarmonogram ? '<span class="kolejka__znak kolejka__znak--pora">własna pora</span>' : ''}
+          ${w.przesunieta ? '<span class="kolejka__znak kolejka__znak--pora">termin zmieniony</span>' : ''}
         </span>
         <em>${esc(w.tresc)}</em>
         ${
@@ -1243,6 +1286,86 @@
         }
       </span>
     </li>`;
+  }
+
+  /**
+   * Co pacjent naprawdę odpowiedział: kolejne oceny bólu i odhaczenia
+   * tydzień po tygodniu. Bez tego procent w karcie jest liczbą bez historii.
+   */
+  function odpowiedziPacjenta(t) {
+    const bol = P.bolTerapii(t.id);
+    const l = P.linia(t.linia);
+
+    /* Cztery ostatnie tygodnie, od najstarszego. */
+    const tygodnie = Array.from({ length: 4 }, (_, i) => {
+      const od = P.isoZa(-7 * (4 - i));
+      const doKiedy = P.isoZa(-7 * (3 - i));
+      return { od, doKiedy, etykieta: i === 3 ? 'ten tydzień' : `−${4 - i} tydz.` };
+    });
+
+    const wiersz = (cw) => {
+      const def = P.cwiczenie(cw.cwiczenieId);
+      const cel = cw.razyWTygodniu || 0;
+      return `<tr>
+        <th scope="row">${esc(def ? def.nazwa : cw.cwiczenieId)}<em>${cel}× w tygodniu</em></th>
+        ${tygodnie
+          .map((tydz) => {
+            const ile = S().odhaczenia.filter(
+              (o) => o.terapiaId === t.id && o.cwiczenieId === cw.cwiczenieId && o.data >= tydz.od && o.data < tydz.doKiedy
+            ).length;
+            const proc = cel ? Math.min(Math.round((ile / cel) * 100), 100) : 0;
+            return `<td><span class="slupek" style="--h:${proc}%;--c:${l.kolor}" title="${ile} z ${cel}"></span><b>${ile}</b></td>`;
+          })
+          .join('')}
+      </tr>`;
+    };
+
+    const bolHtml = bol.length
+      ? `<ol class="bol-lista">
+          ${bol
+            .slice(-8)
+            .map((b, i, tab) => {
+              const poprz = i ? tab[i - 1].wartosc : null;
+              const zmiana = poprz === null ? '' : b.wartosc < poprz ? 'w dół' : b.wartosc > poprz ? 'w górę' : 'bez zmian';
+              return `<li>
+                <span class="bol-lista__data">${krotka(b.data)}</span>
+                <span class="bol-lista__pasek"><span style="width:${b.wartosc * 10}%;--c:${l.kolor}"></span></span>
+                <span class="bol-lista__wartosc">${b.wartosc}<em>/10</em></span>
+                <span class="bol-lista__zmiana">${zmiana}</span>
+              </li>`;
+            })
+            .join('')}
+        </ol>
+        <p class="pat__nastepna-wiad">Pierwszy odczyt ${bol[0].wartosc}, ostatni ${bol[bol.length - 1].wartosc}. ${
+          bol.length > 1
+            ? bol[bol.length - 1].wartosc < bol[0].wartosc
+              ? 'Ból spada.'
+              : bol[bol.length - 1].wartosc > bol[0].wartosc
+                ? 'Ból rośnie — warto sprawdzić plan.'
+                : 'Bez zmiany od początku terapii.'
+            : ''
+        }</p>`
+      : '<p class="pusto">Pacjent nie odpowiedział jeszcze na żadne pytanie o ból. Ankieta idzie wieczorem po wizycie.</p>';
+
+    return `<div class="pat__block">
+      <h3>Co odpowiada pacjent</h3>
+
+      <p class="wiad-naglowek">Ból po wizytach</p>
+      ${bolHtml}
+
+      <p class="wiad-naglowek">Odhaczone ćwiczenia, tydzień po tygodniu</p>
+      ${
+        t.cwiczenia.length
+          ? `<div class="table-wrap">
+              <table class="odhaczenia">
+                <thead><tr><th scope="col">Ćwiczenie</th>${tygodnie.map((x) => `<th scope="col">${x.etykieta}</th>`).join('')}</tr></thead>
+                <tbody>${t.cwiczenia.map(wiersz).join('')}</tbody>
+              </table>
+            </div>
+            <p class="notatki__info">Liczba to odhaczenia w danym tygodniu, słupek pokazuje je w stosunku do tego, co zadałeś.</p>`
+          : '<p class="pusto">Ten pacjent nie ma zadanych ćwiczeń.</p>'
+      }
+    </div>`;
   }
 
   /** Wiersz wizyty w karcie pacjenta — z akcjami, żeby nie wracać do „Dziś". */
@@ -1362,6 +1485,8 @@
             </div>`
       }
 
+      ${t ? odpowiedziPacjenta(t) : ''}
+
       <div class="pat__block">
         <h3 class="pat__h3--row">Wizyty
           <span class="pat__h3-akcje">
@@ -1438,11 +1563,32 @@
       </div>
 
       <div class="pat__block">
-        <h3>Notatka</h3>
-        <p class="pat__note">${esc(p.notatka || 'Brak notatki.')}</p>
-        <div class="pat__akcje pat__akcje--male">
-          <button class="btn btn--sm" type="button" data-akcja="notatka" data-pacjent-id="${p.id}">${p.notatka ? 'Zmień notatkę' : 'Dodaj notatkę'}</button>
-        </div>
+        <h3 class="pat__h3--row">Notatki
+          <button class="btn btn--sm" type="button" data-akcja="nowa-notatka" data-pacjent-id="${p.id}">${ikona('plus')}Dopisz</button>
+        </h3>
+        <p class="notatki__info">Domyślnie notatka zostaje u Ciebie. Oznaczona jako widoczna trafia do karty, którą pacjent otwiera z SMS-a.</p>
+        ${(() => {
+          const lista = P.notatkiPacjenta(p.id);
+          if (!lista.length) return '<p class="pusto">Nie ma jeszcze żadnej notatki.</p>';
+          return `<ul class="notatki">${lista
+            .map(
+              (n) => `<li class="notatka${n.dlaPacjenta ? ' is-dla-pacjenta' : ''}">
+                <span class="notatka__gora">
+                  <span class="notatka__znak">${n.dlaPacjenta ? 'Widzi pacjent' : 'Tylko dla Ciebie'}</span>
+                  <span class="notatka__data">${krotka(n.kiedy)}</span>
+                </span>
+                <p class="notatka__tekst">${esc(n.tekst)}</p>
+                <span class="notatka__akcje">
+                  <button class="btn btn--sm btn--ghost" type="button" data-akcja="widocznosc-notatki" data-notatka="${n.id}">
+                    ${n.dlaPacjenta ? 'Ukryj przed pacjentem' : 'Pokaż pacjentowi'}
+                  </button>
+                  <button class="btn btn--sm btn--ghost" type="button" data-akcja="edytuj-notatke" data-notatka="${n.id}">Edytuj</button>
+                  <button class="btn btn--sm btn--ghost" type="button" data-akcja="usun-notatke" data-notatka="${n.id}">Usuń</button>
+                </span>
+              </li>`
+            )
+            .join('')}</ul>`;
+        })()}
       </div>
 
       <div class="pat__akcje">
@@ -2258,8 +2404,6 @@
         return formNowaTerapia(d.pacjentId);
       case 'edytuj-terapie':
         return formEdytujTerapie(d.terapia);
-      case 'notatka':
-        return formNotatka(d.pacjentId);
       case 'cwiczenia':
         return formCwiczenia(d.terapia);
       case 'link':
@@ -2341,6 +2485,19 @@
       case 'przywroc-wiadomosc':
         P.akcje.przywrocWiadomosc(d.wid);
         return toast('Wiadomość wraca do kolejki', true);
+      case 'nowa-notatka':
+        return formNotatkaKarty(d.pacjentId);
+      case 'edytuj-notatke': {
+        const n = (S().notatki || []).find((x) => x.id === d.notatka);
+        return formNotatkaKarty(n.pacjentId, n.id);
+      }
+      case 'widocznosc-notatki': {
+        const wynik = P.akcje.przelaczWidocznoscNotatki(d.notatka);
+        return toast(wynik.dlaPacjenta ? 'Pacjent zobaczy tę notatkę w swojej karcie' : 'Notatka znów jest tylko dla Ciebie', true);
+      }
+      case 'usun-notatke':
+        P.akcje.usunNotatke(d.notatka);
+        return toast('Notatka usunięta', true);
       case 'napisz':
         return formNapisz(d.pacjentId);
       case 'pora-pacjenta':
@@ -2403,10 +2560,6 @@
         return zapiszNowaTerapie(d.pacjentId);
       case 'edycja-terapii':
         return zapiszEdycjeTerapii(d.terapia);
-      case 'notatka':
-        P.akcje.dodajNotatke(d.pacjentId, $('#nn-tekst').value.trim());
-        schowajModal();
-        return toast('Zapisano notatkę', true);
       case 'cwiczenia':
         return zapiszCwiczenia(d.terapia);
       case 'wizyta':
@@ -2430,6 +2583,15 @@
         return zapiszBlokade();
       case 'kreator':
         return zapiszKreator();
+      case 'notatka-karty': {
+        const tekst = $('#nk-tekst').value.trim();
+        if (tekst.length < 3) return bladModalu('nk-err', 'Napisz treść notatki.');
+        const dlaPacjenta = $('#nk-dla-pacjenta').checked;
+        if (d.notatka) P.akcje.zmienNotatke(d.notatka, { tekst, dlaPacjenta });
+        else P.akcje.dodajNotatkeKarty({ pacjentId: d.pacjentId, terapiaId: d.terapia || null, tekst, dlaPacjenta });
+        schowajModal();
+        return toast(dlaPacjenta ? 'Zapisano. Pacjent zobaczy tę notatkę.' : 'Zapisano notatkę', true);
+      }
       case 'napisz':
         return zapiszNapisz(d.pacjentId);
       case 'pora-pacjenta': {
@@ -2454,14 +2616,37 @@
         schowajModal();
         return toast('Przywrócono domyślne ustawienia', true);
       }
-      case 'wiadomosc':
-        P.akcje.nadpiszWiadomosc(d.wid, $('#ew-tresc').value.trim());
+      case 'wiadomosc': {
+        const tresc = $('#ew-tresc').value.trim();
+        const data = $('#ew-data').value;
+        const godzina = $('#ew-godzina').value;
+        if (tresc.length < 5) return bladModalu('ew-err', 'Treść jest za krótka.');
+        if (!data || !godzina) return bladModalu('ew-err', 'Podaj dzień i godzinę.');
+        if (data < P.iso(P.dzis)) return bladModalu('ew-err', 'Nie da się wysłać wstecz.');
+        P.akcje.nadpiszWiadomosc(d.wid, tresc);
+        P.akcje.przesunWiadomosc(d.wid, data, godzina);
         schowajModal();
-        return toast('Zmieniono treść tej wiadomości', true);
+        return toast(`Wyjdzie ${krotka(data)} o ${godzina}`, true);
+      }
+      case 'wyslij-teraz': {
+        const w = P.kolejkaWiadomosci(30).find((x) => x.id === d.wid);
+        if (!w) return;
+        P.akcje.wyslijWiadomoscTeraz(w.id, w.pacjentId, ($('#ew-tresc') || {}).value || w.tresc);
+        schowajModal();
+        return toast('Wysłane. Ślad jest w historii pacjenta.', true);
+      }
+      case 'napisz-teraz': {
+        const tresc = $('#nw-tresc').value.trim();
+        if (tresc.length < 5) return bladModalu('nw-err', 'Napisz treść wiadomości.');
+        P.akcje.zapiszWyslanie(d.pacjentId, 'sms', tresc);
+        schowajModal();
+        return toast('Wysłane. Ślad jest w historii pacjenta.', true);
+      }
       case 'wiadomosc-domyslna':
         P.akcje.przywrocTrescWiadomosci(d.wid);
+        P.akcje.przywrocTerminWiadomosci(d.wid);
         schowajModal();
-        return toast('Wróciła treść z szablonu', true);
+        return toast('Wróciła treść i termin z reguły', true);
       case 'osoba':
         return zapiszOsobe(d.osoba);
       case 'gabinet': {

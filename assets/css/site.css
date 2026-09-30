@@ -3704,3 +3704,20 @@ svg path {
     flex: none;
   }
 }
+
+/* Skok do najbliższego wolnego dnia z pustego widoku godzin. */
+.empty__skok {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.empty__skok:hover {
+  color: var(--l-kregoslup, #1f5fd6);
+}

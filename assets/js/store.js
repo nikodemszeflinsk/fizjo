@@ -11,7 +11,7 @@
   'use strict';
 
   const KLUCZ = 'panel-gabinetu';
-  const WERSJA = 5;
+  const WERSJA = 6;
 
   /* ── Pomocnicze ────────────────────────────────────────────────────── */
   const dzis = new Date();
@@ -86,9 +86,13 @@
       zdarzenia: [],
       blokady: [],
       wylaczone: [],
+      notatki: [],
       wiadomosci: {},
       nadpisaneWiadomosci: {},
       pominieteWiadomosci: [],
+      /* Terminy przesunięte ręcznie i wiadomości już wysłane. */
+      terminyWiadomosci: {},
+      wyslaneWiadomosci: [],
       /* Odstępstwa od reguł gabinetu dla pojedynczych pacjentów. */
       wiadomosciPacjenta: {},
       /* Wiadomości napisane ręcznie, poza regułami. */
@@ -98,18 +102,18 @@
 
   function bibliotekaCwiczen() {
     /* Biblioteka ćwiczeń — terapeuta wybiera z niej albo dopisuje własne.
-       `rysunek` to id sylwetki rysowanej w karcie pacjenta (assets/js/pacjent.js). */
+       Przy wdrożeniu do każdego ćwiczenia podpina się nagranie z gabinetu. */
     const cwiczeniaBiblioteka = [
-      { id: 'c-koci', nazwa: 'Koci grzbiet', opis: 'W klęku podpartym zaokrąglaj i prostuj plecy, powoli, bez bólu.', rysunek: 'kleczenie' },
-      { id: 'c-mostek', nazwa: 'Mostek biodrowy', opis: 'Leżąc na plecach unieś biodra, zatrzymaj na 3 sekundy, opuść.', rysunek: 'lezenie' },
-      { id: 'c-ptak', nazwa: 'Ptak-pies', opis: 'W klęku podpartym wyprostuj przeciwną rękę i nogę, utrzymaj 5 sekund.', rysunek: 'kleczenie' },
-      { id: 'c-rotacja', nazwa: 'Rotacja odcinka piersiowego', opis: 'Siedząc, obróć tułów w bok i zatrzymaj oddech na 2 sekundy.', rysunek: 'siedzenie' },
-      { id: 'c-lopatki', nazwa: 'Ściąganie łopatek', opis: 'Siedząc prosto, ściągnij łopatki do siebie i w dół, przytrzymaj 5 sekund.', rysunek: 'siedzenie' },
-      { id: 'c-kark', nazwa: 'Rozciąganie karku', opis: 'Delikatnie przyciągnij ucho do barku, wytrzymaj 20 sekund na stronę.', rysunek: 'siedzenie' },
-      { id: 'c-nadgarstek', nazwa: 'Mobilizacja nadgarstka', opis: 'Zegnij i wyprostuj nadgarstek, potem krążenia w obie strony.', rysunek: 'siedzenie' },
-      { id: 'c-przysiad', nazwa: 'Przysiad przy ścianie', opis: 'Plecy na ścianie, zejdź do kąta prostego i wytrzymaj.', rysunek: 'sciana' },
-      { id: 'c-lydka', nazwa: 'Wspięcia na palce', opis: 'Stojąc, unieś się na palce i powoli opuść. Trzymaj się oparcia.', rysunek: 'stanie' },
-      { id: 'c-balans', nazwa: 'Stanie na jednej nodze', opis: 'Utrzymaj równowagę 30 sekund, potem z zamkniętymi oczami.', rysunek: 'stanie' },
+      { id: 'c-koci', nazwa: 'Koci grzbiet', opis: 'W klęku podpartym zaokrąglaj i prostuj plecy, powoli, bez bólu.' },
+      { id: 'c-mostek', nazwa: 'Mostek biodrowy', opis: 'Leżąc na plecach unieś biodra, zatrzymaj na 3 sekundy, opuść.' },
+      { id: 'c-ptak', nazwa: 'Ptak-pies', opis: 'W klęku podpartym wyprostuj przeciwną rękę i nogę, utrzymaj 5 sekund.' },
+      { id: 'c-rotacja', nazwa: 'Rotacja odcinka piersiowego', opis: 'Siedząc, obróć tułów w bok i zatrzymaj oddech na 2 sekundy.' },
+      { id: 'c-lopatki', nazwa: 'Ściąganie łopatek', opis: 'Siedząc prosto, ściągnij łopatki do siebie i w dół, przytrzymaj 5 sekund.' },
+      { id: 'c-kark', nazwa: 'Rozciąganie karku', opis: 'Delikatnie przyciągnij ucho do barku, wytrzymaj 20 sekund na stronę.' },
+      { id: 'c-nadgarstek', nazwa: 'Mobilizacja nadgarstka', opis: 'Zegnij i wyprostuj nadgarstek, potem krążenia w obie strony.' },
+      { id: 'c-przysiad', nazwa: 'Przysiad przy ścianie', opis: 'Plecy na ścianie, zejdź do kąta prostego i wytrzymaj.' },
+      { id: 'c-lydka', nazwa: 'Wspięcia na palce', opis: 'Stojąc, unieś się na palce i powoli opuść. Trzymaj się oparcia.' },
+      { id: 'c-balans', nazwa: 'Stanie na jednej nodze', opis: 'Utrzymaj równowagę 30 sekund, potem z zamkniętymi oczami.' },
     ];
     return cwiczeniaBiblioteka;
   }
@@ -260,8 +264,17 @@
       w('t13', 'p13', -16, '13:00', 'k1', 'odbyta'),
       w('t14', 'p14', -24, '11:00', 'k2', 'odbyta'),
       w('t14', 'p14', -31, '11:00', 'k1', 'odbyta'),
+      /* Dwa domknięte cykle w całości — z nich bierze się wypis dla pacjenta. */
+      w('t8', 'p8', -76, '17:00', 's1', 'odbyta'),
+      w('t8', 'p8', -68, '17:00', 's2', 'odbyta'),
+      w('t8', 'p8', -55, '17:00', 's3', 'odbyta'),
+      w('t8', 'p8', -41, '17:00', 's3', 'odbyta'),
+      w('t8', 'p8', -27, '17:00', 's3', 'odbyta'),
       w('t8', 'p8', -14, '17:00', 's3', 'odbyta'),
-      w('t11', 'p11', -30, '12:00', 'k1', 'odbyta'),
+      w('t11', 'p11', -90, '12:00', 'k1', 'odbyta'),
+      w('t11', 'p11', -76, '12:00', 'k2', 'odbyta'),
+      w('t11', 'p11', -55, '12:00', 's3', 'odbyta'),
+      w('t11', 'p11', -30, '12:00', 's3', 'odbyta'),
       w('t3', 'p3', -8, '12:00', 'b1', 'nieobecnosc'),
     ];
 
@@ -269,9 +282,11 @@
     const odhaczenia = [];
     const dodajOdhaczenia = (terapiaId, cwiczenieId, dni) =>
       dni.forEach((d) => odhaczenia.push({ id: id('o'), terapiaId, cwiczenieId, data: isoZa(-d) }));
-    dodajOdhaczenia('t1', 'c-koci', [1, 2, 3, 5, 6, 8, 9, 10, 12, 13]);
-    dodajOdhaczenia('t1', 'c-mostek', [1, 2, 3, 5, 8, 9, 12, 13]);
-    dodajOdhaczenia('t1', 'c-ptak', [2, 5, 9, 12]);
+    /* t1 odhacza od początku terapii — stąd w karcie widać, że z tygodnia
+       na tydzień robi więcej, a ból w tym samym czasie spada. */
+    dodajOdhaczenia('t1', 'c-koci', [1, 2, 3, 5, 6, 8, 9, 10, 12, 13, 15, 16, 19, 20, 22, 24, 27]);
+    dodajOdhaczenia('t1', 'c-mostek', [1, 2, 3, 5, 8, 9, 12, 13, 15, 17, 20, 23, 26]);
+    dodajOdhaczenia('t1', 'c-ptak', [2, 5, 9, 12, 16, 19, 25]);
     dodajOdhaczenia('t2', 'c-lydka', [1, 3, 6, 8, 11]);
     dodajOdhaczenia('t2', 'c-balans', [1, 2, 6, 8]);
     dodajOdhaczenia('t4', 'c-przysiad', [1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13]);
@@ -282,6 +297,9 @@
     dodajOdhaczenia('t10', 'c-mostek', [1, 2, 3, 5, 7, 8, 10, 12]);
     dodajOdhaczenia('t10', 'c-balans', [2, 5, 8, 12]);
     dodajOdhaczenia('t13', 'c-nadgarstek', [6, 13]);
+    /* Zamknięte cykle: odhaczenia z czasu trwania terapii, nie z ostatnich dni. */
+    dodajOdhaczenia('t8', 'c-przysiad', [16, 18, 21, 23, 25, 28, 30, 32, 35, 38, 42, 45, 49, 52, 56, 60, 63, 67, 70, 74]);
+    dodajOdhaczenia('t11', 'c-lydka', [32, 35, 39, 42, 46, 49, 53, 56, 60, 63, 67, 70, 74, 78, 82, 86]);
     dodajOdhaczenia('t14', 'c-koci', [9]);
 
     /* Odczyty bólu z ankiet po wizycie. */
@@ -297,6 +315,29 @@
     dodajBol('t11', [[90, 5], [70, 4], [50, 2], [30, 1]]);
     dodajBol('t12', [[2, 5]]);
     dodajBol('t14', [[40, 6], [31, 6], [24, 6]]);
+
+    /* Zamknięte terapie mają zamrożony wynik — tak samo jak te, które gabinet
+       zamyka ręcznie. Bez niego pacjent nie dostałby wypisu po cyklu. */
+    const domknij = (tid, powod) => {
+      const t = terapie.find((x) => x.id === tid);
+      if (!t) return;
+      const odczyty = bol.filter((b) => b.terapiaId === tid).sort((a, b) => a.data.localeCompare(b.data));
+      /* Dla zamkniętego cyklu liczymy z całego jego czasu, nie z dwóch tygodni. */
+      const tygodnie = Math.max(Math.round((fromIso(t.koniec) - fromIso(t.start)) / DZIEN_MS / 7), 1);
+      const oczekiwane = t.cwiczenia.reduce((s, x) => s + (x.razyWTygodniu || 0) * tygodnie, 0);
+      const zrobione = odhaczenia.filter((o) => o.terapiaId === tid && o.data >= t.start && o.data <= t.koniec).length;
+      t.powodZakonczenia = powod;
+      t.wynik = {
+        wizytyOdbyte: wizyty.filter((w) => w.terapiaId === tid && w.status === 'odbyta').length,
+        planWizyt: t.planWizyt,
+        bolStart: odczyty.length ? odczyty[0].wartosc : null,
+        bolKoniec: odczyty.length ? odczyty[odczyty.length - 1].wartosc : null,
+        cwiczenia: oczekiwane ? Math.min(Math.round((zrobione / oczekiwane) * 100), 100) : null,
+        dni: Math.round((fromIso(t.koniec) - fromIso(t.start)) / DZIEN_MS),
+      };
+    };
+    domknij('t8', 'plan zrealizowany');
+    domknij('t11', 'poprawa przed planem');
 
     const zdarzenia = [
       { id: id('z'), pacjentId: 'p1', kiedy: isoZa(-1), typ: 'sms', tekst: 'Przypomnienie o wizycie — symulacja' },
@@ -315,6 +356,16 @@
       odhaczenia,
       bol,
       zdarzenia,
+      /* Notatki z karty. Domyślnie prywatne; oznaczone jako widoczne
+         pokazują się pacjentowi w jego karcie pod linkiem. */
+      notatki: [
+        { id: id('n'), pacjentId: 'p1', terapiaId: 't1', kiedy: isoZa(-6), tekst: 'Praca zdalna, laptop na kolanach — omówić ustawienie biurka na następnej wizycie.', dlaPacjenta: false },
+        { id: id('n'), pacjentId: 'p1', terapiaId: 't1', kiedy: isoZa(-6), tekst: 'Ćwiczenia najlepiej rano, przed pracą — wieczorem i tak nie wychodzi.', dlaPacjenta: true },
+        { id: id('n'), pacjentId: 'p2', terapiaId: 't2', kiedy: isoZa(-3), tekst: 'Wraca do biegania szybciej, niż ustaliliśmy. Pilnować obciążeń.', dlaPacjenta: false },
+        { id: id('n'), pacjentId: 'p4', terapiaId: 't4', kiedy: isoZa(-4), tekst: 'Do czasu kontroli u operatora bez skoków i biegania.', dlaPacjenta: true },
+        { id: id('n'), pacjentId: 'p8', terapiaId: 't8', kiedy: isoZa(-14), tekst: 'Wracamy do dystansu stopniowo: pierwszy miesiąc do 5 km, potem dokładamy po kilometrze na tydzień.', dlaPacjenta: true },
+        { id: id('n'), pacjentId: 'p8', terapiaId: 't8', kiedy: isoZa(-14), tekst: 'Przysiad przy ścianie zostaje na stałe, w dni po bieganiu.', dlaPacjenta: true },
+      ],
       /* Urlop, przerwa, wyjazd — godziny wycięte z grafiku. */
       blokady: [
         { id: id('bl'), data: isoZa(11), od: 8, do: 19, powod: 'Szkolenie — terapia wisceralna' },
@@ -328,6 +379,9 @@
       /* Pojedyncze wiadomości: zmieniona treść i te wyjęte z kolejki. */
       nadpisaneWiadomosci: {},
       pominieteWiadomosci: [],
+      /* Terminy przesunięte ręcznie i wiadomości już wysłane. */
+      terminyWiadomosci: {},
+      wyslaneWiadomosci: [],
       /* Odstępstwa od reguł gabinetu dla pojedynczych pacjentów. */
       wiadomosciPacjenta: {},
       /* Wiadomości napisane ręcznie, poza regułami. */
@@ -354,6 +408,24 @@
           dane.nadpisaneWiadomosci = dane.nadpisaneWiadomosci || {};
           dane.pominieteWiadomosci = dane.pominieteWiadomosci || [];
           dane.wiadomosciWlasne = dane.wiadomosciWlasne || [];
+          dane.terminyWiadomosci = dane.terminyWiadomosci || {};
+          dane.wyslaneWiadomosci = dane.wyslaneWiadomosci || [];
+          /* Jedna notatka w polu pacjenta staje się pierwszą notatką w karcie. */
+          if (!dane.notatki) {
+            dane.notatki = [];
+            (dane.pacjenci || []).forEach((x) => {
+              if (x.notatka) {
+                dane.notatki.push({
+                  id: id('n'),
+                  pacjentId: x.id,
+                  terapiaId: null,
+                  kiedy: x.utworzony || iso(dzis),
+                  tekst: x.notatka,
+                  dlaPacjenta: false,
+                });
+              }
+            });
+          }
           /* Stara lista wyłączeń staje się odstępstwami pacjentów. */
           if (!dane.wiadomosciPacjenta) {
             dane.wiadomosciPacjenta = {};
@@ -703,18 +775,22 @@
       const spozniona = dataZReguly < dzisIso;
       const data = spozniona ? dzisIso : dataZReguly;
       const id = `${typ}-${pacjentId}-${dataZReguly}`;
+      /* Termin przesunięty ręcznie wygrywa z regułą. */
+      const przesuniete = (stan.terminyWiadomosci || {})[id];
       out.push({
         id,
         pacjentId,
         terapiaId,
         typ,
-        data,
-        godzina: u.godzina,
+        data: przesuniete ? przesuniete.data : data,
+        godzina: przesuniete ? przesuniete.godzina : u.godzina,
+        przesunieta: !!przesuniete,
         nazwa: TYPY_WIADOMOSCI[typ].nazwa,
         powod: opis,
         tresc: nadpisane[id] !== undefined ? nadpisane[id] : wypelnij(u.szablon, dane),
         wlasnaTresc: nadpisane[id] !== undefined,
         usunieta: pominiete.includes(id),
+        wyslana: (stan.wyslaneWiadomosci || []).includes(id),
         /* Wiadomość nie pójdzie, gdy rodzaj jest wyłączony w gabinecie,
            gdy pacjent go sobie wyłączył albo gdy nie ma zgody na SMS. */
         /* Rodzaj wyłączony w gabinecie to co innego niż wyłączony dla tej osoby. */
@@ -810,6 +886,8 @@
         wlasnaTresc: false,
         recznaWiadomosc: true,
         usunieta: pominiete.includes(w.id),
+        wyslana: (stan.wyslaneWiadomosci || []).includes(w.id),
+        przesunieta: false,
         wylaczonaRodzaj: false,
         wylaczonaPacjent: p.zgodaSms === false,
         wlasnyHarmonogram: false,
@@ -822,6 +900,12 @@
       )
     );
   }
+
+  /** Notatki z karty, najnowsze na górze. */
+  const notatkiPacjenta = (pacjentId, tylkoDlaPacjenta = false) =>
+    (stan.notatki || [])
+      .filter((n) => n.pacjentId === pacjentId && (!tylkoDlaPacjenta || n.dlaPacjenta))
+      .sort((a, b) => b.kiedy.localeCompare(a.kiedy));
 
   /** Wszystko, co wyjdzie do jednego pacjenta. */
   const wiadomosciPacjenta = (pacjentId, dni = 21) =>
@@ -1153,6 +1237,35 @@
       });
     },
 
+    /** Przesunięcie terminu jednej wiadomości, bez ruszania reguły. */
+    przesunWiadomosc(id, data, godzina) {
+      return zmien('Przesunięto wiadomość', (s) => {
+        s.terminyWiadomosci = s.terminyWiadomosci || {};
+        s.terminyWiadomosci[id] = { data, godzina };
+        const wlasna = (s.wiadomosciWlasne || []).find((x) => x.id === id);
+        if (wlasna) Object.assign(wlasna, { data, godzina });
+      });
+    },
+
+    przywrocTerminWiadomosci(id) {
+      return zmien('Przywrócono termin z reguły', (s) => {
+        if (s.terminyWiadomosci) delete s.terminyWiadomosci[id];
+      });
+    },
+
+    /**
+     * Wysyłka od razu, zamiast czekania na termin. W prototypie zostaje
+     * ślad w historii pacjenta; wiadomość znika z kolejki, żeby nie poszła
+     * drugi raz o zaplanowanej porze.
+     */
+    wyslijWiadomoscTeraz(id, pacjentId, tekst) {
+      return zmien('Wysłano wiadomość', (s) => {
+        s.wyslaneWiadomosci = s.wyslaneWiadomosci || [];
+        if (!s.wyslaneWiadomosci.includes(id)) s.wyslaneWiadomosci.push(id);
+        log(s, pacjentId, 'sms', `${tekst} — symulacja`);
+      });
+    },
+
     /** Usunięcie jednej wiadomości z kolejki — nie rusza pozostałych. */
     usunWiadomosc(id) {
       return zmien('Usunięto wiadomość z kolejki', (s) => {
@@ -1319,6 +1432,38 @@
       });
     },
 
+    /** Notatka w karcie. `dlaPacjenta` decyduje, czy zobaczy ją pacjent. */
+    dodajNotatkeKarty({ pacjentId, terapiaId = null, tekst, dlaPacjenta = false }) {
+      return zmien('Dodano notatkę', (s) => {
+        s.notatki = s.notatki || [];
+        const n = { id: id('n'), pacjentId, terapiaId, kiedy: iso(new Date()), tekst: tekst.trim(), dlaPacjenta };
+        s.notatki.unshift(n);
+        return n;
+      });
+    },
+
+    zmienNotatke(nid, dane) {
+      return zmien('Zmieniono notatkę', (s) => {
+        const n = (s.notatki || []).find((x) => x.id === nid);
+        if (n) Object.assign(n, dane);
+        return n;
+      });
+    },
+
+    przelaczWidocznoscNotatki(nid) {
+      return zmien('Zmieniono widoczność notatki', (s) => {
+        const n = (s.notatki || []).find((x) => x.id === nid);
+        if (n) n.dlaPacjenta = !n.dlaPacjenta;
+        return n;
+      });
+    },
+
+    usunNotatke(nid) {
+      return zmien('Usunięto notatkę', (s) => {
+        s.notatki = (s.notatki || []).filter((x) => x.id !== nid);
+      });
+    },
+
     dodajNotatke(pacjentId, tekst) {
       return zmien('Dodano notatkę', (s) => log(s, pacjentId, 'notatka', tekst));
     },
@@ -1427,6 +1572,7 @@
     ustawieniaRodzaju,
     maWlasneUstawienia,
     wiadomosciPacjenta,
+    notatkiPacjenta,
     DNI_TYGODNIA,
   };
 })();

@@ -4171,3 +4171,194 @@ svg path {
     justify-content: space-between;
   }
 }
+
+/* ── Notatki w karcie pacjenta ──────────────────────────────────────── */
+.notatki__info {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.notatki {
+  display: grid;
+  gap: 8px;
+}
+
+.notatka {
+  padding: 13px 14px;
+  border-radius: var(--r-sm);
+  background: var(--floor);
+}
+
+.notatka.is-dla-pacjenta {
+  background: var(--accent-soft);
+}
+
+.notatka__gora {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 7px;
+}
+
+.notatka__znak {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--hair);
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.notatka.is-dla-pacjenta .notatka__znak {
+  background: var(--accent);
+  color: #fff;
+}
+
+.notatka__data {
+  color: var(--faint);
+  font-size: 0.76rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.notatka__tekst {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.notatka__akcje {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+/* ── Odpowiedzi pacjenta: ból i odhaczenia ──────────────────────────── */
+.bol-lista {
+  display: grid;
+  gap: 4px;
+  margin: 0 0 6px;
+  padding: 0;
+  list-style: none;
+}
+
+.bol-lista li {
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr) 54px 74px;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: var(--r-sm);
+}
+
+.bol-lista li:nth-child(odd) {
+  background: var(--floor);
+}
+
+.bol-lista__data {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.bol-lista__pasek {
+  display: block;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--floor-2);
+  overflow: hidden;
+}
+
+.bol-lista__pasek span {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--c);
+}
+
+.bol-lista__wartosc {
+  font-family: var(--f-display);
+  font-size: 1rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.bol-lista__wartosc em {
+  color: var(--faint);
+  font-family: var(--f-body);
+  font-size: 0.72rem;
+  font-style: normal;
+  font-weight: 400;
+}
+
+.bol-lista__zmiana {
+  color: var(--faint);
+  font-size: 0.74rem;
+  text-align: right;
+}
+
+/* Tabela odhaczeń */
+.odhaczenia {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.odhaczenia th[scope='col'] {
+  padding: 8px 6px;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.odhaczenia th[scope='col']:first-child {
+  text-align: left;
+}
+
+.odhaczenia th[scope='row'] {
+  padding: 10px 6px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.odhaczenia th[scope='row'] em {
+  display: block;
+  color: var(--muted);
+  font-style: normal;
+  font-size: 0.74rem;
+  font-weight: 400;
+}
+
+.odhaczenia td {
+  padding: 10px 6px;
+  text-align: center;
+  vertical-align: bottom;
+}
+
+.odhaczenia tbody tr:not(:last-child) {
+  border-bottom: 1px solid var(--hair);
+}
+
+.slupek {
+  display: block;
+  width: 26px;
+  height: 30px;
+  margin: 0 auto 4px;
+  border-radius: 4px 4px 2px 2px;
+  background: linear-gradient(to top, var(--c) var(--h), var(--floor-2) var(--h));
+}
+
+.odhaczenia td b {
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+}

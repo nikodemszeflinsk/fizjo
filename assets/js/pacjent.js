@@ -21,22 +21,14 @@
     return `${DNI_KR[d.getDay()]} ${d.getDate()}.${String(d.getMonth() + 1).padStart(2, '0')}`;
   };
 
-  /* ── Rysunki ćwiczeń ───────────────────────────────────────────────── */
-  /* Pacjent, który nie pamięta pozycji, nie ćwiczy. Sylwetka wystarczy. */
-  const RYSUNKI = {
-    kleczenie:
-      '<path d="M14 44h44" class="podloga"/><path d="M20 44V30c0-8 6-13 14-13h10c8 0 13 5 13 12"/><circle cx="60" cy="24" r="5"/><path d="M20 44v-6M34 44v-8M48 44v-7"/>',
-    lezenie:
-      '<path d="M8 44h56" class="podloga"/><path d="M14 44v-6h12l8-12 10 8 8-2v12"/><circle cx="16" cy="32" r="5"/>',
-    siedzenie:
-      '<path d="M12 56h48" class="podloga"/><path d="M26 56V34h16v22M26 34l-4-14M42 34l6-10"/><circle cx="34" cy="14" r="6"/><path d="M42 44h10"/>',
-    sciana:
-      '<path d="M10 8v52" class="podloga"/><path d="M18 14v22l14 2v22"/><circle cx="20" cy="10" r="5"/><path d="M32 38h14"/><path d="M14 60h40" class="podloga"/>',
-    stanie:
-      '<path d="M12 58h48" class="podloga"/><path d="M36 58V32M36 32l-8-12M36 32l8-12M36 32v-8"/><circle cx="36" cy="16" r="6"/><path d="M30 58h12"/>',
-  };
-  const rysunek = (id) =>
-    `<svg class="cw__rys" viewBox="0 0 72 64" aria-hidden="true">${RYSUNKI[id] || RYSUNKI.stanie}</svg>`;
+  /* ── Miejsce na materiał ćwiczenia ─────────────────────────────────── */
+  /* W demie stoi tu ramka zastępcza. Przy wdrożeniu wchodzi w nią nagranie
+     albo zdjęcie z gabinetu — to, co terapeuta pokazuje pacjentowi na wizycie. */
+  const miejsceNaMaterial = () => `
+    <span class="cw__material" aria-hidden="true">
+      <svg viewBox="0 0 64 48"><rect x="1" y="1" width="62" height="46" rx="7" /><path d="M26 17.5v13l11.5-6.5Z" /></svg>
+      <span>nagranie<br />gabinetu</span>
+    </span>`;
 
   /* ── Komunikat ─────────────────────────────────────────────────────── */
   let toastT;
@@ -46,6 +38,9 @@
     clearTimeout(toastT);
     toastT = setTimeout(() => $('#toast').classList.remove('is-on'), 2600);
   }
+
+  /** Strona gabinetu z rezerwacją — obok karty pacjenta w tym samym wdrożeniu. */
+  const adresRezerwacji = () => `${location.pathname.replace(/pacjent\.html$/, '')}demo.html#rezerwacja`;
 
   /* ── Z linku: ?t=<terapia> albo ?p=<pacjent> ───────────────────────── */
   const parametry = new URLSearchParams(location.search);
@@ -89,7 +84,7 @@
       `DTEND:${stamp(koniec)}`,
       `SUMMARY:${usl ? usl.nazwa : 'Wizyta'} — ${u.nazwa}`,
       `LOCATION:${u.adres}`,
-      `DESCRIPTION:${u.terapeuta}, tel. ${u.telefon}`,
+      `DESCRIPTION:${(P.terapeuta(wizyta.terapeutaId) || {}).imie || u.nazwa}, tel. ${u.telefon}`,
       'BEGIN:VALARM',
       'TRIGGER:-PT2H',
       'ACTION:DISPLAY',
@@ -178,6 +173,88 @@
     return seria;
   }
 
+  /* ── Wypis po zakończonej terapii ──────────────────────────────────── */
+  /* Pacjent, który skończył cykl, nie potrzebuje już listy ćwiczeń na dziś.
+     Potrzebuje jednej kartki: co osiągnęliście, co robić dalej i jak wrócić. */
+  function renderWypis(t) {
+    const p = P.pacjent(t.pacjentId);
+    const u = P.stan.ustawienia;
+    const l = P.linia(t.linia);
+    const w = t.wynik;
+    const imie = p.imie.split(' ')[0];
+    const spadek = w.bolStart !== null && w.bolKoniec !== null ? w.bolStart - w.bolKoniec : null;
+    const zalecenia = P.notatkiPacjenta(p.id, true);
+    document.title = `Podsumowanie terapii · ${u.nazwa}`;
+
+    $('#karta').innerHTML = `
+      <header class="naglowek" style="--c:${l.kolor}">
+        <p class="naglowek__gabinet">${esc(u.nazwa)}</p>
+        <h1 class="naglowek__h1">To już koniec cyklu,<br />${esc(imie)}.</h1>
+        <p class="naglowek__linia">${esc(t.etykieta)} · ${esc(t.powodZakonczenia || 'terapia zakończona')}</p>
+      </header>
+
+      ${t.cel ? `<section class="blok blok--cel"><p class="cel__label">Cel, od którego zaczynaliśmy</p><p class="cel__tekst">${esc(t.cel)}</p></section>` : ''}
+
+      <section class="blok">
+        <h2>Co się udało</h2>
+        <div class="wypis__liczby">
+          <div><span>Wizyty</span><b>${w.wizytyOdbyte}</b><em>z ${w.planWizyt} zaplanowanych</em></div>
+          <div><span>Ból</span><b>${w.bolStart !== null ? `${w.bolStart} → ${w.bolKoniec}` : '—'}</b><em>${
+            spadek !== null && spadek > 0 ? `mniej o ${spadek} w skali 0–10` : 'w skali 0–10'
+          }</em></div>
+          <div><span>Ćwiczenia</span><b>${w.cwiczenia === null ? '—' : `${w.cwiczenia}%`}</b><em>z tego, co było zadane</em></div>
+          <div><span>Czas</span><b>${w.dni !== null ? w.dni : '—'}</b><em>dni terapii</em></div>
+        </div>
+      </section>
+
+      ${
+        zalecenia.length
+          ? `<section class="blok blok--od-terapeuty">
+              <h2>Na dalej</h2>
+              <ul class="od-terapeuty">
+                ${zalecenia.map((n) => `<li><p>${esc(n.tekst)}</p><em>${krotka(n.kiedy)}</em></li>`).join('')}
+              </ul>
+            </section>`
+          : ''
+      }
+
+      ${
+        t.cwiczenia.length
+          ? `<section class="blok">
+              <h2>Ćwiczenia, które warto zostawić</h2>
+              <p class="blok__note">Nie musisz robić wszystkiego codziennie. Te trzymają efekt, na który pracowaliśmy.</p>
+              <ul class="wypis__cw">
+                ${t.cwiczenia
+                  .map((cw) => {
+                    const def = P.cwiczenie(cw.cwiczenieId);
+                    return `<li><strong>${esc(def ? def.nazwa : cw.cwiczenieId)}</strong><em>${esc(cw.powtorzenia)} · ${cw.razyWTygodniu}× w tygodniu</em></li>`;
+                  })
+                  .join('')}
+              </ul>
+              <a class="btn btn--linia" href="?t=${t.id}&druk=1">Wydrukuj kartę ćwiczeń</a>
+            </section>`
+          : ''
+      }
+
+      <section class="blok">
+        <h2>Gdyby wróciło</h2>
+        <p class="blok__note">
+          Nawroty zdarzają się najczęściej przy zmianie obciążenia: nowa praca, powrót do sportu,
+          dłuższy wyjazd. Nie czekaj, aż ból będzie taki jak na początku — wtedy wracamy do punktu wyjścia.
+        </p>
+        <div class="termin__akcje">
+          <a class="btn btn--ink" href="${esc(adresRezerwacji())}">Zarezerwuj wizytę online</a>
+          <a class="btn btn--linia" href="tel:${esc(tel(u.telefon))}">Zadzwoń: ${esc(u.telefon)}</a>
+        </div>
+      </section>
+
+      <footer class="stopka">
+        <p>${esc(u.nazwa)}${P.terapeuta(t.terapeutaId) ? ` · ${esc(P.terapeuta(t.terapeutaId).imie)}` : ''}</p>
+        <p><a href="tel:${esc(tel(u.telefon))}">${esc(u.telefon)}</a> · ${esc(u.adres)}</p>
+        <p class="stopka__note">To podsumowanie terapii, nie dokumentacja medyczna. Zachowaj je, gdyby przydało się przy kolejnej wizycie.</p>
+      </footer>`;
+  }
+
   /* ── Widok do druku ────────────────────────────────────────────────── */
   function renderDruk(t) {
     const p = P.pacjent(t.pacjentId);
@@ -188,7 +265,7 @@
       <div class="druk">
         <header class="druk__head">
           <div>
-            <p class="druk__gabinet">${esc(u.nazwa)} · ${esc(u.terapeuta)}</p>
+            <p class="druk__gabinet">${esc(u.nazwa)}${P.terapeuta(t.terapeutaId) ? ` · ${esc(P.terapeuta(t.terapeutaId).imie)}` : ''}</p>
             <h1>Ćwiczenia domowe — ${esc(p.imie)}</h1>
             <p class="druk__terapia">${esc(t.etykieta)}${t.cel ? ` · cel: ${esc(t.cel)}` : ''}</p>
           </div>
@@ -224,6 +301,8 @@
     const t = znajdzTerapie();
     if (!t) return brak();
     if (doDruku) return renderDruk(t);
+    /* Cykl zamknięty — zamiast bieżących ćwiczeń pacjent dostaje wypis. */
+    if (t.status !== 'aktywna' && t.wynik) return renderWypis(t);
 
     const p = P.pacjent(t.pacjentId);
     const u = P.stan.ustawienia;
@@ -255,14 +334,20 @@
           const kiedy = dni === 0 ? 'dzisiaj' : dni === -1 ? 'jutro' : `w ${DNI[d.getDay()]}, ${d.getDate()} ${MIES[d.getMonth()]}`;
           return `<p class="termin__kiedy">${kiedy} o <strong>${nast.godzina}</strong></p>
             <p class="termin__gdzie">${esc(u.adres)}</p>
-            <p class="termin__kto">${esc(u.terapeuta)} · <a href="tel:${esc(tel(u.telefon))}">${esc(u.telefon)}</a></p>
+            <p class="termin__kto">${
+              P.terapeuta(nast.terapeutaId) ? `${esc(P.terapeuta(nast.terapeutaId).imie)} · ` : ''
+            }<a href="tel:${esc(tel(u.telefon))}">${esc(u.telefon)}</a></p>
             <div class="termin__akcje">
               <button class="btn btn--ink" type="button" data-ics="${nast.id}">Dodaj do kalendarza</button>
               <button class="btn btn--linia" type="button" data-przeloz="${nast.id}">Nie mogę, przełóż</button>
+              <a class="btn btn--linia" href="${esc(adresRezerwacji())}">Zarezerwuj kolejną online</a>
             </div>`;
         })()
       : `<p class="termin__kiedy termin__kiedy--brak">Nie masz jeszcze umówionego kolejnego terminu.</p>
-         <div class="termin__akcje"><a class="btn btn--ink" href="tel:${esc(tel(u.telefon))}">Zadzwoń i umów: ${esc(u.telefon)}</a></div>`;
+         <div class="termin__akcje">
+           <a class="btn btn--ink" href="${esc(adresRezerwacji())}">Zarezerwuj online</a>
+           <a class="btn btn--linia" href="tel:${esc(tel(u.telefon))}">Albo zadzwoń: ${esc(u.telefon)}</a>
+         </div>`;
 
     $('#karta').innerHTML = `
       <header class="naglowek" style="--c:${l.kolor}">
@@ -277,6 +362,17 @@
         <h2>Najbliższa wizyta</h2>
         <div class="termin">${terminHtml}</div>
       </section>
+
+      ${(() => {
+        const notatki = P.notatkiPacjenta(p.id, true);
+        if (!notatki.length) return '';
+        return `<section class="blok blok--od-terapeuty">
+          <h2>Od Twojego fizjoterapeuty</h2>
+          <ul class="od-terapeuty">
+            ${notatki.map((n) => `<li><p>${esc(n.tekst)}</p><em>${krotka(n.kiedy)}</em></li>`).join('')}
+          </ul>
+        </section>`;
+      })()}
 
       <section class="blok">
         <h2>Ćwiczenia na dziś</h2>
@@ -297,7 +393,7 @@
                         <em>${esc(c.powtorzenia)} · ${c.razyWTygodniu}× w tygodniu</em>
                         ${def && def.opis ? `<span class="cw__opis">${esc(def.opis)}</span>` : ''}
                       </span>
-                      ${rysunek(def && def.rysunek)}
+                      ${miejsceNaMaterial()}
                     </button>
                   </li>`;
                 })
@@ -341,7 +437,7 @@
       </section>
 
       <footer class="stopka">
-        <p>${esc(u.nazwa)} · ${esc(u.terapeuta)}</p>
+        <p>${esc(u.nazwa)}${P.terapeuta(t.terapeutaId) ? ` · ${esc(P.terapeuta(t.terapeutaId).imie)}` : ''}</p>
         <p><a href="tel:${esc(tel(u.telefon))}">${esc(u.telefon)}</a> · ${esc(u.adres)}</p>
         <p class="stopka__note">Ta strona pokazuje plan ćwiczeń i terminy. Nie jest dokumentacją medyczną i nie zastępuje kontaktu z fizjoterapeutą. Jeśli ból wyraźnie rośnie, przerwij ćwiczenia i zadzwoń.</p>
       </footer>
