@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Strona gabinetu — co widzi pacjent · Studio Widok</title>
+  <meta name="description" content="Jak wygląda strona, na którą trafia pacjent z wyszukiwarki: wybór problemu, wolne terminy, rezerwacja w minutę i podstrony dla każdej dolegliwości." />
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#14171A" />
+
+  <meta property="og:title" content="Strona gabinetu — co widzi pacjent" />
+  <meta property="og:description" content="Jak wygląda strona, na którą trafia pacjent z wyszukiwarki: wybór problemu, wolne terminy, rezerwacja w minutę i podstrony dla każdej dolegliwości." />
+  <meta property="og:type" content="website" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/karta.css?v=20" />
+</head>
+<body>
+  <a class="skip" href="#tresc">Przejdź do treści</a>
+
+  <header class="tools">
+    <a class="tools__brand" href="index.html" aria-label="Kanał Pozyskiwania Pacjentów — strona główna">
+      <svg class="tools__mark" viewBox="0 0 40 40" aria-hidden="true">
+        <path d="M8 6v20a8 8 0 0 1-3 6" style="stroke:#1F5FD6" />
+        <path d="M15 6v28" style="stroke:#E8590C" />
+        <path d="M22 6v28" style="stroke:#13875A" />
+        <path d="M29 6v28" style="stroke:#C2255C" />
+        <path d="M36 6v28" style="stroke:#F2B705" />
+      </svg>
+      Kanał Pozyskiwania Pacjentów
+    </a>
+    <nav class="tools__nav" aria-label="Na skróty">
+      <a href="index.html#sciezka">Jak to działa</a>
+      <a href="panel-gabinetu.html">Panel</a>
+      <a href="index.html#pakiety">Pakiety</a>
+      <a class="tools__cta" href="index.html#kontakt">
+        Umów rozmowę
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
+      </a>
+    </nav>
+  </header>
+
+  <main id="tresc">
+    <nav class="okruchy okruchy--oferta" aria-label="Ścieżka">
+      <a href="index.html">Oferta</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">Strona gabinetu</span>
+    </nav>
+
+    <section class="of-hero">
+      <p class="of-hero__kicker">Oczami pacjenta</p>
+      <h1 class="of-hero__h1">Tak wygląda miejsce,<br />do którego trafia Twój pacjent.</h1>
+      <p class="of-hero__lead">Nie zakładka „oferta” i nie formularz kontaktowy. Strona, która prowadzi od pytania „co mnie boli” do umówionej godziny, zanim ktoś zdąży wrócić do wyników wyszukiwania.</p>
+      <div class="of-hero__cta">
+        <a class="cta cta--blue" href="demo.html">
+          Otwórz demo strony
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
+        </a>
+        <a class="cta cta--line" href="index.html#kontakt">Umów rozmowę</a>
+      </div>
+      <p class="of-hero__uwaga">Wszystko poniżej jest w demie, które możesz otworzyć i wyklikać.</p>
+    </section>
+
+    <section class="of-blok">
+      <div class="of-blok__in">
+        <div class="of-blok__text">
+          <p class="of-blok__num">01</p>
+          <h2 class="of-blok__h">Pacjent od razu widzi, czy leczysz to, co jego boli</h2>
+          <p class="of-blok__lead">Zamiast listy usług, cztery rzeczy, z którymi ludzie do Ciebie przychodzą — każda w swoim kolorze, każda z własną ścieżką. Jedno kliknięcie i jest już w rezerwacji, a nie w cenniku.</p>
+          <ul class="of-blok__punkty">
+            <li>Kolory prowadzą przez całą stronę, więc nikt nie gubi się w zakładkach</li>
+            <li>Obok od razu widać najbliższe wolne terminy, prosto z Twojego grafiku</li>
+          </ul>
+        </div>
+        <figure class="of-blok__obraz">
+          <a class="of-blok__lupa" href="assets/img/zrzuty/strona-pierwszy-ekran.jpg" target="_blank" rel="noopener"
+            aria-label="Otwórz zrzut w pełnym rozmiarze: Pierwszy ekran strony gabinetu: nagłówek „Co Cię boli? Idź za kolorem”, lista najbliższych terminów i cztery kolorowe problemy do wyboru.">
+            <img src="assets/img/zrzuty/strona-pierwszy-ekran.jpg" alt="Pierwszy ekran strony gabinetu: nagłówek „Co Cię boli? Idź za kolorem”, lista najbliższych terminów i cztery kolorowe problemy do wyboru." width="1400" height="836" loading="lazy" />
+            <span class="of-blok__powieksz">Powiększ</span>
+          </a>
+          <figcaption>Pierwszy ekran. Po prawej terminy liczone z grafiku zespołu.</figcaption>
+        </figure>
+      </div>
+    </section>
+    <section class="of-blok of-blok--odwrocony">
+      <div class="of-blok__in">
+        <div class="of-blok__text">
+          <p class="of-blok__num">02</p>
+          <h2 class="of-blok__h">Nie wie, co wybrać? Trzy pytania i już wie</h2>
+          <p class="of-blok__lead">Połowa ludzi nie potrafi nazwać swojego problemu i właśnie dlatego odkłada telefon. Kwalifikator pyta, gdzie boli, od jak dawna i co pogarsza — a potem sam wskazuje, od czego zacząć i kiedy jest wolny termin.</p>
+          <ul class="of-blok__punkty">
+            <li>Odpowiedź jest uzasadniona po ludzku, nie sloganem</li>
+            <li>Na końcu przycisk, który wchodzi prosto w rezerwację z wybraną usługą</li>
+            <li>Wyraźnie napisane, że to podpowiedź, a nie diagnoza</li>
+          </ul>
+        </div>
+        <figure class="of-blok__obraz">
+          <a class="of-blok__lupa" href="assets/img/zrzuty/strona-kwalifikator.jpg" target="_blank" rel="noopener"
+            aria-label="Otwórz zrzut w pełnym rozmiarze: Wynik kwalifikatora: nazwa terapii, uzasadnienie wyboru, usługa, czas, koszt i najbliższy termin.">
+            <img src="assets/img/zrzuty/strona-kwalifikator.jpg" alt="Wynik kwalifikatora: nazwa terapii, uzasadnienie wyboru, usługa, czas, koszt i najbliższy termin." width="1400" height="964" loading="lazy" />
+            <span class="of-blok__powieksz">Powiększ</span>
+          </a>
+          <figcaption>Wynik po trzech pytaniach: usługa, koszt, termin i powód, dla którego akurat ten.</figcaption>
+        </figure>
+      </div>
+    </section>
+    <section class="of-blok">
+      <div class="of-blok__in">
+        <div class="of-blok__text">
+          <p class="of-blok__num">03</p>
+          <h2 class="of-blok__h">Wybiera godzinę, zamiast wypełniać formularz</h2>
+          <p class="of-blok__lead">Widzi Twoje realne wolne terminy — te same, które masz w panelu. Może wskazać konkretną osobę z zespołu albo wziąć pierwszą wolną godzinę u kogokolwiek.</p>
+          <ul class="of-blok__punkty">
+            <li>Trzy kroki, każdy można cofnąć</li>
+            <li>Przy godzinie widać, kto ją weźmie</li>
+            <li>Zajęte terminy nigdy się nie pokazują, więc nie ma podwójnych rezerwacji</li>
+          </ul>
+        </div>
+        <figure class="of-blok__obraz">
+          <a class="of-blok__lupa" href="assets/img/zrzuty/strona-terminy.jpg" target="_blank" rel="noopener"
+            aria-label="Otwórz zrzut w pełnym rozmiarze: Krok rezerwacji z wyborem dnia i godziny; przy każdej godzinie inicjały terapeuty, który ją weźmie.">
+            <img src="assets/img/zrzuty/strona-terminy.jpg" alt="Krok rezerwacji z wyborem dnia i godziny; przy każdej godzinie inicjały terapeuty, który ją weźmie." width="1400" height="664" loading="lazy" />
+            <span class="of-blok__powieksz">Powiększ</span>
+          </a>
+          <figcaption>Wybór terminu. Chipy u góry zawężają do jednej osoby z zespołu.</figcaption>
+        </figure>
+      </div>
+    </section>
+    <section class="of-blok of-blok--odwrocony">
+      <div class="of-blok__in">
+        <div class="of-blok__text">
+          <p class="of-blok__num">04</p>
+          <h2 class="of-blok__h">Po rezerwacji wie dokładnie, co się wydarzy</h2>
+          <p class="of-blok__lead">Numer rezerwacji, godzina, adres, kto przyjmie — i trzy zdania o tym, co będzie dalej. Pacjent, który wie, czego się spodziewać, rzadziej odwołuje.</p>
+          <ul class="of-blok__punkty">
+            <li>Przycisk „Dodaj do kalendarza” w telefonie</li>
+            <li>Trasa do gabinetu jednym kliknięciem</li>
+            <li>Informacja, że dzień przed przyjdzie SMS z linkiem do jego karty</li>
+          </ul>
+        </div>
+        <figure class="of-blok__obraz">
+          <a class="of-blok__lupa" href="assets/img/zrzuty/strona-potwierdzenie.jpg" target="_blank" rel="noopener"
+            aria-label="Otwórz zrzut w pełnym rozmiarze: Ekran potwierdzenia rezerwacji z numerem, szczegółami wizyty i informacją, co stanie się dalej.">
+            <img src="assets/img/zrzuty/strona-potwierdzenie.jpg" alt="Ekran potwierdzenia rezerwacji z numerem, szczegółami wizyty i informacją, co stanie się dalej." width="1344" height="1236" loading="lazy" />
+            <span class="of-blok__powieksz">Powiększ</span>
+          </a>
+          <figcaption>Potwierdzenie. Pacjent wychodzi ze stroną z konkretem, nie z „skontaktujemy się”.</figcaption>
+        </figure>
+      </div>
+    </section>
+    <section class="of-blok">
+      <div class="of-blok__in">
+        <div class="of-blok__text">
+          <p class="of-blok__num">05</p>
+          <h2 class="of-blok__h">Każda dolegliwość ma własną stronę — i to ona pokazuje się w Google</h2>
+          <p class="of-blok__lead">Ktoś wpisuje „ból krzyża fizjoterapeuta” i trafia na stronę o bólu krzyża: objawy, które zna, przebieg terapii, ile to trwa, ile kosztuje i kto się tym zajmuje. Nie na ogólną zakładkę o gabinecie.</p>
+          <ul class="of-blok__punkty">
+            <li>Osobna strona dla każdego problemu, z własnym tytułem i opisem dla wyszukiwarki</li>
+            <li>Pytania i odpowiedzi w formacie, który Google rozumie i pokazuje w wynikach</li>
+            <li>Każda kończy się terminem, nie prośbą o kontakt</li>
+          </ul>
+        </div>
+        <figure class="of-blok__obraz">
+          <a class="of-blok__lupa" href="assets/img/zrzuty/strona-podstrona-problemu.jpg" target="_blank" rel="noopener"
+            aria-label="Otwórz zrzut w pełnym rozmiarze: Podstrona o fizjoterapii kręgosłupa: nagłówek, objawy, najbliższy termin i przyciski rezerwacji.">
+            <img src="assets/img/zrzuty/strona-podstrona-problemu.jpg" alt="Podstrona o fizjoterapii kręgosłupa: nagłówek, objawy, najbliższy termin i przyciski rezerwacji." width="1400" height="972" loading="lazy" />
+            <span class="of-blok__powieksz">Powiększ</span>
+          </a>
+          <figcaption>Podstrona problemu. Tyle takich stron, ile problemów leczysz.</figcaption>
+        </figure>
+      </div>
+    </section>
+    <section class="of-blok of-blok--odwrocony">
+      <div class="of-blok__in">
+        <div class="of-blok__text">
+          <p class="of-blok__num">06</p>
+          <h2 class="of-blok__h">Widzi, kto go przyjmie, zanim przyjdzie</h2>
+          <p class="of-blok__lead">Zdjęcie, specjalizacja, kursy, godziny przyjęć i najbliższy wolny termin każdej osoby. Pacjent, który wybiera człowieka, przychodzi pewniejszy — i rzadziej odwołuje.</p>
+          <ul class="of-blok__punkty">
+            <li>Przy każdej osobie przycisk, który zaczyna rezerwację właśnie do niej</li>
+            <li>Grafik bierze się z panelu, więc nie da się obiecać godziny, której nie ma</li>
+          </ul>
+        </div>
+        <figure class="of-blok__obraz">
+          <a class="of-blok__lupa" href="assets/img/zrzuty/strona-zespol.jpg" target="_blank" rel="noopener"
+            aria-label="Otwórz zrzut w pełnym rozmiarze: Sekcja zespołu: trzy karty fizjoterapeutów ze zdjęciem, specjalizacją, kursami i najbliższym terminem.">
+            <img src="assets/img/zrzuty/strona-zespol.jpg" alt="Sekcja zespołu: trzy karty fizjoterapeutów ze zdjęciem, specjalizacją, kursami i najbliższym terminem." width="1400" height="1061" loading="lazy" />
+            <span class="of-blok__powieksz">Powiększ</span>
+          </a>
+          <figcaption>Zespół. Każda osoba ma swoje problemy, swój grafik i swój kolor.</figcaption>
+        </figure>
+      </div>
+    </section>
+    <section class="of-blok">
+      <div class="of-blok__in">
+        <div class="of-blok__text">
+          <p class="of-blok__num">07</p>
+          <h2 class="of-blok__h">Na telefonie działa tak samo — a stamtąd przychodzi większość</h2>
+          <p class="of-blok__lead">Ludzie szukają fizjoterapeuty wieczorem, w łóżku, na telefonie. Cała strona jest zbudowana pod ten ekran: duże przyciski, pasek „Zadzwoń” zawsze pod kciukiem, rezerwacja bez przewijania na boki.</p>
+          <ul class="of-blok__punkty">
+            <li>Pasek z telefonem i rezerwacją przyklejony na dole</li>
+            <li>Sygnał „otwarte teraz” albo „otwieramy jutro o 8:00”, liczony z grafiku</li>
+          </ul>
+        </div>
+        <figure class="of-blok__obraz of-blok__obraz--waski">
+          <a class="of-blok__lupa" href="assets/img/zrzuty/strona-telefon.jpg" target="_blank" rel="noopener"
+            aria-label="Otwórz zrzut w pełnym rozmiarze: Strona gabinetu na ekranie telefonu z paskiem „Zadzwoń” i przyciskiem rezerwacji na dole.">
+            <img src="assets/img/zrzuty/strona-telefon.jpg" alt="Strona gabinetu na ekranie telefonu z paskiem „Zadzwoń” i przyciskiem rezerwacji na dole." width="420" height="860" loading="lazy" />
+            <span class="of-blok__powieksz">Powiększ</span>
+          </a>
+          <figcaption>Ten sam gabinet na telefonie.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+
+    <section class="of-finale">
+      <div class="of-finale__in">
+        <h2 class="of-finale__h">Wejdź i sprawdź sam</h2>
+        <p>Demo działa na prawdziwym kalendarzu i prawdziwych godzinach. Umów fikcyjną wizytę, kliknij wszystko, nic się nie zepsuje. Najlepiej otwórz to na telefonie — większość pacjentów tak właśnie trafi.</p>
+        <div class="of-hero__cta">
+          <a class="cta cta--blue" href="demo.html">
+            Otwórz demo strony
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
+          </a>
+          <a class="cta cta--line" href="panel-gabinetu.html">Zobacz, co widzisz Ty</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="of-stopka">
+    <p><strong>Studio Widok</strong> · system pozyskiwania pacjentów dla gabinetów fizjoterapii</p>
+    <p><a href="tel:+48783480341">783 480 341</a> · <a href="mailto:kontakt@studio-widok.pl">kontakt@studio-widok.pl</a> · <a href="https://studio-widok.pl">studio-widok.pl</a></p>
+    <p class="of-stopka__note">Zrzuty pochodzą z działającego dema. Dane gabinetu, nazwiska i ceny są przykładowe.</p>
+  </footer>
+</body>
+</html>

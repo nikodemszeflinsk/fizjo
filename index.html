@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/karta.css?v=19" />
+  <link rel="stylesheet" href="assets/css/karta.css?v=20" />
 </head>
 <body>
   <a class="skip" href="#tresc">Przejdź do treści</a>
@@ -33,7 +33,7 @@
     </a>
     <nav class="tools__nav" aria-label="Na skróty">
       <a href="#sciezka">Jak to działa</a>
-      <a href="#demo">Demo</a>
+      <a href="#demo">Strona i panel</a>
       <a href="#funkcje">Funkcje</a>
       <a href="#pakiety">Pakiety</a>
       <a class="tools__cta" href="#kontakt">
@@ -61,7 +61,7 @@
               Umów 15 minut rozmowy
               <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
             </a>
-            <a class="cta cta--line" href="demo.html">Zobacz demo strony</a>
+            <a class="cta cta--line" href="strona-gabinetu.html">Zobacz, jak to wygląda</a>
           </div>
           <ul class="hero__facts">
             <li><strong>Rezerwacja działa o 23:00</strong>, kiedy pacjent szuka pomocy</li>
@@ -71,7 +71,7 @@
           </ul>
         </div>
 
-        <a class="phone phone--hero" href="demo.html" tabindex="-1" aria-hidden="true">
+        <a class="phone phone--hero" href="strona-gabinetu.html" tabindex="-1" aria-hidden="true">
           <img src="assets/img/demo-telefon.jpg" alt="" width="780" height="1688" />
         </a>
       </div>
@@ -216,42 +216,57 @@
     <section class="band band--paper" id="demo" aria-labelledby="h-demo">
       <div class="band__in">
         <h2 class="h2" id="h-demo">Zobacz, zanim zdecydujesz</h2>
-        <p class="lead">Dwa działające dema na przykładzie fikcyjnego gabinetu „Linia Ruchu”. Klikaj do woli, nic się nie zepsuje.</p>
+        <p class="lead">Dwie strony systemu, każda pokazana krok po kroku, z kadrami z działającego dema. Na końcu każdej wchodzisz do środka i klikasz sam.</p>
 
-        <div class="widok">
-          <div class="widok__taby" role="tablist" aria-label="Dwie strony systemu">
-            <button class="widok__tab" type="button" role="tab" id="tab-pacjent" aria-controls="p-pacjent" aria-selected="true">Oczami pacjenta</button>
-            <button class="widok__tab" type="button" role="tab" id="tab-gabinet" aria-controls="p-gabinet" aria-selected="false">Oczami gabinetu</button>
-          </div>
-
-          <div class="widok__panel" id="p-pacjent" role="tabpanel" aria-labelledby="tab-pacjent">
-            <div class="widok__text">
-              <p class="proof__h">Umawia się w minutę, bez telefonu</p>
-              <p>Wybiera, z czym przychodzi, i godzinę z Twojego grafiku. Trzy kroki, numer rezerwacji, wizyta w kalendarzu. Dzień przed dostaje SMS, a w nim link do własnej karty: ćwiczenia, terminy i przycisk „nie mogę, przełóż”.</p>
-              <a class="cta cta--blue" href="demo.html">
-                Otwórz demo strony
+        <div class="bramy">
+          <article class="brama">
+            <div class="brama__text">
+              <p class="brama__kicker">Oczami pacjenta</p>
+              <h3 class="brama__h">Strona, na którą trafia z wyszukiwarki</h3>
+              <p class="brama__lead">
+                Wybiera to, co go boli, widzi Twoje wolne godziny i umawia się w minutę —
+                bez telefonu i bez czekania do rana. Każda dolegliwość ma własną stronę,
+                bo to ona odpowiada na pytanie wpisane w Google.
+              </p>
+              <ul class="brama__punkty">
+                <li>Rezerwacja w trzy kroki, z wyborem terapeuty</li>
+                <li>Kwalifikator dla tych, którzy nie wiedzą, co wybrać</li>
+                <li>Osobna strona dla każdego problemu</li>
+              </ul>
+              <a class="cta cta--blue" href="strona-gabinetu.html">
+                Zobacz, co widzi pacjent
                 <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
               </a>
             </div>
-            <a class="phone" href="demo.html" tabindex="-1" aria-hidden="true">
-              <img src="assets/img/demo-telefon.jpg" alt="" width="780" height="1688" loading="lazy" />
+            <a class="brama__obraz brama__obraz--telefon" href="strona-gabinetu.html" tabindex="-1" aria-hidden="true">
+              <img src="assets/img/zrzuty/strona-telefon.jpg" alt="" width="420" height="860" loading="lazy" />
             </a>
-          </div>
+          </article>
 
-          <div class="widok__panel" id="p-gabinet" role="tabpanel" aria-labelledby="tab-gabinet" hidden>
-            <div class="widok__text">
-              <p class="proof__h">Dzień w jednym ekranie</p>
-              <p>Wizyty na dziś z jednym kliknięciem na każdą, lista osób, które nie umówiły kolejnej wizyty — z powodem przy każdej — i kolejka wiadomości, które wychodzą same. Do tego kalendarz z blokadami na urlop i kartoteka.</p>
-              <a class="cta cta--blue" href="crm.html">
-                Otwórz demo panelu
+          <article class="brama brama--ciemna">
+            <div class="brama__text">
+              <p class="brama__kicker">Oczami gabinetu</p>
+              <h3 class="brama__h">Panel, który rano mówi, co robić</h3>
+              <p class="brama__lead">
+                Kto dziś przychodzi, kogo potwierdzić i do kogo zadzwonić, bo właśnie wypada
+                z terapii — z powodem przy każdym nazwisku. Do tego kalendarz zespołu,
+                kartoteka i wiadomości, które wychodzą same.
+              </p>
+              <ul class="brama__punkty">
+                <li>Jeden ekran zamiast pięciu zakładek</li>
+                <li>Powód po ludzku, nigdy „ryzyko 78%”</li>
+                <li>Pacjent dostaje swoją kartę z ćwiczeniami SMS-em</li>
+              </ul>
+              <a class="cta cta--blue" href="panel-gabinetu.html">
+                Zobacz, co widzisz Ty
                 <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
               </a>
             </div>
-            <a class="screen" href="crm.html" tabindex="-1" aria-hidden="true">
+            <a class="brama__obraz" href="panel-gabinetu.html" tabindex="-1" aria-hidden="true">
               <span class="screen__bar"><i></i><i></i><i></i></span>
-              <img src="assets/img/crm-podglad.jpg" alt="" width="1440" height="900" loading="lazy" />
+              <img src="assets/img/zrzuty/panel-dzis.jpg" alt="" width="1400" height="972" loading="lazy" />
             </a>
-          </div>
+          </article>
         </div>
       </div>
     </section>
@@ -587,7 +602,7 @@
       <nav class="foot__col" aria-labelledby="foot-nav">
         <p class="foot__h" id="foot-nav">Na stronie</p>
         <a href="#jak-to-dziala">Jak to działa</a>
-        <a href="#demo">Demo</a>
+        <a href="#demo">Strona i panel</a>
         <a href="#funkcje">Funkcje</a>
       <a href="#pakiety">Pakiety</a>
         <a href="#kontakt">Kontakt</a>
@@ -602,10 +617,11 @@
 
       <div class="foot__col foot__col--cta">
         <p class="foot__h">Zobacz to w działaniu</p>
-        <a class="cta cta--blue" href="demo.html">
-          Otwórz demo
+        <a class="cta cta--blue" href="strona-gabinetu.html">
+          Strona gabinetu
           <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
         </a>
+        <a class="cta cta--line" href="panel-gabinetu.html">Panel gabinetu</a>
       </div>
     </div>
 
@@ -639,29 +655,6 @@
       document.querySelectorAll('[data-calc]').forEach((i) => i.addEventListener('input', update));
       update();
       document.getElementById('rok').textContent = new Date().getFullYear();
-
-      // Przełącznik perspektyw: ta sama sekcja raz oczami pacjenta, raz gabinetu.
-      const taby = document.querySelectorAll('.widok__tab');
-      taby.forEach((t) =>
-        t.addEventListener('click', () => {
-          taby.forEach((x) => {
-            const wybrany = x === t;
-            x.setAttribute('aria-selected', String(wybrany));
-            document.getElementById(x.getAttribute('aria-controls')).hidden = !wybrany;
-          });
-        })
-      );
-
-      // Wybór pakietu z cennika ustawia go w formularzu.
-      const form = document.getElementById('form');
-      const status = document.getElementById('form-status');
-      document.querySelectorAll('[data-plan]').forEach((a) =>
-        a.addEventListener('click', () => {
-          const r = form.querySelector(`input[name="pakiet"][value="${a.dataset.plan}"]`);
-          if (r) r.checked = true;
-          setTimeout(() => form.querySelector('#c-name').focus({ preventScroll: true }), 500);
-        })
-      );
 
       const fail = (el, msg) => {
         el.setAttribute('aria-invalid', 'true');

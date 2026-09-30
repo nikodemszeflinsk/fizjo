@@ -2966,3 +2966,461 @@ svg path {
     padding: 22px 20px;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Podstrony ofertowe: strona gabinetu i panel
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.okruchy--oferta {
+  max-width: var(--wrap, 1200px);
+  margin: 0 auto;
+  padding: 26px clamp(20px, 5vw, 56px) 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.okruchy--oferta a {
+  color: var(--muted);
+}
+
+.okruchy--oferta [aria-current] {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* ── Pierwszy ekran ─────────────────────────────────────────────────── */
+.of-hero {
+  max-width: var(--wrap, 1200px);
+  margin: 0 auto;
+  padding: 34px clamp(20px, 5vw, 56px) 60px;
+}
+
+.of-hero__kicker {
+  display: inline-block;
+  margin: 0 0 18px;
+  padding: 6px 15px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.of-hero__h1 {
+  max-width: 18ch;
+  margin: 0;
+  font-family: var(--f-display);
+  font-size: clamp(2.2rem, 6vw, 4rem);
+  font-weight: 900;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+
+.of-hero__lead {
+  max-width: 56ch;
+  margin: 24px 0 0;
+  color: var(--ink-2);
+  font-size: clamp(1.05rem, 2.2vw, 1.25rem);
+  line-height: 1.6;
+}
+
+.of-hero__cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.cta--line {
+  border: 1px solid var(--hair-2);
+  background: transparent;
+  color: var(--ink);
+}
+
+.cta--line:hover {
+  border-color: var(--ink);
+  background: var(--floor);
+}
+
+.of-hero__uwaga {
+  margin: 20px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* ── Blok: tekst i obraz ────────────────────────────────────────────── */
+.of-blok {
+  padding: 46px 0;
+  border-top: 1px solid var(--hair);
+}
+
+.of-blok:nth-child(even) {
+  background: var(--paper);
+}
+
+.of-blok__in {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  align-items: center;
+  gap: clamp(28px, 5vw, 64px);
+  max-width: var(--wrap, 1200px);
+  margin: 0 auto;
+  padding: 0 clamp(20px, 5vw, 56px);
+}
+
+.of-blok--odwrocony .of-blok__in {
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+}
+
+.of-blok--odwrocony .of-blok__text {
+  order: 2;
+}
+
+.of-blok__num {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-family: var(--f-display);
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.of-blok__h {
+  margin: 0 0 14px;
+  font-family: var(--f-display);
+  font-size: clamp(1.45rem, 3.2vw, 2.1rem);
+  font-weight: 800;
+  line-height: 1.14;
+  letter-spacing: -0.022em;
+}
+
+.of-blok__lead {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 1.02rem;
+  line-height: 1.62;
+}
+
+.of-blok__punkty {
+  display: grid;
+  gap: 9px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.of-blok__punkty li {
+  position: relative;
+  padding-left: 22px;
+  color: var(--muted);
+  font-size: 0.94rem;
+  line-height: 1.55;
+}
+
+.of-blok__punkty li::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 0;
+  width: 10px;
+  height: 2px;
+  background: var(--accent);
+}
+
+/* ── Obraz ──────────────────────────────────────────────────────────── */
+.of-blok__obraz {
+  margin: 0;
+}
+
+.of-blok__obraz img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--r-sign);
+  background: var(--floor);
+  box-shadow: 0 18px 44px rgba(20, 23, 26, 0.13);
+}
+
+.of-blok__obraz--waski img {
+  max-width: 380px;
+  margin: 0 auto;
+}
+
+.of-blok__obraz figcaption {
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* ── Finał ──────────────────────────────────────────────────────────── */
+.of-finale {
+  padding: 60px 0 70px;
+  background: var(--ink);
+  color: #cfd3d6;
+}
+
+.of-finale__in {
+  max-width: var(--wrap, 1200px);
+  margin: 0 auto;
+  padding: 0 clamp(20px, 5vw, 56px);
+}
+
+.of-finale__h {
+  margin: 0 0 14px;
+  color: #fff;
+  font-family: var(--f-display);
+  font-size: clamp(1.8rem, 4.5vw, 2.8rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.of-finale p {
+  max-width: 58ch;
+  margin: 0;
+  line-height: 1.62;
+}
+
+.of-finale .cta--line {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+.of-finale .cta--line:hover {
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.of-finale :focus-visible {
+  outline-color: #fff;
+}
+
+/* ── Stopka ─────────────────────────────────────────────────────────── */
+.of-stopka {
+  max-width: var(--wrap, 1200px);
+  margin: 0 auto;
+  padding: 34px clamp(20px, 5vw, 56px) 60px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.of-stopka p {
+  margin: 0 0 6px;
+}
+
+.of-stopka strong {
+  color: var(--ink);
+}
+
+.of-stopka__note {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--hair);
+  color: var(--faint);
+  font-size: 0.82rem;
+}
+
+@media (max-width: 900px) {
+  .of-blok__in,
+  .of-blok--odwrocony .of-blok__in {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 26px;
+  }
+
+  .of-blok--odwrocony .of-blok__text {
+    order: 0;
+  }
+
+  .of-blok {
+    padding: 36px 0;
+  }
+
+  .of-blok__obraz--waski img {
+    max-width: 320px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Dwie bramy: strona i panel, jedna pod drugą
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.bramy {
+  display: grid;
+  gap: 20px;
+  margin-top: 34px;
+}
+
+.brama {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: center;
+  gap: clamp(24px, 4vw, 52px);
+  padding: clamp(24px, 3.5vw, 40px);
+  border-radius: var(--r-sign);
+  background: var(--floor);
+  overflow: hidden;
+}
+
+.brama--ciemna {
+  background: var(--ink);
+  color: #cfd3d6;
+}
+
+.brama--ciemna :focus-visible {
+  outline-color: #fff;
+}
+
+.brama__kicker {
+  display: inline-block;
+  margin: 0 0 12px;
+  padding: 5px 13px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.brama--ciemna .brama__kicker {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.brama__h {
+  margin: 0 0 12px;
+  font-family: var(--f-display);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 800;
+  line-height: 1.14;
+  letter-spacing: -0.022em;
+}
+
+.brama--ciemna .brama__h {
+  color: #fff;
+}
+
+.brama__lead {
+  margin: 0;
+  max-width: 48ch;
+  line-height: 1.6;
+}
+
+.brama__punkty {
+  display: grid;
+  gap: 7px;
+  margin: 16px 0 22px;
+  padding: 0;
+  list-style: none;
+}
+
+.brama__punkty li {
+  position: relative;
+  padding-left: 20px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.brama--ciemna .brama__punkty li {
+  color: #b7bcc1;
+}
+
+.brama__punkty li::before {
+  content: '';
+  position: absolute;
+  top: 9px;
+  left: 0;
+  width: 9px;
+  height: 2px;
+  background: var(--accent);
+}
+
+/* Obraz jako podgląd ekranu, nie zdjęcie. */
+.brama__obraz {
+  position: relative;
+  display: block;
+  border-radius: var(--r-sign);
+  background: var(--paper);
+  box-shadow: 0 18px 44px rgba(20, 23, 26, 0.16);
+  overflow: hidden;
+}
+
+.brama__obraz img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.brama__obraz .screen__bar {
+  display: flex;
+  gap: 6px;
+  padding: 10px 14px;
+  background: #23272b;
+}
+
+.brama__obraz .screen__bar i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.brama__obraz--telefon {
+  max-width: 320px;
+  margin: 0 auto;
+  border-radius: 26px;
+  box-shadow: 0 20px 50px rgba(20, 23, 26, 0.2);
+}
+
+@media (max-width: 900px) {
+  .brama {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .brama__obraz--telefon {
+    max-width: 260px;
+  }
+}
+
+/* Zrzut da się otworzyć w pełnym rozmiarze — na telefonie to jedyny sposób,
+   żeby przeczytać, co jest na ekranie panelu. */
+.of-blok__lupa {
+  position: relative;
+  display: block;
+  border-radius: var(--r-sign);
+  overflow: hidden;
+}
+
+.of-blok__powieksz {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(20, 23, 26, 0.82);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.2s, transform 0.2s var(--ease-out);
+}
+
+.of-blok__lupa:hover .of-blok__powieksz,
+.of-blok__lupa:focus-visible .of-blok__powieksz {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (hover: none) {
+  .of-blok__powieksz {
+    opacity: 1;
+    transform: none;
+  }
+}
