@@ -410,7 +410,7 @@
             const l = t ? P.linia(t.linia) : { kolor: '#535A61' };
             const z = P.terapeuta(w.terapeutaId);
             const wielu = P.zespolAktywny().length > 1;
-            return `<button class="event" type="button" data-pacjent="${p.id}" style="--c:${l.kolor};top:${pozycja(w.godzina) + 1}px;height:${Math.max((w.minuty / 60) * 52 - 3, 32)}px">
+            return `<button class="event" type="button" data-akcja="wizyta" data-wizyta="${w.id}" style="--c:${l.kolor};top:${pozycja(w.godzina) + 1}px;height:${Math.max((w.minuty / 60) * 52 - 3, 32)}px">
               <b>${esc(p.imie)}${wielu && z ? `<i style="--c:${z.kolor}">${esc(z.inicjaly)}</i>` : ''}</b>
               <span>${w.godzina} · ${esc((P.usluga(w.uslugaId) || {}).nazwa || '')}</span>
             </button>`;
@@ -1063,6 +1063,30 @@
   /* ── Karta pacjenta ────────────────────────────────────────────────── */
   let otwartyPacjent = null;
 
+  /** Wiersz wizyty w karcie pacjenta — z akcjami, żeby nie wracać do „Dziś". */
+  function wizytaWKarcie(w) {
+    const s = STATUS[w.status];
+    const dni = P.dniOd(w.data);
+    const zamknieta = ['odbyta', 'nieobecnosc'].includes(w.status);
+    const przyszla = dni <= 0 && !zamknieta;
+    const akcje = zamknieta
+      ? `<button class="btn btn--sm btn--ghost" type="button" data-akcja="status" data-wizyta="${w.id}" data-status="potwierdzona">Cofnij</button>`
+      : `${dni === 0 ? `<button class="btn btn--sm btn--accent" type="button" data-akcja="status" data-wizyta="${w.id}" data-status="odbyta">Odbyta</button>
+             <button class="btn btn--sm btn--ghost" type="button" data-akcja="status" data-wizyta="${w.id}" data-status="nieobecnosc">Nie przyszedł</button>` : ''}
+         ${przyszla && w.status === 'zaplanowana' ? `<button class="btn btn--sm" type="button" data-akcja="status" data-wizyta="${w.id}" data-status="potwierdzona">Potwierdź</button>` : ''}
+         ${przyszla ? `<button class="btn btn--sm btn--ghost" type="button" data-akcja="przeloz" data-wizyta="${w.id}">Przełóż</button>
+             <button class="btn btn--sm btn--ghost" type="button" data-akcja="odwolaj" data-wizyta="${w.id}">Odwołaj</button>` : ''}`;
+    return `<li class="wizyta-mini">
+      <span class="wizyta-mini__gora">
+        <span>${krotka(w.data)}, ${w.godzina}<em>${esc((P.usluga(w.uslugaId) || {}).nazwa || '')}${
+          P.zespolAktywny().length > 1 && P.terapeuta(w.terapeutaId) ? ` · ${esc(krotkieImie(P.terapeuta(w.terapeutaId).imie))}` : ''
+        }</em></span>
+        <span class="pill ${s.klasa}">${s.tekst}</span>
+      </span>
+      ${akcje.trim() ? `<span class="wizyta-mini__akcje">${akcje}</span>` : ''}
+    </li>`;
+  }
+
   function renderDrawer() {
     if (!otwartyPacjent) return;
     const p = P.pacjent(otwartyPacjent);
@@ -1157,15 +1181,19 @@
       }
 
       <div class="pat__block">
-        <h3>Wizyty</h3>
+        <h3 class="pat__h3--row">Wizyty
+          <span class="pat__h3-akcje">
+            ${
+              t && P.nastepnaWizyta(t.id)
+                ? `<button class="btn btn--sm btn--ghost" type="button" data-akcja="w-kalendarzu" data-data="${P.nastepnaWizyta(t.id).data}">${ikona('kalendarz')}W kalendarzu</button>`
+                : ''
+            }
+            <button class="btn btn--sm btn--accent" type="button" data-akcja="umow" data-pacjent-id="${p.id}">${ikona('plus')}Umów</button>
+          </span>
+        </h3>
         ${
           historia.length
-            ? `<ul class="prosta prosta--wizyty">${historia
-                .map((w) => {
-                  const s = STATUS[w.status];
-                  return `<li><span>${krotka(w.data)}, ${w.godzina}<em>${esc((P.usluga(w.uslugaId) || {}).nazwa || '')}</em></span><span class="pill ${s.klasa}">${s.tekst}</span></li>`;
-                })
-                .join('')}</ul>`
+            ? `<ul class="prosta prosta--wizyty">${historia.map(wizytaWKarcie).join('')}</ul>`
             : '<p class="pusto">Brak wizyt.</p>'
         }
       </div>
@@ -1183,6 +1211,16 @@
 
       <div class="pat__block">
         <h3>Wiadomości do pacjenta</h3>
+        ${(() => {
+          /* Co dostanie najbliżej — żeby nie trzeba było iść do Wiadomości. */
+          const naj = P.kolejkaWiadomosci(14).find(
+            (w) => w.pacjentId === p.id && !w.usunieta && !w.wylaczonaRodzaj && !w.wylaczonaPacjent
+          );
+          return naj
+            ? `<p class="pat__nastepna-wiad">Najbliżej: <strong>${esc(naj.nazwa.toLowerCase())}</strong>, ${krotka(naj.data)} o ${naj.godzina}.
+                <button class="link-btn" type="button" data-view="wiadomosci">Zobacz kolejkę</button></p>`
+            : '<p class="pat__nastepna-wiad">W najbliższych dwóch tygodniach nic do tego pacjenta nie wyjdzie.</p>';
+        })()}
         <ul class="ustawienia-sms">
           ${Object.entries(P.TYPY_WIADOMOSCI)
             .map(([typ, def]) => {
@@ -1239,11 +1277,11 @@
     el.hidden = false;
   }
 
-  function formNowyPacjent() {
+  function formNowyPacjent(imieWstepne = '') {
     modal(
       'Nowy pacjent',
       `<div class="form-grid">
-        ${pole('np-imie', 'Imię i nazwisko')}
+        ${pole('np-imie', 'Imię i nazwisko', 'text', imieWstepne)}
         ${pole('np-tel', 'Telefon', 'tel')}
         ${pole('np-mail', 'E-mail <em>(opcjonalnie)</em>', 'email')}
         <div class="field">
@@ -1411,6 +1449,10 @@
     /* Gdy pacjent ma terapię, domyślnie proponujemy jej prowadzącego. */
     const terapiaWstepna = pacjentId ? P.terapiaPacjenta(pacjentId) : null;
     const terapeutaWstepny = terapiaWstepna ? terapiaWstepna.terapeutaId : null;
+    /* Przy istniejącej terapii proponujemy usługę z jej problemu, a nie pierwszą z cennika. */
+    const uslugaWstepna = terapiaWstepna
+      ? (S().uslugi.find((u) => u.linia === terapiaWstepna.linia) || {}).id
+      : null;
 
     modal(
       przekladana ? 'Przełóż wizytę' : 'Umów wizytę',
@@ -1420,14 +1462,27 @@
             ? `<p class="modal__info field--full">${esc(P.pacjent(przekladana.pacjentId).imie)} · teraz ${krotka(przekladana.data)}, ${przekladana.godzina}. Stary termin wróci do wolnych godzin.</p>`
             : `<div class="field field--full">
                 <label for="uw-pacjent">Pacjent</label>
-                <select id="uw-pacjent">${pacjenci
-                  .map((p) => `<option value="${p.id}" ${p.id === pacjentId ? 'selected' : ''}>${esc(p.imie)}</option>`)
-                  .join('')}</select>
+                <span class="pole-z-akcja">
+                  <select id="uw-pacjent">${pacjenci
+                    .map((p) => `<option value="${p.id}" ${p.id === pacjentId ? 'selected' : ''}>${esc(p.imie)}</option>`)
+                    .join('')}</select>
+                  <button class="link-btn" type="button" data-akcja="uw-nowy">Nowy pacjent</button>
+                </span>
+              </div>
+              <div class="nowy-inline field--full" id="uw-nowy-pola" hidden>
+                <p class="nowy-inline__h">Dodaj pacjenta i od razu umów</p>
+                <div class="form-grid">
+                  ${pole('uw-imie', 'Imię i nazwisko', 'text', '', 'placeholder="Jan Przykładowy"')}
+                  ${pole('uw-tel', 'Telefon', 'tel', '', 'placeholder="600 000 000"')}
+                </div>
+                <button class="link-btn" type="button" data-akcja="uw-anuluj-nowy">Wybiorę z listy</button>
               </div>
               <div class="field field--full">
                 <label for="uw-usluga">Usługa</label>
                 <select id="uw-usluga">${S()
-                  .uslugi.map((u) => `<option value="${u.id}">${esc(u.nazwa)} · ${u.minuty} min · ${zl(u.cena)}</option>`)
+                  .uslugi.map(
+                    (u) => `<option value="${u.id}" ${u.id === uslugaWstepna ? 'selected' : ''}>${esc(u.nazwa)} · ${u.minuty} min · ${zl(u.cena)}</option>`
+                  )
                   .join('')}</select>
               </div>
               ${
@@ -1491,7 +1546,17 @@
   function zapiszWizyte() {
     const wybrana = $('#uw-sloty [aria-pressed="true"]');
     if (!wybrana) return bladModalu('uw-err', 'Wybierz godzinę.');
-    const pacjentId = $('#uw-pacjent').value;
+
+    /* Pacjenta, którego jeszcze nie ma w kartotece, zakładamy tu i teraz. */
+    let pacjentId = $('#uw-pacjent').value;
+    const nowe = $('#uw-nowy-pola');
+    if (nowe && !nowe.hidden) {
+      const imie = $('#uw-imie').value.trim();
+      const tel = $('#uw-tel').value.trim();
+      if (imie.length < 3) return bladModalu('uw-err', 'Podaj imię i nazwisko nowego pacjenta.');
+      if (tel.replace(/\D/g, '').length < 9) return bladModalu('uw-err', 'Podaj telefon nowego pacjenta.');
+      pacjentId = P.akcje.dodajPacjenta({ imie, telefon: tel, zrodlo: 'inne' }).id;
+    }
     const t = P.terapiaPacjenta(pacjentId);
 
     if ($('#uw-seria') && $('#uw-seria').checked) {
@@ -1656,6 +1721,56 @@
       <p class="modal__err" id="gb-err" hidden></p>`,
       `<button class="btn btn--ghost" type="button" data-close>Anuluj</button>
        <button class="btn btn--accent" type="button" data-zapisz="gabinet">Zapisz</button>`
+    );
+  }
+
+  /* ── Okno wizyty ───────────────────────────────────────────────────── */
+  /* Klik w wizytę w kalendarzu otwiera ją samą, a nie całą kartotekę —
+     stąd da się zrobić wszystko, co dotyczy tej godziny, i wejść głębiej. */
+  function formWizyta(wid) {
+    const w = S().wizyty.find((x) => x.id === wid);
+    if (!w) return;
+    const pac = P.pacjent(w.pacjentId);
+    const t = w.terapiaId ? P.terapia(w.terapiaId) : null;
+    const u = P.usluga(w.uslugaId);
+    const z = P.terapeuta(w.terapeutaId);
+    const s = STATUS[w.status];
+    const zamknieta = ['odbyta', 'nieobecnosc'].includes(w.status);
+
+    modal(
+      `${krotka(w.data)}, ${w.godzina}`,
+      `<div class="wizyta-okno">
+        <button class="wizyta-okno__kto" type="button" data-akcja="karta-pacjenta" data-pacjent-id="${pac.id}">
+          <span class="pat__mark" style="--c:${t ? P.linia(t.linia).kolor : '#535A61'};--on:#fff">${inicjaly(pac.imie)}</span>
+          <span>
+            <strong>${esc(pac.imie)}</strong>
+            <em>${esc(pac.telefon)}${t ? ` · ${esc(t.etykieta)}` : ' · bez karty terapii'}</em>
+          </span>
+          <span class="wizyta-okno__strzalka">${ikona('link')}Otwórz kartę</span>
+        </button>
+
+        <dl class="dane">
+          <div><dt>Usługa</dt><dd>${esc(u ? u.nazwa : '—')} · ${w.minuty} min${u ? ` · ${zl(u.cena)}` : ''}</dd></div>
+          ${z ? `<div><dt>Prowadzi</dt><dd>${esc(z.imie)}</dd></div>` : ''}
+          <div><dt>Status</dt><dd><span class="pill ${s.klasa}">${s.tekst}</span></dd></div>
+          ${t ? `<div><dt>Postęp terapii</dt><dd>${P.odbyte(t.id)} z ${t.planWizyt} wizyt</dd></div>` : ''}
+        </dl>
+
+        <div class="wizyta-okno__akcje">
+          ${
+            zamknieta
+              ? `<button class="btn" type="button" data-akcja="status" data-wizyta="${w.id}" data-status="potwierdzona" data-zamknij>Cofnij oznaczenie</button>`
+              : `<button class="btn btn--accent" type="button" data-akcja="status" data-wizyta="${w.id}" data-status="odbyta" data-zamknij>Odbyta</button>
+                 ${w.status === 'zaplanowana' ? `<button class="btn" type="button" data-akcja="status" data-wizyta="${w.id}" data-status="potwierdzona" data-zamknij>Potwierdź</button>` : ''}
+                 <button class="btn btn--ghost" type="button" data-akcja="status" data-wizyta="${w.id}" data-status="nieobecnosc" data-zamknij>Nie przyszedł</button>
+                 <button class="btn btn--ghost" type="button" data-akcja="przeloz" data-wizyta="${w.id}">Przełóż</button>
+                 <button class="btn btn--ghost" type="button" data-akcja="odwolaj" data-wizyta="${w.id}">Odwołaj</button>`
+          }
+          <a class="btn btn--ghost" href="tel:${esc(String(pac.telefon).replace(/\s/g, ''))}">${ikona('phone')}Zadzwoń</a>
+        </div>
+      </div>`,
+      `<button class="btn btn--ghost" type="button" data-close>Zamknij</button>
+       <button class="btn" type="button" data-akcja="umow" data-pacjent-id="${pac.id}">Umów kolejną</button>`
     );
   }
 
@@ -1826,7 +1941,10 @@
             </button></li>`;
           })
           .join('')
-      : '<li class="search__empty">Nie znaleziono pacjenta.</li>';
+      : `<li class="search__empty">
+            Nikogo takiego nie ma w kartotece.
+            <button class="link-btn" type="button" data-akcja="nowy-pacjent" data-imie="${esc(fraza.trim())}">Dodaj „${esc(fraza.trim())}"</button>
+          </li>`;
   }
 
   /* ── Render ────────────────────────────────────────────────────────── */
@@ -1843,15 +1961,23 @@
 
   /* ── Zdarzenia ─────────────────────────────────────────────────────── */
   document.addEventListener('click', async (e) => {
+    /* Kliknięcie w tło zamyka to, co jest na wierzchu. Sprawdzamy to przed
+       szukaniem przycisku, bo tło przyciskiem nie jest. */
+    if (e.target.classList.contains('modal__veil')) return schowajModal();
+    if (e.target.classList.contains('drawer__veil')) return zamknijDrawer();
+
     /* Wiersz kartoteki też jest klikalny — nie tylko przyciski w nim. */
     const el = e.target.closest('button, a, tr[data-pacjent]');
     if (!el) return;
     const d = el.dataset;
 
-    if (d.close !== undefined || el.classList.contains('modal__veil') || el.classList.contains('drawer__veil')) {
+    if (d.close !== undefined) {
       return el.closest('#modal') ? schowajModal() : zamknijDrawer();
     }
-    if (d.view) return pokazWidok(d.view);
+    if (d.view) {
+      if (!$('#drawer').hidden) zamknijDrawer();
+      return pokazWidok(d.view);
+    }
     if (d.pacjent) {
       $('#search-out').hidden = true;
       return otworzPacjenta(d.pacjent);
@@ -1884,14 +2010,44 @@
     }
 
     switch (d.akcja) {
+      case 'wizyta':
+        return formWizyta(d.wizyta);
+      case 'w-kalendarzu': {
+        /* Przeskakujemy na tydzień, w którym leży ta wizyta. */
+        const cel = P.fromIso(d.data);
+        const poniedzialekTeraz = new Date(P.dzis);
+        poniedzialekTeraz.setDate(P.dzis.getDate() - ((P.dzis.getDay() + 6) % 7));
+        const poniedzialekCelu = new Date(cel);
+        poniedzialekCelu.setDate(cel.getDate() - ((cel.getDay() + 6) % 7));
+        tydzienPrzesuniecie = Math.round((poniedzialekCelu - poniedzialekTeraz) / (7 * 86400000));
+        zamknijDrawer();
+        return pokazWidok('kalendarz');
+      }
+      case 'karta-pacjenta':
+        schowajModal();
+        return otworzPacjenta(d.pacjentId);
+      case 'uw-nowy': {
+        $('#uw-nowy-pola').hidden = false;
+        $('#uw-pacjent').closest('.field').hidden = true;
+        $('#uw-imie').focus();
+        return;
+      }
+      case 'uw-anuluj-nowy': {
+        $('#uw-nowy-pola').hidden = true;
+        $('#uw-pacjent').closest('.field').hidden = false;
+        return;
+      }
       case 'nowa-wizyta':
         return formUmow();
       case 'umow':
+        schowajModal();
         return formUmow({ pacjentId: d.pacjentId });
       case 'umow-slot':
         return formUmow({ data: d.data, godzina: d.godzina });
       case 'nowy-pacjent':
-        return formNowyPacjent();
+        $('#search-out').hidden = true;
+        $('#search').value = '';
+        return formNowyPacjent(d.imie || '');
       case 'nowa-terapia':
         return formNowaTerapia(d.pacjentId);
       case 'edytuj-terapie':
@@ -1905,6 +2061,7 @@
       case 'status': {
         const poprzedni = (S().wizyty.find((x) => x.id === d.wizyta) || {}).status;
         P.akcje.zmienStatusWizyty(d.wizyta, d.status);
+        if (d.zamknij !== undefined) schowajModal();
         const nazwy = {
           odbyta: 'Wizyta oznaczona jako odbyta',
           nieobecnosc: 'Zapisano nieobecność',
@@ -1913,8 +2070,10 @@
         return toast(nazwy[d.status] || 'Zmieniono status wizyty', true);
       }
       case 'przeloz':
+        schowajModal();
         return formUmow({ wizytaId: d.wizyta });
       case 'odwolaj': {
+        schowajModal();
         const w = S().wizyty.find((x) => x.id === d.wizyta);
         const kopia = w ? { ...w } : null;
         P.akcje.zmienStatusWizyty(d.wizyta, 'odwolana');

@@ -364,12 +364,15 @@
 
   /* ── Zdarzenia ─────────────────────────────────────────────────────── */
   document.addEventListener('click', (e) => {
+    /* Tło okna nie jest przyciskiem, więc sprawdzamy je osobno. */
+    if (e.target.classList.contains('modal__veil')) return zamknijModal();
+
     const el = e.target.closest('button');
     if (!el) return;
     const t = znajdzTerapie();
 
     if (el.dataset.drukuj !== undefined) return window.print();
-    if (el.dataset.close !== undefined || el.classList.contains('modal__veil')) return zamknijModal();
+    if (el.dataset.close !== undefined) return zamknijModal();
     if (el.dataset.godz) {
       document.querySelectorAll('#pz-sloty .slot').forEach((s) => s.setAttribute('aria-pressed', String(s === el)));
       $('#pz-err').hidden = true;

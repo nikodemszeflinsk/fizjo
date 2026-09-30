@@ -3807,3 +3807,194 @@ svg path {
     grid-column: 2;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Akcje w kontekście: wizyta w karcie, nowy pacjent w umawianiu, okno wizyty
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.pat__h3--row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* ── Wizyta w karcie pacjenta ───────────────────────────────────────── */
+.wizyta-mini {
+  display: block !important;
+  padding: 10px 12px !important;
+}
+
+.wizyta-mini__gora {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.wizyta-mini__gora > span:first-child {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.wizyta-mini__gora em {
+  display: block;
+  color: var(--muted);
+  font-style: normal;
+  font-size: 0.78rem;
+  font-weight: 400;
+  font-variant-numeric: normal;
+}
+
+.wizyta-mini__akcje {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+/* ── Pole z akcją obok ──────────────────────────────────────────────── */
+.pole-z-akcja {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pole-z-akcja select {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.pole-z-akcja .link-btn {
+  flex: none;
+  font-size: 0.85rem;
+}
+
+.nowy-inline {
+  margin-top: -4px;
+  padding: 16px;
+  border-radius: var(--r-sm);
+  background: var(--accent-soft);
+}
+
+.nowy-inline__h {
+  margin: 0 0 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent-dark);
+}
+
+.nowy-inline .link-btn {
+  margin-top: 12px;
+  font-size: 0.85rem;
+}
+
+/* ── Okno pojedynczej wizyty ────────────────────────────────────────── */
+.wizyta-okno__kto {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  margin-bottom: 18px;
+  padding: 14px;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sm);
+  background: var(--paper);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.18s, background-color 0.18s;
+}
+
+.wizyta-okno__kto:hover {
+  border-color: var(--ink);
+  background: var(--floor);
+}
+
+.wizyta-okno__kto strong {
+  display: block;
+  font-size: 1rem;
+}
+
+.wizyta-okno__kto em {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-style: normal;
+  font-size: 0.82rem;
+}
+
+.wizyta-okno__strzalka {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.wizyta-okno__strzalka svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+}
+
+.wizyta-okno__akcje {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+/* Podpowiedź w wyszukiwarce, gdy nikogo nie ma. */
+.search__empty {
+  padding: 14px 16px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.search__empty .link-btn {
+  display: block;
+  margin-top: 6px;
+}
+
+@media (max-width: 720px) {
+  .wizyta-okno__kto {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .wizyta-okno__strzalka {
+    grid-column: 2;
+  }
+
+  .pole-z-akcja {
+    flex-wrap: wrap;
+  }
+}
+
+.pat__h3-akcje {
+  display: flex;
+  gap: 6px;
+}
+
+.pat__nastepna-wiad {
+  margin: 0 0 12px;
+  padding: 11px 13px;
+  border-radius: var(--r-sm);
+  background: var(--accent-soft);
+  color: var(--ink-2);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.pat__nastepna-wiad .link-btn {
+  font-size: 0.86rem;
+}
