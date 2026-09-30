@@ -655,47 +655,242 @@
   }
 
   /* ── Widok: Wiadomości ─────────────────────────────────────────────── */
+  /* Góra ekranu to ustawienia rodzajów — jeden włącznik na rodzaj, nie na
+     wiadomość. Dół to kolejka konkretnych wysyłek, gdzie da się poprawić
+     albo wyjąć pojedynczą sztukę, nie ruszając reszty. */
+
+  const DNI_PELNE = ['niedziela', 'poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota'];
+
+  /** Kiedy idzie dany rodzaj, jednym zdaniem. */
+  function kiedyIdzie(typ) {
+    const u = P.ustawieniaRodzaju(typ);
+    const def = P.TYPY_WIADOMOSCI[typ];
+    if (def.kiedy === 'przed') {
+      const d = u.dniPrzed || 1;
+      return `${d === 1 ? 'dzień' : `${d} dni`} przed wizytą, o ${u.godzina}`;
+    }
+    if (def.kiedy === 'poWizycie') return `w dniu wizyty, o ${u.godzina}`;
+    if (def.kiedy === 'tydzien') return `w ${DNI_PELNE[u.dzien === undefined ? 1 : u.dzien]}, o ${u.godzina}`;
+    if (def.kiedy === 'poTerapii') {
+      const d = u.dniPo || 1;
+      return `${d === 1 ? 'dzień' : `${d} dni`} po zamknięciu terapii, o ${u.godzina}`;
+    }
+    return `o ${u.godzina}`;
+  }
+
   function renderWiadomosci() {
     const kolejka = P.kolejkaWiadomosci(7);
-    const czynne = kolejka.filter((w) => !w.wylaczona);
-    $('#view-date').textContent = `${czynne.length} wiadomości w kolejce na siedem dni`;
+    const pojda = kolejka.filter((w) => !w.usunieta && !w.wylaczonaRodzaj && !w.wylaczonaPacjent);
+    $('#view-date').textContent = `${pojda.length} ${pojda.length === 1 ? 'wiadomość' : 'wiadomości'} wyjdzie w ciągu siedmiu dni`;
+
+    const rodzaj = (typ) => {
+      const def = P.TYPY_WIADOMOSCI[typ];
+      const u = P.ustawieniaRodzaju(typ);
+      const ile = kolejka.filter((w) => w.typ === typ && !w.usunieta && !w.wylaczonaPacjent).length;
+      return `<article class="rodzaj${u.wlaczona ? '' : ' is-off'}">
+        <div class="rodzaj__gora">
+          <div>
+            <h3 class="rodzaj__nazwa">${esc(def.nazwa)}</h3>
+            <p class="rodzaj__opis">${esc(def.opis)}</p>
+          </div>
+          <button class="switch" type="button" role="switch" aria-checked="${u.wlaczona}"
+            data-akcja="przelacz-rodzaj" data-typ="${typ}" aria-label="${esc(def.nazwa)}: włącz albo wyłącz">
+            <span></span>${u.wlaczona ? 'włączone' : 'wyłączone'}
+          </button>
+        </div>
+
+        <dl class="rodzaj__dane">
+          <div><dt>Kiedy</dt><dd>${kiedyIdzie(typ)}</dd></div>
+          <div><dt>W kolejce</dt><dd>${ile ? `${ile} na siedem dni` : 'nic w tym tygodniu'}</dd></div>
+        </dl>
+
+        <p class="rodzaj__szablon">${esc(u.szablon)}</p>
+
+        <div class="rodzaj__akcje">
+          <button class="btn btn--sm" type="button" data-akcja="ustaw-rodzaj" data-typ="${typ}">Zmień treść i porę</button>
+        </div>
+      </article>`;
+    };
 
     const dni = [...new Set(kolejka.map((w) => w.data))];
     const grupa = (dataIso) => {
       const poz = kolejka.filter((w) => w.data === dataIso);
+      const ilePojdzie = poz.filter((w) => !w.usunieta && !w.wylaczonaRodzaj && !w.wylaczonaPacjent).length;
       return `<article class="card">
         <header class="card__head card__head--row">
           <div>
-            <h2>${krotka(dataIso)}${P.dniOd(dataIso) === 0 ? ' · dzisiaj' : ''}</h2>
-            <p class="card__note">${poz.filter((w) => !w.wylaczona).length} z ${poz.length} pójdzie</p>
+            <h3 class="kolejka__dzien">${krotka(dataIso)}${P.dniOd(dataIso) === 0 ? ' · dzisiaj' : ''}</h3>
+            <p class="card__note">${ilePojdzie} z ${poz.length} pójdzie</p>
           </div>
         </header>
-        <ul class="kolejka">
-          ${poz
-            .map((w) => {
-              const p = P.pacjent(w.pacjentId);
-              return `<li class="${w.wylaczona ? 'is-off' : ''}">
-                <span class="kolejka__czas">${w.godzina}</span>
-                <span class="kolejka__co">
-                  <strong>${esc(w.nazwa)}</strong>
-                  <button class="kolejka__kto" type="button" data-pacjent="${p.id}">${esc(p.imie)} · ${esc(p.telefon)}</button>
-                  <em>${esc(w.tresc)}</em>
-                </span>
-                <button class="switch" type="button" role="switch" aria-checked="${!w.wylaczona}"
-                  data-akcja="przelacz-wiadomosc" data-pacjent-id="${p.id}" data-typ="${w.typ}">
-                  <span></span>${w.wylaczona ? 'wyłączone' : 'włączone'}
-                </button>
-              </li>`;
-            })
-            .join('')}
-        </ul>
+        <ul class="kolejka">${poz.map(wiersz).join('')}</ul>
       </article>`;
     };
 
+    const wiersz = (w) => {
+      const p = P.pacjent(w.pacjentId);
+      const nieidzie = w.usunieta || w.wylaczonaRodzaj || w.wylaczonaPacjent;
+      const powod = w.usunieta
+        ? 'usunięta z kolejki'
+        : w.wylaczonaRodzaj
+          ? 'ten rodzaj jest wyłączony'
+          : w.wylaczonaPacjent
+            ? 'pacjent nie chce takich wiadomości'
+            : '';
+      return `<li class="${nieidzie ? 'is-off' : ''}">
+        <span class="kolejka__czas">${w.godzina}</span>
+        <span class="kolejka__co">
+          <strong>${esc(w.nazwa)}${w.wlasnaTresc ? '<span class="kolejka__znak">zmieniona</span>' : ''}</strong>
+          <button class="kolejka__kto" type="button" data-pacjent="${p.id}">${esc(p.imie)} · ${esc(p.telefon)}</button>
+          <em>${esc(w.tresc)}</em>
+          ${powod ? `<span class="kolejka__powod">Nie pójdzie: ${powod}</span>` : `<span class="kolejka__skad">${esc(w.powod)}</span>`}
+        </span>
+        <span class="kolejka__akcje">
+          ${
+            w.usunieta
+              ? `<button class="btn btn--sm" type="button" data-akcja="przywroc-wiadomosc" data-wid="${w.id}">Przywróć</button>`
+              : `<button class="btn btn--sm" type="button" data-akcja="edytuj-wiadomosc" data-wid="${w.id}">Edytuj</button>
+                 <button class="btn btn--sm btn--ghost" type="button" data-akcja="usun-wiadomosc" data-wid="${w.id}">Usuń</button>`
+          }
+        </span>
+      </li>`;
+    };
+
     $('#wiadomosci').innerHTML = `
-      <p class="wyjasnienie">Kolejka wynika z kalendarza i z terapii — nic nie trzeba w nią wpisywać. Przypomnienie idzie dzień przed wizytą, pytanie o ból wieczorem po wizycie, pytanie o ćwiczenia w poniedziałek rano. Wyłącznik działa dla jednego pacjenta i jednego rodzaju wiadomości.</p>
-      <p class="wyjasnienie wyjasnienie--uwaga">W prototypie nic nie wychodzi na zewnątrz. W działającym systemie SMS-y są wliczone w abonament do 200 miesięcznie.</p>
+      <p class="wyjasnienie">
+        Kolejka układa się sama z kalendarza i z terapii — nie trzeba jej niczym karmić.
+        Tutaj decydujesz, które rodzaje wiadomości wychodzą, kiedy i co w nich jest.
+      </p>
+
+      <div class="rodzaje">${Object.keys(P.TYPY_WIADOMOSCI).map(rodzaj).join('')}</div>
+
+      <h2 class="sekcja-h">Najbliższe siedem dni</h2>
+      <p class="wyjasnienie wyjasnienie--uwaga">
+        W prototypie nic nie wychodzi na zewnątrz. W działającym systemie SMS-y są wliczone
+        w abonament do 200 miesięcznie.
+      </p>
       ${dni.length ? dni.map(grupa).join('') : '<p class="pusto">Na najbliższy tydzień nie ma nic do wysłania.</p>'}`;
+  }
+
+  /* ── Ustawienia rodzaju wiadomości ─────────────────────────────────── */
+  function formRodzaj(typ) {
+    const def = P.TYPY_WIADOMOSCI[typ];
+    const u = P.ustawieniaRodzaju(typ);
+    const godziny = Array.from({ length: 15 }, (_, i) => `${i + 7}:00`);
+
+    const kiedyPola = () => {
+      if (def.kiedy === 'przed') {
+        return `<div class="field">
+            <label for="rw-dni">Ile dni przed wizytą</label>
+            <select id="rw-dni">
+              ${[1, 2, 3].map((d) => `<option value="${d}" ${d === (u.dniPrzed || 1) ? 'selected' : ''}>${d === 1 ? 'dzień przed' : `${d} dni przed`}</option>`).join('')}
+            </select>
+          </div>`;
+      }
+      if (def.kiedy === 'tydzien') {
+        return `<div class="field">
+            <label for="rw-dzien">Dzień tygodnia</label>
+            <select id="rw-dzien">
+              ${[1, 2, 3, 4, 5, 6, 0].map((d) => `<option value="${d}" ${d === (u.dzien === undefined ? 1 : u.dzien) ? 'selected' : ''}>${DNI_PELNE[d]}</option>`).join('')}
+            </select>
+          </div>`;
+      }
+      if (def.kiedy === 'poTerapii') {
+        return `<div class="field">
+            <label for="rw-po">Ile dni po zamknięciu terapii</label>
+            <select id="rw-po">
+              ${[1, 2, 3, 7].map((d) => `<option value="${d}" ${d === (u.dniPo || 1) ? 'selected' : ''}>${d === 1 ? 'następnego dnia' : `po ${d} dniach`}</option>`).join('')}
+            </select>
+          </div>`;
+      }
+      return '<p class="modal__info field--full">Ta wiadomość idzie w dniu wizyty — do ustawienia zostaje godzina.</p>';
+    };
+
+    modal(
+      `Wiadomość: ${def.nazwa.toLowerCase()}`,
+      `<p class="modal__info">${esc(def.opis)}</p>
+
+      <p class="modal__label">Kiedy wychodzi</p>
+      <div class="form-grid">
+        ${kiedyPola()}
+        <div class="field">
+          <label for="rw-godzina">O której</label>
+          <select id="rw-godzina">
+            ${godziny.map((g) => `<option value="${g}" ${g === u.godzina ? 'selected' : ''}>${g}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+
+      <p class="modal__label">Treść</p>
+      <div class="field field--full">
+        <label for="rw-szablon" class="visually-hidden">Treść wiadomości</label>
+        <textarea id="rw-szablon" rows="4">${esc(u.szablon)}</textarea>
+      </div>
+      <p class="modal__info">
+        Słowa w nawiasach klamrowych podmieniają się same przy wysyłce. Kliknij, żeby wstawić:
+      </p>
+      <div class="pola">
+        ${def.pola.map((pole) => `<button class="pole-btn" type="button" data-pole="${pole}">{${pole}}</button>`).join('')}
+      </div>
+      <p class="podglad" id="rw-podglad"></p>
+      <p class="modal__err" id="rw-err" hidden></p>`,
+      `<button class="btn btn--ghost" type="button" data-close>Anuluj</button>
+       <button class="btn" type="button" data-zapisz="rodzaj-domyslny" data-typ="${typ}">Przywróć domyślną</button>
+       <button class="btn btn--accent" type="button" data-zapisz="rodzaj" data-typ="${typ}">Zapisz</button>`
+    );
+    podgladSzablonu();
+  }
+
+  /** Podgląd na prawdziwym pacjencie, żeby było widać efekt podmiany. */
+  function podgladSzablonu() {
+    const pole = $('#rw-szablon');
+    const out = $('#rw-podglad');
+    if (!pole || !out) return;
+    const p = S().pacjenci[0];
+    const dane = {
+      imie: p ? p.imie.split(' ')[0] : 'Anna',
+      gabinet: S().ustawienia.nazwa,
+      adres: S().ustawienia.adres,
+      kiedy: 'jutro',
+      godzina: '9:30',
+      link: 'linia-ruchu.pl/k/4821',
+    };
+    const tekst = pole.value.replace(/\{(\w+)\}/g, (calosc, k) => (dane[k] !== undefined ? dane[k] : calosc));
+    out.innerHTML = `<span>Tak zobaczy to pacjent:</span>${esc(tekst)}`;
+  }
+
+  function zapiszRodzaj(typ) {
+    const szablon = $('#rw-szablon').value.trim();
+    if (szablon.length < 10) return bladModalu('rw-err', 'Treść jest za krótka.');
+    const dane = { godzina: $('#rw-godzina').value, szablon };
+    if ($('#rw-dni')) dane.dniPrzed = Number($('#rw-dni').value);
+    if ($('#rw-dzien')) dane.dzien = Number($('#rw-dzien').value);
+    if ($('#rw-po')) dane.dniPo = Number($('#rw-po').value);
+    P.akcje.zapiszRodzajWiadomosci(typ, dane);
+    schowajModal();
+    toast('Zapisano ustawienia wiadomości', true);
+  }
+
+  /* ── Edycja jednej wiadomości ──────────────────────────────────────── */
+  function formWiadomosc(wid) {
+    const w = P.kolejkaWiadomosci(14).find((x) => x.id === wid);
+    if (!w) return;
+    const p = P.pacjent(w.pacjentId);
+    modal(
+      'Edytuj tę wiadomość',
+      `<p class="modal__info">
+        Do: <strong>${esc(p.imie)}</strong> · ${esc(p.telefon)}<br />
+        Wyjdzie ${krotka(w.data)} o ${w.godzina} — ${esc(w.powod)}.
+      </p>
+      <div class="field field--full">
+        <label for="ew-tresc">Treść</label>
+        <textarea id="ew-tresc" rows="4">${esc(w.tresc)}</textarea>
+      </div>
+      <p class="modal__info">Zmiana dotyczy tylko tej jednej wiadomości. Szablon dla pozostałych zostaje bez zmian.</p>`,
+      `<button class="btn btn--ghost" type="button" data-close>Anuluj</button>
+       ${w.wlasnaTresc ? `<button class="btn" type="button" data-zapisz="wiadomosc-domyslna" data-wid="${wid}">Wróć do szablonu</button>` : ''}
+       <button class="btn btn--accent" type="button" data-zapisz="wiadomosc" data-wid="${wid}">Zapisz</button>`
+    );
   }
 
   /* ── Widok: Miesiąc ────────────────────────────────────────────────── */
@@ -1670,6 +1865,15 @@
       $('#uw-err').hidden = true;
       return;
     }
+    if (d.pole) {
+      const pole = $('#rw-szablon');
+      const poz = pole.selectionStart;
+      pole.value = `${pole.value.slice(0, poz)}{${d.pole}}${pole.value.slice(pole.selectionEnd)}`;
+      pole.focus();
+      pole.selectionStart = pole.selectionEnd = poz + d.pole.length + 2;
+      podgladSzablonu();
+      return;
+    }
     if (d.kolor) {
       $$('#modal [data-kolor]').forEach((k) => k.setAttribute('aria-pressed', String(k === el)));
       return;
@@ -1753,6 +1957,25 @@
       case 'miesiac':
         miesiacPrzesuniecie = d.o === '0' ? 0 : miesiacPrzesuniecie + Number(d.o);
         return renderMiesiac();
+      case 'przelacz-rodzaj': {
+        const wynik = P.akcje.przelaczRodzajWiadomosci(d.typ);
+        return toast(
+          wynik.wlaczona
+            ? `${P.TYPY_WIADOMOSCI[d.typ].nazwa}: znów wychodzi`
+            : `${P.TYPY_WIADOMOSCI[d.typ].nazwa}: wyłączone dla wszystkich`,
+          true
+        );
+      }
+      case 'ustaw-rodzaj':
+        return formRodzaj(d.typ);
+      case 'edytuj-wiadomosc':
+        return formWiadomosc(d.wid);
+      case 'usun-wiadomosc':
+        P.akcje.usunWiadomosc(d.wid);
+        return toast('Wiadomość nie pójdzie', true);
+      case 'przywroc-wiadomosc':
+        P.akcje.przywrocWiadomosc(d.wid);
+        return toast('Wiadomość wraca do kolejki', true);
       case 'przelacz-wiadomosc': {
         const wynik = P.akcje.przelaczWiadomosc(d.pacjentId, d.typ);
         return toast(wynik.wylaczona ? 'Wyłączono ten rodzaj wiadomości dla pacjenta' : 'Włączono z powrotem', true);
@@ -1832,6 +2055,22 @@
         return zapiszBlokade();
       case 'kreator':
         return zapiszKreator();
+      case 'rodzaj':
+        return zapiszRodzaj(d.typ);
+      case 'rodzaj-domyslny': {
+        const def = P.TYPY_WIADOMOSCI[d.typ];
+        P.akcje.zapiszRodzajWiadomosci(d.typ, { ...def.domyslne, szablon: def.szablon });
+        schowajModal();
+        return toast('Przywrócono domyślne ustawienia', true);
+      }
+      case 'wiadomosc':
+        P.akcje.nadpiszWiadomosc(d.wid, $('#ew-tresc').value.trim());
+        schowajModal();
+        return toast('Zmieniono treść tej wiadomości', true);
+      case 'wiadomosc-domyslna':
+        P.akcje.przywrocTrescWiadomosci(d.wid);
+        schowajModal();
+        return toast('Wróciła treść z szablonu', true);
       case 'osoba':
         return zapiszOsobe(d.osoba);
       case 'gabinet': {
@@ -1867,6 +2106,10 @@
       default:
         break;
     }
+  });
+
+  document.addEventListener('input', (e) => {
+    if (e.target.id === 'rw-szablon') podgladSzablonu();
   });
 
   document.addEventListener('change', (e) => {

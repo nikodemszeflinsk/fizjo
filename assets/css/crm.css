@@ -3603,3 +3603,207 @@ svg path {
   text-underline-offset: 3px;
   cursor: pointer;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Wiadomości: rodzaje i kolejka
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Cztery rodzaje układają się w kwadrat; trzy w rzędzie zostawiały sierotę. */
+.rodzaje {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 34px;
+}
+
+.rodzaj {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  border-radius: var(--r);
+  background: var(--white);
+  box-shadow: 0 1px 2px rgba(20, 23, 26, 0.06);
+  transition: opacity 0.2s;
+}
+
+.rodzaj.is-off {
+  background: var(--floor);
+  box-shadow: none;
+}
+
+.rodzaj.is-off .rodzaj__szablon,
+.rodzaj.is-off .rodzaj__dane {
+  opacity: 0.5;
+}
+
+.rodzaj__gora {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.rodzaj__nazwa {
+  margin: 0 0 4px;
+  font-family: var(--f-display);
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.rodzaj__opis {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.rodzaj__dane {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 26px;
+  margin: 0;
+}
+
+.rodzaj__dane dt {
+  color: var(--faint);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rodzaj__dane dd {
+  margin: 2px 0 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.rodzaj__szablon {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: var(--r-sm);
+  background: var(--floor);
+  color: var(--ink-2);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.rodzaj.is-off .rodzaj__szablon {
+  background: var(--floor-2);
+}
+
+.rodzaj__akcje {
+  margin-top: auto;
+}
+
+.sekcja-h {
+  margin: 0 0 10px;
+  font-family: var(--f-display);
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+}
+
+/* ── Kolejka ────────────────────────────────────────────────────────── */
+.kolejka__dzien {
+  margin: 0;
+  font-family: var(--f-display);
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.kolejka__znak {
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: var(--f-body);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.kolejka__skad,
+.kolejka__powod {
+  display: block;
+  margin-top: 5px;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.kolejka__skad {
+  color: var(--faint);
+  font-weight: 400;
+}
+
+.kolejka__powod {
+  color: var(--warn);
+}
+
+.kolejka__akcje {
+  flex: none;
+  display: flex;
+  gap: 6px;
+}
+
+/* ── Szablon w oknie ────────────────────────────────────────────────── */
+.pola {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.pole-btn {
+  padding: 6px 12px;
+  border: 1px dashed var(--hair-2);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--accent);
+  font-family: var(--f-body);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pole-btn:hover {
+  border-style: solid;
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.podglad {
+  margin: 16px 0 0;
+  padding: 14px 16px;
+  border-radius: var(--r-sm);
+  background: var(--ink);
+  color: #e9ecea;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.podglad span {
+  display: block;
+  margin-bottom: 6px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 900px) {
+  .rodzaje {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+
+  .kolejka__akcje {
+    grid-column: 2;
+  }
+}

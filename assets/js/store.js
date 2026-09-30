@@ -11,7 +11,7 @@
   'use strict';
 
   const KLUCZ = 'panel-gabinetu';
-  const WERSJA = 3;
+  const WERSJA = 4;
 
   /* ── Pomocnicze ────────────────────────────────────────────────────── */
   const dzis = new Date();
@@ -86,6 +86,9 @@
       zdarzenia: [],
       blokady: [],
       wylaczone: [],
+      wiadomosci: {},
+      nadpisaneWiadomosci: {},
+      pominieteWiadomosci: [],
     };
   }
 
@@ -316,6 +319,11 @@
       ],
       /* Pacjenci, którzy nie chcą danego typu wiadomości. */
       wylaczone: [],
+      /* Ustawienia rodzajów wiadomości; puste = domyślne z TYPY_WIADOMOSCI. */
+      wiadomosci: {},
+      /* Pojedyncze wiadomości: zmieniona treść i te wyjęte z kolejki. */
+      nadpisaneWiadomosci: {},
+      pominieteWiadomosci: [],
     };
   }
 
@@ -334,6 +342,9 @@
         if (dane && dane.wersja >= 1 && dane.wersja < WERSJA) {
           dane.blokady = dane.blokady || [];
           dane.wylaczone = dane.wylaczone || [];
+          dane.wiadomosci = dane.wiadomosci || {};
+          dane.nadpisaneWiadomosci = dane.nadpisaneWiadomosci || {};
+          dane.pominieteWiadomosci = dane.pominieteWiadomosci || [];
           /* Jednoosobowy gabinet staje się zespołem jednoosobowym. */
           if (!dane.zespol) {
             const u = dane.ustawienia;
@@ -589,97 +600,169 @@
   /* ── Kolejka wiadomości ────────────────────────────────────────────── */
   /* Nic tu nie jest zapisane: kolejka wynika z wizyt, terapii i kalendarza.
      Zapisujemy tylko wyłączenia i ślad po wysyłce. */
+  /* Rodzaje wiadomości. `kiedy` opisuje, co da się w nich przestawić, a `szablon`
+     jest punktem wyjścia — gabinet może go zmienić w Ustawieniach wiadomości. */
   const TYPY_WIADOMOSCI = {
-    przypomnienie: { nazwa: 'Przypomnienie o wizycie', godzina: '18:00' },
-    'ankieta-bol': { nazwa: 'Pytanie o ból po wizycie', godzina: '19:00' },
-    'ankieta-cwiczenia': { nazwa: 'Tygodniowe pytanie o ćwiczenia', godzina: '9:00' },
-    opinia: { nazwa: 'Prośba o opinię w Google', godzina: '10:00' },
+    przypomnienie: {
+      nazwa: 'Przypomnienie o wizycie',
+      opis: 'Idzie przed każdą umówioną wizytą.',
+      kiedy: 'przed',
+      domyslne: { wlaczona: true, dniPrzed: 1, godzina: '18:00' },
+      szablon: '{imie}, przypominamy o wizycie {kiedy} o {godzina}. {gabinet}',
+      pola: ['imie', 'kiedy', 'godzina', 'gabinet', 'adres', 'link'],
+    },
+    'ankieta-bol': {
+      nazwa: 'Pytanie o ból po wizycie',
+      opis: 'Jedna cyfra od pacjenta. Z tego bierze się krzywa bólu w karcie terapii.',
+      kiedy: 'poWizycie',
+      domyslne: { wlaczona: true, godzina: '19:00' },
+      szablon: '{imie}, jak dziś z bólem w skali 0–10? Odpowiedz w swojej karcie: {link}',
+      pola: ['imie', 'gabinet', 'link'],
+    },
+    'ankieta-cwiczenia': {
+      nazwa: 'Tygodniowe pytanie o ćwiczenia',
+      opis: 'Raz w tygodniu do wszystkich, którzy mają zadane ćwiczenia.',
+      kiedy: 'tydzien',
+      domyslne: { wlaczona: true, dzien: 1, godzina: '9:00' },
+      szablon: '{imie}, jak poszły ćwiczenia w minionym tygodniu? Odhacz je tutaj: {link}',
+      pola: ['imie', 'gabinet', 'link'],
+    },
+    opinia: {
+      nazwa: 'Prośba o opinię w Google',
+      opis: 'Po zamknięciu terapii, gdy jest czym się chwalić.',
+      kiedy: 'poTerapii',
+      domyslne: { wlaczona: true, dniPo: 1, godzina: '10:00' },
+      szablon:
+        '{imie}, cieszymy się, że terapia dobiegła końca. Jeśli było warto, opinia w Mapach Google bardzo nam pomaga: {link}',
+      pola: ['imie', 'gabinet', 'link'],
+    },
   };
 
+  /** Ustawienia rodzaju: zapisane w gabinecie albo domyślne. */
+  const ustawieniaRodzaju = (typ) => ({
+    ...TYPY_WIADOMOSCI[typ].domyslne,
+    szablon: TYPY_WIADOMOSCI[typ].szablon,
+    ...((stan.wiadomosci || {})[typ] || {}),
+  });
+
+  const DNI_TYGODNIA = ['niedziela', 'poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota'];
+
   const wylaczona = (pacjentId, typ) => stan.wylaczone.some((x) => x.pacjentId === pacjentId && x.typ === typ);
+
+  /** Podstawia dane pacjenta i wizyty w szablon. */
+  function wypelnij(szablon, dane) {
+    return String(szablon).replace(/\{(\w+)\}/g, (całość, pole) => (dane[pole] !== undefined ? dane[pole] : całość));
+  }
 
   function kolejkaWiadomosci(dniDoPrzodu = 7) {
     const dzisIso = iso(dzis);
     const granica = isoZa(dniDoPrzodu);
+    const nadpisane = stan.nadpisaneWiadomosci || {};
+    const pominiete = stan.pominieteWiadomosci || [];
     const out = [];
-    const dodaj = (pacjentId, terapiaId, typ, data, tresc) => {
+
+    const dodaj = (pacjentId, terapiaId, typ, data, dane, opis) => {
       if (data < dzisIso || data > granica) return;
       const p = pacjent(pacjentId);
       if (!p) return;
+      const u = ustawieniaRodzaju(typ);
+      const id = `${typ}-${pacjentId}-${data}`;
       out.push({
-        id: `${typ}-${pacjentId}-${data}`,
+        id,
         pacjentId,
         terapiaId,
         typ,
         data,
-        godzina: TYPY_WIADOMOSCI[typ].godzina,
+        godzina: u.godzina,
         nazwa: TYPY_WIADOMOSCI[typ].nazwa,
-        tresc,
-        wylaczona: wylaczona(pacjentId, typ) || p.zgodaSms === false,
+        powod: opis,
+        tresc: nadpisane[id] !== undefined ? nadpisane[id] : wypelnij(u.szablon, dane),
+        wlasnaTresc: nadpisane[id] !== undefined,
+        usunieta: pominiete.includes(id),
+        /* Wiadomość nie pójdzie, gdy rodzaj jest wyłączony w gabinecie,
+           gdy pacjent go sobie wyłączył albo gdy nie ma zgody na SMS. */
+        wylaczonaRodzaj: !u.wlaczona,
+        wylaczonaPacjent: wylaczona(pacjentId, typ) || p.zgodaSms === false,
       });
     };
 
-    stan.wizyty
-      .filter((w) => ['zaplanowana', 'potwierdzona'].includes(w.status) && w.data >= dzisIso)
-      .forEach((w) => {
-        const p = pacjent(w.pacjentId);
-        const dzien = fromIso(w.data);
-        dzien.setDate(dzien.getDate() - 1);
-        dodaj(
-          w.pacjentId,
-          w.terapiaId,
-          'przypomnienie',
-          iso(dzien),
-          `${p.imie.split(' ')[0]}, przypominamy o wizycie jutro o ${w.godzina}. ${stan.ustawienia.nazwa}`
-        );
-      });
+    /* Link do karty pacjenta: w prototypie składamy go z nazwy gabinetu,
+       żeby w podglądzie wyglądał tak, jak będzie wyglądał naprawdę. */
+    const domena = `${stan.ustawienia.nazwa
+      .toLowerCase()
+      .replace(/[ąćęłńóśźż]/g, (z) => ({ ą: 'a', ć: 'c', ę: 'e', ł: 'l', ń: 'n', ó: 'o', ś: 's', ź: 'z', ż: 'z' })[z])
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')}.pl`;
 
+    const daneWspolne = (p) => ({
+      imie: p.imie.split(' ')[0],
+      gabinet: stan.ustawienia.nazwa,
+      adres: stan.ustawienia.adres,
+      link: `${domena}/k/${p.id.replace(/\D/g, '').padStart(4, '0').slice(-4)}`,
+    });
+
+    /* Przypomnienie: tyle dni przed wizytą, ile ustawił gabinet. */
+    {
+      const u = ustawieniaRodzaju('przypomnienie');
+      stan.wizyty
+        .filter((w) => ['zaplanowana', 'potwierdzona'].includes(w.status) && w.data >= dzisIso)
+        .forEach((w) => {
+          const p = pacjent(w.pacjentId);
+          if (!p) return;
+          const dzien = fromIso(w.data);
+          dzien.setDate(dzien.getDate() - (u.dniPrzed || 1));
+          const kiedy = (u.dniPrzed || 1) === 1 ? 'jutro' : `${DNI_TYGODNIA[fromIso(w.data).getDay()]}`;
+          dodaj(w.pacjentId, w.terapiaId, 'przypomnienie', iso(dzien), { ...daneWspolne(p), kiedy, godzina: w.godzina }, `wizyta ${krotkaData(w.data)}, ${w.godzina}`);
+        });
+    }
+
+    /* Pytanie o ból: wieczorem w dniu odbytej wizyty. */
     stan.wizyty
       .filter((w) => w.status === 'odbyta' && w.data === dzisIso)
       .forEach((w) => {
         const p = pacjent(w.pacjentId);
-        dodaj(
-          w.pacjentId,
-          w.terapiaId,
-          'ankieta-bol',
-          dzisIso,
-          `${p.imie.split(' ')[0]}, jak dziś z bólem w skali 0–10? Odpowiedz jedną cyfrą albo kliknij w swoją kartę.`
-        );
+        if (!p) return;
+        dodaj(w.pacjentId, w.terapiaId, 'ankieta-bol', dzisIso, daneWspolne(p), 'wizyta odbyta dzisiaj');
       });
 
-    /* Pytanie o ćwiczenia idzie w poniedziałek rano. */
-    const poniedzialek = new Date(dzis);
-    poniedzialek.setDate(dzis.getDate() + ((8 - dzis.getDay()) % 7 || 7));
-    stan.terapie
-      .filter((t) => t.status === 'aktywna' && t.cwiczenia.length)
-      .forEach((t) => {
-        const p = pacjent(t.pacjentId);
-        dodaj(
-          t.pacjentId,
-          t.id,
-          'ankieta-cwiczenia',
-          iso(poniedzialek),
-          `${p.imie.split(' ')[0]}, jak poszły ćwiczenia w minionym tygodniu? Odhacz je w swojej karcie.`
-        );
-      });
+    /* Pytanie o ćwiczenia: w wybranym dniu tygodnia. */
+    {
+      const u = ustawieniaRodzaju('ankieta-cwiczenia');
+      const cel = u.dzien === undefined ? 1 : Number(u.dzien);
+      const dzien = new Date(dzis);
+      const doPrzodu = (cel - dzis.getDay() + 7) % 7 || 7;
+      dzien.setDate(dzis.getDate() + doPrzodu);
+      stan.terapie
+        .filter((t) => t.status === 'aktywna' && t.cwiczenia.length)
+        .forEach((t) => {
+          const p = pacjent(t.pacjentId);
+          if (!p) return;
+          dodaj(t.pacjentId, t.id, 'ankieta-cwiczenia', iso(dzien), daneWspolne(p), `${t.cwiczenia.length} zadanych ćwiczeń`);
+        });
+    }
 
-    stan.terapie
-      .filter((t) => t.status !== 'aktywna' && t.koniec && dniOd(t.koniec) <= 3)
-      .filter((t) => !stan.zdarzenia.some((z) => z.pacjentId === t.pacjentId && z.typ === 'opinia'))
-      .forEach((t) => {
-        const p = pacjent(t.pacjentId);
-        const dzien = fromIso(t.koniec);
-        dzien.setDate(dzien.getDate() + 1);
-        dodaj(
-          t.pacjentId,
-          t.id,
-          'opinia',
-          iso(dzien),
-          `${p.imie.split(' ')[0]}, cieszymy się, że terapia dobiegła końca. Jeśli było warto, opinia w Mapach Google bardzo nam pomaga.`
-        );
-      });
+    /* Prośba o opinię: tyle dni po zamknięciu cyklu, ile ustawił gabinet. */
+    {
+      const u = ustawieniaRodzaju('opinia');
+      stan.terapie
+        .filter((t) => t.status !== 'aktywna' && t.koniec && dniOd(t.koniec) <= 3)
+        .filter((t) => !stan.zdarzenia.some((z) => z.pacjentId === t.pacjentId && z.typ === 'opinia'))
+        .forEach((t) => {
+          const p = pacjent(t.pacjentId);
+          if (!p) return;
+          const dzien = fromIso(t.koniec);
+          dzien.setDate(dzien.getDate() + (u.dniPo || 1));
+          dodaj(t.pacjentId, t.id, 'opinia', iso(dzien), daneWspolne(p), 'terapia zamknięta');
+        });
+    }
 
-    return out.sort((a, b) => (a.data + a.godzina.padStart(5, '0')).localeCompare(b.data + b.godzina.padStart(5, '0')));
+    return out.sort((a, b) => (a.data + naMinuty(a.godzina)).localeCompare(b.data + naMinuty(b.godzina)));
+  }
+
+  /** Data w formacie, który czyta się w treści wiadomości. */
+  function krotkaData(isoData) {
+    const d = fromIso(isoData);
+    return `${d.getDate()}.${String(d.getMonth() + 1).padStart(2, '0')}`;
   }
 
   /* ── Kto wejdzie na zwolniony termin ───────────────────────────────── */
@@ -965,6 +1048,52 @@
       });
     },
 
+    /** Ustawienia całego rodzaju: włącznik, harmonogram, szablon treści. */
+    zapiszRodzajWiadomosci(typ, dane) {
+      return zmien('Zmieniono ustawienia wiadomości', (s) => {
+        s.wiadomosci = s.wiadomosci || {};
+        s.wiadomosci[typ] = { ...ustawieniaRodzaju(typ), ...dane };
+        return s.wiadomosci[typ];
+      });
+    },
+
+    przelaczRodzajWiadomosci(typ) {
+      const teraz = ustawieniaRodzaju(typ).wlaczona;
+      return zmien('Przełączono rodzaj wiadomości', (s) => {
+        s.wiadomosci = s.wiadomosci || {};
+        s.wiadomosci[typ] = { ...ustawieniaRodzaju(typ), wlaczona: !teraz };
+        return { wlaczona: !teraz };
+      });
+    },
+
+    /** Zmiana treści jednej wiadomości, bez ruszania szablonu. */
+    nadpiszWiadomosc(id, tresc) {
+      return zmien('Zmieniono treść wiadomości', (s) => {
+        s.nadpisaneWiadomosci = s.nadpisaneWiadomosci || {};
+        s.nadpisaneWiadomosci[id] = tresc;
+      });
+    },
+
+    przywrocTrescWiadomosci(id) {
+      return zmien('Przywrócono treść z szablonu', (s) => {
+        if (s.nadpisaneWiadomosci) delete s.nadpisaneWiadomosci[id];
+      });
+    },
+
+    /** Usunięcie jednej wiadomości z kolejki — nie rusza pozostałych. */
+    usunWiadomosc(id) {
+      return zmien('Usunięto wiadomość z kolejki', (s) => {
+        s.pominieteWiadomosci = s.pominieteWiadomosci || [];
+        if (!s.pominieteWiadomosci.includes(id)) s.pominieteWiadomosci.push(id);
+      });
+    },
+
+    przywrocWiadomosc(id) {
+      return zmien('Przywrócono wiadomość', (s) => {
+        s.pominieteWiadomosci = (s.pominieteWiadomosci || []).filter((x) => x !== id);
+      });
+    },
+
     /** Wyłączenie albo włączenie typu wiadomości dla jednego pacjenta. */
     przelaczWiadomosc(pacjentId, typ) {
       return zmien('Zmieniono ustawienia wiadomości', (s) => {
@@ -1179,5 +1308,7 @@
     wynikTerapii,
     podsumowanieMiesiaca,
     TYPY_WIADOMOSCI,
+    ustawieniaRodzaju,
+    DNI_TYGODNIA,
   };
 })();
