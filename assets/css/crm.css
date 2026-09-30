@@ -3226,12 +3226,13 @@ svg path {
   display: inline-grid;
   place-items: center;
   flex: none;
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: var(--c, var(--muted));
   color: #fff;
-  font-size: 0.64rem;
+  /* Inicjały mówią, kto bierze tę godzinę — muszą być czytelne, nie ozdobne. */
+  font-size: 0.7rem;
   font-weight: 800;
   letter-spacing: 0.02em;
 }
@@ -4635,11 +4636,11 @@ tr.is-cicho td:first-child {
 .znak-nowy {
   display: inline-block;
   margin-left: 7px;
-  padding: 1px 8px;
+  padding: 2px 8px;
   border-radius: 999px;
   background: var(--accent);
   color: #fff;
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;

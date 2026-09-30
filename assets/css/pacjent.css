@@ -496,13 +496,14 @@ a {
   display: grid;
   place-items: center;
   gap: 4px;
-  width: 84px;
+  width: 94px;
   padding: 10px 6px;
   border: 1px dashed var(--hair-2);
   border-radius: 9px;
   background: var(--floor);
   color: var(--faint);
-  font-size: 0.62rem;
+  /* Podpis mówi pacjentowi, co się tu pojawi — musi dać się przeczytać. */
+  font-size: 0.7rem;
   font-weight: 700;
   line-height: 1.25;
   letter-spacing: 0.02em;
