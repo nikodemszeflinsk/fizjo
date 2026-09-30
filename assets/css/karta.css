@@ -517,7 +517,7 @@ svg path {
 .timeline__tag {
   display: inline-block;
   margin-left: 2px;
-  padding: 3px 9px;
+  padding: 8px 12px;
   border-radius: 999px;
   background: var(--accent);
   color: #fff;
@@ -2936,7 +2936,7 @@ svg path {
 }
 
 .grupa__tag {
-  padding: 4px 11px;
+  padding: 8px 12px;
   border-radius: 999px;
   background: var(--accent);
   color: #fff;
@@ -3542,7 +3542,7 @@ svg path {
   align-items: center;
   gap: 7px;
   margin-bottom: 12px;
-  padding: 5px 12px;
+  padding: 8px 14px;
   border-radius: 999px;
   background: var(--accent);
   color: #fff;
@@ -3867,7 +3867,7 @@ svg path {
 .ofr-hero__dla {
   display: inline-block;
   margin: 0 0 20px;
-  padding: 6px 15px;
+  padding: 9px 16px;
   border-radius: 999px;
   background: var(--accent);
   color: #fff;
@@ -4222,7 +4222,7 @@ svg path {
 .ofr-cena__znak {
   display: inline-block;
   margin: 0 0 14px;
-  padding: 5px 13px;
+  padding: 8px 14px;
   border-radius: 999px;
   background: var(--accent);
   color: #fff;
@@ -4390,7 +4390,7 @@ svg path {
 }
 
 .ofr-zakres__tag {
-  padding: 3px 11px;
+  padding: 8px 12px;
   border-radius: 999px;
   background: var(--floor-2);
   color: var(--muted);
