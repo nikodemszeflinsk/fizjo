@@ -3998,3 +3998,176 @@ svg path {
 .pat__nastepna-wiad .link-btn {
   font-size: 0.86rem;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Wiadomości w karcie pacjenta
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.wiad-lista {
+  display: grid;
+  gap: 2px;
+  margin-bottom: 22px;
+}
+
+.wiad-lista__poz {
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr);
+  gap: 4px 12px;
+  padding: 12px;
+  border-radius: var(--r-sm);
+  background: var(--floor);
+}
+
+.wiad-lista__poz.is-off {
+  opacity: 0.55;
+}
+
+.wiad-lista__kiedy {
+  display: grid;
+  align-content: start;
+  gap: 1px;
+}
+
+.wiad-lista__kiedy strong {
+  font-family: var(--f-display);
+  font-size: 0.92rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.wiad-lista__kiedy em {
+  color: var(--muted);
+  font-style: normal;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.wiad-lista__nazwa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.wiad-lista__co em {
+  display: block;
+  margin-top: 5px;
+  color: var(--muted);
+  font-style: normal;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.wiad-lista__akcje {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 9px;
+}
+
+.kolejka__znak--pora {
+  background: rgba(19, 135, 90, 0.14);
+  color: #0f6e49;
+}
+
+/* ── Rodzaje przy pacjencie ─────────────────────────────────────────── */
+.wiad-naglowek {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.wiad-rodzaje {
+  display: grid;
+  gap: 2px;
+}
+
+.wiad-rodzaje > li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 11px 12px;
+  border-radius: var(--r-sm);
+  background: var(--floor);
+}
+
+.wiad-rodzaje > li.is-off {
+  opacity: 0.6;
+}
+
+.wiad-rodzaje__co strong {
+  display: block;
+  font-size: 0.9rem;
+}
+
+.wiad-rodzaje__co em {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-style: normal;
+  font-size: 0.78rem;
+}
+
+.wiad-rodzaje__uwaga {
+  display: block;
+  margin-top: 5px;
+  color: var(--warn);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.wiad-rodzaje__akcje {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.wiad-rodzaje__akcje .switch[disabled],
+.wiad-rodzaje__akcje .btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Gotowe treści ──────────────────────────────────────────────────── */
+.gotowce {
+  display: grid;
+  gap: 6px;
+}
+
+.gotowiec {
+  padding: 11px 14px;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sm);
+  background: var(--paper);
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.18s, background-color 0.18s;
+}
+
+.gotowiec:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+@media (max-width: 720px) {
+  .wiad-rodzaje > li {
+    flex-wrap: wrap;
+  }
+
+  .wiad-rodzaje__akcje {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

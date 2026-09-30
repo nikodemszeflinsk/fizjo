@@ -11,7 +11,7 @@
   'use strict';
 
   const KLUCZ = 'panel-gabinetu';
-  const WERSJA = 4;
+  const WERSJA = 5;
 
   /* ── Pomocnicze ────────────────────────────────────────────────────── */
   const dzis = new Date();
@@ -89,6 +89,10 @@
       wiadomosci: {},
       nadpisaneWiadomosci: {},
       pominieteWiadomosci: [],
+      /* Odstępstwa od reguł gabinetu dla pojedynczych pacjentów. */
+      wiadomosciPacjenta: {},
+      /* Wiadomości napisane ręcznie, poza regułami. */
+      wiadomosciWlasne: [],
     };
   }
 
@@ -324,6 +328,10 @@
       /* Pojedyncze wiadomości: zmieniona treść i te wyjęte z kolejki. */
       nadpisaneWiadomosci: {},
       pominieteWiadomosci: [],
+      /* Odstępstwa od reguł gabinetu dla pojedynczych pacjentów. */
+      wiadomosciPacjenta: {},
+      /* Wiadomości napisane ręcznie, poza regułami. */
+      wiadomosciWlasne: [],
     };
   }
 
@@ -345,6 +353,15 @@
           dane.wiadomosci = dane.wiadomosci || {};
           dane.nadpisaneWiadomosci = dane.nadpisaneWiadomosci || {};
           dane.pominieteWiadomosci = dane.pominieteWiadomosci || [];
+          dane.wiadomosciWlasne = dane.wiadomosciWlasne || [];
+          /* Stara lista wyłączeń staje się odstępstwami pacjentów. */
+          if (!dane.wiadomosciPacjenta) {
+            dane.wiadomosciPacjenta = {};
+            (dane.wylaczone || []).forEach((x) => {
+              dane.wiadomosciPacjenta[x.pacjentId] = dane.wiadomosciPacjenta[x.pacjentId] || {};
+              dane.wiadomosciPacjenta[x.pacjentId][x.typ] = { wlaczona: false };
+            });
+          }
           /* Jednoosobowy gabinet staje się zespołem jednoosobowym. */
           if (!dane.zespol) {
             const u = dane.ustawienia;
@@ -638,16 +655,30 @@
     },
   };
 
-  /** Ustawienia rodzaju: zapisane w gabinecie albo domyślne. */
-  const ustawieniaRodzaju = (typ) => ({
-    ...TYPY_WIADOMOSCI[typ].domyslne,
-    szablon: TYPY_WIADOMOSCI[typ].szablon,
-    ...((stan.wiadomosci || {})[typ] || {}),
-  });
+  /**
+   * Ustawienia rodzaju. Bez pacjenta — reguła gabinetu. Z pacjentem — ta sama
+   * reguła plus to, co ustawiono wyłącznie dla niego (inna pora, inny odstęp,
+   * wyłączenie). Nadpisania trzymamy osobno, żeby zmiana reguły gabinetu
+   * nadal działała dla wszystkich, którzy jej nie zmienili.
+   */
+  function ustawieniaRodzaju(typ, pacjentId = null) {
+    const gabinet = {
+      ...TYPY_WIADOMOSCI[typ].domyslne,
+      szablon: TYPY_WIADOMOSCI[typ].szablon,
+      ...((stan.wiadomosci || {})[typ] || {}),
+    };
+    if (!pacjentId) return gabinet;
+    const wlasne = ((stan.wiadomosciPacjenta || {})[pacjentId] || {})[typ] || {};
+    return { ...gabinet, ...wlasne, wlasne: Object.keys(wlasne).length > 0 };
+  }
+
+  /** Czy ten pacjent ma cokolwiek ustawione po swojemu. */
+  const maWlasneUstawienia = (pacjentId) =>
+    Object.keys((stan.wiadomosciPacjenta || {})[pacjentId] || {}).length > 0;
 
   const DNI_TYGODNIA = ['niedziela', 'poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota'];
 
-  const wylaczona = (pacjentId, typ) => stan.wylaczone.some((x) => x.pacjentId === pacjentId && x.typ === typ);
+  const wylaczona = (pacjentId, typ) => ustawieniaRodzaju(typ, pacjentId).wlaczona === false;
 
   /** Podstawia dane pacjenta i wizyty w szablon. */
   function wypelnij(szablon, dane) {
@@ -661,12 +692,17 @@
     const pominiete = stan.pominieteWiadomosci || [];
     const out = [];
 
-    const dodaj = (pacjentId, terapiaId, typ, data, dane, opis) => {
-      if (data < dzisIso || data > granica) return;
+    const dodaj = (pacjentId, terapiaId, typ, dataZReguly, dane, opis) => {
+      if (dataZReguly > granica) return;
       const p = pacjent(pacjentId);
       if (!p) return;
-      const u = ustawieniaRodzaju(typ);
-      const id = `${typ}-${pacjentId}-${data}`;
+      const u = ustawieniaRodzaju(typ, pacjentId);
+      /* Reguła może wskazać dzień, który już minął — np. „trzy dni przed"
+         przy wizycie jutro. Systemu nie da się cofnąć, więc wiadomość idzie
+         najbliżej jak można, a kolejka mówi wprost, że termin minął. */
+      const spozniona = dataZReguly < dzisIso;
+      const data = spozniona ? dzisIso : dataZReguly;
+      const id = `${typ}-${pacjentId}-${dataZReguly}`;
       out.push({
         id,
         pacjentId,
@@ -681,8 +717,11 @@
         usunieta: pominiete.includes(id),
         /* Wiadomość nie pójdzie, gdy rodzaj jest wyłączony w gabinecie,
            gdy pacjent go sobie wyłączył albo gdy nie ma zgody na SMS. */
-        wylaczonaRodzaj: !u.wlaczona,
+        /* Rodzaj wyłączony w gabinecie to co innego niż wyłączony dla tej osoby. */
+        wylaczonaRodzaj: ustawieniaRodzaju(typ).wlaczona === false,
         wylaczonaPacjent: wylaczona(pacjentId, typ) || p.zgodaSms === false,
+        wlasnyHarmonogram: !!u.wlasne,
+        spozniona,
       });
     };
 
@@ -701,14 +740,14 @@
       link: `${domena}/k/${p.id.replace(/\D/g, '').padStart(4, '0').slice(-4)}`,
     });
 
-    /* Przypomnienie: tyle dni przed wizytą, ile ustawił gabinet. */
+    /* Przypomnienie: tyle dni przed wizytą, ile ustawiono dla tego pacjenta. */
     {
-      const u = ustawieniaRodzaju('przypomnienie');
       stan.wizyty
         .filter((w) => ['zaplanowana', 'potwierdzona'].includes(w.status) && w.data >= dzisIso)
         .forEach((w) => {
           const p = pacjent(w.pacjentId);
           if (!p) return;
+          const u = ustawieniaRodzaju('przypomnienie', w.pacjentId);
           const dzien = fromIso(w.data);
           dzien.setDate(dzien.getDate() - (u.dniPrzed || 1));
           const kiedy = (u.dniPrzed || 1) === 1 ? 'jutro' : `${DNI_TYGODNIA[fromIso(w.data).getDay()]}`;
@@ -725,39 +764,68 @@
         dodaj(w.pacjentId, w.terapiaId, 'ankieta-bol', dzisIso, daneWspolne(p), 'wizyta odbyta dzisiaj');
       });
 
-    /* Pytanie o ćwiczenia: w wybranym dniu tygodnia. */
-    {
-      const u = ustawieniaRodzaju('ankieta-cwiczenia');
-      const cel = u.dzien === undefined ? 1 : Number(u.dzien);
-      const dzien = new Date(dzis);
-      const doPrzodu = (cel - dzis.getDay() + 7) % 7 || 7;
-      dzien.setDate(dzis.getDate() + doPrzodu);
-      stan.terapie
-        .filter((t) => t.status === 'aktywna' && t.cwiczenia.length)
-        .forEach((t) => {
-          const p = pacjent(t.pacjentId);
-          if (!p) return;
-          dodaj(t.pacjentId, t.id, 'ankieta-cwiczenia', iso(dzien), daneWspolne(p), `${t.cwiczenia.length} zadanych ćwiczeń`);
-        });
-    }
+    /* Pytanie o ćwiczenia: w dniu tygodnia ustawionym dla tego pacjenta. */
+    stan.terapie
+      .filter((t) => t.status === 'aktywna' && t.cwiczenia.length)
+      .forEach((t) => {
+        const p = pacjent(t.pacjentId);
+        if (!p) return;
+        const u = ustawieniaRodzaju('ankieta-cwiczenia', t.pacjentId);
+        const cel = u.dzien === undefined ? 1 : Number(u.dzien);
+        const dzien = new Date(dzis);
+        dzien.setDate(dzis.getDate() + ((cel - dzis.getDay() + 7) % 7 || 7));
+        dodaj(t.pacjentId, t.id, 'ankieta-cwiczenia', iso(dzien), daneWspolne(p), `${t.cwiczenia.length} zadanych ćwiczeń`);
+      });
 
     /* Prośba o opinię: tyle dni po zamknięciu cyklu, ile ustawił gabinet. */
     {
-      const u = ustawieniaRodzaju('opinia');
       stan.terapie
         .filter((t) => t.status !== 'aktywna' && t.koniec && dniOd(t.koniec) <= 3)
         .filter((t) => !stan.zdarzenia.some((z) => z.pacjentId === t.pacjentId && z.typ === 'opinia'))
         .forEach((t) => {
           const p = pacjent(t.pacjentId);
           if (!p) return;
+          const u = ustawieniaRodzaju('opinia', t.pacjentId);
           const dzien = fromIso(t.koniec);
           dzien.setDate(dzien.getDate() + (u.dniPo || 1));
           dodaj(t.pacjentId, t.id, 'opinia', iso(dzien), daneWspolne(p), 'terapia zamknięta');
         });
     }
 
-    return out.sort((a, b) => (a.data + naMinuty(a.godzina)).localeCompare(b.data + naMinuty(b.godzina)));
+    /* Wiadomości napisane ręcznie — ta sama kolejka, ten sam zestaw akcji. */
+    (stan.wiadomosciWlasne || []).forEach((w) => {
+      if (w.data < dzisIso || w.data > granica) return;
+      const p = pacjent(w.pacjentId);
+      if (!p) return;
+      out.push({
+        id: w.id,
+        pacjentId: w.pacjentId,
+        terapiaId: null,
+        typ: 'wlasna',
+        data: w.data,
+        godzina: w.godzina,
+        nazwa: 'Wiadomość od Ciebie',
+        powod: 'napisana ręcznie',
+        tresc: w.tresc,
+        wlasnaTresc: false,
+        recznaWiadomosc: true,
+        usunieta: pominiete.includes(w.id),
+        wylaczonaRodzaj: false,
+        wylaczonaPacjent: p.zgodaSms === false,
+        wlasnyHarmonogram: false,
+      });
+    });
+
+    return out.sort((a, b) =>
+      `${a.data} ${String(naMinuty(a.godzina)).padStart(4, '0')}`.localeCompare(
+        `${b.data} ${String(naMinuty(b.godzina)).padStart(4, '0')}`
+      )
+    );
   }
+
+  /** Wszystko, co wyjdzie do jednego pacjenta. */
+  const wiadomosciPacjenta = (pacjentId, dni = 21) =>
+    kolejkaWiadomosci(dni).filter((w) => w.pacjentId === pacjentId);
 
   /** Data w formacie, który czyta się w treści wiadomości. */
   function krotkaData(isoData) {
@@ -1069,6 +1137,11 @@
     /** Zmiana treści jednej wiadomości, bez ruszania szablonu. */
     nadpiszWiadomosc(id, tresc) {
       return zmien('Zmieniono treść wiadomości', (s) => {
+        const wlasna = (s.wiadomosciWlasne || []).find((x) => x.id === id);
+        if (wlasna) {
+          wlasna.tresc = tresc;
+          return;
+        }
         s.nadpisaneWiadomosci = s.nadpisaneWiadomosci || {};
         s.nadpisaneWiadomosci[id] = tresc;
       });
@@ -1096,14 +1169,57 @@
 
     /** Wyłączenie albo włączenie typu wiadomości dla jednego pacjenta. */
     przelaczWiadomosc(pacjentId, typ) {
+      const teraz = ustawieniaRodzaju(typ, pacjentId).wlaczona !== false;
       return zmien('Zmieniono ustawienia wiadomości', (s) => {
-        const byla = s.wylaczone.findIndex((x) => x.pacjentId === pacjentId && x.typ === typ);
-        if (byla >= 0) {
-          s.wylaczone.splice(byla, 1);
-          return { wylaczona: false };
-        }
-        s.wylaczone.push({ pacjentId, typ });
-        return { wylaczona: true };
+        s.wiadomosciPacjenta = s.wiadomosciPacjenta || {};
+        s.wiadomosciPacjenta[pacjentId] = s.wiadomosciPacjenta[pacjentId] || {};
+        const biezace = s.wiadomosciPacjenta[pacjentId][typ] || {};
+        s.wiadomosciPacjenta[pacjentId][typ] = { ...biezace, wlaczona: !teraz };
+        return { wylaczona: teraz };
+      });
+    },
+
+    /** Harmonogram tylko dla tego pacjenta: inna pora, inny odstęp. */
+    ustawWiadomoscPacjenta(pacjentId, typ, dane) {
+      return zmien('Zmieniono ustawienia wiadomości pacjenta', (s) => {
+        s.wiadomosciPacjenta = s.wiadomosciPacjenta || {};
+        s.wiadomosciPacjenta[pacjentId] = s.wiadomosciPacjenta[pacjentId] || {};
+        s.wiadomosciPacjenta[pacjentId][typ] = { ...(s.wiadomosciPacjenta[pacjentId][typ] || {}), ...dane };
+        return s.wiadomosciPacjenta[pacjentId][typ];
+      });
+    },
+
+    /** Powrót do reguły gabinetu — kasujemy wszystkie odstępstwa pacjenta. */
+    przywrocUstawieniaPacjenta(pacjentId, typ = null) {
+      return zmien('Przywrócono ustawienia gabinetu', (s) => {
+        if (!s.wiadomosciPacjenta || !s.wiadomosciPacjenta[pacjentId]) return;
+        if (typ) delete s.wiadomosciPacjenta[pacjentId][typ];
+        else delete s.wiadomosciPacjenta[pacjentId];
+      });
+    },
+
+    /** Jednorazowa wiadomość napisana ręcznie. */
+    dodajWiadomosc({ pacjentId, data, godzina, tresc }) {
+      return zmien('Zaplanowano wiadomość', (s) => {
+        s.wiadomosciWlasne = s.wiadomosciWlasne || [];
+        const w = { id: id('wl'), pacjentId, data, godzina, tresc: tresc.trim() };
+        s.wiadomosciWlasne.push(w);
+        log(s, pacjentId, 'sms', `Zaplanowano wiadomość na ${data} ${godzina}`);
+        return w;
+      });
+    },
+
+    zmienWiadomoscWlasna(wid, dane) {
+      return zmien('Zmieniono wiadomość', (s) => {
+        const w = (s.wiadomosciWlasne || []).find((x) => x.id === wid);
+        if (w) Object.assign(w, dane);
+        return w;
+      });
+    },
+
+    skasujWiadomoscWlasna(wid) {
+      return zmien('Skasowano wiadomość', (s) => {
+        s.wiadomosciWlasne = (s.wiadomosciWlasne || []).filter((x) => x.id !== wid);
       });
     },
 
@@ -1309,6 +1425,8 @@
     podsumowanieMiesiaca,
     TYPY_WIADOMOSCI,
     ustawieniaRodzaju,
+    maWlasneUstawienia,
+    wiadomosciPacjenta,
     DNI_TYGODNIA,
   };
 })();

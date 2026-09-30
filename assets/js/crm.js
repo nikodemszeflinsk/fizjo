@@ -776,7 +776,7 @@
   function formRodzaj(typ) {
     const def = P.TYPY_WIADOMOSCI[typ];
     const u = P.ustawieniaRodzaju(typ);
-    const godziny = Array.from({ length: 15 }, (_, i) => `${i + 7}:00`);
+
 
     const kiedyPola = () => {
       if (def.kiedy === 'przed') {
@@ -813,12 +813,7 @@
       <p class="modal__label">Kiedy wychodzi</p>
       <div class="form-grid">
         ${kiedyPola()}
-        <div class="field">
-          <label for="rw-godzina">O której</label>
-          <select id="rw-godzina">
-            ${godziny.map((g) => `<option value="${g}" ${g === u.godzina ? 'selected' : ''}>${g}</option>`).join('')}
-          </select>
-        </div>
+        ${pole('rw-godzina', 'O której', 'time', u.godzina)}
       </div>
 
       <p class="modal__label">Treść</p>
@@ -869,6 +864,134 @@
     P.akcje.zapiszRodzajWiadomosci(typ, dane);
     schowajModal();
     toast('Zapisano ustawienia wiadomości', true);
+  }
+
+  /* ── Wiadomość napisana ręcznie ────────────────────────────────────── */
+  function formNapisz(pacjentId) {
+    const pac = P.pacjent(pacjentId);
+    const t = P.terapiaPacjenta(pacjentId);
+    const nast = t ? P.nastepnaWizyta(t.id) : null;
+    const imie = pac.imie.split(' ')[0];
+    /* Kilka zdań, które i tak pisze się najczęściej. */
+    const gotowce = [
+      `${imie}, muszę przesunąć jutrzejszą wizytę. Proszę o telefon: ${S().ustawienia.telefon}`,
+      `${imie}, proszę zabrać na wizytę wyniki badań obrazowych.`,
+      `${imie}, zwolnił się wcześniejszy termin. Jeśli pasuje, proszę dać znać.`,
+      `${imie}, proszę przyjść w wygodnym stroju do ćwiczeń.`,
+    ];
+
+    modal(
+      `Napisz do: ${krotkieImie(pac.imie)}`,
+      `<p class="modal__info">
+        Jednorazowa wiadomość, poza regułami. Trafi do kolejki i wyjdzie
+        o wskazanej porze.${nast ? ` Najbliższa wizyta: ${krotka(nast.data)}, ${nast.godzina}.` : ''}
+      </p>
+
+      <div class="form-grid">
+        ${pole('nw-data', 'Kiedy wysłać', 'date', P.iso(P.dzis), `min="${P.iso(P.dzis)}"`)}
+        ${pole('nw-godzina', 'O której', 'time', '10:00')}
+      </div>
+
+      <div class="field field--full">
+        <label for="nw-tresc">Treść</label>
+        <textarea id="nw-tresc" rows="3" placeholder="Napisz to, co powiedziałbyś przez telefon."></textarea>
+      </div>
+
+      <p class="modal__label">Zacznij od gotowego</p>
+      <div class="gotowce">
+        ${gotowce.map((g, i) => `<button class="gotowiec" type="button" data-gotowiec="${i}">${esc(g)}</button>`).join('')}
+      </div>
+      <p class="modal__err" id="nw-err" hidden></p>`,
+      `<button class="btn btn--ghost" type="button" data-close>Anuluj</button>
+       <button class="btn btn--accent" type="button" data-zapisz="napisz" data-pacjent-id="${pacjentId}">Zaplanuj wysyłkę</button>`
+    );
+    /* Gotowce trzymamy przy oknie, żeby klik mógł je wstawić bez szukania. */
+    $('#modal').dataset.gotowce = JSON.stringify(gotowce);
+  }
+
+  function zapiszNapisz(pacjentId) {
+    const tresc = $('#nw-tresc').value.trim();
+    const data = $('#nw-data').value;
+    const godzina = $('#nw-godzina').value;
+    if (tresc.length < 5) return bladModalu('nw-err', 'Napisz treść wiadomości.');
+    if (!data) return bladModalu('nw-err', 'Wybierz dzień wysyłki.');
+    if (!godzina) return bladModalu('nw-err', 'Podaj godzinę.');
+    if (data < P.iso(P.dzis)) return bladModalu('nw-err', 'Nie da się wysłać wstecz — wybierz dzisiaj albo później.');
+    P.akcje.dodajWiadomosc({ pacjentId, data, godzina, tresc });
+    schowajModal();
+    toast(`Wiadomość zaplanowana na ${krotka(data)}, ${godzina}`, true);
+  }
+
+  /* ── Pora rodzaju dla jednego pacjenta ─────────────────────────────── */
+  function formPoraPacjenta(pacjentId, typ) {
+    const pac = P.pacjent(pacjentId);
+    const def = P.TYPY_WIADOMOSCI[typ];
+    const u = P.ustawieniaRodzaju(typ, pacjentId);
+    const gabinet = P.ustawieniaRodzaju(typ);
+
+    const kiedyPole = () => {
+      if (def.kiedy === 'przed') {
+        return `<div class="field">
+            <label for="pp-dni">Ile dni przed wizytą</label>
+            <select id="pp-dni">
+              ${[1, 2, 3, 5, 7]
+                .map((d) => `<option value="${d}" ${d === (u.dniPrzed || 1) ? 'selected' : ''}>${d === 1 ? 'dzień przed' : `${d} dni przed`}</option>`)
+                .join('')}
+            </select>
+          </div>`;
+      }
+      if (def.kiedy === 'tydzien') {
+        return `<div class="field">
+            <label for="pp-dzien">Dzień tygodnia</label>
+            <select id="pp-dzien">
+              ${[1, 2, 3, 4, 5, 6, 0]
+                .map((d) => `<option value="${d}" ${d === (u.dzien === undefined ? 1 : u.dzien) ? 'selected' : ''}>${DNI_PELNE[d]}</option>`)
+                .join('')}
+            </select>
+          </div>`;
+      }
+      if (def.kiedy === 'poTerapii') {
+        return `<div class="field">
+            <label for="pp-po">Ile dni po terapii</label>
+            <select id="pp-po">
+              ${[1, 2, 3, 7]
+                .map((d) => `<option value="${d}" ${d === (u.dniPo || 1) ? 'selected' : ''}>${d === 1 ? 'następnego dnia' : `po ${d} dniach`}</option>`)
+                .join('')}
+            </select>
+          </div>`;
+      }
+      return '';
+    };
+
+    modal(
+      `${def.nazwa} — ${krotkieImie(pac.imie)}`,
+      `<p class="modal__info">
+        Reguła gabinetu: <strong>${kiedyIdzie(typ)}</strong>. Tutaj ustawiasz wyjątek
+        tylko dla tej osoby — reszta pacjentów zostaje przy regule.
+      </p>
+
+      <div class="form-grid">
+        ${kiedyPole()}
+        ${pole('pp-godzina', 'O której', 'time', u.godzina)}
+      </div>
+
+      <p class="podglad" id="pp-podglad"></p>
+      <p class="modal__err" id="pp-err" hidden></p>`,
+      `<button class="btn btn--ghost" type="button" data-close>Anuluj</button>
+       ${u.wlasne ? `<button class="btn" type="button" data-zapisz="pora-domyslna" data-pacjent-id="${pacjentId}" data-typ="${typ}">Wróć do reguły</button>` : ''}
+       <button class="btn btn--accent" type="button" data-zapisz="pora-pacjenta" data-pacjent-id="${pacjentId}" data-typ="${typ}">Zapisz wyjątek</button>`
+    );
+    podgladPory(pacjentId, typ);
+  }
+
+  /** Pokazuje, kiedy dokładnie wyjdzie najbliższa taka wiadomość. */
+  function podgladPory(pacjentId, typ) {
+    const out = $('#pp-podglad');
+    if (!out) return;
+    const naj = P.wiadomosciPacjenta(pacjentId, 30).find((w) => w.typ === typ);
+    out.innerHTML = naj
+      ? `<span>Najbliższa taka wiadomość</span>${krotka(naj.data)} o ${naj.godzina}${naj.spozniona ? ' (termin z reguły już minął)' : ''}`
+      : '<span>Najbliższa taka wiadomość</span>w najbliższym miesiącu nie ma powodu, żeby wyszła';
   }
 
   /* ── Edycja jednej wiadomości ──────────────────────────────────────── */
@@ -1063,6 +1186,65 @@
   /* ── Karta pacjenta ────────────────────────────────────────────────── */
   let otwartyPacjent = null;
 
+  /** Kiedy dany rodzaj wychodzi akurat do tego pacjenta. */
+  function kiedyDlaPacjenta(typ, pacjentId) {
+    const u = P.ustawieniaRodzaju(typ, pacjentId);
+    const def = P.TYPY_WIADOMOSCI[typ];
+    if (def.kiedy === 'przed') {
+      const d = u.dniPrzed || 1;
+      return `${d === 1 ? 'dzień' : `${d} dni`} przed wizytą, ${u.godzina}`;
+    }
+    if (def.kiedy === 'poWizycie') return `w dniu wizyty, ${u.godzina}`;
+    if (def.kiedy === 'tydzien') return `${DNI_PELNE[u.dzien === undefined ? 1 : u.dzien]}, ${u.godzina}`;
+    if (def.kiedy === 'poTerapii') {
+      const d = u.dniPo || 1;
+      return `${d === 1 ? 'dzień' : `${d} dni`} po terapii, ${u.godzina}`;
+    }
+    return u.godzina;
+  }
+
+  /** Jedna konkretna wiadomość w karcie pacjenta. */
+  function wiadomoscWKarcie(w) {
+    const nieidzie = w.usunieta || w.wylaczonaRodzaj || w.wylaczonaPacjent;
+    const powod = w.usunieta
+      ? 'usunięta z kolejki'
+      : w.wylaczonaRodzaj
+        ? 'rodzaj wyłączony w gabinecie'
+        : w.wylaczonaPacjent
+          ? 'wyłączone dla tego pacjenta'
+          : '';
+    return `<li class="wiad-lista__poz${nieidzie ? ' is-off' : ''}">
+      <span class="wiad-lista__kiedy">
+        <strong>${krotka(w.data)}</strong>
+        <em>${w.godzina}</em>
+      </span>
+      <span class="wiad-lista__co">
+        <span class="wiad-lista__nazwa">
+          ${esc(w.nazwa)}
+          ${w.recznaWiadomosc ? '<span class="kolejka__znak">ręczna</span>' : ''}
+          ${w.wlasnaTresc ? '<span class="kolejka__znak">zmieniona</span>' : ''}
+          ${w.wlasnyHarmonogram ? '<span class="kolejka__znak kolejka__znak--pora">własna pora</span>' : ''}
+        </span>
+        <em>${esc(w.tresc)}</em>
+        ${
+          powod
+            ? `<span class="kolejka__powod">Nie pójdzie: ${powod}</span>`
+            : w.spozniona
+              ? '<span class="kolejka__powod">Termin z reguły już minął — pójdzie dzisiaj</span>'
+              : `<span class="kolejka__skad">${esc(w.powod)}</span>`
+        }
+      </span>
+      <span class="wiad-lista__akcje">
+        ${
+          w.usunieta
+            ? `<button class="btn btn--sm" type="button" data-akcja="przywroc-wiadomosc" data-wid="${w.id}">Przywróć</button>`
+            : `<button class="btn btn--sm btn--ghost" type="button" data-akcja="edytuj-wiadomosc" data-wid="${w.id}">Edytuj</button>
+               <button class="btn btn--sm btn--ghost" type="button" data-akcja="${w.recznaWiadomosc ? 'skasuj-wiadomosc' : 'usun-wiadomosc'}" data-wid="${w.id}">${w.recznaWiadomosc ? 'Skasuj' : 'Nie wysyłaj'}</button>`
+        }
+      </span>
+    </li>`;
+  }
+
   /** Wiersz wizyty w karcie pacjenta — z akcjami, żeby nie wracać do „Dziś". */
   function wizytaWKarcie(w) {
     const s = STATUS[w.status];
@@ -1210,31 +1392,49 @@
       }
 
       <div class="pat__block">
-        <h3>Wiadomości do pacjenta</h3>
+        <h3 class="pat__h3--row">Wiadomości
+          <span class="pat__h3-akcje">
+            ${P.maWlasneUstawienia(p.id) ? `<button class="btn btn--sm btn--ghost" type="button" data-akcja="reset-wiad" data-pacjent-id="${p.id}">Wróć do reguł gabinetu</button>` : ''}
+            <button class="btn btn--sm btn--accent" type="button" data-akcja="napisz" data-pacjent-id="${p.id}">${ikona('sms')}Napisz</button>
+          </span>
+        </h3>
+
         ${(() => {
-          /* Co dostanie najbliżej — żeby nie trzeba było iść do Wiadomości. */
-          const naj = P.kolejkaWiadomosci(14).find(
-            (w) => w.pacjentId === p.id && !w.usunieta && !w.wylaczonaRodzaj && !w.wylaczonaPacjent
-          );
-          return naj
-            ? `<p class="pat__nastepna-wiad">Najbliżej: <strong>${esc(naj.nazwa.toLowerCase())}</strong>, ${krotka(naj.data)} o ${naj.godzina}.
-                <button class="link-btn" type="button" data-view="wiadomosci">Zobacz kolejkę</button></p>`
-            : '<p class="pat__nastepna-wiad">W najbliższych dwóch tygodniach nic do tego pacjenta nie wyjdzie.</p>';
+          const kolejka = P.wiadomosciPacjenta(p.id, 21);
+          if (!kolejka.length) {
+            return '<p class="pusto">W najbliższych trzech tygodniach nic do tego pacjenta nie wyjdzie.</p>';
+          }
+          return `<ul class="wiad-lista">${kolejka.map(wiadomoscWKarcie).join('')}</ul>`;
         })()}
-        <ul class="ustawienia-sms">
+
+        <p class="wiad-naglowek">Co i kiedy do niego wychodzi</p>
+        <ul class="wiad-rodzaje">
           ${Object.entries(P.TYPY_WIADOMOSCI)
             .map(([typ, def]) => {
-              const wyl = S().wylaczone.some((x) => x.pacjentId === p.id && x.typ === typ);
-              return `<li>
-                <span>${esc(def.nazwa)}<em>o ${def.godzina}</em></span>
-                <button class="switch" type="button" role="switch" aria-checked="${!wyl}"
-                  data-akcja="przelacz-wiadomosc" data-pacjent-id="${p.id}" data-typ="${typ}">
-                  <span></span>${wyl ? 'wyłączone' : 'włączone'}
-                </button>
+              const u = P.ustawieniaRodzaju(typ, p.id);
+              const gabinetowe = P.ustawieniaRodzaju(typ);
+              const wylaczonyWGabinecie = gabinetowe.wlaczona === false;
+              const wlaczona = u.wlaczona !== false && !wylaczonyWGabinecie;
+              return `<li class="${wlaczona ? '' : 'is-off'}">
+                <span class="wiad-rodzaje__co">
+                  <strong>${esc(def.nazwa)}</strong>
+                  <em>${kiedyDlaPacjenta(typ, p.id)}${u.wlasne ? ' · ustawione dla tej osoby' : ''}</em>
+                  ${wylaczonyWGabinecie ? '<span class="wiad-rodzaje__uwaga">Ten rodzaj jest wyłączony w całym gabinecie</span>' : ''}
+                </span>
+                <span class="wiad-rodzaje__akcje">
+                  <button class="btn btn--sm btn--ghost" type="button" data-akcja="pora-pacjenta" data-pacjent-id="${p.id}" data-typ="${typ}"
+                    ${wylaczonyWGabinecie ? 'disabled' : ''}>Pora</button>
+                  <button class="switch" type="button" role="switch" aria-checked="${wlaczona}"
+                    data-akcja="przelacz-wiadomosc" data-pacjent-id="${p.id}" data-typ="${typ}"
+                    ${wylaczonyWGabinecie ? 'disabled' : ''} aria-label="${esc(def.nazwa)} dla tego pacjenta">
+                    <span></span>${wlaczona ? 'tak' : 'nie'}
+                  </button>
+                </span>
               </li>`;
             })
             .join('')}
         </ul>
+        ${p.zgodaSms === false ? '<p class="wiad-rodzaje__uwaga">Pacjent nie zgodził się na SMS-y — nic do niego nie wyjdzie, niezależnie od ustawień.</p>' : ''}
       </div>
 
       <div class="pat__block">
@@ -1991,6 +2191,12 @@
       $('#uw-err').hidden = true;
       return;
     }
+    if (d.gotowiec !== undefined) {
+      const lista = JSON.parse($('#modal').dataset.gotowce || '[]');
+      $('#nw-tresc').value = lista[Number(d.gotowiec)] || '';
+      $('#nw-tresc').focus();
+      return;
+    }
     if (d.pole) {
       const pole = $('#rw-szablon');
       const poz = pole.selectionStart;
@@ -2135,6 +2341,16 @@
       case 'przywroc-wiadomosc':
         P.akcje.przywrocWiadomosc(d.wid);
         return toast('Wiadomość wraca do kolejki', true);
+      case 'napisz':
+        return formNapisz(d.pacjentId);
+      case 'pora-pacjenta':
+        return formPoraPacjenta(d.pacjentId, d.typ);
+      case 'reset-wiad':
+        P.akcje.przywrocUstawieniaPacjenta(d.pacjentId);
+        return toast('Ten pacjent wraca do reguł gabinetu', true);
+      case 'skasuj-wiadomosc':
+        P.akcje.skasujWiadomoscWlasna(d.wid);
+        return toast('Wiadomość skasowana', true);
       case 'przelacz-wiadomosc': {
         const wynik = P.akcje.przelaczWiadomosc(d.pacjentId, d.typ);
         return toast(wynik.wylaczona ? 'Wyłączono ten rodzaj wiadomości dla pacjenta' : 'Włączono z powrotem', true);
@@ -2214,6 +2430,22 @@
         return zapiszBlokade();
       case 'kreator':
         return zapiszKreator();
+      case 'napisz':
+        return zapiszNapisz(d.pacjentId);
+      case 'pora-pacjenta': {
+        const dane = { godzina: $('#pp-godzina').value };
+        if ($('#pp-dni')) dane.dniPrzed = Number($('#pp-dni').value);
+        if ($('#pp-dzien')) dane.dzien = Number($('#pp-dzien').value);
+        if ($('#pp-po')) dane.dniPo = Number($('#pp-po').value);
+        if (!dane.godzina) return bladModalu('pp-err', 'Podaj godzinę.');
+        P.akcje.ustawWiadomoscPacjenta(d.pacjentId, d.typ, dane);
+        schowajModal();
+        return toast('Zapisano wyjątek dla tego pacjenta', true);
+      }
+      case 'pora-domyslna':
+        P.akcje.przywrocUstawieniaPacjenta(d.pacjentId, d.typ);
+        schowajModal();
+        return toast('Ten rodzaj wraca do reguły gabinetu', true);
       case 'rodzaj':
         return zapiszRodzaj(d.typ);
       case 'rodzaj-domyslny': {
@@ -2273,6 +2505,15 @@
 
   document.addEventListener('change', (e) => {
     if (e.target.id === 'uw-dzien' || e.target.id === 'uw-terapeuta') renderSloty();
+    if (['pp-dni', 'pp-dzien', 'pp-po', 'pp-godzina'].includes(e.target.id)) {
+      const przycisk = $('[data-zapisz="pora-pacjenta"]');
+      if (przycisk) {
+        /* Podgląd liczymy na zapisanych danych, więc pokazujemy tylko zmianę pory. */
+        const godz = $('#pp-godzina').value;
+        const out = $('#pp-podglad');
+        if (out) out.innerHTML = `<span>Po zapisaniu</span>wiadomość wyjdzie o ${godz}`;
+      }
+    }
     if (e.target.id === 'uw-seria') $('#uw-seria-pola').hidden = !e.target.checked;
     if (e.target.dataset.akcja === 'przypisz') {
       P.akcje.przypiszTerapie(e.target.dataset.terapia, e.target.value);
