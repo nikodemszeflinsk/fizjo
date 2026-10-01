@@ -2210,7 +2210,7 @@ svg path {
   align-items: center;
   gap: 7px;
   margin: 0 0 12px;
-  padding: 5px 13px;
+  padding: 8px 14px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
@@ -2358,10 +2358,10 @@ svg path {
 
 .mini__znacznik {
   position: absolute;
-  top: -10px;
+  top: -13px;
   right: 12px;
   margin: 0;
-  padding: 3px 10px;
+  padding: 8px 12px;
   border-radius: 999px;
   background: var(--accent);
   color: #fff;
@@ -4877,6 +4877,22 @@ svg path {
   .ofr-ceny {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+/* Karta pilotażowa i licznik stoją na niebieskim, więc ich teksty pomocnicze
+   dostają rozjaśniony odcień tego niebieskiego zamiast neutralnej szarości. */
+.ofr-licznik__label,
+.ofr-licznik__data,
+.ofr-licznik__minelo,
+.ofr-licznik__zegar em,
+.ofr-cena--pilot .ofr-cena__opis,
+.ofr-cena--pilot .ofr-cena__lista li {
+  color: #c3d4f2;
+}
+
+.ofr-cena--pilot .ofr-cena__kwota span,
+.ofr-cena--pilot .ofr-cena__kwota em {
+  color: #a8bde3;
 }
 
 .ofr-cena__opis {
