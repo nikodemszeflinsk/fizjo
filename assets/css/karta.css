@@ -3315,7 +3315,7 @@ svg path {
 .brama__kicker {
   display: inline-block;
   margin: 0 0 12px;
-  padding: 5px 13px;
+  padding: 8px 14px;
   border-radius: 999px;
   background: var(--ink);
   color: #fff;
@@ -4230,14 +4230,14 @@ svg path {
 .ofr-cena__znak {
   display: inline-block;
   margin: 0 0 14px;
-  padding: 8px 14px;
+  padding: 9px 16px;
   border-radius: 999px;
   background: var(--accent);
   color: #fff;
-  font-size: 0.74rem;
+  font-size: 0.84rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  text-transform: none;
 }
 
 .ofr-cena__znak--cichy {
@@ -5207,17 +5207,18 @@ svg path {
   }
 }
 
+/* To już zdanie, nie jedno słowo — kapitaliki czyta się w nim trudno. */
 .ofr-pilotblok__znak {
   display: inline-block;
   margin: 0 0 14px !important;
-  padding: 8px 14px;
+  padding: 9px 16px;
   border-radius: 999px;
   background: var(--accent);
   color: #fff !important;
-  font-size: 0.75rem !important;
+  font-size: 0.86rem !important;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  text-transform: none;
 }
 
 .ofr-pilotblok .ofr-umowa {
@@ -5294,7 +5295,7 @@ svg path {
 
 /* ── Kalkulator: opcjonalne reklamy ───────────────────────────────────── */
 .calc__reklamy {
-  padding: 14px 0 6px;
+  padding: 14px 0 16px;
   border-top: 1px solid rgba(255, 255, 255, 0.14);
   border-bottom: 1px solid rgba(255, 255, 255, 0.14);
 }
