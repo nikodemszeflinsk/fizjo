@@ -4926,3 +4926,458 @@ svg path {
 .ofr-lista--hero {
   margin-top: 0;
 }
+
+/* ══ Oferta, układ trzeci: pakiety, kafle dem, tory wdrożenia ═══════════ */
+
+/* Podtytuł pod nagłówkiem — merytoryczny, bez przycisków. */
+.ofr-hero__h2 {
+  max-width: 54ch;
+  margin: 22px 0 0;
+  color: var(--ink-2);
+  font-family: var(--f-body);
+  font-size: clamp(1.1rem, 2.2vw, 1.32rem);
+  font-weight: 400;
+  line-height: 1.55;
+  letter-spacing: 0;
+}
+
+.ofr-h2--szeroki {
+  max-width: 34ch;
+}
+
+.ofr-h3 {
+  margin: clamp(40px, 5vw, 60px) 0 0;
+  font-family: var(--f-display);
+  font-size: clamp(1.3rem, 2.6vw, 1.8rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+/* ── Punkt wyjścia: tekst obok grafiki wyników ────────────────────────── */
+.ofr-wyjscie {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: clamp(26px, 5vw, 64px);
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .ofr-wyjscie {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ── Oznaczenia pakietów ──────────────────────────────────────────────── */
+/* Fizjoterapeuta ma w każdym miejscu widzieć, co jest w którym pakiecie —
+   i że Prowadzenie jest jeszcze w becie. */
+.ofr-tag {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-family: var(--f-body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+.ofr-tag--wid {
+  background: var(--floor-2);
+  color: var(--ink-2);
+}
+
+.ofr-tag--prow {
+  background: var(--accent);
+  color: #fff;
+}
+
+.ofr-tag--beta {
+  background: #f2b705;
+  color: #14171a;
+}
+
+.ofr-tag--opt {
+  border: 1px solid var(--hair-2);
+  background: transparent;
+  color: var(--muted);
+}
+
+.ofr-blok--ink .ofr-tag--wid,
+.brama--ciemna .ofr-tag--wid,
+.ofr-pilot .ofr-tag--wid {
+  background: rgba(255, 255, 255, 0.16);
+  color: #e9ecea;
+}
+
+.ofr-pakiet {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 16px 0 10px;
+}
+
+.ofr-pakiet + .brama__punkty {
+  margin-top: 0;
+}
+
+/* Znacznik pod przystankiem drogi. */
+.path__tag {
+  margin: 8px 0 0;
+}
+
+/* Na jasnym tle sekcji `paper` karty z landingu muszą zmienić tło, tak jak tam. */
+.ofr-blok--paper .five {
+  background: var(--floor);
+}
+
+.ofr-blok--paper .path__num {
+  background: var(--paper);
+}
+
+.ofr-blok--paper .path__stop {
+  min-width: 0;
+}
+
+/* Lista pięciu sekund: kropki, nie liczby. */
+.five__list--kropki {
+  counter-reset: none;
+}
+
+.five__list--kropki li {
+  counter-increment: none;
+  padding-left: 22px;
+}
+
+.five__list--kropki li::before {
+  content: '';
+  top: 0.55em;
+  width: 9px;
+  height: 9px;
+  background: var(--accent);
+}
+
+.ofr-blok--paper .bramy {
+  margin-top: clamp(36px, 5vw, 56px);
+}
+
+@media (max-width: 860px) {
+  .path {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .path::before,
+  .path::after {
+    display: none;
+  }
+}
+
+/* ── Funkcje: uwaga między parami grup ────────────────────────────────── */
+.funkcje__uwaga {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 18px 28px;
+  background: var(--paper);
+  color: var(--ink-2);
+  font-size: 1rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.funkcje__uwaga strong {
+  color: var(--accent);
+}
+
+.grupa__tag--wid {
+  background: var(--floor-2);
+  color: var(--ink-2);
+}
+
+.grupa--panel .grupa__tag--wid {
+  background: rgba(255, 255, 255, 0.16);
+  color: #e9ecea;
+}
+
+.grupa__tag--beta {
+  background: #f2b705;
+  color: #14171a;
+}
+
+.ofr-blok--paper .funkcje,
+.ofr-blok--paper .gains {
+  margin-top: 30px;
+}
+
+/* ── Kafle dem ────────────────────────────────────────────────────────── */
+.ofr-zobacz {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  gap: 18px;
+  margin-top: 34px;
+}
+
+@media (max-width: 860px) {
+  .ofr-zobacz {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.ofr-kafel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  overflow: hidden;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sign);
+  background: #fff;
+}
+
+.ofr-kafel--duzy {
+  grid-row: span 2;
+}
+
+.ofr-kafel img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-bottom: 1px solid var(--hair);
+  background: var(--paper);
+}
+
+/* Karta pacjenta to pionowy ekran telefonu — pokazujemy jej górę. */
+.ofr-kafel img.ofr-kafel__pion {
+  height: 190px;
+  object-fit: cover;
+  object-position: top;
+}
+
+.ofr-kafel__tresc {
+  padding: clamp(18px, 2.6vw, 26px);
+}
+
+.ofr-kafel__tresc .ofr-pakiet {
+  margin-top: 0;
+}
+
+.ofr-kafel h3 {
+  margin: 0 0 8px;
+  font-family: var(--f-display);
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.ofr-kafel p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 0.97rem;
+  line-height: 1.55;
+}
+
+.ofr-kafel .ofr-pakiet {
+  margin-bottom: 14px;
+}
+
+.ofr-kafel__akcje {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+/* ── Oferta pilotażowa nad pakietami ──────────────────────────────────── */
+.ofr-pilotblok {
+  display: block;
+  padding: clamp(22px, 3vw, 34px);
+}
+
+.ofr-pilotblok__gora {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(250px, 300px);
+  gap: clamp(22px, 3vw, 40px);
+  align-items: center;
+}
+
+@media (max-width: 860px) {
+  .ofr-pilotblok__gora {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.ofr-pilotblok__znak {
+  display: inline-block;
+  margin: 0 0 14px !important;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff !important;
+  font-size: 0.75rem !important;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ofr-pilotblok .ofr-umowa {
+  margin-top: 30px;
+}
+
+.ofr-pilotblok .ofr-licznik__minelo {
+  margin-top: 4px;
+}
+
+/* ── Reklamy jako osobna usługa ───────────────────────────────────────── */
+.ofr-reklamy {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px 36px;
+  align-items: center;
+  margin-top: 18px;
+  padding: clamp(20px, 3vw, 30px);
+  border: 1px dashed rgba(255, 255, 255, 0.3);
+  border-radius: var(--r-sign);
+}
+
+@media (max-width: 760px) {
+  .ofr-reklamy {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.ofr-reklamy h3 {
+  margin: 0 0 8px;
+  font-family: var(--f-display);
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.ofr-reklamy p {
+  max-width: 62ch;
+  margin: 0;
+  color: #cfd3d6;
+  font-size: 0.97rem;
+  line-height: 1.6;
+}
+
+.ofr-reklamy .ofr-cena__znak {
+  margin-bottom: 12px;
+}
+
+.ofr-reklamy .ofr-reklamy__cena {
+  display: grid;
+  gap: 2px;
+  text-align: right;
+}
+
+.ofr-reklamy__cena b {
+  color: #fff;
+  font-family: var(--f-display);
+  font-size: clamp(1.7rem, 3.4vw, 2.2rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.ofr-reklamy__cena span {
+  color: #aab1b6;
+  font-size: 0.86rem;
+}
+
+@media (max-width: 760px) {
+  .ofr-reklamy .ofr-reklamy__cena {
+    text-align: left;
+  }
+}
+
+/* ── Kalkulator: opcjonalne reklamy ───────────────────────────────────── */
+.calc__reklamy {
+  padding: 14px 0 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.calc__przelacznik {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #e9ecea;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.calc__przelacznik input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--accent);
+}
+
+.calc__przelacznik em {
+  color: #aab1b6;
+  font-style: normal;
+  font-weight: 400;
+}
+
+.calc__reklamy-pola {
+  display: grid;
+  gap: 18px;
+  margin-top: 16px;
+}
+
+.calc__reklamy-pola[hidden] {
+  display: none;
+}
+
+.range__label em {
+  color: #aab1b6;
+  font-style: normal;
+}
+
+.calc__result .calc__sub {
+  margin-top: 4px;
+  color: #aab1b6;
+  font-size: 0.82rem;
+  font-weight: 400;
+}
+
+/* ── Dwa tory wdrożenia ───────────────────────────────────────────────── */
+.ofr-tory {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 34px;
+}
+
+@media (max-width: 860px) {
+  .ofr-tory {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.ofr-tor {
+  padding: clamp(20px, 3vw, 30px);
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sign);
+  background: #fff;
+}
+
+.ofr-tor .ofr-pakiet {
+  margin-top: 0;
+}
+
+.ofr-tor h3 {
+  margin: 0 0 6px;
+  font-family: var(--f-display);
+  font-size: 1.6rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.ofr-etapy--tor {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+  margin-top: 22px;
+}
