@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Oferta dla gabinetu — program pilotażowy · Studio Widok</title>
-  <meta name="description" content="Własne miejsce w wyszukiwarce zamiast miejsca na cudzej liście. Oferta dla gabinetu fizjoterapii wraz z programem pilotażowym pakietu Prowadzenie." />
+  <title>System pozyskiwania pacjentów dla gabinetu fizjoterapii · Studio Widok</title>
+  <meta name="description" content="Strona, która zdobywa pacjentów z wyszukiwarki, i panel, który rano mówi, od czego zacząć. Zakres, koszty i wdrożenie w dziesięć dni roboczych." />
   <!-- Strona wysyłana linkiem po rozmowie. Nie ma jej w nawigacji ani w wyszukiwarce. -->
   <meta name="robots" content="noindex, nofollow" />
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/karta.css?v=27" />
+  <link rel="stylesheet" href="assets/css/karta.css?v=29" />
 </head>
 <body class="ofr-body">
   <a class="skip" href="#tresc">Przejdź do treści</a>
@@ -29,306 +29,371 @@
       </svg>
       Studio Widok
     </span>
-    <span class="ofr-pasek__co">Oferta po rozmowie · ważna 14 dni</span>
+    <nav class="ofr-pasek__nav" aria-label="Na skróty">
+      <a href="#jak">Jak to działa</a>
+      <a href="#zakres">Co dostajesz</a>
+      <a href="#koszta">Koszty</a>
+      <a href="#wdrozenie">Wdrożenie</a>
+    </nav>
   </header>
 
   <main id="tresc">
 
-    <!-- ── Otwarcie ───────────────────────────────────────────────────── -->
+    <!-- ── Hero ───────────────────────────────────────────────────────── -->
     <section class="ofr-hero">
-      <p class="ofr-hero__dla" id="ofr-dla">Przygotowane dla Twojego gabinetu</p>
-      <h1 class="ofr-hero__h1">Własne miejsce w Google,<br />zamiast miejsca na cudzej liście.</h1>
-      <p class="ofr-hero__lead">
-        Pomagamy gabinetom fizjoterapii zdobywać pacjentów z wyszukiwarki. Nie zestawiamy Cię
-        z listą innych specjalistów, jak robią to ZnanyLekarz czy Booksy — budujemy miejsce,
-        które należy do Ciebie i które prowadzi odwiedzającego prosto do wybrania Twojej terapii.
-      </p>
-      <p class="ofr-hero__lead ofr-hero__lead--druga">
-        Rezerwacje ze strony od razu wpadają do panelu, także w nocy.
-        <strong>Ty rano otwierasz jedną stronę i widzisz, od czego zacząć.</strong>
-      </p>
-      <div class="ofr-hero__cta">
-        <a class="cta cta--blue" href="demo.html" target="_blank" rel="noopener">
-          Otwórz demo strony
-          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
-        </a>
-        <a class="cta cta--blue" href="crm.html" target="_blank" rel="noopener">
-          Otwórz demo panelu
-          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
-        </a>
-        <a class="cta cta--line" href="#pilotaz">Warunki pilotażu</a>
+      <div class="ofr-hero__in">
+        <div class="ofr-hero__tekst">
+          <p class="ofr-hero__dla">System pozyskiwania pacjentów dla gabinetów fizjoterapii</p>
+          <h1 class="ofr-hero__h1">Pacjent szuka pomocy o 23:00.<br />Umawia się u Ciebie, zanim zdążysz odebrać telefon.</h1>
+          <p class="ofr-hero__lead">
+            Pomagamy zdobywać pacjentów z wyszukiwarki. Nie zestawiamy Cię z listą innych
+            specjalistów, jak ZnanyLekarz czy Booksy — budujemy miejsce, które należy do Ciebie
+            i prowadzi odwiedzającego prosto do wybrania Twojej terapii.
+          </p>
+          <p class="ofr-hero__lead ofr-hero__lead--druga">
+            Rezerwacje ze strony od razu wpadają do panelu, także w nocy.
+            <strong>Ty rano otwierasz jedną stronę i widzisz, od czego zacząć.</strong>
+          </p>
+          <div class="ofr-hero__cta">
+            <a class="cta cta--blue" href="demo.html" target="_blank" rel="noopener">
+              Otwórz demo strony
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
+            </a>
+            <a class="cta cta--blue" href="crm.html" target="_blank" rel="noopener">
+              Otwórz demo panelu
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
+            </a>
+            <a class="cta cta--line" href="#koszta">Zobacz koszty</a>
+          </div>
+          <p class="ofr-hero__uwaga">
+            Oba dema działają naprawdę — możesz w nich klikać wszystko. Dane należą do fikcyjnej
+            kliniki „Linia Ruchu”, nazwiska i ceny są przykładowe.
+          </p>
+        </div>
+
+        <div class="ofr-hero__kadry" aria-hidden="true">
+          <img class="ofr-hero__panel" src="assets/img/zrzuty/panel-dzis.jpg" alt="" width="1400" height="972" />
+          <img class="ofr-hero__telefon" src="assets/img/zrzuty/strona-telefon.jpg" alt="" width="420" height="860" />
+        </div>
       </div>
-      <p class="ofr-hero__uwaga">
-        Oba dema działają naprawdę — możesz w nich klikać wszystko. Dane należą do fikcyjnej
-        kliniki „Linia Ruchu”, nazwiska i ceny są przykładowe.
-      </p>
     </section>
 
-    <!-- ── Co się dzieje dzisiaj ──────────────────────────────────────── -->
+    <!-- ── Problem ────────────────────────────────────────────────────── -->
     <section class="ofr-blok">
       <div class="ofr-blok__in">
-        <p class="ofr-kicker">Punkt wyjścia</p>
-        <h2 class="ofr-h2">Pacjent już Cię szuka. Pytanie, gdzie trafia.</h2>
-        <p class="ofr-lead">
-          Człowiek z bólem krzyża nie wpisuje w Google nazwy Twojego gabinetu. Wpisuje to,
-          co go boli — wieczorem, po pracy, z telefonu. To, co zobaczy w ciągu pierwszych
-          pięciu sekund, decyduje, czy jutro będzie u Ciebie, czy u kogoś obok.
-        </p>
-        <ul class="ofr-lista">
-          <li>
-            <strong>Telefon dzwoni w trakcie zabiegu.</strong>
-            Nie odbierasz, bo masz ręce na pacjencie. Ten, kto dzwonił, wybiera kolejny numer
-            z listy i już nie wraca.
-          </li>
-          <li>
-            <strong>Wieczorem nie ma kogo zapytać.</strong>
-            Ludzie szukają fizjoterapeuty wtedy, kiedy boli. Wtedy Twoja rejestracja śpi,
-            a decyzja i tak zapada.
-          </li>
-          <li>
-            <strong>Pacjent znika po drugiej wizycie.</strong>
-            Zaplanowane osiem, przyszedł na dwie. Przepadł przychód z sześciu wizyt,
-            a terapia nie została dokończona.
-          </li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- ── Lista kontra własne miejsce ────────────────────────────────── -->
-    <section class="ofr-blok ofr-blok--ink">
-      <div class="ofr-blok__in">
-        <p class="ofr-kicker ofr-kicker--jasny">Na czym polega różnica</p>
-        <h2 class="ofr-h2">Na portalu jesteś jednym z pięciu. U siebie jesteś jedyny.</h2>
-        <p class="ofr-lead ofr-lead--jasny">
-          To ta sama osoba, szukająca tej samej pomocy. Różni się tylko to, gdzie trafia
-          i co tam robi.
-        </p>
-
-        <div class="ofr-vs">
-          <article class="ofr-vs__kol">
-            <h3>Na cudzej liście</h3>
-            <ul>
-              <li>Pacjent widzi Ciebie i pięciu innych w jednym rzędzie</li>
-              <li>Porównuje ceny i liczbę opinii, bo nie ma czego innego porównać</li>
-              <li>Prowizja od pacjenta, którego portal tylko wypożycza</li>
-              <li>Numer, historia i zgody zostają na platformie</li>
-              <li>Pozycję da się odebrać jedną zmianą algorytmu portalu</li>
-            </ul>
+        <p class="ofr-kicker">Gdzie dziś uciekają pacjenci</p>
+        <h2 class="ofr-h2">Nie dlatego, że ktoś leczy lepiej. Dlatego, że u kogoś dało się umówić od razu.</h2>
+        <div class="losses">
+          <article class="loss">
+            <h3>Telefon dzwoni w trakcie zabiegu</h3>
+            <p>Nie odbierasz, bo masz ręce na pacjencie. Ten, kto dzwonił, wybiera kolejny numer z listy i już nie wraca.</p>
           </article>
-          <article class="ofr-vs__kol ofr-vs__kol--my">
-            <h3>W Twoim miejscu</h3>
-            <ul>
-              <li>Pacjent wpisuje „rwa kulszowa”, trafia na stronę o rwie kulszowej</li>
-              <li>Czyta o swoim problemie i wybiera termin, bo nie ma z kim Cię porównywać</li>
-              <li>Płacisz za system, nigdy za pojedynczego pacjenta</li>
-              <li>Baza, numery i zgody zostają u Ciebie</li>
-              <li>Domena, treści i wizytówka są Twoje — także gdy się rozstaniemy</li>
-            </ul>
+          <article class="loss">
+            <h3>Wieczorem nie ma kogo zapytać</h3>
+            <p>Ludzie szukają fizjoterapeuty, kiedy boli — po pracy, w nocy, w weekend. Wtedy Twoja rejestracja śpi.</p>
           </article>
-        </div>
-
-        <p class="ofr-fine ofr-fine--jasny">
-          Portale mogą zostać. Dla wielu gabinetów to sensowny kanał — chodzi o to,
-          żeby nie był jedyny.
-        </p>
-      </div>
-    </section>
-
-    <!-- ── Jak to działa ──────────────────────────────────────────────── -->
-    <section class="ofr-blok">
-      <div class="ofr-blok__in">
-        <p class="ofr-kicker">Jak to działa</p>
-        <h2 class="ofr-h2">Trzy rzeczy, które dzieją się bez Ciebie</h2>
-
-        <ol class="ofr-kroki">
-          <li>
-            <span class="ofr-kroki__num" aria-hidden="true">1</span>
-            <h3>Znajduje Cię, bo szuka swojego problemu</h3>
-            <p>
-              Każda dolegliwość, którą leczysz, dostaje własną stronę: objawy jego słowami,
-              przebieg terapii, ile trwa, ile kosztuje i kto się tym zajmuje. To ona pokazuje się
-              w wynikach, nie ogólna zakładka „oferta”. Do tego uporządkowana wizytówka w Mapach
-              Google — dla tych, którzy szukają z telefonu w okolicy.
-            </p>
-          </li>
-          <li>
-            <span class="ofr-kroki__num" aria-hidden="true">2</span>
-            <h3>Umawia się sam, o dowolnej porze</h3>
-            <p>
-              Widzi Twoje realne wolne godziny i wybiera tę, która mu pasuje — także o 23:00.
-              Kto nie umie nazwać swojego problemu, odpowiada na trzy pytania i dostaje konkret:
-              od czego zacząć, ile to trwa i kiedy jest termin. <strong>Rezerwacja od razu wpada
-              do panelu.</strong> Rano otwierasz jedną stronę i widzisz, od czego zacząć dzień.
-            </p>
-          </li>
-          <li>
-            <span class="ofr-kroki__num" aria-hidden="true">3</span>
-            <h3>Dochodzi terapię do końca</h3>
-            <p>
-              Dzień przed wizytą dostaje SMS z przypomnieniem, po wizycie jedno pytanie o ból,
-              w dni ćwiczeń przypomnienie z linkiem do odhaczenia. Ty rano widzisz nazwiska osób,
-              które właśnie wypadają z cyklu — z powodem przy każdym. Zamiast domyślać się,
-              po prostu dzwonisz.
-            </p>
-          </li>
-        </ol>
-
-        <div class="ofr-podglad">
-          <a class="ofr-podglad__kadr" href="demo.html" target="_blank" rel="noopener">
-            <img src="assets/img/zrzuty/strona-telefon.jpg" alt="Strona gabinetu na telefonie: wybór problemu i najbliższe wolne terminy." width="420" height="860" loading="lazy" />
-            <span>Tak widzi to pacjent</span>
-          </a>
-          <a class="ofr-podglad__kadr ofr-podglad__kadr--szeroki" href="crm.html" target="_blank" rel="noopener">
-            <img src="assets/img/zrzuty/panel-dzis.jpg" alt="Panel gabinetu, widok „Dziś”: grafik dnia i osoby, które nie umówiły kolejnej wizyty." width="1400" height="972" loading="lazy" />
-            <span>Tak widzisz to Ty</span>
-          </a>
+          <article class="loss">
+            <h3>Pacjent znika po drugiej wizycie</h3>
+            <p>Zaplanowane osiem, przyszedł na dwie. Przepadł przychód z sześciu wizyt, a terapia nie została dokończona.</p>
+          </article>
+          <article class="loss">
+            <h3>Wizytówka odstrasza</h3>
+            <p>Stare godziny, dwa zdjęcia, cztery opinie. Pacjent porównuje Cię z gabinetem obok i wybiera jego.</p>
+          </article>
         </div>
       </div>
     </section>
 
-    <!-- ── Program pilotażowy ─────────────────────────────────────────── -->
-    <section class="ofr-pilot" id="pilotaz">
+    <!-- ── Jak działa rozwiązanie ─────────────────────────────────────── -->
+    <section class="ofr-blok ofr-blok--ink" id="jak">
       <div class="ofr-blok__in">
-        <p class="ofr-kicker ofr-kicker--jasny">Program pilotażowy</p>
-        <h2 class="ofr-h2">Budujemy to dla gabinetów fizjoterapii. Chcemy budować to z Wami.</h2>
+        <p class="ofr-kicker ofr-kicker--jasny">Jak to działa</p>
+        <h2 class="ofr-h2">Od „boli mnie krzyż” o 21:47 do opinii, która przyprowadzi następnego</h2>
         <p class="ofr-lead ofr-lead--jasny">
-          Tworzymy rozwiązanie specjalnie dla gabinetów fizjoterapii — nie uniwersalny system
-          do wszystkiego, w którym fizjoterapia jest jedną z dwudziestu branż. Pierwsze gabinety
-          otrzymują dostęp na preferencyjnych warunkach i mają bezpośredni wpływ na to,
-          w którą stronę to pójdzie dalej.
-        </p>
-        <p class="ofr-lead ofr-lead--jasny">
-          Zależy nam na konkretnych rozwiązaniach realnych problemów, a nie na kolejnych
-          funkcjach z listy. Dlatego chcemy pracować z ludźmi, którzy powiedzą nam wprost,
-          co w ich dniu nie działa.
+          Droga jednego pacjenta w siedmiu ekranach — raz takich, jakie widzi on, raz takich,
+          jakie widzisz Ty. <strong>Klikaj po kolei albo zostaw: przesuwają się same.</strong>
         </p>
 
-        <div class="ofr-ceny">
-          <article class="ofr-cena ofr-cena--pilot">
-            <p class="ofr-cena__znak">Warunki pilotażowe</p>
-            <h3>Prowadzenie</h3>
-            <p class="ofr-cena__kwota">
-              3 499 zł <span>wdrożenie</span>
-              <em>zamiast 4 900 zł</em>
+        <div class="droga" id="droga">
+          <ol class="droga__kroki" id="droga-kroki" role="tablist" aria-label="Kroki drogi pacjenta"></ol>
+          <div class="droga__scena" id="droga-scena" role="tabpanel" aria-live="polite"></div>
+          <div class="droga__nawigacja">
+            <p class="droga__licznik">
+              <span id="droga-licznik">Ekran 1 z 7</span>
+              <span class="droga__pasek" aria-hidden="true"><i id="droga-pasek"></i></span>
             </p>
-            <p class="ofr-cena__kwota ofr-cena__kwota--sub">
-              199 zł <span>miesięcznie</span>
-              <em>zamiast 379 zł</em>
-            </p>
-            <ul class="ofr-cena__lista">
-              <li>Cena zamrożona na dwanaście miesięcy od startu</li>
-              <li>Pierwsze 30 dni bez zobowiązania</li>
-              <li>Twoje uwagi wchodzą do kolejki przed resztą</li>
-              <li>Bezpośredni kontakt, nie formularz zgłoszeniowy</li>
-            </ul>
-            <p class="ofr-cena__stopka">Dla pierwszych pięciu gabinetów.</p>
-          </article>
-
-          <article class="ofr-cena">
-            <p class="ofr-cena__znak ofr-cena__znak--cichy">Cennik standardowy</p>
-            <h3>Prowadzenie</h3>
-            <p class="ofr-cena__kwota">4 900 zł <span>wdrożenie</span></p>
-            <p class="ofr-cena__kwota ofr-cena__kwota--sub">379 zł <span>miesięcznie</span></p>
-            <ul class="ofr-cena__lista">
-              <li>Ten sam zakres, ta sama opieka</li>
-              <li>Cena obowiązująca po zamknięciu pilotażu</li>
-            </ul>
-            <p class="ofr-cena__stopka">Dla gabinetów dołączających później.</p>
-          </article>
-        </div>
-
-        <div class="ofr-umowa">
-          <div>
-            <h3>Co dostajesz</h3>
-            <ul>
-              <li>Pełny pakiet Prowadzenie od pierwszego dnia — bez okrojonej wersji „testowej”</li>
-              <li>Niższą cenę wdrożenia i abonamentu, zamrożoną na rok</li>
-              <li>Wpływ na to, co powstaje w następnej kolejności</li>
-              <li>Nasz numer telefonu, a nie adres pomocy technicznej</li>
-            </ul>
-          </div>
-          <div>
-            <h3>O co prosimy w zamian</h3>
-            <ul>
-              <li>Pół godziny rozmowy raz w miesiącu o tym, co działa, a co przeszkadza</li>
-              <li>Zgodę na pokazanie efektów w liczbach, bez nazwisk pacjentów</li>
-              <li>Zgodę na powołanie się na Wasz gabinet — dopiero wtedy, gdy będzie czym</li>
-            </ul>
+            <div class="droga__przyciski">
+              <button class="droga__strzalka" type="button" data-droga-wstecz aria-label="Poprzedni ekran">
+                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16 10H5m4-4-4 4 4 4" /></svg>
+              </button>
+              <button class="droga__strzalka droga__strzalka--dalej" type="button" data-droga-dalej>
+                Następny ekran
+                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
+              </button>
+            </div>
           </div>
         </div>
-
-        <p class="ofr-fine ofr-fine--jasny">
-          Umowa na sześć miesięcy, potem na czas nieokreślony z miesięcznym wypowiedzeniem.
-          Budżet reklamowy, jeśli zdecydujesz się na reklamy, płacisz osobno i bezpośrednio
-          do Google i Meta. Ceny netto.
-        </p>
       </div>
     </section>
 
     <!-- ── Zakres ─────────────────────────────────────────────────────── -->
-    <section class="ofr-blok">
+    <section class="ofr-blok" id="zakres">
       <div class="ofr-blok__in">
-        <p class="ofr-kicker">Zakres</p>
-        <h2 class="ofr-h2">Co dokładnie stawiamy</h2>
+        <p class="ofr-kicker">Co dokładniej dostajesz</p>
+        <h2 class="ofr-h2">Trzy rzeczy, które zaczynają działać tego samego dnia</h2>
         <p class="ofr-lead">
-          Wszystko poniżej działa w demie, które możesz teraz otworzyć. Jeśli czegoś tu nie ma,
+          Wszystko poniżej jest w demie, które możesz teraz otworzyć. Jeśli czegoś tu nie ma,
           to znaczy, że tego nie robimy — a nie, że „do ustalenia”.
         </p>
 
-        <div class="ofr-zakres">
-          <article>
-            <h3>Widoczność <span class="ofr-zakres__tag">podstawa</span></h3>
+        <article class="ofr-grupa">
+          <div class="ofr-grupa__text">
+            <p class="ofr-grupa__num">01</p>
+            <h3>Strona, na którą trafia pacjent</h3>
             <ul>
-              <li>Strona z rezerwacją online na Twoich danych i Twojej domenie</li>
-              <li>Osobna podstrona dla każdej częstej dolegliwości, pod realne wyszukiwania</li>
-              <li>Wizytówka Google: usługi, godziny, zdjęcia, zbieranie opinii</li>
-              <li>Rezerwacje wpadające do Twojego Kalendarza Google</li>
-              <li>Integracja ze ZnanyLekarz, jeśli tam jesteś</li>
+              <li><strong>Osobna podstrona dla każdej dolegliwości</strong> — objawy jego słowami, przebieg terapii, czas i cena. To ona pokazuje się w wynikach, nie zakładka „oferta”.</li>
+              <li><strong>Rezerwacja w trzy kroki</strong> z realnymi godzinami z Twojego grafiku, z wyborem terapeuty albo pierwszego wolnego terminu.</li>
+              <li><strong>Kwalifikator</strong> dla tych, którzy nie umieją nazwać problemu: trzy pytania i konkretna odpowiedź z terminem.</li>
+              <li><strong>Wizytówka w Mapach Google</strong>: usługi, godziny, zdjęcia i zbieranie opinii.</li>
+            </ul>
+            <a class="ofr-grupa__link" href="demo.html" target="_blank" rel="noopener">Zobacz to w demie strony →</a>
+          </div>
+          <a class="ofr-grupa__obraz" href="demo.html" target="_blank" rel="noopener">
+            <img src="assets/img/zrzuty/strona-pierwszy-ekran.jpg" alt="Pierwszy ekran strony gabinetu: cztery problemy do wyboru i najbliższe wolne terminy." width="1400" height="836" loading="lazy" />
+          </a>
+        </article>
+
+        <article class="ofr-grupa ofr-grupa--odwrocona">
+          <div class="ofr-grupa__text">
+            <p class="ofr-grupa__num">02</p>
+            <h3>Panel, który rano mówi, od czego zacząć</h3>
+            <ul>
+              <li><strong>Ekran „Dziś”</strong>: kto przychodzi, kto zarezerwował w nocy przez stronę, kto nie umówił kolejnej wizyty — z powodem przy każdym nazwisku.</li>
+              <li><strong>Kalendarz zespołu</strong> z wolnymi godzinami, blokadami na urlop i serią wizyt umawianą jednym kliknięciem.</li>
+              <li><strong>Kartoteka</strong> z kartą terapii, własną biblioteką ćwiczeń i historią kontaktu co do godziny.</li>
+              <li><strong>Ankiety i wiadomości</strong>: ból po wizycie, przypomnienia w dni ćwiczeń, prośba o opinię — wszystko układa się samo z kalendarza.</li>
+            </ul>
+            <a class="ofr-grupa__link" href="crm.html" target="_blank" rel="noopener">Zobacz to w demie panelu →</a>
+          </div>
+          <a class="ofr-grupa__obraz" href="crm.html" target="_blank" rel="noopener">
+            <img src="assets/img/zrzuty/panel-radar.jpg" alt="Lista osób, które nie umówiły kolejnej wizyty, z powodami i przyciskami „Umów termin”." width="1000" height="446" loading="lazy" />
+          </a>
+        </article>
+
+        <article class="ofr-grupa">
+          <div class="ofr-grupa__text">
+            <p class="ofr-grupa__num">03</p>
+            <h3>Karta, którą pacjent dostaje SMS-em</h3>
+            <ul>
+              <li><strong>Bez logowania i bez aplikacji</strong> — klika w link i widzi swoją terapię: cel, najbliższą wizytę i ćwiczenia na ten tydzień.</li>
+              <li><strong>Ćwiczenia z Twoimi nagraniami</strong>, które odhacza; to jedyne źródło procentu, który widzisz w panelu.</li>
+              <li><strong>„Nie mogę, przełóż”</strong> — sam wybiera nowy termin z grafiku swojego terapeuty, zamiast dzwonić w trakcie Twojej wizyty.</li>
+              <li><strong>Wypis po zamkniętym cyklu</strong>: ile wizyt, o ile spadł ból, co robić dalej i jak wrócić. To ta kartka, którą pokazuje znajomym.</li>
+            </ul>
+            <a class="ofr-grupa__link" href="pacjent.html?t=t1" target="_blank" rel="noopener">Zobacz kartę pacjenta →</a>
+          </div>
+          <a class="ofr-grupa__obraz ofr-grupa__obraz--waski" href="pacjent.html?t=t1" target="_blank" rel="noopener">
+            <img src="assets/img/zrzuty/pacjent-karta.jpg" alt="Karta pacjenta na telefonie: cel terapii, najbliższa wizyta i pytanie o ból." width="420" height="900" loading="lazy" />
+          </a>
+        </article>
+      </div>
+    </section>
+
+    <!-- ── Co robimy za Ciebie ────────────────────────────────────────── -->
+    <section class="ofr-blok ofr-blok--paper">
+      <div class="ofr-blok__in">
+        <p class="ofr-kicker">Co robimy za Ciebie</p>
+        <h2 class="ofr-h2">Twojej pracy w tym jest jedna rozmowa i jedno przeczytanie tekstów</h2>
+        <p class="ofr-lead">
+          Nie dostajesz programu do nauczenia się i konta, z którym zostajesz sam. Dostajesz
+          postawiony system i kogoś, kto odbiera telefon.
+        </p>
+
+        <div class="ofr-role">
+          <div class="ofr-role__kol ofr-role__kol--my">
+            <h3>Robimy my</h3>
+            <ul>
+              <li>Piszemy teksty strony i wszystkich podstron — Wy je tylko czytacie i mówicie, co się nie zgadza</li>
+              <li>Stawiamy stronę na Waszej domenie, z rezerwacją liczącą godziny z Waszego grafiku</li>
+              <li>Porządkujemy wizytówkę w Mapach Google: usługi, kategorie, zdjęcia, zbieranie opinii</li>
+              <li>Wpisujemy zespół, godziny, cennik i pierwszych pacjentów do panelu</li>
+              <li>Ustawiamy przypomnienia, pytania o ból i o ćwiczenia</li>
+              <li>Przechodzimy przez panel na żywo — godzina na Waszym sprzęcie, na Waszych przypadkach</li>
+              <li>Odbieramy telefon i poprawiamy, co trzeba, przez cały czas współpracy</li>
+            </ul>
+          </div>
+          <div class="ofr-role__kol">
+            <h3>Robisz Ty</h3>
+            <ul>
+              <li>Piętnaście minut rozmowy na start: godziny przyjęć, usługi z cenami, najczęstsze problemy</li>
+              <li>Przeczytanie gotowych tekstów i powiedzenie, co poprawić</li>
+              <li>Zdjęcia zespołu i gabinetu oraz dostępy do domeny i wizytówki, jeśli już je macie</li>
+            </ul>
+            <p class="ofr-role__uwaga">
+              Tyle. Reszta dzieje się po naszej stronie, a Ty dostajesz gotowe do sprawdzenia.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Koszta ─────────────────────────────────────────────────────── -->
+    <section class="ofr-pilot" id="koszta">
+      <div class="ofr-blok__in">
+        <p class="ofr-kicker ofr-kicker--jasny">Koszty</p>
+        <h2 class="ofr-h2">Płacisz za system, nigdy za pojedynczego pacjenta</h2>
+
+        <div class="ofr-pilotblok">
+          <div class="ofr-pilotblok__tekst">
+            <h3>Program pilotażowy</h3>
+            <p>
+              Tworzymy rozwiązanie specjalnie dla gabinetów fizjoterapii. Pierwsze gabinety
+              otrzymują dostęp do usługi na preferencyjnych warunkach i mają bezpośredni wpływ
+              na jej dalszy rozwój — bo zależy nam na konkretnych rozwiązaniach realnych
+              problemów, a nie na kolejnych funkcjach z listy.
+            </p>
+            <p class="ofr-pilotblok__warunki">
+              Cena pilotażowa obowiązuje przez dwanaście miesięcy od startu. W zamian prosimy
+              o pół godziny rozmowy raz w miesiącu i zgodę na pokazanie efektów w liczbach,
+              bez nazwisk pacjentów.
+            </p>
+          </div>
+          <div class="ofr-licznik" data-koniec="2026-10-15T23:59:59+02:00">
+            <p class="ofr-licznik__label">Warunki pilotażowe wygasają za</p>
+            <p class="ofr-licznik__zegar">
+              <span><b data-zegar="dni">–</b><em>dni</em></span>
+              <span><b data-zegar="godz">–</b><em>godz.</em></span>
+              <span><b data-zegar="min">–</b><em>min</em></span>
+            </p>
+            <p class="ofr-licznik__data">do 15 października 2026</p>
+          </div>
+        </div>
+
+        <div class="ofr-ceny">
+          <article class="ofr-cena ofr-cena--pilot">
+            <p class="ofr-cena__znak">Nasza propozycja</p>
+            <h3>Prowadzenie</h3>
+            <p class="ofr-cena__opis">Strona z rezerwacją i panel gabinetu. Pacjent umawia się sam, Ty prowadzisz terapię do końca.</p>
+            <p class="ofr-cena__kwota">
+              <span class="ofr-cena__pilotaz" data-cena-pilot="4 900 zł">3 499 zł</span> <span>wdrożenie</span>
+              <em data-cena-stara>zamiast 4 900 zł</em>
+            </p>
+            <p class="ofr-cena__kwota ofr-cena__kwota--sub">
+              <span class="ofr-cena__pilotaz" data-cena-pilot="379 zł">199 zł</span> <span>miesięcznie</span>
+              <em data-cena-stara>zamiast 379 zł</em>
+            </p>
+            <ul class="ofr-cena__lista">
+              <li>Wszystko ze strony i z wizytówki Google</li>
+              <li>Panel gabinetu: dzień, kalendarz zespołu, kartoteka</li>
+              <li>Lista osób, które nie umówiły kolejnej wizyty, z powodem</li>
+              <li>SMS-y: potwierdzenia, przypomnienia, prośby o opinię</li>
+              <li>Ankiety: ból po wizycie i ćwiczenia w dni ćwiczeń</li>
+              <li>Karta pacjenta z Twoimi nagraniami i wypis na koniec cyklu</li>
+              <li>Podsumowanie miesiąca i wsparcie techniczne</li>
+            </ul>
+          </article>
+
+          <article class="ofr-cena ofr-cena--mniejsza">
+            <p class="ofr-cena__znak ofr-cena__znak--cichy">Wariant bez panelu</p>
+            <h3>Widoczność</h3>
+            <p class="ofr-cena__opis">Sama strona z rezerwacją i wizytówka. Zapisy prowadzisz po swojemu.</p>
+            <p class="ofr-cena__kwota">2 900 zł <span>wdrożenie</span></p>
+            <p class="ofr-cena__kwota ofr-cena__kwota--sub">149 zł <span>miesięcznie</span></p>
+            <ul class="ofr-cena__lista">
+              <li>Strona z rezerwacją online na Twoich danych</li>
+              <li>Podstrona dla każdej częstej dolegliwości</li>
+              <li>Wizytówka Google i rezerwacje w Kalendarzu Google</li>
               <li>Potwierdzenie i przypomnienie e-mailem</li>
               <li>Hosting, poprawki i aktualizacje w cenie</li>
             </ul>
-            <p class="ofr-zakres__cena">2 900 zł wdrożenie&nbsp;·&nbsp;149 zł miesięcznie</p>
-          </article>
-
-          <article class="ofr-zakres--main">
-            <h3>Prowadzenie <span class="ofr-zakres__tag ofr-zakres__tag--pilot">w pilotażu</span></h3>
-            <ul>
-              <li><strong>Wszystko z pakietu Widoczność</strong></li>
-              <li>Panel gabinetu: dzień, kalendarz tygodnia, kartoteka pacjentów</li>
-              <li>Lista osób, które nie umówiły kolejnej wizyty — z powodem przy każdej</li>
-              <li>SMS-y: potwierdzenia, przypomnienia, prośby o opinię</li>
-              <li>Ankieta SMS: ból po wizycie i ćwiczenia w dni ćwiczeń, jedno kliknięcie</li>
-              <li>Karta pacjenta z ćwiczeniami i Twoimi nagraniami, wynik terapii i wypis na koniec cyklu</li>
-              <li>Podsumowanie miesiąca: ilu nowych pacjentów i skąd przyszli</li>
-              <li>Wsparcie techniczne: odbieramy telefon i poprawiamy, co trzeba</li>
-            </ul>
-            <p class="ofr-zakres__cena ofr-zakres__cena--pilot">3 499 zł wdrożenie&nbsp;·&nbsp;199 zł miesięcznie</p>
+            <p class="ofr-cena__stopka">Bez panelu, ankiet i kart pacjenta. Przejście wyżej w dowolnym momencie, bez budowania strony od nowa.</p>
           </article>
         </div>
 
-        <p class="ofr-fine">
-          Czego nie robimy: dokumentacji medycznej, rozliczeń z NFZ, kasy fiskalnej ani układania
-          planów terapii. Fizjoterapeuta wie, jak leczyć — my dowozimy pacjentów i pilnujemy,
-          żeby nie znikali w połowie.
+        <p class="ofr-fine ofr-fine--jasny">
+          Pierwsze 30 dni bez zobowiązania. Umowa na sześć miesięcy, potem na czas nieokreślony
+          z miesięcznym wypowiedzeniem. Strona, treści, wizytówka i baza pacjentów zostają Twoje,
+          także po zakończeniu współpracy. Reklamy Google i Meta to osobna usługa, wyceniana pod
+          cele; budżet reklamowy płacisz bezpośrednio do Google i Meta. Ceny netto.
         </p>
       </div>
     </section>
 
+    <!-- ── Kalkulator ─────────────────────────────────────────────────── -->
+    <section class="ofr-blok">
+      <div class="ofr-blok__in">
+        <section class="calc" aria-labelledby="h-calc">
+          <div class="calc__head">
+            <h3 id="h-calc">Ile wizyt musi przynieść, żeby się zwrócił</h3>
+            <p>Przykładowy scenariusz, nie gwarancja wyniku. Ustaw wartości ze swojego gabinetu.</p>
+          </div>
+          <div class="calc__grid">
+            <div class="calc__inputs">
+              <label class="range">
+                <span class="range__label">Nowi pacjenci miesięcznie z systemu</span>
+                <input type="range" min="2" max="60" step="1" value="8" data-calc="pacjenci" />
+                <output data-out="pacjenci">8</output>
+              </label>
+              <label class="range">
+                <span class="range__label">Średnia cena wizyty</span>
+                <input type="range" min="100" max="400" step="10" value="200" data-calc="cena" />
+                <output data-out="cena">200 zł</output>
+              </label>
+              <label class="range">
+                <span class="range__label">Wizyt w jednym cyklu terapii</span>
+                <input type="range" min="1" max="12" step="1" value="5" data-calc="wizyty" />
+                <output data-out="wizyty">5</output>
+              </label>
+              <label class="range">
+                <span class="range__label">Miesięczny koszt systemu</span>
+                <input type="range" min="100" max="5000" step="1" value="199" data-calc="koszt" />
+                <output data-out="koszt">199 zł</output>
+              </label>
+              <label class="range">
+                <span class="range__label">Ilu na dziesięciu przerywa terapię w połowie</span>
+                <input type="range" min="0" max="8" step="1" value="3" data-calc="przerywa" />
+                <output data-out="przerywa">3 z 10</output>
+              </label>
+            </div>
+            <dl class="calc__result" aria-live="polite">
+              <div class="calc__big">
+                <dt>Na każdą złotówkę wydaną na system</dt>
+                <dd data-res="zwrot">—</dd>
+              </div>
+              <div>
+                <dt>Przychód z nowych pacjentów</dt>
+                <dd data-res="przychod">—</dd>
+              </div>
+              <div>
+                <dt>Koszt miesięczny</dt>
+                <dd data-res="koszt">—</dd>
+              </div>
+              <div class="calc__wide">
+                <dt>Nowych pacjentów miesięcznie, żeby koszt się zwrócił</dt>
+                <dd data-res="prog">—</dd>
+              </div>
+              <div class="calc__wide calc__strata">
+                <dt>Zostaje na stole, gdy pacjent nie wraca na drugą połowę terapii</dt>
+                <dd data-res="strata">—</dd>
+              </div>
+            </dl>
+          </div>
+        </section>
+      </div>
+    </section>
+
     <!-- ── Wdrożenie ──────────────────────────────────────────────────── -->
-    <section class="ofr-blok ofr-blok--paper">
+    <section class="ofr-blok ofr-blok--paper" id="wdrozenie">
       <div class="ofr-blok__in">
         <p class="ofr-kicker">Wdrożenie</p>
         <h2 class="ofr-h2">Dziesięć dni roboczych od decyzji do pierwszej rezerwacji</h2>
-        <p class="ofr-lead">
-          Twojej pracy w tym jest jedna rozmowa i jedno przeczytanie tekstów. Resztę robimy my.
-        </p>
         <ol class="ofr-etapy">
-          <li><strong>Dzień 1</strong> Rozmowa: godziny przyjęć każdej osoby, usługi z cenami, cztery najczęstsze problemy, dostępy do domeny i wizytówki.</li>
-          <li><strong>Dni 2–4</strong> Strona, podstrony problemów, zespół i rezerwacja licząca wolne godziny z Waszego grafiku. Teksty piszemy my.</li>
-          <li><strong>Dni 5–6</strong> Wizytówka w Mapach Google, tytuły i opisy podstron pod to, co ludzie naprawdę wpisują.</li>
-          <li><strong>Dni 7–8</strong> Panel: Wasz zespół, cennik, pierwsi pacjenci, przypomnienia i ankiety. Godzina przejścia przez panel na żywo.</li>
-          <li><strong>Dzień 9</strong> Próba: testowa wizyta z telefonu, SMS, karta pacjenta. Poprawiamy, co zgrzyta.</li>
-          <li><strong>Dzień 10</strong> Start. Strona idzie na Waszą domenę i od tego dnia przyjmuje rezerwacje o każdej porze.</li>
+          <li><strong>Dzień 1&nbsp;·&nbsp;Rozmowa</strong> Godziny przyjęć każdej osoby, usługi z cenami, cztery najczęstsze problemy, dostępy do domeny i wizytówki.</li>
+          <li><strong>Dni 2–4&nbsp;·&nbsp;Strona</strong> Podstrony problemów, zespół i rezerwacja licząca wolne godziny z Waszego grafiku. Teksty piszemy my.</li>
+          <li><strong>Dni 5–6&nbsp;·&nbsp;Wyszukiwarka</strong> Wizytówka w Mapach Google, tytuły i opisy podstron pod to, co ludzie naprawdę wpisują.</li>
+          <li><strong>Dni 7–8&nbsp;·&nbsp;Panel</strong> Wasz zespół, cennik, pierwsi pacjenci, przypomnienia i ankiety. Godzina przejścia przez panel na żywo.</li>
+          <li><strong>Dzień 9&nbsp;·&nbsp;Próba</strong> Testowa wizyta z telefonu, SMS, karta pacjenta. Poprawiamy, co zgrzyta.</li>
+          <li><strong>Dzień 10&nbsp;·&nbsp;Start</strong> Strona idzie na Waszą domenę i od tego dnia przyjmuje rezerwacje o każdej porze.</li>
         </ol>
         <p class="ofr-fine">
           Dziesięć dni liczymy od momentu, w którym mamy zdjęcia i dostępy. Jeśli czegoś brakuje,
@@ -337,7 +402,7 @@
       </div>
     </section>
 
-    <!-- ── Zastrzeżenia ───────────────────────────────────────────────── -->
+    <!-- ── Zanim zapytasz ─────────────────────────────────────────────── -->
     <section class="ofr-blok">
       <div class="ofr-blok__in ofr-blok__in--waski">
         <p class="ofr-kicker">Zanim zapytasz</p>
@@ -353,7 +418,7 @@
           </details>
           <details>
             <summary>Nie jestem dobry w komputerach.<span class="faq__icon" aria-hidden="true"></span></summary>
-            <p>Panel otwiera się w przeglądarce, tak samo jak poczta — nic nie instalujesz. Przy wdrożeniu przechodzimy go razem na Waszych pacjentach, a do każdej funkcji jest opisana instrukcja. W pilotażu odbieramy telefon i poprawiamy, co trzeba.</p>
+            <p>Panel otwiera się w przeglądarce, tak samo jak poczta — nic nie instalujesz. Przy wdrożeniu przechodzimy go razem na Waszych pacjentach, a do każdej funkcji jest opisana instrukcja. Potem odbieramy telefon i poprawiamy, co trzeba.</p>
           </details>
           <details>
             <summary>A jeśli po pół roku zrezygnuję?<span class="faq__icon" aria-hidden="true"></span></summary>
@@ -363,12 +428,12 @@
       </div>
     </section>
 
-    <!-- ── Następny krok ──────────────────────────────────────────────── -->
+    <!-- ── Zamknięcie ─────────────────────────────────────────────────── -->
     <section class="ofr-koniec">
       <div class="ofr-blok__in">
         <h2 class="ofr-h2 ofr-h2--duzy">Następny krok to jedna rozmowa</h2>
         <p class="ofr-lead ofr-lead--jasny">
-          Piętnaście minut, bez prezentacji i bez slajdów. Pokazujemy demo na przykładzie
+          Piętnaście minut, bez prezentacji i bez slajdów. Przechodzimy przez demo na przykładzie
           Twojej specjalizacji i mówimy wprost, czy to się u Ciebie opłaca.
         </p>
         <div class="ofr-koniec__kontakt">
@@ -376,31 +441,71 @@
             Zadzwoń: 783 480 341
             <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
           </a>
-          <a class="cta cta--line ofr-koniec__mail" id="ofr-mail" href="mailto:kontakt@studio-widok.pl?subject=Program%20pilota%C5%BCowy%20%E2%80%94%20gabinet">
+          <a class="cta cta--line" href="mailto:kontakt@studio-widok.pl?subject=Oferta%20dla%20gabinetu">
             kontakt@studio-widok.pl
           </a>
         </div>
         <p class="ofr-fine ofr-fine--jasny">
           Studio Widok · <a href="https://studio-widok.pl" rel="noopener">studio-widok.pl</a>
-          · oferta ważna 14 dni od rozmowy
+          · systemy pozyskiwania pacjentów dla gabinetów fizjoterapii
         </p>
       </div>
     </section>
   </main>
 
   <script>
-    /* Link wysyłamy po rozmowie, więc możemy podpisać go nazwą gabinetu:
-       oferta-pilotaz.html?gabinet=Nazwa. Bez parametru strona czyta się tak samo. */
-    (function () {
-      var nazwa = new URLSearchParams(location.search).get('gabinet');
-      if (!nazwa) return;
-      nazwa = nazwa.replace(/[<>]/g, '').trim().slice(0, 60);
-      if (!nazwa) return;
-      document.getElementById('ofr-dla').textContent = 'Przygotowane dla: ' + nazwa;
-      document.title = 'Oferta dla ' + nazwa + ' · Studio Widok';
-      var mail = document.getElementById('ofr-mail');
-      mail.href = 'mailto:kontakt@studio-widok.pl?subject=' + encodeURIComponent('Program pilotażowy — ' + nazwa);
+    (() => {
+      /* Odliczanie do konkretnej daty, nie „14 dni od wejścia” — licznik, który
+         każdemu pokazuje co innego, nie jest terminem, tylko sztuczką. */
+      const box = document.querySelector('[data-koniec]');
+      if (!box) return;
+      const koniec = new Date(box.dataset.koniec);
+      const pole = (k) => box.querySelector(`[data-zegar="${k}"]`);
+
+      function wygaslo() {
+        document.querySelectorAll('[data-cena-stara]').forEach((el) => el.remove());
+        document.querySelectorAll('[data-cena-pilot]').forEach((el) => {
+          el.textContent = el.dataset.cenaPilot;
+          el.classList.remove('ofr-cena__pilotaz');
+        });
+        box.innerHTML =
+          '<p class="ofr-licznik__label">Warunki pilotażowe z tej oferty wygasły</p>' +
+          '<p class="ofr-licznik__minelo">Napisz albo zadzwoń — sprawdzimy, czy w bieżącej turze są jeszcze miejsca.</p>';
+      }
+
+      function tyk() {
+        const zostalo = koniec - new Date();
+        if (zostalo <= 0) return wygaslo();
+        pole('dni').textContent = Math.floor(zostalo / 86400000);
+        pole('godz').textContent = Math.floor((zostalo % 86400000) / 3600000);
+        pole('min').textContent = Math.floor((zostalo % 3600000) / 60000);
+      }
+      tyk();
+      setInterval(tyk, 30000);
+    })();
+
+    (() => {
+      /* Kalkulator zwrotu — liczby przykładowe, wpisuje je właściciel gabinetu. */
+      const zl = (n) => `${Math.round(n).toLocaleString('pl-PL')} zł`;
+      const val = (k) => Number(document.querySelector(`[data-calc="${k}"]`).value);
+      const out = (k, t) => (document.querySelector(`[data-out="${k}"]`).textContent = t);
+      const res = (k, t) => (document.querySelector(`[data-res="${k}"]`).textContent = t);
+      const update = () => {
+        const p = val('pacjenci'), c = val('cena'), w = val('wizyty'), k = val('koszt'), x = val('przerywa');
+        out('pacjenci', p); out('cena', zl(c)); out('wizyty', w); out('koszt', zl(k)); out('przerywa', `${x} z 10`);
+        const przychod = p * c * w;
+        /* Kto przerywa, zwykle znika mniej więcej w połowie zaplanowanych wizyt. */
+        res('strata', `${zl(p * 12 * (x / 10) * Math.floor(w / 2) * c)} rocznie`);
+        res('przychod', zl(przychod));
+        res('koszt', zl(k));
+        res('zwrot', `${(przychod / k).toLocaleString('pl-PL', { maximumFractionDigits: 1 })} zł przychodu`);
+        res('prog', String(Math.ceil(k / (c * w))));
+        document.querySelectorAll('.range input').forEach((i) => i.style.setProperty('--p', `${((i.value - i.min) / (i.max - i.min)) * 100}%`));
+      };
+      document.querySelectorAll('[data-calc]').forEach((i) => i.addEventListener('input', update));
+      update();
     })();
   </script>
+  <script src="assets/js/droga.js?v=4" defer></script>
 </body>
 </html>
