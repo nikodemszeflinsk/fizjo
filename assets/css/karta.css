@@ -5382,3 +5382,420 @@ svg path {
   gap: 18px;
   margin-top: 22px;
 }
+
+/* ══ Oferta, układ czwarty: hero tekstowe, droga z wyrównaniem, rozwijane listy ═══ */
+
+/* ── Nawigacja ────────────────────────────────────────────────────────── */
+.ofr-pasek__nav {
+  align-items: center;
+}
+
+/* Dopisek po prawej: oferta jest ograniczona — widać to od pierwszego ekranu. */
+.ofr-pasek__oferta {
+  padding: 9px 14px;
+  border-radius: 999px;
+  background: #f2b705;
+  color: #14171a !important;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none !important;
+}
+
+.ofr-pasek__oferta:hover {
+  background: #ffd24a;
+}
+
+/* ── Hero tekstowe ────────────────────────────────────────────────────── */
+.ofr-hero__opis {
+  display: grid;
+  gap: 14px;
+  max-width: 64ch;
+  margin-top: 28px;
+}
+
+.ofr-hero__opis p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: clamp(1.02rem, 1.9vw, 1.14rem);
+  line-height: 1.65;
+}
+
+.ofr-obietnice {
+  margin-top: 34px;
+  padding: clamp(20px, 3vw, 30px);
+  border: 1px solid var(--hair-2);
+  border-radius: var(--r-sign);
+  background: var(--paper);
+}
+
+.ofr-obietnice__h {
+  margin: 0 0 16px;
+  font-family: var(--f-display);
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+}
+
+.ofr-obietnice ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 32px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (max-width: 760px) {
+  .ofr-obietnice ul {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.ofr-obietnice li {
+  position: relative;
+  padding-left: 28px;
+  color: var(--ink-2);
+  font-size: 0.97rem;
+  line-height: 1.55;
+}
+
+.ofr-obietnice li::before {
+  position: absolute;
+  left: 0;
+  top: 0.4em;
+  width: 13px;
+  height: 7px;
+  border-left: 2px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
+  content: '';
+  rotate: -45deg;
+}
+
+.ofr-obietnice strong {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--ink);
+}
+
+.ofr-hero__dalej {
+  max-width: 64ch;
+  margin: 24px 0 0;
+  color: var(--muted);
+  font-size: 0.96rem;
+  line-height: 1.6;
+}
+
+.ofr-hero__dalej a {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ── Plakietka Widoczności: czarna obwódka, bo szara na szarym ginęła ──── */
+.ofr-tag--wid,
+.grupa__tag--wid {
+  border: 1.5px solid var(--ink);
+  background: #fff;
+  color: var(--ink);
+}
+
+.ofr-blok--ink .ofr-tag--wid,
+.brama--ciemna .ofr-tag--wid,
+.ofr-pilot .ofr-tag--wid,
+.grupa--panel .grupa__tag--wid {
+  border-color: rgba(255, 255, 255, 0.85);
+  background: transparent;
+  color: #fff;
+}
+
+/* ── Droga: pięć rzędów wyrównanych w poprzek czterech przystanków ──────── */
+/* Bez tego plakietki i opisy lądowały na różnych wysokościach, bo moduły
+   miały po jednej albo po dwóch liniach. Podsiatka trzyma każdy rząd
+   na wysokości najwyższego z czterech. */
+.path {
+  grid-template-rows: none;
+  row-gap: 0;
+}
+
+.path__stop {
+  display: grid;
+  grid-row: span 5;
+  grid-template-rows: subgrid;
+  row-gap: 0;
+  min-width: 0;
+}
+
+.path__stop > .path__num {
+  margin-bottom: 18px;
+}
+
+.path__stop > .path__mod {
+  margin-bottom: 10px;
+}
+
+.path__stop > .path__tag {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 6px;
+  min-height: 0;
+  margin: 0 0 12px;
+}
+
+.path__stop > .path__tag:empty {
+  margin: 0;
+}
+
+.path__stop > .path__opis {
+  margin: 0;
+  line-height: 1.55;
+}
+
+@media (max-width: 860px) {
+  /* Jedna kolumna: podsiatka nie ma czego wyrównywać. */
+  .path__stop {
+    grid-row: auto;
+    grid-template-rows: none;
+    margin-bottom: 26px;
+  }
+}
+
+/* ── Rozwijane listy z podstrony systemu ──────────────────────────────── */
+.brama__wiecej {
+  grid-column: 1 / -1;
+  margin-top: 6px;
+}
+
+.brama__wiecej summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border: 1.5px solid currentColor;
+  border-radius: 999px;
+  color: var(--ink);
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+}
+
+.brama--ciemna .brama__wiecej summary {
+  color: #fff;
+}
+
+.brama__wiecej summary::-webkit-details-marker {
+  display: none;
+}
+
+.brama__wiecej summary::after {
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  content: '';
+  rotate: 45deg;
+  translate: 0 -2px;
+  transition: rotate 0.2s var(--ease-out);
+}
+
+.brama__wiecej[open] summary::after {
+  rotate: -135deg;
+  translate: 0 2px;
+}
+
+.brama__wiecej summary:hover {
+  background: rgba(31, 95, 214, 0.1);
+}
+
+.brama__wiecej-zwin,
+.brama__wiecej[open] .brama__wiecej-otw {
+  display: none;
+}
+
+.brama__wiecej[open] .brama__wiecej-zwin {
+  display: inline;
+}
+
+.wiecej__lista {
+  columns: 2 320px;
+  column-gap: 40px;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--hair-2);
+}
+
+.brama--ciemna .wiecej__lista {
+  border-top-color: rgba(255, 255, 255, 0.2);
+}
+
+.wiecej__poz {
+  break-inside: avoid;
+  margin: 0 0 26px;
+}
+
+.wiecej__pakiet {
+  margin: 0 0 8px;
+}
+
+.wiecej__poz h4 {
+  margin: 0 0 8px;
+  font-family: var(--f-display);
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.012em;
+}
+
+.brama--ciemna .wiecej__poz h4 {
+  color: #fff;
+}
+
+.wiecej__poz ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wiecej__poz li {
+  position: relative;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.brama--ciemna .wiecej__poz li {
+  color: #b7bcc1;
+}
+
+.wiecej__poz li::before {
+  position: absolute;
+  left: 0;
+  top: 0.66em;
+  width: 8px;
+  height: 2px;
+  background: var(--accent);
+  content: '';
+}
+
+/* ── Pakiety równorzędne, pilotaż pod nimi ────────────────────────────── */
+.ofr-ceny {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+}
+
+@media (max-width: 860px) {
+  .ofr-ceny {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.ofr-cena--prow {
+  border-color: var(--accent);
+  background: rgba(31, 95, 214, 0.16);
+}
+
+.ofr-cena--prow .ofr-cena__opis,
+.ofr-cena--prow .ofr-cena__lista li {
+  color: #c3d4f2;
+}
+
+.ofr-cena--prow .ofr-cena__kwota span {
+  color: #a8bde3;
+}
+
+.ofr-cena__stopka a {
+  color: #fff;
+  font-weight: 700;
+}
+
+.ofr-cena--prow .ofr-cena__stopka {
+  color: #c3d4f2;
+}
+
+.ofr-pilotblok {
+  margin-top: 18px;
+}
+
+.ofr-pilotblok__waznosc {
+  margin-top: 14px !important;
+  color: #fff !important;
+  font-weight: 700;
+}
+
+.ofr-pilotblok__tekst h3 {
+  max-width: 28ch;
+  font-size: clamp(1.4rem, 2.8vw, 1.9rem);
+  line-height: 1.15;
+}
+
+/* Ceny pilotażowe z cenami oryginalnymi obok — przekreślone, ale czytelne. */
+.ofr-pilotceny {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 32px;
+  margin-top: 28px;
+  padding: clamp(18px, 3vw, 26px);
+  border-radius: var(--r-sign);
+  background: rgba(31, 95, 214, 0.18);
+  border: 1px solid var(--accent);
+}
+
+@media (max-width: 760px) {
+  .ofr-pilotceny {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.ofr-pilotceny__tyt {
+  grid-column: 1 / -1;
+  margin: 0 0 16px;
+  font-family: var(--f-display);
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+}
+
+.ofr-pilotceny__rzad {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  align-items: baseline;
+  gap: 4px 16px;
+}
+
+.ofr-pilotceny__etykieta {
+  flex-basis: 100%;
+  color: #c3d4f2;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.ofr-pilotceny__nowa {
+  color: #fff;
+  font-family: var(--f-display);
+  font-size: clamp(2rem, 4vw, 2.7rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.ofr-pilotceny__stara {
+  color: #e9ecea;
+  font-family: var(--f-display);
+  font-size: clamp(1.35rem, 2.6vw, 1.75rem);
+  font-weight: 700;
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
+
+.ofr-pilotceny__zawsze {
+  flex-basis: 100%;
+  color: #c3d4f2;
+  font-size: 0.86rem;
+  font-style: normal;
+}
