@@ -5135,8 +5135,39 @@ svg path {
   background: #fff;
 }
 
+.ofr-zobacz {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Wiodący kafel — strona gabinetu — na całą szerokość: obraz z lewej, treść z prawej. */
 .ofr-kafel--duzy {
-  grid-row: span 2;
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  align-items: center;
+}
+
+.ofr-kafel--duzy img {
+  border-right: 1px solid var(--hair);
+  border-bottom: 0;
+}
+
+.ofr-kafel--duzy h3 {
+  font-size: clamp(1.5rem, 2.6vw, 1.9rem);
+}
+
+@media (max-width: 860px) {
+  .ofr-zobacz {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ofr-kafel--duzy {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ofr-kafel--duzy img {
+    border-right: 0;
+    border-bottom: 1px solid var(--hair);
+  }
 }
 
 .ofr-kafel img {
@@ -5854,33 +5885,22 @@ svg path {
   color: var(--ink, #14171a);
 }
 
-/* Grafiki w rozwijanych listach „Dowiedz się więcej” — te same zrzuty co na stronie systemu. */
-.wiecej__obraz {
-  margin: 16px 0 0;
-}
-
-.wiecej__obraz img {
-  display: block;
-  width: 100%;
-  height: auto;
+/* „Dowiedz się więcej”: sekcje wklejone z system.html, w jasnym panelu także na ciemnej bramie. */
+.wiecej__lista {
+  columns: auto;
+  margin-top: 28px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--hair-2);
   border-radius: var(--r-sign, 12px);
-  background: var(--floor);
-  box-shadow: 0 10px 28px rgba(20, 23, 26, 0.12);
+  background: var(--white, #fff);
+  color: var(--ink);
 }
 
-.wiecej__obraz--waski img {
-  max-width: 240px;
-  margin: 0 auto;
+.wiecej__lista .of-blok:first-child {
+  border-top: 0;
 }
 
-.wiecej__obraz figcaption {
-  margin-top: 10px;
-  color: var(--muted);
-  font-size: 0.82rem;
-  line-height: 1.45;
-  text-align: center;
-}
-
-.brama--ciemna .wiecej__obraz figcaption {
-  color: #b7bcc1;
+.wiecej__lista .of-blok__in {
+  max-width: none;
 }
