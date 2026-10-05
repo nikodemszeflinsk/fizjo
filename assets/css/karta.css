@@ -6386,7 +6386,7 @@ svg path {
 /* Pilotaż w żółci „W rozwoju”: plakietka i okienka z cenami. */
 .ofr-pilotblok .ofr-pilotblok__znak {
   background: #f2b705;
-  color: #14171a;
+  color: #14171a !important;
 }
 
 .ofr-pilotblok .ofr-pilotceny__rzad {
