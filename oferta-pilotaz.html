@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/karta.css?v=62" />
+  <link rel="stylesheet" href="assets/css/karta.css?v=63" />
 </head>
 <body class="ofr-body">
   <a class="skip" href="#tresc">Przejdź do treści</a>
@@ -1064,6 +1064,7 @@
                 <li>Wdrożenie panelu za darmo</li>
                 <li>Stałą cenę pilotażową, także po zakończeniu pilotażu</li>
                 <li>Telefon do nas zamiast formularza zgłoszeniowego</li>
+                <li>Priorytetową odpowiedź na zgłoszenia techniczne do 24 godzin</li>
                 <li>Pierwszeństwo dla funkcji, których Ci brakuje</li>
                 <li>Nowości, zanim trafią do oferty</li>
               </ul>
@@ -1269,7 +1270,7 @@
           </details>
           <details>
             <summary>Ile mojego czasu to zajmie i co, gdy coś przestanie działać?<span class="faq__icon" aria-hidden="true"></span></summary>
-            <p>Po Twojej stronie to rozmowa na start, akceptacja tekstów i projektu oraz spotkanie, na którym przedstawiamy panel. Resztę robimy my. Gdy coś nie działa, dzwonisz albo piszesz bezpośrednio do nas — w pilotażu masz numer telefonu, a nie formularz zgłoszeniowy. Hosting i aktualizacje są w ramach utrzymania po naszej stronie.</p>
+            <p>Po Twojej stronie to rozmowa na start, akceptacja tekstów i projektu oraz spotkanie, na którym przedstawiamy panel. Resztę robimy my. Gdy coś nie działa, dzwonisz albo piszesz bezpośrednio do nas — w pilotażu masz numer telefonu, a nie formularz zgłoszeniowy, i priorytetową odpowiedź do 24 godzin. Hosting i aktualizacje są w ramach utrzymania po naszej stronie.</p>
           </details>
           <details>
             <summary>A jeśli zrezygnuję?<span class="faq__icon" aria-hidden="true"></span></summary>
@@ -1292,14 +1293,14 @@
             </li>
             <li>
               <strong>Dostajesz umowę</strong>
-              <span>Przygotowujemy ją na podstawie podanych danych i wysyłamy razem z krótką listą rzeczy do zebrania: zdjęcia, godziny przyjęć, usługi i cennik oraz dostępy do domeny i wizytówki.</span>
+              <span>Mailem lub SMS-em, w ciągu doby. Przygotowujemy ją na podstawie podanych danych i wysyłamy razem z krótką listą rzeczy do zebrania: zdjęcia, godziny przyjęć, usługi i cennik oraz dostępy do domeny i wizytówki.</span>
             </li>
             <li>
               <strong>Ruszamy</strong>
               <span>Rozmowa startowa, poznajemy Twój gabinet i zaczynamy od strony.</span>
             </li>
           </ol>
-          <p class="ofr-koniec__nota">Rezerwacja miejsca nie jest podpisaniem umowy — umowę najpierw czytasz.</p>
+          <p class="ofr-koniec__nota">Rezerwacja miejsca nie oznacza zawarcia umowy — umowę dostaniesz mailem lub SMS-em w ciągu doby.</p>
           <p class="ofr-koniec__termin">Oferta pilotażowa ważna do 8 października lub do wyczerpania miejsc.</p>
           <div class="ofr-koniec__kontakt">
             <a class="cta cta--line" href="tel:+48783480341">Wolę zadzwonić: 783 480 341</a>
@@ -1538,7 +1539,7 @@
           });
           if (!r.ok) throw new Error(String(r.status));
           form.classList.add('is-sent');
-          status.textContent = 'Dziękujemy! Miejsce zarezerwowane. Odezwiemy się w ciągu jednego dnia roboczego i wyślemy umowę do przeczytania.';
+          status.textContent = 'Dziękujemy! Miejsce zarezerwowane. Umowę dostaniesz mailem lub SMS-em w ciągu doby.';
         } catch (_) {
           const body = [
             ['Wybór', 'pakiet'], ['Imię i nazwisko', 'imie'], ['Gabinet', 'gabinet'], ['Telefon', 'telefon'], ['E-mail', 'email'],
