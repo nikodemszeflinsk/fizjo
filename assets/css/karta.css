@@ -6185,3 +6185,16 @@ svg path {
 .ofr-pilotblok .ofr-pilotceny .ofr-pilotceny__nota {
   margin-top: 4px;
 }
+
+/* Widoczność: ceny bez niebieskiego pola — niebieskie panele zostają tylko w pilotażu. */
+.ofr-cena--wid .ofr-cena__ceny {
+  margin-top: 0;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  gap: 12px;
+}
+
+.ofr-cena--wid .ofr-cena__ceny .ofr-cena__kwota span {
+  color: #a8bde3;
+}
