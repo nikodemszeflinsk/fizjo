@@ -6399,3 +6399,10 @@ svg path {
 .ofr-pilotblok .ofr-pilotceny__rzad .ofr-pilotceny__stara {
   color: #14171a;
 }
+
+.ofr-tor__czas {
+  margin: -4px 0 18px;
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
