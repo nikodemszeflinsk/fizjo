@@ -5813,7 +5813,7 @@ svg path {
   background: rgba(242, 183, 5, 0.12);
 }
 
-.ofr-wczesny .ofr-tag {
+.ofr-wczesny > .ofr-tag {
   flex: none;
   margin-top: 1px;
 }
@@ -5822,7 +5822,12 @@ svg path {
   margin: 0;
   color: var(--ink-2);
   font-size: 0.95rem;
-  line-height: 1.55;
+  line-height: 2.05;
+}
+
+/* Nazwy pakietów w treści, jako dymki — tak jak przy przystankach drogi. */
+.ofr-wczesny p .ofr-tag {
+  margin: 0 2px;
 }
 
 .ofr-wczesny a {
@@ -5847,4 +5852,35 @@ svg path {
   border: 1.5px solid var(--ink, #14171a);
   background: #fff;
   color: var(--ink, #14171a);
+}
+
+/* Grafiki w rozwijanych listach „Dowiedz się więcej” — te same zrzuty co na stronie systemu. */
+.wiecej__obraz {
+  margin: 16px 0 0;
+}
+
+.wiecej__obraz img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--r-sign, 12px);
+  background: var(--floor);
+  box-shadow: 0 10px 28px rgba(20, 23, 26, 0.12);
+}
+
+.wiecej__obraz--waski img {
+  max-width: 240px;
+  margin: 0 auto;
+}
+
+.wiecej__obraz figcaption {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.brama--ciemna .wiecej__obraz figcaption {
+  color: #b7bcc1;
 }

@@ -2198,7 +2198,7 @@
             <button class="btn btn--sm btn--accent" type="button" data-akcja="cw-dopisz-zapisz">Dodaj do planu i do biblioteki</button>
             <button class="link-btn" type="button" data-akcja="cw-dopisz-anuluj">Rezygnuję</button>
           </div>
-          <p class="modal__info">Trafi też do biblioteki, więc następnym razem będzie już na liście. Nagranie dorzucisz później w Ustawieniach.</p>
+          <p class="modal__info">Trafi też do biblioteki, więc następnym razem będzie już na liście. Nagranie dorzucisz później w zakładce Od pacjenta, w widoku Ćwiczenia.</p>
         </div>
       </div>
       <p class="modal__err" id="cwp-err" hidden></p>`,

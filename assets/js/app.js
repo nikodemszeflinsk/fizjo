@@ -665,7 +665,7 @@
         <li>W SMS-ie jest link do Twojej karty: terminy, ćwiczenia i przycisk „nie mogę, przełóż”.</li>
         <li>Termin możesz zmienić sam, bez dzwonienia.</li>
       </ul>
-      <p class="demo-note">Tryb demo: w prawdziwym wdrożeniu rezerwacja trafia do kalendarza gabinetu, a pacjent dostaje SMS z przypomnieniem.</p>
+      <p class="demo-note">Tryb demo: w prawdziwym wdrożeniu rezerwacja trafia do kalendarza gabinetu, a pacjent dostaje przypomnienie o wizycie e-mailem (pakiet Widoczność), w pakiecie Prowadzenie także SMS-em.</p>
     </div>`;
   }
 
