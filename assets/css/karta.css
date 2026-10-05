@@ -6255,3 +6255,108 @@ svg path {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ── Karty pakietów: równe rzędy (subgrid), „W rozwoju” jako zakładka ── */
+.ofr-ceny {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  row-gap: 0;
+  margin-top: 62px;
+}
+
+.ofr-ceny .ofr-cena {
+  position: relative;
+  display: grid;
+  grid-row: span 7;
+  grid-template-rows: subgrid;
+  align-content: start;
+  gap: 0;
+}
+
+@media (max-width: 860px) {
+  .ofr-ceny {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 28px;
+  }
+
+  .ofr-ceny .ofr-cena {
+    grid-row: auto;
+    grid-template-rows: none;
+  }
+}
+
+.ofr-ceny .ofr-cena > * {
+  min-width: 0;
+}
+
+.ofr-ceny .ofr-cena h3 {
+  margin-bottom: 6px;
+}
+
+.ofr-ceny .ofr-cena__podtytul {
+  margin: 0 0 14px;
+}
+
+.ofr-ceny .ofr-cena__opis {
+  margin: 0 0 4px;
+}
+
+.ofr-ceny .ofr-cena__ceny {
+  margin: 14px 0 0;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  gap: 12px;
+}
+
+.ofr-ceny .ofr-cena__nota {
+  margin: 10px 0 0;
+}
+
+.ofr-ceny .ofr-cena__lista {
+  align-content: start;
+}
+
+.ofr-ceny .ofr-cena__stopka {
+  align-self: end;
+}
+
+/* „W rozwoju”: przyklejona do górnej krawędzi karty, kwadratowa z zaokrąglonymi górnymi rogami. */
+.ofr-ceny .ofr-cena__znak--rozwoj {
+  position: absolute;
+  bottom: 100%;
+  left: 22px;
+  margin: 0 0 -1px;
+  padding: 10px 20px 9px;
+  border-radius: 12px 12px 0 0;
+  font-size: 0.86rem;
+}
+
+/* Ceny pilotażu na całą szerokość, pod tekstem i licznikiem. */
+.ofr-pilotblok > .ofr-pilotceny {
+  margin: 30px 0 0;
+}
+
+.ofr-pilotblok > .ofr-pilotceny .ofr-pilotceny__rzad {
+  padding: 24px 30px;
+  gap: 6px 22px;
+}
+
+.ofr-pilotblok > .ofr-pilotceny .ofr-pilotceny__nowa {
+  font-size: clamp(2.3rem, 4.6vw, 3.4rem);
+}
+
+.ofr-pilotblok > .ofr-pilotceny .ofr-pilotceny__stara {
+  font-size: clamp(1.3rem, 2.4vw, 1.7rem);
+}
+
+.ofr-pilotblok > .ofr-pilotceny .ofr-pilotceny__etykieta {
+  font-size: 0.95rem;
+}
+
+.ofr-pilotblok > .ofr-pilotceny .ofr-pilotceny__nota {
+  max-width: 84ch;
+}
+
+.ofr-pilotblok > .ofr-pilotblok__waznosc {
+  margin-top: 18px !important;
+}

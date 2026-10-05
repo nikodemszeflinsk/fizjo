@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/karta.css?v=53" />
+  <link rel="stylesheet" href="assets/css/karta.css?v=54" />
 </head>
 <body class="ofr-body">
   <a class="skip" href="#tresc">Przejdź do treści</a>
@@ -982,8 +982,10 @@
             <h3>Prowadzenie</h3>
             <p class="ofr-cena__podtytul">Widoczność + panel gabinetu</p>
             <p class="ofr-cena__opis">Strona z rezerwacją i panel do zarządzania wizytami, kontaktu z pacjentem i ćwiczeń. Panel jest jeszcze tworzony, dlatego pakiet nie jest dziś w normalnej sprzedaży.</p>
-            <p class="ofr-cena__kwota"><s><span class="visually-hidden">cena po pilotażu: </span>3&nbsp;900&nbsp;zł</s> <span>wdrożenie</span></p>
-            <p class="ofr-cena__kwota ofr-cena__kwota--sub"><s><span class="visually-hidden">cena po pilotażu: </span>499&nbsp;zł</s> <span>miesięcznie</span></p>
+            <div class="ofr-cena__ceny">
+              <p class="ofr-cena__kwota"><s><span class="visually-hidden">cena po pilotażu: </span>3&nbsp;900&nbsp;zł</s> <span>wdrożenie</span></p>
+              <p class="ofr-cena__kwota ofr-cena__kwota--sub"><s><span class="visually-hidden">cena po pilotażu: </span>499&nbsp;zł</s> <span class="ofr-cena__dwa"><span>utrzymanie</span><span>miesięcznie</span></span></p>
+            </div>
             <p class="ofr-cena__nota" data-pilot-only>Ceny obowiązują po zakończeniu pilotażu.</p>
             <ul class="ofr-cena__lista">
               <li>Wszystko z pakietu Widoczność</li>
@@ -1007,6 +1009,18 @@
                 pomoc w jego dopracowaniu. Zależy nam na konkretnych rozwiązaniach realnych
                 problemów, a nie na kolejnych funkcjach z listy.
               </p>
+            </div>
+            <div class="ofr-licznik" data-koniec="2026-10-08T23:59:59+02:00">
+              <p class="ofr-licznik__label">Oferta ważna jeszcze</p>
+              <p class="ofr-licznik__zegar">
+                <span><b data-zegar="dni">–</b><em>dni</em></span>
+                <span><b data-zegar="godz">–</b><em>godz.</em></span>
+                <span><b data-zegar="min">–</b><em>min</em></span>
+              </p>
+              <p class="ofr-licznik__data">do 8 października 2026</p>
+            </div>
+          </div>
+
           <div class="ofr-pilotceny">
             <p class="ofr-pilotceny__tyt">Prowadzenie w ofercie pilotażowej</p>
             <div class="ofr-pilotceny__rzad">
@@ -1020,24 +1034,13 @@
               <s class="ofr-pilotceny__stara"><span class="visually-hidden">zamiast </span>499&nbsp;zł</s>
             </div>
             <p class="ofr-pilotceny__nota">
-              Panel gabinetu — kalendarz wizyt, kartoteka pacjentów, SMS-y i karta pacjenta
+              Panel gabinetu — kartoteka pacjentów, SMS-y i karta pacjenta
               z ćwiczeniami — za darmo: pakiet Prowadzenie w cenie pakietu Widoczność, w zamian
               za pomoc w rozwoju. Różnica w cenie utrzymania wynika z kosztów wysyłki SMS-ów.
               Ta cena zostaje na stałe, także po zakończeniu pilotażu.
             </p>
           </div>
-              <p class="ofr-pilotblok__waznosc">Oferta ważna do upływu terminu lub wcześniejszego wyczerpania miejsc.</p>
-            </div>
-            <div class="ofr-licznik" data-koniec="2026-10-08T23:59:59+02:00">
-              <p class="ofr-licznik__label">Oferta ważna jeszcze</p>
-              <p class="ofr-licznik__zegar">
-                <span><b data-zegar="dni">–</b><em>dni</em></span>
-                <span><b data-zegar="godz">–</b><em>godz.</em></span>
-                <span><b data-zegar="min">–</b><em>min</em></span>
-              </p>
-              <p class="ofr-licznik__data">do 8 października 2026</p>
-            </div>
-          </div>
+          <p class="ofr-pilotblok__waznosc">Oferta ważna do upływu terminu lub wcześniejszego wyczerpania miejsc.</p>
 
           <div class="ofr-odp">
             <div>
