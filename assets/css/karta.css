@@ -6406,3 +6406,148 @@ svg path {
   font-size: 0.95rem;
   font-weight: 700;
 }
+
+/* ── Zakończenie oferty: co dalej i formularz rezerwacji ─────────────── */
+.ofr-koniec__uklad {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: clamp(28px, 5vw, 64px);
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .ofr-koniec__uklad {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.ofr-kroki {
+  display: grid;
+  gap: 20px;
+  margin: 30px 0 0;
+  padding: 0;
+  counter-reset: krok;
+  list-style: none;
+}
+
+.ofr-kroki li {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  padding-left: 52px;
+  counter-increment: krok;
+}
+
+.ofr-kroki li::before {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 50%;
+  background: #f2b705;
+  color: #14171a;
+  font-family: var(--f-display);
+  font-weight: 800;
+  content: counter(krok);
+}
+
+.ofr-kroki strong {
+  font-family: var(--f-display);
+  font-size: 1.12rem;
+  font-weight: 800;
+  letter-spacing: -0.012em;
+}
+
+.ofr-kroki span {
+  color: #cfd3d6;
+  font-size: 0.97rem;
+  line-height: 1.6;
+}
+
+.ofr-koniec__nota {
+  margin: 28px 0 0;
+  color: #fff;
+  font-weight: 700;
+}
+
+.ofr-koniec__termin {
+  margin: 8px 0 0;
+  color: #f2d27a;
+  font-weight: 700;
+}
+
+.ofr-form {
+  padding: clamp(22px, 3vw, 34px);
+  border-radius: var(--r-sign, 12px);
+  background: #fff;
+  color: var(--ink);
+}
+
+.ofr-form__h {
+  margin: 0 0 18px;
+  font-family: var(--f-display);
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.ofr-form__pakiet {
+  margin: 0 0 18px;
+  padding: 0;
+  border: 0;
+}
+
+.ofr-form__pakiet legend {
+  margin-bottom: 8px;
+  padding: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.ofr-form__umowa {
+  margin: 18px 0;
+  padding: 14px 16px;
+  border: 1px solid var(--hair-2);
+  border-radius: 10px;
+}
+
+.ofr-form__umowa summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.ofr-form__umowa summary em {
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-style: normal;
+  font-weight: 400;
+}
+
+.ofr-form__umowa .form__grid {
+  margin-top: 14px;
+}
+
+.ofr-form .form__foot {
+  margin-top: 18px;
+}
+
+.ofr-form.is-sent .form__grid,
+.ofr-form.is-sent .ofr-form__umowa,
+.ofr-form.is-sent .ofr-form__pakiet,
+.ofr-form.is-sent .check,
+.ofr-form.is-sent button[type='submit'] {
+  display: none;
+}
+
+.ofr-kroki li {
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+}
+
+.ofr-kroki li > strong,
+.ofr-kroki li > span {
+  display: block;
+}

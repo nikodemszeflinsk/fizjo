@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/karta.css?v=60" />
+  <link rel="stylesheet" href="assets/css/karta.css?v=62" />
 </head>
 <body class="ofr-body">
   <a class="skip" href="#tresc">Przejdź do treści</a>
@@ -1281,21 +1281,105 @@
 
     <!-- ── Kontakt ────────────────────────────────────────────────────── -->
     <section class="ofr-koniec" id="kontakt">
-      <div class="ofr-blok__in">
-        <h2 class="ofr-h2 ofr-h2--duzy">Następny krok to jedna rozmowa</h2>
-        <p class="ofr-lead ofr-lead--jasny">
-          Piętnaście minut, bez prezentacji i bez slajdów. Przechodzimy przez demo na przykładzie
-          Twojej specjalizacji i mówimy wprost, czy to się u Ciebie opłaca.
-        </p>
-        <div class="ofr-koniec__kontakt">
-          <a class="cta cta--blue" href="tel:+48783480341">
-            Zadzwoń: 783 480 341
-            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
-          </a>
-          <a class="cta cta--line" href="mailto:kontakt@studio-widok.pl?subject=Oferta%20dla%20gabinetu">
-            kontakt@studio-widok.pl
-          </a>
+      <div class="ofr-blok__in ofr-koniec__uklad">
+        <div class="ofr-koniec__tekst">
+          <p class="ofr-kicker ofr-kicker--jasny">Co dalej</p>
+          <h2 class="ofr-h2 ofr-h2--duzy">Jeśli chcesz wejść do pilotażu, to trzy kroki</h2>
+          <ol class="ofr-kroki">
+            <li>
+              <strong>Dajesz znać</strong>
+              <span>Wypełniasz formularz obok albo dzwonisz. Rezerwujemy dla Ciebie jedno z trzech miejsc.</span>
+            </li>
+            <li>
+              <strong>Dostajesz umowę</strong>
+              <span>Przygotowujemy ją na podstawie podanych danych i wysyłamy razem z krótką listą rzeczy do zebrania: zdjęcia, godziny przyjęć, usługi i cennik oraz dostępy do domeny i wizytówki.</span>
+            </li>
+            <li>
+              <strong>Ruszamy</strong>
+              <span>Rozmowa startowa, poznajemy Twój gabinet i zaczynamy od strony.</span>
+            </li>
+          </ol>
+          <p class="ofr-koniec__nota">Rezerwacja miejsca nie jest podpisaniem umowy — umowę najpierw czytasz.</p>
+          <p class="ofr-koniec__termin">Oferta pilotażowa ważna do 8 października lub do wyczerpania miejsc.</p>
+          <div class="ofr-koniec__kontakt">
+            <a class="cta cta--line" href="tel:+48783480341">Wolę zadzwonić: 783 480 341</a>
+            <a class="cta cta--line" href="mailto:kontakt@studio-widok.pl?subject=Oferta%20dla%20gabinetu">kontakt@studio-widok.pl</a>
+          </div>
         </div>
+
+        <form class="ofr-form" id="ofr-rezerwacja" novalidate>
+          <h3 class="ofr-form__h">Zarezerwuj miejsce w pilotażu</h3>
+          <input type="text" name="_honey" class="visually-hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          <input type="hidden" name="_subject" value="Pilotaż — rezerwacja miejsca" />
+          <input type="hidden" name="_captcha" value="false" />
+
+          <fieldset class="ofr-form__pakiet">
+            <legend>Co wybierasz</legend>
+            <div class="picks">
+              <label class="pick" data-pilotaz-opcja><input type="radio" name="pakiet" value="Prowadzenie w pilotażu (strona + panel)" checked /><span>Strona + panel (pilotaż)</span></label>
+              <label class="pick"><input type="radio" name="pakiet" value="Widoczność (strona + rezerwacje)" /><span>Sama strona (Widoczność)</span></label>
+            </div>
+          </fieldset>
+
+          <div class="form__grid">
+            <div class="field">
+              <label for="r-imie">Imię i nazwisko</label>
+              <input id="r-imie" name="imie" type="text" autocomplete="name" required />
+            </div>
+            <div class="field">
+              <label for="r-gabinet">Gabinet i miasto</label>
+              <input id="r-gabinet" name="gabinet" type="text" autocomplete="organization" required />
+            </div>
+            <div class="field">
+              <label for="r-telefon">Telefon</label>
+              <input id="r-telefon" name="telefon" type="tel" autocomplete="tel" inputmode="tel" required />
+            </div>
+            <div class="field">
+              <label for="r-email">E-mail</label>
+              <input id="r-email" name="email" type="email" autocomplete="email" required />
+            </div>
+          </div>
+
+          <details class="ofr-form__umowa">
+            <summary>Dane do umowy <em>(możesz uzupełnić teraz albo przy podpisaniu)</em></summary>
+            <div class="form__grid">
+              <div class="field">
+                <label for="r-firma">Nazwa firmy</label>
+                <input id="r-firma" name="firma" type="text" autocomplete="organization" />
+              </div>
+              <div class="field">
+                <label for="r-nip">NIP</label>
+                <input id="r-nip" name="nip" type="text" inputmode="numeric" />
+              </div>
+              <div class="field field--full">
+                <label for="r-adres">Adres siedziby</label>
+                <input id="r-adres" name="adres" type="text" autocomplete="street-address" />
+              </div>
+              <div class="field">
+                <label for="r-terapeuci">Ilu macie terapeutów</label>
+                <input id="r-terapeuci" name="terapeuci" type="text" inputmode="numeric" />
+              </div>
+              <div class="field">
+                <label for="r-strona">Obecna strona lub wizytówka</label>
+                <input id="r-strona" name="strona" type="text" />
+              </div>
+              <div class="field field--full">
+                <label for="r-uwagi">Uwagi <em>(opcjonalnie)</em></label>
+                <textarea id="r-uwagi" name="uwagi" rows="3"></textarea>
+              </div>
+            </div>
+          </details>
+
+          <label class="check"><input type="checkbox" name="zgoda" value="tak" required /><span>Zgadzam się na wykorzystanie podanych danych do kontaktu i przygotowania umowy.</span></label>
+
+          <div class="form__foot">
+            <button class="cta cta--blue" type="submit">
+              Zarezerwuj miejsce
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
+            </button>
+            <p class="form__status" id="ofr-form-status" role="status"></p>
+          </div>
+        </form>
       </div>
     </section>
   </main>
@@ -1355,6 +1439,11 @@
       function wygaslo() {
         const link = document.querySelector('[data-link-pilot]');
         if (link) link.remove();
+        document.querySelectorAll('[data-pilotaz-opcja]').forEach((e) => e.remove());
+        const wid = document.querySelector('input[name="pakiet"]');
+        if (wid) wid.checked = true;
+        const termin = document.querySelector('.ofr-koniec__termin');
+        if (termin) termin.textContent = 'Oferta pilotażowa wygasła — napisz albo zadzwoń, sprawdzimy, czy w bieżącej turze są jeszcze miejsca.';
         document.getElementById('pilotaz').innerHTML =
           '<p class="ofr-pilotblok__znak">Oferta pilotażowa wygasła</p>' +
           '<p class="ofr-licznik__minelo">Napisz albo zadzwoń — sprawdzimy, czy w bieżącej turze są jeszcze miejsca.</p>';
@@ -1406,6 +1495,61 @@
       document.querySelectorAll('[data-calc]').forEach((i) => i.addEventListener('input', update));
       przelacznik.addEventListener('change', update);
       update();
+    })();
+  </script>
+  <script>
+    (() => {
+      const form = document.getElementById('ofr-rezerwacja');
+      if (!form) return;
+      const status = document.getElementById('ofr-form-status');
+      const fail = (el, msg) => {
+        el.setAttribute('aria-invalid', 'true');
+        const box = el.closest('.field') || el.closest('.check');
+        const e = document.createElement('p');
+        e.className = 'field__err';
+        e.textContent = msg;
+        box.append(e);
+      };
+      form.addEventListener('submit', async (ev) => {
+        ev.preventDefault();
+        form.querySelectorAll('.field__err').forEach((e) => e.remove());
+        form.querySelectorAll('[aria-invalid]').forEach((e) => e.removeAttribute('aria-invalid'));
+        const f = new FormData(form);
+        const bad = [];
+        if (String(f.get('imie')).trim().length < 3) bad.push([form.imie, 'Podaj imię i nazwisko.']);
+        if (String(f.get('gabinet')).trim().length < 2) bad.push([form.gabinet, 'Podaj nazwę gabinetu i miasto.']);
+        if (String(f.get('telefon')).replace(/\D/g, '').length < 9) bad.push([form.telefon, 'Podaj numer telefonu, odezwiemy się.']);
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(f.get('email')))) bad.push([form.email, 'Sprawdź adres e-mail, brakuje w nim „@” albo domeny.']);
+        if (!f.get('zgoda')) bad.push([form.zgoda, 'Bez tej zgody nie możemy przygotować umowy.']);
+        if (bad.length) {
+          bad.forEach(([el, m]) => fail(el, m));
+          bad[0][0].focus();
+          return;
+        }
+        if (f.get('_honey')) return;
+        const btn = form.querySelector('button[type="submit"]');
+        btn.disabled = true;
+        status.textContent = 'Wysyłamy…';
+        try {
+          const r = await fetch('https://formsubmit.co/ajax/kontakt@studio-widok.pl', {
+            method: 'POST',
+            headers: { Accept: 'application/json' },
+            body: f,
+          });
+          if (!r.ok) throw new Error(String(r.status));
+          form.classList.add('is-sent');
+          status.textContent = 'Dziękujemy! Miejsce zarezerwowane. Odezwiemy się w ciągu jednego dnia roboczego i wyślemy umowę do przeczytania.';
+        } catch (_) {
+          const body = [
+            ['Wybór', 'pakiet'], ['Imię i nazwisko', 'imie'], ['Gabinet', 'gabinet'], ['Telefon', 'telefon'], ['E-mail', 'email'],
+            ['Nazwa firmy', 'firma'], ['NIP', 'nip'], ['Adres siedziby', 'adres'], ['Terapeuci', 'terapeuci'],
+            ['Obecna strona', 'strona'], ['Uwagi', 'uwagi'],
+          ].map(([l, k]) => `${l}: ${f.get(k) || '-'}`).join('\n');
+          location.href = `mailto:kontakt@studio-widok.pl?subject=${encodeURIComponent('Pilotaż — rezerwacja miejsca')}&body=${encodeURIComponent(body)}`;
+          status.textContent = 'Nie udało się wysłać automatycznie, więc otworzyliśmy wiadomość w Twoim programie pocztowym. Możesz też zadzwonić: 783 480 341.';
+          btn.disabled = false;
+        }
+      });
     })();
   </script>
   <script src="assets/js/droga.js?v=5" defer></script>
