@@ -5725,17 +5725,17 @@ svg path {
   }
 }
 
-.ofr-cena--prow {
+.ofr-cena--wid {
   border-color: var(--accent);
   background: rgba(31, 95, 214, 0.16);
 }
 
-.ofr-cena--prow .ofr-cena__opis,
-.ofr-cena--prow .ofr-cena__lista li {
+.ofr-cena--wid .ofr-cena__opis,
+.ofr-cena--wid .ofr-cena__lista li {
   color: #c3d4f2;
 }
 
-.ofr-cena--prow .ofr-cena__kwota span {
+.ofr-cena--wid .ofr-cena__kwota span {
   color: #a8bde3;
 }
 
@@ -5744,7 +5744,7 @@ svg path {
   font-weight: 700;
 }
 
-.ofr-cena--prow .ofr-cena__stopka {
+.ofr-cena--wid .ofr-cena__stopka {
   color: #c3d4f2;
 }
 
@@ -5964,8 +5964,24 @@ svg path {
 
 /* ── Prowadzenie „w rozwoju”: widać, co będzie, ale nie da się kupić ── */
 .ofr-cena--wylaczona {
-  border-style: dashed;
-  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed #5b6168;
+  background: rgba(255, 255, 255, 0.03);
+  color: #9aa2a8;
+}
+
+.ofr-cena--wylaczona h3,
+.ofr-cena--wylaczona .ofr-cena__podtytul,
+.ofr-cena--wylaczona .ofr-cena__opis,
+.ofr-cena--wylaczona .ofr-cena__kwota,
+.ofr-cena--wylaczona .ofr-cena__kwota span,
+.ofr-cena--wylaczona .ofr-cena__lista li,
+.ofr-cena--wylaczona .ofr-cena__stopka,
+.ofr-cena--wylaczona .ofr-cena__stopka a {
+  color: #9aa2a8;
+}
+
+.ofr-cena--wylaczona .ofr-cena__lista li::before {
+  border-color: #6b737a;
 }
 
 .ofr-cena__znak--rozwoj {
@@ -5981,7 +5997,7 @@ svg path {
 }
 
 .ofr-cena--wylaczona .ofr-cena__kwota s {
-  color: #c3d4f2;
+  color: #9aa2a8;
   text-decoration-thickness: 3px;
 }
 
@@ -6028,4 +6044,69 @@ svg path {
   color: #e9ecea;
   font-size: 0.95rem;
   line-height: 1.5;
+}
+
+.ofr-cena__nota--cicha {
+  margin: 6px 0 0;
+  color: #a8bde3;
+  font-size: 0.86rem;
+  font-weight: 400;
+}
+
+/* Ceny pilotażowe: przekreślona najpierw, z opisem nad nią, potem duża cena. */
+.ofr-pilotceny__rzad {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 18px;
+}
+
+.ofr-pilotceny__stos {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+
+.ofr-pilotceny__stos .ofr-pilotceny__etykieta {
+  flex-basis: auto;
+  font-size: 0.78rem;
+  line-height: 1.2;
+}
+
+.ofr-pilotceny__stos .ofr-pilotceny__stara {
+  font-size: clamp(1.5rem, 2.9vw, 1.95rem);
+  line-height: 1.1;
+}
+
+.ofr-umowa p {
+  margin: 0;
+  color: #cfd3d6;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Czego nie robimy: zwykły tekst. */
+.ofr-nie p {
+  max-width: 74ch;
+  margin: 0 0 16px;
+  color: var(--ink-2);
+  font-size: 1.02rem;
+  line-height: 1.7;
+}
+
+.ofr-nie p:last-child {
+  margin-bottom: 0;
+}
+
+.ofr-pilotceny .ofr-pilotceny__tyt {
+  margin-bottom: 24px;
+}
+
+.ofr-pilotceny .ofr-pilotceny__nota {
+  margin-top: 26px;
+}
+
+.ofr-nie .ofr-h3 {
+  margin-bottom: 18px;
 }
