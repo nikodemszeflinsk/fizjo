@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/karta.css?v=42" />
+  <link rel="stylesheet" href="assets/css/karta.css?v=43" />
 </head>
 <body class="ofr-body">
   <a class="skip" href="#tresc">Przejdź do treści</a>
@@ -977,7 +977,7 @@
 
         <div class="ofr-ceny">
           <article class="ofr-cena">
-            <p class="ofr-cena__znak ofr-cena__znak--cichy">Zapisy prowadzisz po swojemu</p>
+            <p class="ofr-cena__znak ofr-cena__znak--cichy">Gotowe do wdrożenia</p>
             <h3>Widoczność</h3>
             <p class="ofr-cena__opis">Pacjenci znajdują Cię w wyszukiwarce i umawiają się sami — do Twojego Kalendarza Google.</p>
             <p class="ofr-cena__kwota">2&nbsp;900&nbsp;zł <span>wdrożenie</span></p>
@@ -994,12 +994,14 @@
             <p class="ofr-cena__stopka">Przejście do Prowadzenia w dowolnym momencie, bez budowania strony od nowa.</p>
           </article>
 
-          <article class="ofr-cena ofr-cena--prow">
-            <p class="ofr-cena__znak">System prowadzi zapisy</p>
+          <article class="ofr-cena ofr-cena--prow ofr-cena--wylaczona">
+            <p class="ofr-cena__znak ofr-cena__znak--rozwoj" data-pilot-only>W rozwoju</p>
             <h3>Prowadzenie</h3>
-            <p class="ofr-cena__opis">Strona z rezerwacją i panel gabinetu. Pacjent umawia się sam, Ty prowadzisz terapię do końca.</p>
-            <p class="ofr-cena__kwota">3&nbsp;900&nbsp;zł <span>wdrożenie</span></p>
-            <p class="ofr-cena__kwota ofr-cena__kwota--sub">499&nbsp;zł <span>miesięcznie</span></p>
+            <p class="ofr-cena__podtytul">Widoczność + panel gabinetu</p>
+            <p class="ofr-cena__opis">Strona z rezerwacją i panel do zarządzania wizytami, kontaktu z pacjentem i ćwiczeń. Panel jest jeszcze tworzony, dlatego pakiet nie jest dziś w normalnej sprzedaży.</p>
+            <p class="ofr-cena__kwota"><s><span class="visually-hidden">cena po pilotażu: </span>3&nbsp;900&nbsp;zł</s> <span>wdrożenie</span></p>
+            <p class="ofr-cena__kwota ofr-cena__kwota--sub"><s><span class="visually-hidden">cena po pilotażu: </span>499&nbsp;zł</s> <span>miesięcznie</span></p>
+            <p class="ofr-cena__nota" data-pilot-only>Ceny obowiązują po zakończeniu pilotażu.</p>
             <ul class="ofr-cena__lista">
               <li>Wszystko z pakietu Widoczność</li>
               <li>Zarządzanie wizytami: dzień, kalendarz z wizytami i statusami, kartoteka</li>
@@ -1008,7 +1010,7 @@
               <li>Ćwiczenia: karta pacjenta z Twoimi nagraniami, odhaczenia dzień po dniu i wypis na koniec cyklu</li>
               <li>Podsumowanie miesiąca i wsparcie techniczne</li>
             </ul>
-            <p class="ofr-cena__stopka" data-link-pilot>Dla trzech pierwszych gabinetów wdrożenie panelu jest bezpłatne — <a href="#pilotaz">zobacz ofertę pilotażową</a>.</p>
+            <p class="ofr-cena__stopka" data-link-pilot>Dostępny teraz tylko w ofercie pilotażowej — <a href="#pilotaz">zobacz, na jakich warunkach</a>.</p>
           </article>
         </div>
 
@@ -1016,13 +1018,12 @@
           <div class="ofr-pilotblok__gora">
             <div class="ofr-pilotblok__tekst">
               <p class="ofr-pilotblok__znak">Ograniczona oferta pilotażowa · 3 gabinety</p>
-              <h3>Wdrożenie panelu za darmo — w zamian za pomoc w jego dopracowaniu</h3>
+              <h3>Panel jest jeszcze w budowie. Co to znaczy dla Ciebie?</h3>
               <p>
-                Tworzymy rozwiązanie specjalnie dla gabinetów fizjoterapii. Zależy nam na konkretnych
-                rozwiązaniach realnych problemów, a nie na kolejnych funkcjach z listy — dlatego panel,
-                który działa i którego używasz od pierwszego dnia, dopracowujemy na prawdziwych
-                gabinetach. Szukamy trzech, które będą z nami pracować: Ty dostajesz go bez opłaty
-                za wdrożenie, my dostajemy szczere uwagi i wiemy, co budować dalej.
+                Strona z rezerwacją jest gotowa do wdrożenia. Panel gabinetu dopracowujemy razem
+                z pierwszymi gabinetami, dlatego wdrożenie panelu jest u nas za darmo — w zamian za
+                pomoc w jego dopracowaniu. Zależy nam na konkretnych rozwiązaniach realnych
+                problemów, a nie na kolejnych funkcjach z listy.
               </p>
               <p class="ofr-pilotblok__waznosc">Oferta ważna do upływu terminu lub wcześniejszego wyczerpania miejsc.</p>
             </div>
@@ -1037,28 +1038,43 @@
             </div>
           </div>
 
+          <div class="ofr-odp">
+            <div>
+              <h4>Działa, ale się zmienia</h4>
+              <p>Wizyty, wiadomości i ćwiczenia panel obsługuje już teraz. Nowe funkcje i poprawki wchodzą na bieżąco, a niektóre rzeczy będą jeszcze niedopracowane — dlatego rozmawiamy co miesiąc.</p>
+            </div>
+            <div>
+              <h4>Płacisz mało, bo pomagasz</h4>
+              <p>0 zł za wdrożenie panelu i 50 zł miesięcznie na SMS-y. W zamian mówisz nam wprost, co działa, a co przeszkadza.</p>
+            </div>
+            <div>
+              <h4>Nic Cię nie zamyka</h4>
+              <p>Strona z rezerwacją i wizytówka działają niezależnie od panelu. Dane z panelu wyeksportujesz w każdej chwili jednym plikiem.</p>
+            </div>
+          </div>
+
           <div class="ofr-pilotceny">
             <p class="ofr-pilotceny__tyt">Prowadzenie w ofercie pilotażowej</p>
             <div class="ofr-pilotceny__rzad">
               <span class="ofr-pilotceny__etykieta">Wdrożenie</span>
               <b class="ofr-pilotceny__nowa">2&nbsp;900&nbsp;zł</b>
               <s class="ofr-pilotceny__stara"><span class="visually-hidden">zamiast </span>3&nbsp;900&nbsp;zł</s>
-              <em class="ofr-pilotceny__zawsze">w tym wdrożenie panelu: 0&nbsp;zł zamiast 1&nbsp;000&nbsp;zł</em>
             </div>
             <div class="ofr-pilotceny__rzad">
-              <span class="ofr-pilotceny__etykieta">Utrzymanie, miesięcznie</span>
+              <span class="ofr-pilotceny__etykieta">Miesięcznie</span>
               <b class="ofr-pilotceny__nowa">199&nbsp;zł</b>
               <s class="ofr-pilotceny__stara"><span class="visually-hidden">zamiast </span>499&nbsp;zł</s>
-              <em class="ofr-pilotceny__zawsze">cena pilotażowa zostaje na zawsze</em>
+              <em class="ofr-pilotceny__zawsze">cena pilotażowa zostaje na stałe</em>
             </div>
+            <p class="ofr-pilotceny__nota">Strona kosztuje tyle samo co w pakiecie Widoczność. Panel dostajesz za 0&nbsp;zł wdrożenia i 50&nbsp;zł miesięcznie, które pokrywają SMS-y.</p>
           </div>
 
           <div class="ofr-umowa ofr-umowa--trzy">
             <div>
               <h3>Co dostajesz</h3>
               <ul>
-                <li>Wdrożenie panelu za darmo — zamiast 1&nbsp;000&nbsp;zł</li>
-                <li>Utrzymanie 199&nbsp;zł miesięcznie zamiast 499&nbsp;zł, i ta cena zostaje na zawsze</li>
+                <li>Wdrożenie panelu za darmo</li>
+                <li>Panel za 50&nbsp;zł miesięcznie na SMS-y, a ta cena zostaje na stałe</li>
                 <li>Bezpośredni numer do nas, a nie formularz zgłoszeniowy</li>
                 <li>To, czego Ci brakuje w panelu, budujemy w pierwszej kolejności</li>
                 <li>Nowe funkcje dostajesz pierwszy, zanim trafią do oferty</li>
@@ -1073,12 +1089,12 @@
               </ul>
             </div>
             <div>
-              <h3>Czego się spodziewać</h3>
+              <h3>Umowa i zakończenie współpracy</h3>
               <ul>
-                <li>Panel będzie się zmieniał: nowe funkcje i poprawki wchodzą na bieżąco</li>
-                <li>Niektóre rzeczy będą jeszcze niedopracowane — dlatego rozmawiamy co miesiąc</li>
-                <li>Strona z rezerwacją i wizytówka działają niezależnie od panelu</li>
-                <li>Dane z panelu możesz w każdej chwili wyeksportować jednym plikiem</li>
+                <li>Pilotaż trwa trzy miesiące, potem umowa na czas nieokreślony z miesięcznym wypowiedzeniem w dowolnym momencie</li>
+                <li>Gdy kończymy współpracę albo chcesz przejąć utrzymanie, panel zostaje Twój</li>
+                <li>Tracisz wtedy dostęp do wsparcia, rozwoju i aktualizacji</li>
+                <li>Hosting, opłaty za SMS i kopie zapasowe przechodzą na Ciebie</li>
               </ul>
             </div>
           </div>
@@ -1099,9 +1115,9 @@
         </article>
 
         <p class="ofr-fine ofr-fine--jasny">
-          Pierwsze 30 dni bez zobowiązania. Umowa na sześć miesięcy, potem na czas nieokreślony
-          z miesięcznym wypowiedzeniem. Strona, treści, wizytówka i baza pacjentów zostają Twoje,
-          także po zakończeniu współpracy. Ceny netto.
+          Pierwsze 30 dni bez zobowiązania. Widoczność: umowa na sześć miesięcy, potem na czas
+          nieokreślony z miesięcznym wypowiedzeniem. Strona, treści, wizytówka i baza pacjentów
+          zostają Twoje, także po zakończeniu współpracy. Ceny netto.
         </p>
       </div>
     </section>
@@ -1331,6 +1347,8 @@
       function wygaslo() {
         const link = document.querySelector('[data-link-pilot]');
         if (link) link.remove();
+        document.querySelectorAll('[data-pilot-only]').forEach((e) => e.remove());
+        document.querySelectorAll('.ofr-cena--wylaczona').forEach((e) => e.classList.remove('ofr-cena--wylaczona'));
         document.getElementById('pilotaz').innerHTML =
           '<p class="ofr-pilotblok__znak">Oferta pilotażowa wygasła</p>' +
           '<p class="ofr-licznik__minelo">Napisz albo zadzwoń — sprawdzimy, czy w bieżącej turze są jeszcze miejsca.</p>';
@@ -1384,6 +1402,6 @@
       update();
     })();
   </script>
-  <script src="assets/js/droga.js?v=4" defer></script>
+  <script src="assets/js/droga.js?v=5" defer></script>
 </body>
 </html>

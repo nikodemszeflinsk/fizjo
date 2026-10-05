@@ -84,16 +84,16 @@
     {
       kiedy: 'Środa, 18:00',
       kto: 'system',
-      tytul: 'Dzień przed wizytą SMS wychodzi sam.',
+      tytul: 'Dzień przed wizytą wychodzi przypomnienie.',
       opis:
-        'Nie musisz o tym pamiętać ani nikogo o to prosić. W SMS-ie jest link do karty pacjenta — jeśli coś mu wypadnie, przełoży termin sam, a Ty zobaczysz to w grafiku.',
+        'Mailem albo SMS-em, bez Twojego udziału — nie musisz o tym pamiętać ani nikogo o to prosić. W pakiecie Prowadzenie wiadomość ma link do karty pacjenta: jeśli coś mu wypadnie, przełoży termin sam, a Ty zobaczysz to w grafiku.',
       scena: `
         <div class="mini mini--sms">
           <div class="mini__dymek">
             Katarzyno, przypominamy o wizycie jutro o 9:30. Linia Ruchu
             <span class="mini__link">linia-ruchu.pl/k/4821</span>
           </div>
-          <p class="mini__pod">Wysłane automatycznie · wliczone w abonament</p>
+          <p class="mini__pod">Wysłane automatycznie · e-mailem albo SMS-em</p>
         </div>`,
     },
     {

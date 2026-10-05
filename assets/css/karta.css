@@ -5961,3 +5961,71 @@ svg path {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ── Prowadzenie „w rozwoju”: widać, co będzie, ale nie da się kupić ── */
+.ofr-cena--wylaczona {
+  border-style: dashed;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.ofr-cena__znak--rozwoj {
+  background: #f2b705;
+  color: #14171a;
+}
+
+.ofr-cena__podtytul {
+  margin: -6px 0 12px;
+  color: #c3d4f2;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.ofr-cena--wylaczona .ofr-cena__kwota s {
+  color: #c3d4f2;
+  text-decoration-thickness: 3px;
+}
+
+.ofr-cena__nota {
+  margin: 8px 0 0;
+  color: #f2d27a;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+/* Pilotaż odpowiada na pytanie z nagłówka: trzy krótkie odpowiedzi. */
+.ofr-odp {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.ofr-odp > div {
+  padding: 18px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--r-sign, 12px);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.ofr-odp h4 {
+  margin: 0 0 8px;
+  font-family: var(--f-display);
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.012em;
+}
+
+.ofr-odp p {
+  margin: 0;
+  color: #cfd3d6;
+  font-size: 0.93rem;
+  line-height: 1.55;
+}
+
+.ofr-pilotceny__nota {
+  grid-column: 1 / -1;
+  margin: 16px 0 0;
+  color: #e9ecea;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
