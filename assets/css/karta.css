@@ -5799,3 +5799,45 @@ svg path {
   font-size: 0.86rem;
   font-style: normal;
 }
+
+/* ── Wczesny dostęp: jedno oznaczenie na początku, zamiast plakietek wszędzie ── */
+.ofr-wczesny {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  max-width: 64ch;
+  margin-top: 26px;
+  padding: 16px 20px;
+  border: 1.5px solid #f2b705;
+  border-radius: var(--r-sign);
+  background: rgba(242, 183, 5, 0.12);
+}
+
+.ofr-wczesny .ofr-tag {
+  flex: none;
+  margin-top: 1px;
+}
+
+.ofr-wczesny p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.ofr-wczesny a {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+@media (max-width: 620px) {
+  .ofr-wczesny {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+/* Trzy kolumny w bloku pilotażu: dostajesz, prosimy, czego się spodziewać. */
+.ofr-umowa--trzy {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}

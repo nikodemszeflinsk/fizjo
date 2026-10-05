@@ -3721,3 +3721,89 @@ svg path {
 .empty__skok:hover {
   color: var(--l-kregoslup, #1f5fd6);
 }
+
+/* ── Opis dolegliwości własnymi słowami ──────────────────────────────────
+   To najważniejsze pole formularza dla terapeuty, więc nie może wyglądać
+   jak dopisek „opcjonalnie” na końcu. */
+.field--opis {
+  padding: 16px 18px 14px;
+  border: 1.5px solid var(--hair-2);
+  border-radius: var(--r-sign);
+  background: #fff;
+}
+
+.field--opis label {
+  font-family: var(--f-display);
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.field__hint {
+  margin: 4px 0 10px;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.field--opis textarea {
+  min-height: 112px;
+  resize: vertical;
+}
+
+.field__pod {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 14px;
+  margin-top: 10px;
+}
+
+.opis__podpowiedzi {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.opis__chip {
+  padding: 8px 14px;
+  border: 1px solid var(--hair-2);
+  border-radius: 999px;
+  background: var(--floor);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.opis__chip:hover {
+  border-color: var(--ink);
+  background: #fff;
+}
+
+.opis__licznik {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.opis__licznik.is-blisko {
+  color: #b3261e;
+  font-weight: 700;
+}
+
+.done__opis q {
+  display: block;
+  quotes: '„' '”';
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.done__opis span {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}

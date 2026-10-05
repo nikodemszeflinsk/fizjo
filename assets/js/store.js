@@ -284,10 +284,39 @@
       w(null, 'p15', 1, '12:00', 'k1', 'zaplanowana'),
     ];
 
+    /* Opisy z formularza rezerwacji. Pierwszy pacjent wpadł wczoraj w nocy, drugi
+       zarezerwował przez stronę zanim pierwszy raz do nas przyszedł. */
+    const opisz = (pacjentId, opis, zrodlo = 'strona') => {
+      const wiz = wizyty
+        .filter((x) => x.pacjentId === pacjentId && x.status !== 'odwolana')
+        .sort((a, b) => (a.data + a.godzina).localeCompare(b.data + b.godzina))[0];
+      if (wiz) Object.assign(wiz, { opis, zrodlo });
+    };
+    opisz('p15', 'Ból w dolnej części pleców od dwóch tygodni, promieniuje do lewej nogi. Gorzej po siedzeniu przy biurku, lepiej po spacerze. Boję się, że to dysk.');
+    opisz('p12', 'Prawy bark po treningu na siłowni, boli przy podnoszeniu ręki nad głowę i w nocy, kiedy leżę na tym boku.');
+
     /* Odhaczone ćwiczenia z ostatnich dwóch tygodni — stąd bierze się procent. */
     const odhaczenia = [];
+    /* Godzina każdego odhaczenia i odpowiedzi — gabinet widzi nie tylko „zrobił”,
+       ale kiedy. Dla dni minionych deterministyczna, dla dzisiaj liczona wstecz od
+       teraz, żeby w demie nic nie wydarzyło się „w przyszłości". */
+    let licznikGodzin = 0;
+    const GODZINY_CW = [7, 8, 9, 12, 17, 18, 19, 20, 21];
+    const godzinaSeed = (dniWstecz, godziny = GODZINY_CW) => {
+      licznikGodzin += 1;
+      if (dniWstecz === 0) {
+        const teraz = new Date();
+        const minuty = teraz.getHours() * 60 + teraz.getMinutes() - (20 + ((licznikGodzin * 37) % 150));
+        return minuty >= 390 ? `${Math.floor(minuty / 60)}:${String(minuty % 60).padStart(2, '0')}` : null;
+      }
+      return `${godziny[licznikGodzin % godziny.length]}:${String((licznikGodzin * 17) % 60).padStart(2, '0')}`;
+    };
     const dodajOdhaczenia = (terapiaId, cwiczenieId, dni) =>
-      dni.forEach((d) => odhaczenia.push({ id: id('o'), terapiaId, cwiczenieId, data: isoZa(-d) }));
+      dni.forEach((d) => {
+        const godzina = godzinaSeed(d);
+        if (godzina === null) return;
+        odhaczenia.push({ id: id('o'), terapiaId, cwiczenieId, data: isoZa(-d), godzina });
+      });
     /* t1 odhacza od początku terapii — stąd w karcie widać, że z tygodnia
        na tydzień robi więcej, a ból w tym samym czasie spada. */
     dodajOdhaczenia('t1', 'c-koci', [1, 2, 3, 5, 6, 8, 9, 10, 12, 13, 15, 16, 19, 20, 22, 24, 27]);
@@ -307,13 +336,23 @@
     dodajOdhaczenia('t8', 'c-przysiad', [16, 18, 21, 23, 25, 28, 30, 32, 35, 38, 42, 45, 49, 52, 56, 60, 63, 67, 70, 74]);
     dodajOdhaczenia('t11', 'c-lydka', [32, 35, 39, 42, 46, 49, 53, 56, 60, 63, 67, 70, 74, 78, 82, 86]);
     dodajOdhaczenia('t14', 'c-koci', [9]);
+    /* Dzisiaj: kilka osób już ćwiczyło, reszta jeszcze nie. */
+    dodajOdhaczenia('t4', 'c-przysiad', [0]);
+    dodajOdhaczenia('t4', 'c-lydka', [0]);
+    dodajOdhaczenia('t10', 'c-mostek', [0]);
+    dodajOdhaczenia('t2', 'c-lydka', [0]);
 
     /* Odczyty bólu z ankiet po wizycie. */
     const bol = [];
-    const dodajBol = (terapiaId, pary) => pary.forEach(([d, v]) => bol.push({ id: id('b'), terapiaId, data: isoZa(-d), wartosc: v }));
+    const dodajBol = (terapiaId, pary) =>
+      pary.forEach(([d, v]) => {
+        const godzina = godzinaSeed(d, [19, 20, 21]);
+        if (godzina === null) return;
+        bol.push({ id: id('b'), terapiaId, data: isoZa(-d), wartosc: v, godzina });
+      });
     dodajBol('t1', [[34, 7], [27, 6], [20, 5], [6, 3]]);
     dodajBol('t2', [[12, 6], [8, 5], [3, 4]]);
-    dodajBol('t4', [[58, 8], [45, 6], [30, 5], [14, 3], [4, 2]]);
+    dodajBol('t4', [[58, 8], [45, 6], [30, 5], [14, 3], [4, 2], [0, 2]]);
     dodajBol('t5', [[21, 3], [14, 3], [7, 3]]);
     dodajBol('t8', [[76, 7], [60, 5], [40, 3], [20, 2], [14, 1]]);
     dodajBol('t9', [[5, 6]]);
@@ -616,6 +655,13 @@
   /** Pacjent, który jeszcze u nas nie był — żadnej odbytej wizyty. */
   const nowyPacjent = (pid) => !stan.wizyty.some((w) => w.pacjentId === pid && w.status === 'odbyta');
 
+  /** Opisy dolegliwości, które pacjent wpisał własnymi słowami przy rezerwacji — od najnowszego. */
+  const opisyPacjenta = (pid) =>
+    stan.wizyty
+      .filter((w) => w.pacjentId === pid && w.opis)
+      .sort((a, b) => (b.data + b.godzina).localeCompare(a.data + a.godzina))
+      .map((w) => ({ data: w.data, godzina: w.godzina, opis: w.opis, zrodlo: w.zrodlo || 'gabinet', wizytaId: w.id }));
+
   const terapiaPacjenta = (pid) =>
     stan.terapie.filter((t) => t.pacjentId === pid).sort((a, b) => (a.status === 'aktywna' ? -1 : 1))[0] || null;
 
@@ -682,6 +728,61 @@
   }
 
   /**
+   * Dzień po dniu: co pacjent zaznaczył, ćwiczył i odpowiedział. Podział na dni
+   * ćwiczeń bierze z reguły przypomnień, więc „nie zrobił” znaczy tylko wtedy,
+   * gdy tego dnia miał ćwiczyć.
+   */
+  function dziennikTerapii(tid, dni = 14) {
+    const t = terapia(tid);
+    if (!t) return [];
+    const u = ustawieniaRodzaju('ankieta-cwiczenia', t.pacjentId);
+    const dniCw = Array.isArray(u.dni) && u.dni.length ? u.dni.map(Number) : [1, 2, 3, 4, 5];
+    const dzisIso = iso(dzis);
+    const out = [];
+    for (let i = 0; i < dni; i++) {
+      const data = isoZa(-i);
+      if (data < t.start) break;
+      if (t.koniec && data > t.koniec) continue;
+      const cwiczenia = t.cwiczenia.map((c) => {
+        const o = stan.odhaczenia.find((x) => x.terapiaId === tid && x.cwiczenieId === c.cwiczenieId && x.data === data);
+        const def = cwiczenie(c.cwiczenieId);
+        return { id: c.cwiczenieId, nazwa: def ? def.nazwa : c.cwiczenieId, zrobione: !!o, godzina: o ? o.godzina || null : null };
+      });
+      const b = stan.bol.filter((x) => x.terapiaId === tid && x.data === data).pop();
+      out.push({
+        data,
+        dzis: data === dzisIso,
+        planowany: t.cwiczenia.length > 0 && dniCw.includes(fromIso(data).getDay()),
+        cwiczenia,
+        zrobione: cwiczenia.filter((x) => x.zrobione).length,
+        zadane: cwiczenia.length,
+        bol: b ? { wartosc: b.wartosc, godzina: b.godzina || null } : null,
+      });
+    }
+    return out;
+  }
+
+  /** Które ćwiczenia pacjenci faktycznie robią: z zaplanowanych dni, ile odhaczono. */
+  function statystykaCwiczen(dni = 14) {
+    const wynik = {};
+    stan.terapie
+      .filter((t) => t.status === 'aktywna')
+      .forEach((t) => {
+        const dz = dziennikTerapii(t.id, dni);
+        dz.filter((d) => d.planowany && !d.dzis).forEach((d) => {
+          d.cwiczenia.forEach((c) => {
+            const w = (wynik[c.id] = wynik[c.id] || { zadane: 0, zrobione: 0, pacjentow: new Set() });
+            w.zadane += 1;
+            if (c.zrobione) w.zrobione += 1;
+            w.pacjentow.add(t.pacjentId);
+          });
+        });
+      });
+    Object.values(wynik).forEach((w) => (w.pacjentow = w.pacjentow.size));
+    return wynik;
+  }
+
+  /**
    * Wszystko, co pacjenci odesłali między wizytami, w jednym miejscu.
    * Kolejność: najpierw ci, o których trzeba się zatroszczyć — milczący
    * i ci, u których ból nie spada.
@@ -703,6 +804,13 @@
           .sort()
           .pop() || null;
         const milczy = !odczyty.length && !ostatnieOdhaczenie;
+        const dzisWpis = dziennikTerapii(t.id, 1)[0] || null;
+        const wizytaDzis = stan.wizyty.some((w) => w.pacjentId === p.id && w.data === iso(dzis) && w.status === 'odbyta');
+        /* Ostatnia aktywność pacjenta: najpóźniejsze z odhaczeń i odpowiedzi o bólu. */
+        const aktywnosci = [
+          ...stan.odhaczenia.filter((o) => o.terapiaId === t.id).map((o) => ({ data: o.data, godzina: o.godzina || '' })),
+          ...odczyty.map((o) => ({ data: o.data, godzina: o.godzina || '' })),
+        ].sort((a, b) => (b.data + (b.godzina || '').padStart(5, '0')).localeCompare(a.data + (a.godzina || '').padStart(5, '0')));
         /* Jeden odczyt nie jest żadnym kierunkiem — „bez zmiany" przy pierwszej
            odpowiedzi brzmiałoby jak zarzut wobec kogoś, kto właśnie zaczął. */
         const kierunek = odczyty.length < 2 ? null : pierwszy - ostatni;
@@ -722,6 +830,9 @@
           zadaneWTygodniu: biezacy ? biezacy.zadane : 0,
           zrobioneWTygodniu: biezacy ? biezacy.zrobione : 0,
           ostatnieOdhaczenie,
+          ostatniaAktywnosc: aktywnosci[0] || null,
+          dzisWpis,
+          wizytaDzis,
           maCwiczenia: t.cwiczenia.length > 0,
           milczy,
         };
@@ -1662,7 +1773,7 @@
       });
     },
 
-    umowWizyte({ pacjentId, terapiaId, data, godzina, uslugaId, terapeutaId = null }) {
+    umowWizyte({ pacjentId, terapiaId, data, godzina, uslugaId, terapeutaId = null, opis = '', zrodlo = 'gabinet' }) {
       const u = stan.uslugi.find((x) => x.id === uslugaId);
       /* Bez wskazanej osoby bierzemy pierwszą wolną — najpierw prowadzącego terapię. */
       const wolni = terapeuciWolni(data, godzina, u.minuty);
@@ -1679,8 +1790,14 @@
       }
       return zmien('Umówiono wizytę', (s) => {
         const w = { id: id('w'), pacjentId, terapiaId, terapeutaId: wybrany, data, godzina, uslugaId, minuty: u.minuty, status: 'zaplanowana' };
+        /* Opis własnymi słowami pacjenta — z formularza na stronie albo wpisany przez gabinet. */
+        const tekst = String(opis || '').trim();
+        if (tekst) {
+          w.opis = tekst;
+          w.zrodlo = zrodlo;
+        }
         s.wizyty.push(w);
-        log(s, pacjentId, 'wizyta', `Umówiono wizytę: ${data} ${godzina}`);
+        log(s, pacjentId, 'wizyta', `Umówiono wizytę: ${data} ${godzina}${tekst ? ' — z opisem dolegliwości' : ''}`);
         return { wizyta: w };
       });
     },
@@ -1735,7 +1852,10 @@
           s.odhaczenia = s.odhaczenia.filter((o) => o !== juz);
           return { odhaczone: false };
         }
-        s.odhaczenia.push({ id: id('o'), terapiaId, cwiczenieId, data });
+        /* Godzinę zapisujemy tylko dla dzisiaj — odhaczenie wstecz nie ma „teraz". */
+        const wpis = { id: id('o'), terapiaId, cwiczenieId, data };
+        if (data === iso(new Date())) wpis.godzina = terazGodzina();
+        s.odhaczenia.push(wpis);
         return { odhaczone: true };
       });
     },
@@ -1744,7 +1864,7 @@
     zapiszBol(terapiaId, wartosc) {
       return zmien('Zapisano poziom bólu', (s) => {
         const t = s.terapie.find((x) => x.id === terapiaId);
-        s.bol.push({ id: id('b'), terapiaId, data: iso(new Date()), wartosc: Number(wartosc) });
+        s.bol.push({ id: id('b'), terapiaId, data: iso(new Date()), wartosc: Number(wartosc), godzina: terazGodzina() });
         log(s, t.pacjentId, 'ankieta', `Pacjent ocenił ból na ${wartosc}/10`);
       });
     },
@@ -1868,6 +1988,7 @@
     cwiczeniaDoWyboru,
     uzycieCwiczenia,
     terapiaPacjenta,
+    opisyPacjenta,
     podobniPacjenci,
     nowyPacjent,
     kluczTelefonu,
@@ -1878,6 +1999,8 @@
     compliance,
     bolTerapii,
     tygodnieCwiczen,
+    dziennikTerapii,
+    statystykaCwiczen,
     przegladAnkiet,
     wolneGodziny,
     najblizszeTerminy,

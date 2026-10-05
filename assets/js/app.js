@@ -389,6 +389,8 @@
     { id: 'dane', label: 'Twoje dane' },
   ];
 
+  const OPIS_MAX = 600;
+
   const B = {
     step: 0,
     line: null,
@@ -566,7 +568,27 @@
     return stepShell(1, 'Kiedy Ci pasuje?', body, { nextDisabled: !(B.date && B.time) });
   }
 
+  /** Odpowiedzi z kwalifikatora zamieniamy w pierwsze zdania opisu — pacjent poprawia, a nie zaczyna od zera. */
+  function opisZKwalifikatora() {
+    const o = (typeof KW !== 'undefined' && KW.odp) || {};
+    if (!o.gdzie) return '';
+    const gdzie = { plecy: 'plecy albo krzyż', kark: 'kark, barki albo głowa', staw: 'staw (kolano, bark albo skokowy)', pooperacyjne: 'miejsce po operacji lub złamaniu' };
+    const kiedy = { swieze: 'krócej niż dwa tygodnie', kilka: 'od kilku tygodni', dlugo: 'od miesięcy, wraca falami' };
+    const co = { siedzenie: 'siedzenie i praca przy biurku', ruch: 'wysiłek lub trening', rano: 'poranna sztywność', uraz: 'konkretny uraz albo zabieg' };
+    return [
+      gdzie[o.gdzie] ? `Boli mnie: ${gdzie[o.gdzie]}.` : '',
+      kiedy[o.kiedy] ? `Trwa ${kiedy[o.kiedy]}.` : '',
+      co[o.co] ? `Gorzej jest przy: ${co[o.co]}.` : '',
+    ]
+      .filter(Boolean)
+      .join(' ');
+  }
+
   function viewData(errors = {}) {
+    if (!B.data.note && !B.data.notePodpowiedziano) {
+      B.data.note = opisZKwalifikatora();
+      B.data.notePodpowiedziano = true;
+    }
     const d = B.data;
     const field = (id, label, type, value, extra = '', full = false, auto = '') => `
       <div class="field${full ? ' field--full' : ''}">
@@ -580,9 +602,23 @@
         ${field('name', 'Imię i nazwisko', 'text', d.name, 'placeholder="Jan Przykładowy"', true, 'name')}
         ${field('phone', 'Telefon', 'tel', d.phone, 'placeholder="+48 000 000 000" inputmode="tel"', false, 'tel')}
         ${field('email', 'E-mail <em>(opcjonalnie)</em>', 'email', d.email, 'placeholder="adres@email.com"', false, 'email')}
-        <div class="field field--full">
-          <label for="f-note">Co Ci dolega? <em>(opcjonalnie)</em></label>
-          <textarea id="f-note" name="note" placeholder="Np. ból lędźwi od dwóch tygodni, promieniuje do lewej nogi.">${esc(d.note)}</textarea>
+        <div class="field field--full field--opis">
+          <label for="f-note">Opisz swoimi słowami, co Cię boli</label>
+          <p class="field__hint" id="h-note">
+            Nie musisz pisać po medycznemu. Terapeuta przeczyta to przed wizytą i przyjdzie
+            przygotowany — to skraca pierwszą rozmowę i pozwala od razu przejść do sedna.
+          </p>
+          <textarea id="f-note" name="note" rows="4" maxlength="${OPIS_MAX}" aria-describedby="h-note f-note-licznik"
+            placeholder="Np. ból lędźwi od dwóch tygodni, promieniuje do lewej nogi. Gorzej po siedzeniu, lepiej po spacerze.">${esc(d.note)}</textarea>
+          <div class="field__pod">
+            <span class="opis__podpowiedzi" role="group" aria-label="Podpowiedzi, od czego zacząć">
+              <button class="opis__chip" type="button" data-opis-start="Boli mnie: ">Gdzie boli?</button>
+              <button class="opis__chip" type="button" data-opis-start="Trwa od: ">Od kiedy?</button>
+              <button class="opis__chip" type="button" data-opis-start="Gorzej jest, gdy: ">Co pogarsza?</button>
+              <button class="opis__chip" type="button" data-opis-start="Pomaga: ">Co pomaga?</button>
+            </span>
+            <span class="opis__licznik" id="f-note-licznik" aria-live="off">${d.note.length}/${OPIS_MAX}</span>
+          </div>
         </div>
         <label class="check field--full"><input type="checkbox" name="first" ${d.first ? 'checked' : ''} /> To moja pierwsza wizyta</label>
         <label class="check field--full"><input type="checkbox" name="sms" ${d.sms ? 'checked' : ''} /> Przypomnij mi SMS-em dzień przed wizytą</label>
@@ -613,6 +649,11 @@
         <dt>Potwierdzenie</dt><dd>${
           B.data.sms || !B.data.email.trim() ? 'SMS na ' + esc(B.data.phone) : 'e-mail na ' + esc(B.data.email)
         }</dd>
+        ${
+          B.data.note
+            ? `<dt>Twój opis</dt><dd class="done__opis"><q>${esc(B.data.note)}</q><span>Terapeuta przeczyta to przed wizytą.</span></dd>`
+            : ''
+        }
       </dl>
       <div class="done__actions">
         <button class="btn btn--color" type="button" data-ics>${icon('calendar')}Dodaj do kalendarza</button>
@@ -660,6 +701,7 @@
       phone: val('phone').trim(),
       email: val('email').trim(),
       note: val('note').trim(),
+      notePodpowiedziano: true,
       first: chk('first'),
       sms: chk('sms'),
       consent: chk('consent'),
@@ -686,7 +728,7 @@
     const letters = 'ABCDEFGHJKLMNPRSTUWXYZ23456789';
     B.done = 'LR-' + Array.from({ length: 5 }, () => letters[Math.floor(Math.random() * letters.length)]).join('');
     try {
-      localStorage.setItem('linia-ruchu-wizyta', JSON.stringify({ code: B.done, date: B.date, time: B.time, service: B.service }));
+      localStorage.setItem('linia-ruchu-wizyta', JSON.stringify({ code: B.done, date: B.date, time: B.time, service: B.service, note: B.data.note }));
     } catch (_) {}
     renderBooking();
     toast(`Wizyta zarezerwowana: ${dayLabel(fromIso(B.date))}, ${B.time}`);
@@ -907,6 +949,29 @@
     });
 
     $('#booking').addEventListener('click', onBookingClick);
+
+    /* Podpowiedzi opisu: wstawiają początek zdania w miejsce kursora. */
+    $('#booking').addEventListener('click', (e) => {
+      const chip = e.target.closest('[data-opis-start]');
+      if (!chip) return;
+      const pole = $('#f-note');
+      if (!pole) return;
+      const start = chip.dataset.opisStart;
+      const przed = pole.value;
+      const sep = przed && !/[\s]$/.test(przed) ? ' ' : '';
+      pole.value = (przed + sep + start).slice(0, OPIS_MAX);
+      pole.focus();
+      pole.setSelectionRange(pole.value.length, pole.value.length);
+      pole.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    $('#booking').addEventListener('input', (e) => {
+      if (e.target.id !== 'f-note') return;
+      const l = $('#f-note-licznik');
+      if (l) {
+        l.textContent = `${e.target.value.length}/${OPIS_MAX}`;
+        l.classList.toggle('is-blisko', e.target.value.length > OPIS_MAX - 60);
+      }
+    });
 
     const bar = $('#demo-bar');
     try {

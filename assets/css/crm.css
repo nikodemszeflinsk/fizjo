@@ -4881,3 +4881,405 @@ tr.is-cicho td:first-child {
   stroke-width: 1.5;
   stroke-linejoin: round;
 }
+
+/* ── Własnymi słowami: opis z rezerwacji ──────────────────────────────── */
+.pat__block--opis {
+  border-left: 0;
+}
+
+.opisy {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.opisy li {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: var(--r-sm);
+  background: var(--floor);
+}
+
+.opisy__meta {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.opisy q,
+.wizyta-opis q {
+  display: block;
+  quotes: '„' '”';
+  color: var(--ink);
+  font-size: 0.95rem;
+  font-style: italic;
+  line-height: 1.55;
+}
+
+.wizyta-opis {
+  margin-bottom: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sm);
+  background: var(--floor);
+}
+
+.wizyta-opis__h {
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.prosta__opis {
+  display: block;
+  margin-top: 4px;
+  color: var(--ink-2);
+  font-style: italic;
+}
+
+/* ── Od pacjenta: dziś, dzień po dniu, tygodnie, ćwiczenia ───────────── */
+.odp-zakladki {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0 0 18px;
+  border-bottom: 1px solid var(--hair-2);
+}
+
+.odp-zakladka {
+  min-height: 42px;
+  margin-bottom: -1px;
+  padding: 0 16px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.odp-zakladka:hover {
+  color: var(--ink);
+}
+
+.odp-zakladka[aria-selected='true'] {
+  border-bottom-color: var(--accent);
+  color: var(--ink);
+}
+
+.odp-zakladka:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  border-radius: 6px 6px 0 0;
+}
+
+.odp-lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 12px;
+  margin: 0 0 22px;
+  padding: 0;
+  list-style: none;
+}
+
+.odp-lista--kompakt {
+  grid-template-columns: 1fr;
+  gap: 0;
+  border: 1px solid var(--hair);
+  border-radius: var(--r);
+  background: var(--white);
+}
+
+.odp-os {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--hair);
+  border-radius: var(--r);
+  background: var(--white);
+}
+
+.odp-os__gora {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.odp-os__postep {
+  flex: none;
+  color: var(--muted);
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.odp-os__postep b {
+  color: var(--ink);
+  font-family: var(--f-display);
+  font-size: 1.15rem;
+}
+
+.odp-os__akcje {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+}
+
+.odp-cw {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.odp-cw li {
+  display: grid;
+  grid-template-columns: 22px 1fr auto;
+  align-items: baseline;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 7px;
+  font-size: 0.9rem;
+}
+
+.odp-cw li.is-ok {
+  background: rgba(19, 135, 90, 0.09);
+}
+
+.odp-cw__znak {
+  font-weight: 700;
+  text-align: center;
+}
+
+.odp-cw li.is-ok .odp-cw__znak {
+  color: var(--ok);
+}
+
+.odp-cw li.is-brak {
+  color: var(--muted);
+}
+
+.odp-cw em {
+  font-size: 0.82rem;
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.odp-cw li.is-ok em {
+  color: var(--ink-2);
+  font-weight: 700;
+}
+
+.odp-bol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 7px;
+  background: var(--floor);
+  font-size: 0.86rem;
+}
+
+.odp-bol > span:first-child {
+  color: var(--muted);
+}
+
+.odp-bol b {
+  font-family: var(--f-display);
+  font-size: 1.15rem;
+}
+
+.odp-bol b i {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-style: normal;
+  font-weight: 400;
+}
+
+.odp-bol em {
+  color: var(--ink-2);
+  font-style: normal;
+}
+
+.odp-bol--brak {
+  color: var(--muted);
+}
+
+.odp-pusto {
+  display: block;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.odp-cicho {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.2fr) 1.4fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+}
+
+.odp-cicho + .odp-cicho {
+  border-top: 1px solid var(--hair);
+}
+
+.odp-cicho__info {
+  display: grid;
+  gap: 2px;
+  font-size: 0.9rem;
+}
+
+.odp-cicho__info em {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-style: normal;
+}
+
+.odp-cicho .odp-os__akcje {
+  margin-top: 0;
+  justify-content: flex-end;
+}
+
+/* Dzień po dniu */
+.odp-wybor__gora {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.odp-wybor__pole {
+  flex: 1 1 280px;
+  max-width: 420px;
+}
+
+.odp-wybor__podsumowanie {
+  margin: 14px 0 0;
+  color: var(--ink-2);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.dz-lista {
+  margin: 14px 0 20px;
+  padding: 0;
+  border: 1px solid var(--hair);
+  border-radius: var(--r);
+  background: var(--white);
+  list-style: none;
+}
+
+.dz {
+  display: grid;
+  grid-template-columns: 120px 1fr 190px;
+  gap: 12px 18px;
+  align-items: start;
+  padding: 12px 16px;
+}
+
+.dz + .dz {
+  border-top: 1px solid var(--hair);
+}
+
+.dz--dzis {
+  box-shadow: inset 3px 0 0 var(--c, var(--accent));
+  background: var(--paper);
+}
+
+.dz--wolny {
+  background: var(--floor);
+}
+
+.dz__data {
+  display: grid;
+  gap: 1px;
+  font-size: 0.85rem;
+}
+
+.dz__data b {
+  font-size: 0.95rem;
+  text-transform: capitalize;
+}
+
+.dz__data span {
+  color: var(--muted);
+}
+
+.dz__cw {
+  display: grid;
+  gap: 6px;
+}
+
+.dz__bol .odp-bol {
+  display: grid;
+  gap: 2px;
+  padding: 0;
+  background: none;
+}
+
+.odp-brak {
+  color: var(--muted);
+}
+
+@media (max-width: 860px) {
+  .dz {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .dz__data {
+    grid-template-columns: auto auto 1fr;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .odp-cicho {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .odp-cicho .odp-os__akcje {
+    justify-content: flex-start;
+  }
+}
+
+.cwb__robione {
+  color: var(--ink-2);
+  font-weight: 700;
+}
+
+.cwb__robione em {
+  color: var(--muted);
+  font-style: normal;
+  font-weight: 400;
+}
+
+@media (max-width: 560px) {
+  .odp-zakladki {
+    flex-wrap: nowrap;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .odp-zakladka {
+    flex: none;
+    padding: 0 12px;
+    white-space: nowrap;
+  }
+}

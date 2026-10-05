@@ -56,7 +56,7 @@
     link: '<path d="M8.5 11.5a3 3 0 0 0 4.2 0l2.3-2.3a3 3 0 1 0-4.2-4.2l-.9.9M11.5 8.5a3 3 0 0 0-4.2 0L5 10.8a3 3 0 1 0 4.2 4.2l.9-.9"/>',
     wiadomosci: '<path d="M3.5 4.5h13v9h-8l-4 3v-3h-1Z"/>',
     miesiac: '<path d="M3.5 16.5v-6M8 16.5V6M12.5 16.5v-9M17 16.5V3.5"/>',
-    ankiety: '<path d="M4 16.5V9M10 16.5V4.5M16 16.5v-5M2.5 16.5h15"/>',
+    odpacjenta: '<path d="M3.5 11.5h4l.8 2h3.4l.8-2h4M3.5 11.5l2-7h9l2 7v4.5h-13Z"/>',
     druk: '<path d="M6 8V3.5h8V8M5 8h10v6h-2v3H7v-3H5Z"/>',
     blokada: '<path d="M6.5 9V6.5a3.5 3.5 0 0 1 7 0V9M4.5 9h11v7.5h-11Z"/>',
     film: '<path d="M2.5 5.5h15v9h-15ZM8.5 8l4 2.5-4 2.5Z"/>',
@@ -100,7 +100,7 @@
     { id: 'dzis', nazwa: 'Dziś' },
     { id: 'kalendarz', nazwa: 'Kalendarz' },
     { id: 'pacjenci', nazwa: 'Pacjenci' },
-    { id: 'ankiety', nazwa: 'Ankiety' },
+    { id: 'odpacjenta', nazwa: 'Od pacjenta' },
     { id: 'wiadomosci', nazwa: 'Wiadomości' },
     { id: 'miesiac', nazwa: 'Miesiąc' },
     { id: 'ustawienia', nazwa: 'Ustawienia' },
@@ -351,6 +351,7 @@
                             ? `pierwsza wizyta ${wzgledna(wizyta.data)}, ${wizyta.godzina}`
                             : '<b class="prosta__pilne">bez terminu</b>'
                         }</em>
+                        ${wizyta && wizyta.opis ? `<em class="prosta__opis">„${esc(wizyta.opis.length > 90 ? wizyta.opis.slice(0, 88) + '…' : wizyta.opis)}”</em>` : ''}
                       </button>
                       ${
                         wizyta
@@ -1213,7 +1214,7 @@
 
   /* ── Widok: Ustawienia ─────────────────────────────────────────────── */
   /** Jedno ćwiczenie w bibliotece: co mówi pacjentowi i gdzie już siedzi. */
-  function cwiczenieWiersz(c) {
+  function cwiczenieWiersz(c, stat = null) {
     const u = P.uzycieCwiczenia(c.id);
     const gdzie = u.terapie
       ? `${u.terapie} ${u.terapie === 1 ? 'plan' : 'planów'}${u.aktywne ? `, w tym ${u.aktywne} w toku` : ''}`
@@ -1225,6 +1226,11 @@
         <span class="cwb__meta">
           <span>${esc(c.powtorzenia || '')}${c.razy ? ` · ${c.razy}× w tygodniu` : ''}</span>
           <span>${gdzie}</span>
+          ${
+            stat && stat.zadane
+              ? `<span class="cwb__robione">Robione: ${Math.round((stat.zrobione / stat.zadane) * 100)}% <em>(${stat.zrobione} z ${stat.zadane} zaplanowanych odhaczeń, 14 dni)</em></span>`
+              : ''
+          }
           ${
             c.material && c.material.url
               ? `<a class="cwb__material" href="${esc(c.material.url)}" target="_blank" rel="noopener">${ikona('film')}${esc(c.material.opis || 'nagranie')}</a>`
@@ -1312,23 +1318,6 @@
         <article class="card">
           <header class="card__head"><h2>Godziny otwarcia</h2><p class="card__note">Suma grafików zespołu</p></header>
           <table class="mini"><tbody>${godziny}</tbody></table>
-        </article>
-
-        <article class="card card--szeroka">
-          <header class="card__head card__head--row">
-            <div>
-              <h2>Ćwiczenia</h2>
-              <p class="card__note">Z tej listy układasz plan pacjentowi. Opis i nagranie trafiają prosto do jego karty.</p>
-            </div>
-            <button class="btn btn--sm btn--accent" type="button" data-akcja="nowe-cwiczenie">${ikona('plus')}Dodaj ćwiczenie</button>
-          </header>
-          <ul class="cwb">${
-            S().cwiczeniaBiblioteka.length
-              ? S()
-                  .cwiczeniaBiblioteka.map(cwiczenieWiersz)
-                  .join('')
-              : '<li class="pusto">Biblioteka jest pusta. Dodaj pierwsze ćwiczenie.</li>'
-          }</ul>
         </article>
 
         <article class="card">
@@ -1474,8 +1463,19 @@
         }</p>`
       : '<p class="pusto">Pacjent nie odpowiedział jeszcze na żadne pytanie o ból. Ankieta idzie wieczorem po wizycie.</p>';
 
+    const dzisDzien = P.dziennikTerapii(t.id, 1)[0];
+    const dzisHtml = dzisDzien && (dzisDzien.zrobione || dzisDzien.bol || dzisDzien.planowany)
+      ? `<p class="wiad-naglowek">Dzisiaj</p>
+         ${odpCwiczenia(dzisDzien)}
+         ${dzisDzien.bol ? odpBol(dzisDzien, bol.length > 1 ? bol[bol.length - 2] : null) : ''}`
+      : '';
+
     return `<div class="pat__block">
-      <h3>Co odpowiada pacjent</h3>
+      <h3 class="pat__h3--row">Co odpowiada pacjent
+        <button class="btn btn--sm" type="button" data-odp-dni="${t.id}">Dzień po dniu</button>
+      </h3>
+
+      ${dzisHtml}
 
       <p class="wiad-naglowek">Ból po wizytach</p>
       ${bolHtml}
@@ -1547,6 +1547,54 @@
           }</p>
         </div>
       </div>
+
+      <div class="pat__block">
+        <h3 class="pat__h3--row">Notatki
+          <button class="btn btn--sm" type="button" data-akcja="nowa-notatka" data-pacjent-id="${p.id}">${ikona('plus')}Dopisz</button>
+        </h3>
+        <p class="notatki__info">Domyślnie notatka zostaje u Ciebie. Oznaczona jako widoczna trafia do karty, którą pacjent otwiera z SMS-a.</p>
+        ${(() => {
+          const lista = P.notatkiPacjenta(p.id);
+          if (!lista.length) return '<p class="pusto">Nie ma jeszcze żadnej notatki.</p>';
+          return `<ul class="notatki">${lista
+            .map(
+              (n) => `<li class="notatka${n.dlaPacjenta ? ' is-dla-pacjenta' : ''}">
+                <span class="notatka__gora">
+                  <span class="notatka__znak">${n.dlaPacjenta ? 'Widzi pacjent' : 'Tylko dla Ciebie'}</span>
+                  <span class="notatka__data">${krotka(n.kiedy)}</span>
+                </span>
+                <p class="notatka__tekst">${esc(n.tekst)}</p>
+                <span class="notatka__akcje">
+                  <button class="btn btn--sm btn--ghost" type="button" data-akcja="widocznosc-notatki" data-notatka="${n.id}">
+                    ${n.dlaPacjenta ? 'Ukryj przed pacjentem' : 'Pokaż pacjentowi'}
+                  </button>
+                  <button class="btn btn--sm btn--ghost" type="button" data-akcja="edytuj-notatke" data-notatka="${n.id}">Edytuj</button>
+                  <button class="btn btn--sm btn--ghost" type="button" data-akcja="usun-notatke" data-notatka="${n.id}">Usuń</button>
+                </span>
+              </li>`
+            )
+            .join('')}</ul>`;
+        })()}
+      </div>
+
+
+      ${(() => {
+        const opisy = P.opisyPacjenta(p.id);
+        if (!opisy.length) return '';
+        return `<div class="pat__block pat__block--opis">
+          <h3>Własnymi słowami</h3>
+          <p class="notatki__info">Tak pacjent opisał swój problem przy rezerwacji.</p>
+          <ul class="opisy">${opisy
+            .slice(0, 3)
+            .map(
+              (o) => `<li>
+                <span class="opisy__meta">${krotka(o.data)}${o.zrodlo === 'strona' ? ' · rezerwacja ze strony' : ''}</span>
+                <q>${esc(o.opis)}</q>
+              </li>`
+            )
+            .join('')}</ul>
+        </div>`;
+      })()}
 
       ${
         t
@@ -1714,35 +1762,6 @@
             .join('')}
         </ul>
         ${p.zgodaSms === false ? '<p class="wiad-rodzaje__uwaga">Pacjent nie zgodził się na SMS-y — nic do niego nie wyjdzie, niezależnie od ustawień.</p>' : ''}
-      </div>
-
-      <div class="pat__block">
-        <h3 class="pat__h3--row">Notatki
-          <button class="btn btn--sm" type="button" data-akcja="nowa-notatka" data-pacjent-id="${p.id}">${ikona('plus')}Dopisz</button>
-        </h3>
-        <p class="notatki__info">Domyślnie notatka zostaje u Ciebie. Oznaczona jako widoczna trafia do karty, którą pacjent otwiera z SMS-a.</p>
-        ${(() => {
-          const lista = P.notatkiPacjenta(p.id);
-          if (!lista.length) return '<p class="pusto">Nie ma jeszcze żadnej notatki.</p>';
-          return `<ul class="notatki">${lista
-            .map(
-              (n) => `<li class="notatka${n.dlaPacjenta ? ' is-dla-pacjenta' : ''}">
-                <span class="notatka__gora">
-                  <span class="notatka__znak">${n.dlaPacjenta ? 'Widzi pacjent' : 'Tylko dla Ciebie'}</span>
-                  <span class="notatka__data">${krotka(n.kiedy)}</span>
-                </span>
-                <p class="notatka__tekst">${esc(n.tekst)}</p>
-                <span class="notatka__akcje">
-                  <button class="btn btn--sm btn--ghost" type="button" data-akcja="widocznosc-notatki" data-notatka="${n.id}">
-                    ${n.dlaPacjenta ? 'Ukryj przed pacjentem' : 'Pokaż pacjentowi'}
-                  </button>
-                  <button class="btn btn--sm btn--ghost" type="button" data-akcja="edytuj-notatke" data-notatka="${n.id}">Edytuj</button>
-                  <button class="btn btn--sm btn--ghost" type="button" data-akcja="usun-notatke" data-notatka="${n.id}">Usuń</button>
-                </span>
-              </li>`
-            )
-            .join('')}</ul>`;
-        })()}
       </div>
 
       <div class="pat__akcje">
@@ -2260,6 +2279,14 @@
                   : ''
               }`
         }
+        ${
+          przekladana
+            ? ''
+            : `<div class="field field--full">
+                <label for="uw-opis">Opis dolegliwości <em>(jego słowami, opcjonalnie)</em></label>
+                <textarea id="uw-opis" rows="2" maxlength="600" placeholder="Np. ból lędźwi od dwóch tygodni, promieniuje do lewej nogi."></textarea>
+              </div>`
+        }
         <div class="field field--full">
           <label for="uw-dzien">Dzień</label>
           <select id="uw-dzien">${dni.map((d) => `<option value="${d}" ${d === data ? 'selected' : ''}>${krotka(d)}</option>`).join('')}</select>
@@ -2356,6 +2383,7 @@
       data: $('#uw-dzien').value,
       godzina: wybrana.dataset.godz,
       uslugaId: $('#uw-usluga').value,
+      opis: ($('#uw-opis') || {}).value || '',
     });
     if (wynik.blad) return bladModalu('uw-err', wynik.blad);
     schowajModal();
@@ -2516,6 +2544,15 @@
           </span>
           <span class="wizyta-okno__strzalka">${ikona('link')}Otwórz kartę</span>
         </button>
+
+        ${
+          w.opis
+            ? `<div class="wizyta-opis">
+                <p class="wizyta-opis__h">Własnymi słowami pacjenta${w.zrodlo === 'strona' ? ' · rezerwacja ze strony' : ''}</p>
+                <q>${esc(w.opis)}</q>
+              </div>`
+            : ''
+        }
 
         <dl class="dane">
           <div><dt>Usługa</dt><dd>${esc(u ? u.nazwa : '—')} · ${w.minuty} min${u ? ` · ${zl(u.cena)}` : ''}</dd></div>
@@ -2727,20 +2764,199 @@
   }
 
   /* ── Render ────────────────────────────────────────────────────────── */
-  /* ── Ankiety: co pacjenci odsyłają między wizytami ─────────────────── */
-  /* Osobny widok, bo te odpowiedzi to jedyne, co wiesz o pacjencie między
-     wizytami — a rozsiane po kartach nie dawały się ze sobą porównać. */
-  function renderAnkiety() {
-    if (gabinetPusty()) return renderStart();
-    const wiersze = P.przegladAnkiet().filter((w) => !filtrZespolu || w.terapeutaId === filtrZespolu);
-    $('#view-date').textContent = 'Odpowiedzi z ostatnich czterech tygodni';
+  /* ── Od pacjenta: wszystko, co pacjenci odsyłają między wizytami ─────── */
+  /* Jedno miejsce na odpowiedzi z ankiet i odhaczone ćwiczenia, od dzisiejszych
+     godzin po tygodnie. Odpowiedzi to jedyne, co wiesz o pacjencie między wizytami,
+     a rozsiane po kartach nie dawały się ze sobą porównać. */
+  let odpZakladka = 'dzis';
+  let odpTerapia = null;
+  const ODP_ZAKLADKI = [
+    { id: 'dzis', nazwa: 'Dziś', opis: 'Co pacjenci odesłali dzisiaj' },
+    { id: 'dni', nazwa: 'Dzień po dniu', opis: 'Każdy dzień jednego pacjenta, z godzinami' },
+    { id: 'tygodnie', nazwa: 'Tygodnie', opis: 'Odpowiedzi z ostatnich czterech tygodni' },
+    { id: 'biblioteka', nazwa: 'Ćwiczenia', opis: 'Z tej listy układasz plan pacjenta' },
+  ];
 
-    if (!wiersze.length) {
-      $('#ankiety').innerHTML = `${paskiZespolu()}
-        <div class="card"><p class="pusto">Nie ma terapii w toku, więc nie ma o co pytać.</p></div>`;
-      return;
-    }
+  /** Ćwiczenia jednego dnia: zrobione z godziną, reszta wprost jako niezrobione. */
+  function odpCwiczenia(dzien) {
+    if (!dzien.cwiczenia.length) return '<p class="odp-pusto">Brak zadanych ćwiczeń.</p>';
+    return `<ul class="odp-cw">${dzien.cwiczenia
+      .map((x) =>
+        x.zrobione
+          ? `<li class="is-ok"><span class="odp-cw__znak" aria-hidden="true">✓</span><span class="odp-cw__nazwa">${esc(x.nazwa)}</span><em>${x.godzina ? `o ${x.godzina}` : 'zaznaczone'}</em></li>`
+          : `<li class="is-brak"><span class="odp-cw__znak" aria-hidden="true">○</span><span class="odp-cw__nazwa">${esc(x.nazwa)}</span><em>${dzien.dzis ? 'jeszcze nie' : 'nie odhaczone'}</em></li>`
+      )
+      .join('')}</ul>`;
+  }
 
+  /** Odpowiedź o bólu z godziną i porównaniem z poprzednią. */
+  function odpBol(dzien, poprzednia) {
+    const b = dzien.bol;
+    if (!b) return '';
+    const zmiana = !poprzednia ? '' : b.wartosc < poprzednia.wartosc ? 'niżej niż ostatnio' : b.wartosc > poprzednia.wartosc ? 'wyżej niż ostatnio' : 'tak samo jak ostatnio';
+    return `<p class="odp-bol"><span>Odpowiedź o bólu</span><b>${b.wartosc}<i>/10</i></b>${
+      b.godzina ? `<em>o ${b.godzina}</em>` : ''
+    }${poprzednia ? `<em>${zmiana} (${poprzednia.wartosc}/10, ${krotka(poprzednia.data)})</em>` : ''}</p>`;
+  }
+
+  const odpKto = (w) => {
+    const l = P.linia(w.linia);
+    return `<span class="who">
+      <span class="who__mark" style="--c:${l ? l.kolor : '#535A61'};--on:${l ? l.naKolorze : '#fff'}">${inicjaly(w.imie)}</span>
+      <span><span class="who__name">${esc(w.imie)}</span><span class="who__sub">${esc(w.etykieta)}</span></span>
+    </span>`;
+  };
+
+  const odpAkcje = (w) => `<span class="odp-os__akcje">
+    <button class="btn btn--sm btn--ghost" type="button" data-akcja="napisz" data-pacjent-id="${w.pacjentId}">Napisz</button>
+    <button class="btn btn--sm" type="button" data-odp-dni="${w.terapiaId}">Dzień po dniu</button>
+    <button class="btn btn--sm" type="button" data-pacjent="${w.pacjentId}">Karta</button>
+  </span>`;
+
+  const odpKafel = (label, value, foot, klasa = '') =>
+    `<article class="tile${klasa}"><p class="tile__label">${label}</p><p class="tile__value">${value}</p><p class="tile__foot">${foot}</p></article>`;
+
+  const odpOstatnia = (w) => {
+    const a = w.ostatniaAktywnosc;
+    return a ? `${wzgledna(a.data)}${a.godzina ? `, ${a.godzina}` : ''}` : 'jeszcze nic';
+  };
+
+  /* Dziś: kto co zaznaczył i odpowiedział, z godzinami. */
+  function odpDzis(wiersze) {
+    const z = wiersze.filter((w) => w.dzisWpis);
+    const ostatniaGodzina = (w) => {
+      const g = [...w.dzisWpis.cwiczenia.map((x) => x.godzina), w.dzisWpis.bol && w.dzisWpis.bol.godzina].filter(Boolean);
+      return g.map((x) => x.padStart(5, '0')).sort().pop() || '';
+    };
+    const odeslali = z
+      .filter((w) => w.dzisWpis.zrobione || w.dzisWpis.bol)
+      .sort((a, b) => ostatniaGodzina(b).localeCompare(ostatniaGodzina(a)));
+    const cisza = z.filter((w) => !odeslali.includes(w) && w.dzisWpis.planowany);
+    const wolne = z.filter((w) => !odeslali.includes(w) && !w.dzisWpis.planowany);
+
+    const planowanych = z.filter((w) => w.dzisWpis.planowany);
+    const cwiczylo = planowanych.filter((w) => w.dzisWpis.zrobione).length;
+    const zadane = planowanych.reduce((s, w) => s + w.dzisWpis.zadane, 0);
+    const zrobione = planowanych.reduce((s, w) => s + w.dzisWpis.zrobione, 0);
+    const oBol = z.filter((w) => w.dzisWpis.bol).length;
+
+    const karta = (w) => {
+      const d = w.dzisWpis;
+      const poprz = w.odczyty.length > 1 ? w.odczyty[w.odczyty.length - 2] : null;
+      return `<li class="odp-os">
+        <div class="odp-os__gora">
+          ${odpKto(w)}
+          <span class="odp-os__postep"><b>${d.zrobione}</b> z ${d.zadane} ćwiczeń</span>
+        </div>
+        ${odpCwiczenia(d)}
+        ${d.bol ? odpBol(d, poprz) : w.wizytaDzis ? '<p class="odp-bol odp-bol--brak">Po dzisiejszej wizycie pytanie o ból jeszcze bez odpowiedzi.</p>' : ''}
+        ${odpAkcje(w)}
+      </li>`;
+    };
+
+    const kompakt = (w) => `<li class="odp-cicho">
+      ${odpKto(w)}
+      <span class="odp-cicho__info">${
+        w.dzisWpis.planowany ? `ćwiczenia: 0 z ${w.dzisWpis.zadane}` : w.maCwiczenia ? 'dziś bez ćwiczeń w planie' : 'bez zadanych ćwiczeń'
+      }<em>ostatnia odpowiedź: ${odpOstatnia(w)}</em></span>
+      ${odpAkcje(w)}
+    </li>`;
+
+    return `<div class="tiles">
+        ${odpKafel('Ćwiczyło dziś', cwiczylo, `z ${planowanych.length} osób, które dziś mają ćwiczyć`)}
+        ${odpKafel('Odhaczone ćwiczenia', zadane ? `${Math.round((zrobione / zadane) * 100)}%` : '—', `${zrobione} z ${zadane} na dziś`)}
+        ${odpKafel('Odpowiedzi o bólu', oBol, 'zebrane dzisiaj')}
+        ${odpKafel('Jeszcze cicho', cisza.length, 'mieli dziś ćwiczyć · dzień trwa', cisza.length ? ' tile--alert' : '')}
+      </div>
+
+      <h2 class="sekcja-h">Odesłali coś dzisiaj · ${odeslali.length}</h2>
+      ${odeslali.length ? `<ul class="odp-lista">${odeslali.map(karta).join('')}</ul>` : '<p class="pusto">Nikt jeszcze dzisiaj nie odhaczył ćwiczenia ani nie odpowiedział na ankietę.</p>'}
+
+      ${cisza.length ? `<h2 class="sekcja-h">Mieli dziś ćwiczyć, na razie cisza · ${cisza.length}</h2><ul class="odp-lista odp-lista--kompakt">${cisza.map(kompakt).join('')}</ul>` : ''}
+      ${wolne.length ? `<h2 class="sekcja-h">Dziś bez ćwiczeń w planie · ${wolne.length}</h2><ul class="odp-lista odp-lista--kompakt">${wolne.map(kompakt).join('')}</ul>` : ''}
+
+      <p class="card__note card__note--stopka">Godziny to chwila, w której pacjent kliknął w swojej karcie. Brak wpisu znaczy tylko, że pacjent niczego jeszcze nie zaznaczył — niczego nie dopowiadamy za niego.</p>`;
+  }
+
+  /* Dzień po dniu: co dokładnie robił jeden pacjent, każdego dnia. */
+  function odpDni(wiersze) {
+    if (!wiersze.length) return '<div class="card"><p class="pusto">Nie ma terapii w toku, więc nie ma dnia do pokazania.</p></div>';
+    /* Bez wybranej osoby zaczynamy od tej, która odezwała się ostatnio — pusty dziennik niczego nie pokazuje. */
+    const klucz = (x) => (x.ostatniaAktywnosc ? x.ostatniaAktywnosc.data + (x.ostatniaAktywnosc.godzina || '').padStart(5, '0') : '');
+    const najaktywniejszy = [...wiersze].sort((a, b) => klucz(b).localeCompare(klucz(a)))[0];
+    const w = wiersze.find((x) => x.terapiaId === odpTerapia) || najaktywniejszy;
+    odpTerapia = w.terapiaId;
+    const dni = P.dziennikTerapii(w.terapiaId, 14);
+    const zakonczone = dni.filter((d) => d.planowany && !d.dzis);
+    const zadane = zakonczone.reduce((s, d) => s + d.zadane, 0);
+    const zrobione = zakonczone.reduce((s, d) => s + d.zrobione, 0);
+    const dniAktywne = zakonczone.filter((d) => d.zrobione).length;
+    const odczyty = w.odczyty.filter((o) => o.data >= P.isoZa(-13));
+
+    const etykietaDnia = (d) => {
+      const rel = P.dniOd(d.data);
+      const rela = rel === 0 ? 'dziś' : rel === 1 ? 'wczoraj' : DNI[P.fromIso(d.data).getDay()];
+      return `<b>${rela}</b><span>${krotka(d.data)}</span>`;
+    };
+
+    const wiersz = (d) => {
+      const poprz = (() => {
+        const przed = w.odczyty.filter((o) => o.data < d.data);
+        return przed.length ? przed[przed.length - 1] : null;
+      })();
+      const wolny = !d.planowany && !d.zrobione;
+      return `<li class="dz${d.dzis ? ' dz--dzis' : ''}${wolny ? ' dz--wolny' : ''}">
+        <span class="dz__data">${etykietaDnia(d)}</span>
+        <span class="dz__cw">${
+          wolny
+            ? `<span class="odp-pusto">${d.zadane ? 'Dzień bez ćwiczeń w planie.' : 'Brak zadanych ćwiczeń.'}</span>`
+            : `${odpCwiczenia(d)}${
+                !d.planowany ? '<span class="odp-pusto">Dzień bez ćwiczeń w planie — pacjent ćwiczył dodatkowo.</span>' : ''
+              }`
+        }</span>
+        <span class="dz__bol">${
+          d.bol
+            ? odpBol(d, poprz).replace('<p class="odp-bol">', '<span class="odp-bol">').replace('</p>', '</span>')
+            : '<span class="odp-brak" aria-label="bez odpowiedzi o bólu">—</span>'
+        }</span>
+      </li>`;
+    };
+
+    const l = P.linia(w.linia);
+    return `<div class="card card--szeroka odp-wybor">
+        <div class="odp-wybor__gora">
+          <div class="field odp-wybor__pole">
+            <label for="odp-terapia">Pacjent</label>
+            <select id="odp-terapia">
+              ${[...wiersze].sort((a, b) => a.imie.localeCompare(b.imie, 'pl')).map((x) => `<option value="${x.terapiaId}"${x.terapiaId === w.terapiaId ? ' selected' : ''}>${esc(x.imie)} — ${esc(x.etykieta)}</option>`).join('')}
+            </select>
+          </div>
+          <span class="odp-os__akcje">
+            <button class="btn btn--sm btn--ghost" type="button" data-akcja="napisz" data-pacjent-id="${w.pacjentId}">Napisz</button>
+            <button class="btn btn--sm" type="button" data-pacjent="${w.pacjentId}">Karta</button>
+          </span>
+        </div>
+        <p class="odp-wybor__podsumowanie">
+          ${
+            zadane
+              ? `Ostatnie dwa tygodnie: odhaczone <b>${zrobione} z ${zadane}</b> zaplanowanych ćwiczeń (${Math.round((zrobione / zadane) * 100)}%), ćwiczył w <b>${dniAktywne} z ${zakonczone.length}</b> dni z planu.`
+              : 'W tym okresie nie było zaplanowanych dni ćwiczeń.'
+          }
+          ${
+            odczyty.length
+              ? ` Ból: ${odczyty.map((o) => `${o.wartosc}`).join(' → ')}.`
+              : ' Ból: bez odpowiedzi w tym czasie.'
+          }
+        </p>
+      </div>
+
+      <ul class="dz-lista" style="--c:${l ? l.kolor : '#535A61'}">${dni.map(wiersz).join('')}</ul>
+      <p class="card__note card__note--stopka">Dni bez ćwiczeń w planie pochodzą z przypomnień pacjenta (Wiadomości → Przypomnienie o ćwiczeniach). „Nie odhaczone” znaczy tylko tyle, że pacjent niczego nie zaznaczył.</p>`;
+  }
+
+  /* Tygodnie: dotychczasowa tabela, z przejściem do dnia po dniu. */
+  function odpTygodnie(wiersze) {
+    if (!wiersze.length) return '<div class="card"><p class="pusto">Nie ma terapii w toku, więc nie ma o co pytać.</p></div>';
     const zOdczytami = wiersze.filter((w) => w.bolOstatni !== null);
     const wDol = zOdczytami.filter((w) => w.bolKierunek > 0).length;
     const milczacy = wiersze.filter((w) => w.milczy);
@@ -2801,14 +3017,13 @@
         }</td>
         <td class="ank__akcje">
           <button class="btn btn--sm btn--ghost" type="button" data-akcja="napisz" data-pacjent-id="${w.pacjentId}">Napisz</button>
+          <button class="btn btn--sm" type="button" data-odp-dni="${w.terapiaId}">Dzień po dniu</button>
           <button class="btn btn--sm" type="button" data-pacjent="${w.pacjentId}">Karta</button>
         </td>
       </tr>`;
     };
 
-    $('#ankiety').innerHTML = `${paskiZespolu()}
-
-      <div class="tiles">
+    return `<div class="tiles">
         ${kafel('Odpowiedziało o bólu', zOdczytami.length, `z ${wiersze.length} osób w terapii`)}
         ${kafel('Ból spada', wDol, zOdczytami.length ? `z ${zOdczytami.length}, które odpowiedziały` : 'brak odczytów')}
         ${kafel(
@@ -2843,12 +3058,53 @@
       </div>`;
   }
 
+  /* Ćwiczenia: biblioteka, z której układasz plany — razem z tym, co pacjenci z niej faktycznie robią. */
+  function odpBiblioteka() {
+    const stat = P.statystykaCwiczen(14);
+    return `<article class="card card--szeroka">
+        <header class="card__head card__head--row">
+          <div>
+            <h2>Biblioteka ćwiczeń</h2>
+            <p class="card__note">Opis i nagranie trafiają prosto do karty pacjenta. Przy każdym ćwiczeniu widać, jak chętnie pacjenci je odhaczają.</p>
+          </div>
+          <button class="btn btn--sm btn--accent" type="button" data-akcja="nowe-cwiczenie">${ikona('plus')}Dodaj ćwiczenie</button>
+        </header>
+        <ul class="cwb">${
+          S().cwiczeniaBiblioteka.length
+            ? S().cwiczeniaBiblioteka.map((c) => cwiczenieWiersz(c, stat[c.id])).join('')
+            : '<li class="pusto">Biblioteka jest pusta. Dodaj pierwsze ćwiczenie.</li>'
+        }</ul>
+      </article>`;
+  }
+
+  function renderOdPacjenta() {
+    if (gabinetPusty()) return renderStart();
+    const wiersze = P.przegladAnkiet().filter((w) => !filtrZespolu || w.terapeutaId === filtrZespolu);
+    const zakl = ODP_ZAKLADKI.find((x) => x.id === odpZakladka) || ODP_ZAKLADKI[0];
+    $('#view-date').textContent = zakl.opis;
+
+    const tresc = {
+      dzis: () => (wiersze.length ? odpDzis(wiersze) : '<div class="card"><p class="pusto">Nie ma terapii w toku, więc nie ma o co pytać.</p></div>'),
+      dni: () => odpDni(wiersze),
+      tygodnie: () => odpTygodnie(wiersze),
+      biblioteka: () => odpBiblioteka(),
+    }[zakl.id]();
+
+    $('#odpacjenta').innerHTML = `${zakl.id === 'biblioteka' ? '' : paskiZespolu()}
+      <div class="odp-zakladki" role="tablist" aria-label="Widoki odpowiedzi pacjentów">
+        ${ODP_ZAKLADKI.map(
+          (x) => `<button class="odp-zakladka" type="button" role="tab" aria-selected="${x.id === zakl.id}" data-odp-zakl="${x.id}">${x.nazwa}</button>`
+        ).join('')}
+      </div>
+      <div role="tabpanel">${tresc}</div>`;
+  }
+
   function render() {
     renderRail();
     if (widok === 'dzis') renderDzis();
     if (widok === 'kalendarz') renderKalendarz();
     if (widok === 'pacjenci') renderPacjenci();
-    if (widok === 'ankiety') renderAnkiety();
+    if (widok === 'odpacjenta') renderOdPacjenta();
     if (widok === 'wiadomosci') renderWiadomosci();
     if (widok === 'miesiac') renderMiesiac();
     if (widok === 'ustawienia') renderUstawienia();
@@ -2873,6 +3129,17 @@
     if (d.view) {
       if (!$('#drawer').hidden) zamknijDrawer();
       return pokazWidok(d.view);
+    }
+    if (d.odpZakl) {
+      odpZakladka = d.odpZakl;
+      return renderOdPacjenta();
+    }
+    if (d.odpDni) {
+      /* Z karty pacjenta albo z listy: ten sam widok, od razu na tej osobie. */
+      odpTerapia = d.odpDni;
+      odpZakladka = 'dni';
+      if (!$('#drawer').hidden) zamknijDrawer();
+      return pokazWidok('odpacjenta');
     }
     if (d.pacjent) {
       $('#search-out').hidden = true;
@@ -3329,6 +3596,11 @@
       }
     }
     if (e.target.id === 'uw-seria') $('#uw-seria-pola').hidden = !e.target.checked;
+    if (e.target.id === 'odp-terapia') {
+      odpTerapia = e.target.value;
+      renderOdPacjenta();
+      $('#odp-terapia').focus();
+    }
     if (e.target.dataset.akcja === 'przypisz') {
       P.akcje.przypiszTerapie(e.target.dataset.terapia, e.target.value);
       toast('Zmieniono prowadzącego terapię', true);
