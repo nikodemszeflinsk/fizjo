@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/karta.css?v=40" />
+  <link rel="stylesheet" href="assets/css/karta.css?v=42" />
 </head>
 <body class="ofr-body">
   <a class="skip" href="#tresc">Przejdź do treści</a>
@@ -864,11 +864,47 @@
             </ul>
           </article>
         </div>
-        <p class="ofr-fine">
-          Czego nie robimy: dokumentacji medycznej, rozliczeń z NFZ, kasy fiskalnej ani układania
-          planów terapii. Fizjoterapeuta wie, jak leczyć — my dowozimy pacjentów i pilnujemy,
-          żeby nie znikali w połowie.
-        </p>
+        <div class="ofr-nie" id="czego-nie-robimy">
+          <h3 class="ofr-h3">Czego nie robimy</h3>
+          <p class="ofr-lead">
+            Lepiej powiedzieć to teraz niż po podpisaniu. Fizjoterapeuta wie, jak leczyć — my dowozimy
+            pacjentów i pilnujemy, żeby nie znikali w połowie. Reszty nie ruszamy.
+          </p>
+          <ul class="ofr-nie__lista">
+            <li>
+              <strong>Dokumentacji medycznej</strong>
+              <span>Wywiad, badanie i historię choroby prowadzisz tam, gdzie dziś. Panel pilnuje terminów, kontaktu i ćwiczeń, a nie kartoteki medycznej.</span>
+            </li>
+            <li>
+              <strong>Planów terapii za Ciebie</strong>
+              <span>Co pacjent ma ćwiczyć, decydujesz Ty. My dajemy narzędzie, w którym układasz plan z własnych ćwiczeń i nagrań.</span>
+            </li>
+            <li>
+              <strong>Rozliczeń, faktur i NFZ</strong>
+              <span>Nie zastępujemy programu księgowego ani kasy fiskalnej. Cena wizyty jest na stronie, płatność odbywa się u Ciebie, na miejscu.</span>
+            </li>
+            <li>
+              <strong>Gwarancji pozycji w Google</strong>
+              <span>Układamy stronę i wizytówkę pod to, co ludzie wpisują, ale nikt uczciwy nie obiecuje pierwszego miejsca. Obiecujemy konkretne godziny w Twoim grafiku, a nie miejsce w wynikach.</span>
+            </li>
+            <li>
+              <strong>Wybierania opinii</strong>
+              <span>Prośba o opinię idzie do każdego pacjenta po zakończonej terapii, a nie tylko do zadowolonych. Opinii nie kupujemy ani nie piszemy.</span>
+            </li>
+            <li>
+              <strong>Prowizji od pacjenta i zamkniętych drzwi</strong>
+              <span>Płacisz za system, nigdy za pojedynczego pacjenta. Domena, treści, wizytówka i baza pacjentów są Twoje, a dane z panelu wyeksportujesz jednym plikiem.</span>
+            </li>
+            <li>
+              <strong>Reklam bez Twojej decyzji</strong>
+              <span>Reklamy to osobna usługa, którą włączasz sam. Budżet płacisz bezpośrednio Google i Meta, a my niczego nie dokładamy po cichu.</span>
+            </li>
+            <li>
+              <strong>Wszystkiego naraz</strong>
+              <span>Nie budujemy kolejnego systemu do wszystkiego. Robimy jedno: ruch z wyszukiwarki zamieniamy w wizyty i pilnujemy, żeby pacjent doszedł do końca terapii.</span>
+            </li>
+          </ul>
+        </div>
       </div>
     </section>
 
@@ -962,8 +998,8 @@
             <p class="ofr-cena__znak">System prowadzi zapisy</p>
             <h3>Prowadzenie</h3>
             <p class="ofr-cena__opis">Strona z rezerwacją i panel gabinetu. Pacjent umawia się sam, Ty prowadzisz terapię do końca.</p>
-            <p class="ofr-cena__kwota">4&nbsp;900&nbsp;zł <span>wdrożenie</span></p>
-            <p class="ofr-cena__kwota ofr-cena__kwota--sub">679&nbsp;zł <span>miesięcznie</span></p>
+            <p class="ofr-cena__kwota">3&nbsp;900&nbsp;zł <span>wdrożenie</span></p>
+            <p class="ofr-cena__kwota ofr-cena__kwota--sub">499&nbsp;zł <span>miesięcznie</span></p>
             <ul class="ofr-cena__lista">
               <li>Wszystko z pakietu Widoczność</li>
               <li>Zarządzanie wizytami: dzień, kalendarz z wizytami i statusami, kartoteka</li>
@@ -1006,13 +1042,13 @@
             <div class="ofr-pilotceny__rzad">
               <span class="ofr-pilotceny__etykieta">Wdrożenie</span>
               <b class="ofr-pilotceny__nowa">2&nbsp;900&nbsp;zł</b>
-              <s class="ofr-pilotceny__stara"><span class="visually-hidden">zamiast </span>4&nbsp;900&nbsp;zł</s>
-              <em class="ofr-pilotceny__zawsze">w tym wdrożenie panelu: 0&nbsp;zł zamiast 2&nbsp;000&nbsp;zł</em>
+              <s class="ofr-pilotceny__stara"><span class="visually-hidden">zamiast </span>3&nbsp;900&nbsp;zł</s>
+              <em class="ofr-pilotceny__zawsze">w tym wdrożenie panelu: 0&nbsp;zł zamiast 1&nbsp;000&nbsp;zł</em>
             </div>
             <div class="ofr-pilotceny__rzad">
               <span class="ofr-pilotceny__etykieta">Utrzymanie, miesięcznie</span>
-              <b class="ofr-pilotceny__nowa">299&nbsp;zł</b>
-              <s class="ofr-pilotceny__stara"><span class="visually-hidden">zamiast </span>679&nbsp;zł</s>
+              <b class="ofr-pilotceny__nowa">199&nbsp;zł</b>
+              <s class="ofr-pilotceny__stara"><span class="visually-hidden">zamiast </span>499&nbsp;zł</s>
               <em class="ofr-pilotceny__zawsze">cena pilotażowa zostaje na zawsze</em>
             </div>
           </div>
@@ -1021,8 +1057,8 @@
             <div>
               <h3>Co dostajesz</h3>
               <ul>
-                <li>Wdrożenie panelu za darmo — zamiast 2&nbsp;000&nbsp;zł</li>
-                <li>Utrzymanie 299&nbsp;zł miesięcznie zamiast 679&nbsp;zł, i ta cena zostaje na zawsze</li>
+                <li>Wdrożenie panelu za darmo — zamiast 1&nbsp;000&nbsp;zł</li>
+                <li>Utrzymanie 199&nbsp;zł miesięcznie zamiast 499&nbsp;zł, i ta cena zostaje na zawsze</li>
                 <li>Bezpośredni numer do nas, a nie formularz zgłoszeniowy</li>
                 <li>To, czego Ci brakuje w panelu, budujemy w pierwszej kolejności</li>
                 <li>Nowe funkcje dostajesz pierwszy, zanim trafią do oferty</li>
@@ -1097,8 +1133,8 @@
               </label>
               <label class="range">
                 <span class="range__label">Miesięczny koszt systemu</span>
-                <input type="range" min="100" max="5000" step="1" value="299" data-calc="koszt" />
-                <output data-out="koszt">299 zł</output>
+                <input type="range" min="100" max="5000" step="1" value="199" data-calc="koszt" />
+                <output data-out="koszt">199 zł</output>
               </label>
 
               <div class="calc__reklamy">
