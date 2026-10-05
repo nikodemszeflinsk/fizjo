@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/karta.css?v=45" />
+  <link rel="stylesheet" href="assets/css/karta.css?v=50" />
 </head>
 <body class="ofr-body">
   <a class="skip" href="#tresc">Przejdź do treści</a>
@@ -175,12 +175,7 @@
         </div>
 
         <p class="ofr-fine ofr-fine--jasny">
-          W cenie utrzymania, czyli 149&nbsp;zł miesięcznie, hosting, poprawki i aktualizacje strony są
-          po naszej stronie. Możesz z niego zrezygnować w każdej chwili, z miesięcznym wypowiedzeniem,
-          i prowadzić stronę sam: strona, treści, wizytówka i baza pacjentów są Twoje, ale hosting,
-          domena, poprawki i aktualizacje spadają wtedy na Ciebie. Warto zostać przy utrzymaniu,
-          bo wtedy to my pilnujemy, żeby strona i rezerwacje po prostu działały, a Ty zajmujesz się
-          pacjentami. Pakiet Prowadzenie jest w rozwoju, a jego warunki są w ramce pilotażu powyżej.
+          Portale mogą zostać. Dla wielu gabinetów to sensowny kanał — chodzi o to, żeby nie był jedyny.
         </p>
       </div>
     </section>
@@ -837,7 +832,7 @@
               <li><b>Wizytówka w Mapach</b>: godziny, usługi, zdjęcia, zbieranie opinii.</li>
               <li><b>Podstrony pod frazy z miastem</b> — tyle stron, ile problemów, każda z własnym tytułem i opisem.</li>
               <li><b>Dane strukturalne</b> pytań i odpowiedzi, żeby wyszukiwarka rozumiała, co jest na stronie.</li>
-              <li><b>Struktura pod kampanię reklamową</b>: konto, pomiar rezerwacji, strony docelowe i podział na grupy reklam — przygotowane tak, żeby kampanię dało się uruchomić od razu. Od 499 zł za kampanię; budżet reklamowy płacisz osobno.</li>
+              <li><span class="ofr-tag ofr-tag--opt">Osobna usługa</span> <b>Struktura pod kampanię reklamową</b>: konto, pomiar rezerwacji, strony docelowe i podział na grupy reklam — przygotowane tak, żeby kampanię dało się uruchomić od razu. Od 499 zł za kampanię; budżet reklamowy płacisz osobno.</li>
             </ul>
           </article>
 
@@ -958,18 +953,18 @@
         <h2 class="ofr-h2">Dwa sposoby na to samo</h2>
         <p class="ofr-lead ofr-lead--jasny">
           Różnica jest jedna: czy zapisy prowadzisz sam, czy system robi to za Ciebie.
-          Płacisz za system, nigdy za pojedynczego pacjenta.
         </p>
 
         <div class="ofr-ceny">
           <article class="ofr-cena ofr-cena--wid">
-            <p class="ofr-cena__znak">Gotowe do wdrożenia</p>
             <h3>Widoczność</h3>
             <p class="ofr-cena__podtytul">Strona + rezerwacje</p>
             <p class="ofr-cena__opis">Pacjenci znajdują Cię w wyszukiwarce i umawiają się sami — do Twojego Kalendarza Google.</p>
-            <p class="ofr-cena__kwota">2&nbsp;900&nbsp;zł <span>wdrożenie</span></p>
-            <p class="ofr-cena__kwota ofr-cena__kwota--sub">149&nbsp;zł <span>utrzymanie miesięcznie</span></p>
-            <p class="ofr-cena__nota ofr-cena__nota--cicha">(Utrzymanie jest opcjonalne — stronę możesz prowadzić samodzielnie.)</p>
+            <div class="ofr-cena__ceny">
+              <p class="ofr-cena__kwota">2&nbsp;900&nbsp;zł <span>wdrożenie</span></p>
+              <p class="ofr-cena__kwota ofr-cena__kwota--sub">149&nbsp;zł <span class="ofr-cena__dwa"><span>utrzymanie</span><span>miesięcznie</span></span></p>
+            </div>
+            <p class="ofr-cena__nota ofr-cena__nota--cicha">(Możesz również zrezygnować z utrzymania i samemu zająć się obsługą techniczną.)</p>
             <ul class="ofr-cena__lista">
               <li>Strona z rezerwacją online na Twoich danych</li>
               <li>Kalendarz dostępności: włączasz godziny i blokujesz urlopy, pacjent widzi tylko wolne</li>
@@ -1008,11 +1003,28 @@
               <p class="ofr-pilotblok__znak">Ograniczona oferta pilotażowa · 3 gabinety</p>
               <h3>Panel jest jeszcze w budowie. Co to znaczy dla Ciebie?</h3>
               <p>
-                Strona z rezerwacją jest gotowa do wdrożenia. Panel gabinetu dopracowujemy razem
-                z pierwszymi gabinetami, dlatego wdrożenie panelu jest u nas za darmo — w zamian za
+                Panel gabinetu dopracowujemy razem z pierwszymi gabinetami, dlatego wdrożenie panelu jest u nas za darmo — w zamian za
                 pomoc w jego dopracowaniu. Zależy nam na konkretnych rozwiązaniach realnych
                 problemów, a nie na kolejnych funkcjach z listy.
               </p>
+          <div class="ofr-pilotceny">
+            <p class="ofr-pilotceny__tyt">Prowadzenie w ofercie pilotażowej</p>
+            <div class="ofr-pilotceny__rzad">
+              <span class="ofr-pilotceny__stos">
+                <span class="ofr-pilotceny__etykieta">Wdrożenie</span>
+                <s class="ofr-pilotceny__stara"><span class="visually-hidden">zamiast </span>3&nbsp;900&nbsp;zł</s>
+              </span>
+              <b class="ofr-pilotceny__nowa">2&nbsp;900&nbsp;zł</b>
+            </div>
+            <div class="ofr-pilotceny__rzad">
+              <span class="ofr-pilotceny__stos">
+                <span class="ofr-pilotceny__etykieta">Utrzymanie miesięcznie</span>
+                <s class="ofr-pilotceny__stara"><span class="visually-hidden">zamiast </span>499&nbsp;zł</s>
+              </span>
+              <b class="ofr-pilotceny__nowa">199&nbsp;zł</b>
+            </div>
+            <p class="ofr-pilotceny__nota">Strona z rezerwacją i panel w jednej cenie — i ta cena zostaje na stałe, także po zakończeniu pilotażu.</p>
+          </div>
               <p class="ofr-pilotblok__waznosc">Oferta ważna do upływu terminu lub wcześniejszego wyczerpania miejsc.</p>
             </div>
             <div class="ofr-licznik" data-koniec="2026-10-08T23:59:59+02:00">
@@ -1039,25 +1051,6 @@
               <h4>Nic Cię nie zamyka</h4>
               <p>Strona z rezerwacją i wizytówka działają niezależnie od panelu. Dane z panelu wyeksportujesz w każdej chwili jednym plikiem.</p>
             </div>
-          </div>
-
-          <div class="ofr-pilotceny">
-            <p class="ofr-pilotceny__tyt">Prowadzenie w ofercie pilotażowej</p>
-            <div class="ofr-pilotceny__rzad">
-              <span class="ofr-pilotceny__stos">
-                <span class="ofr-pilotceny__etykieta">Wdrożenie</span>
-                <s class="ofr-pilotceny__stara"><span class="visually-hidden">zamiast </span>3&nbsp;900&nbsp;zł</s>
-              </span>
-              <b class="ofr-pilotceny__nowa">2&nbsp;900&nbsp;zł</b>
-            </div>
-            <div class="ofr-pilotceny__rzad">
-              <span class="ofr-pilotceny__stos">
-                <span class="ofr-pilotceny__etykieta">Utrzymanie miesięcznie</span>
-                <s class="ofr-pilotceny__stara"><span class="visually-hidden">zamiast </span>499&nbsp;zł</s>
-              </span>
-              <b class="ofr-pilotceny__nowa">199&nbsp;zł</b>
-            </div>
-            <p class="ofr-pilotceny__nota">Strona z rezerwacją i panel w jednej cenie — i ta cena zostaje na stałe, także po zakończeniu pilotażu.</p>
           </div>
 
           <div class="ofr-umowa ofr-umowa--trzy">
@@ -1108,12 +1101,13 @@
         </article>
 
         <p class="ofr-fine ofr-fine--jasny">
-          Pierwsze 30 dni bez zobowiązania. Widoczność nie wiąże Cię umową na czas określony:
-          utrzymanie wypowiadasz z miesięcznym wyprzedzeniem, a stronę, treści, wizytówkę i bazę
-          pacjentów masz na własność, więc możesz prowadzić je sam. Warto jednak zostać przy
-          utrzymaniu — za 149&nbsp;zł miesięcznie hosting, poprawki i aktualizacje są po naszej
-          stronie, a Ty zajmujesz się pacjentami, nie stroną. Warunki pilotażu Prowadzenia są
-          w ramce wyżej. Ceny netto.
+          Utrzymanie, czyli 149&nbsp;zł miesięcznie, obejmuje hosting, poprawki i aktualizacje strony
+          po naszej stronie. Możesz z niego zrezygnować w każdej chwili, z miesięcznym
+          wypowiedzeniem, i prowadzić stronę sam: strona, treści, wizytówka i baza pacjentów są
+          Twoje, ale hosting, domena, poprawki i aktualizacje spadają wtedy na Ciebie. Warto zostać
+          przy utrzymaniu, bo wtedy to my pilnujemy, żeby strona i rezerwacje po prostu działały,
+          a Ty zajmujesz się pacjentami. Pakiet Prowadzenie jest w rozwoju, a jego warunki są
+          w ramce pilotażu powyżej.
         </p>
       </div>
     </section>
