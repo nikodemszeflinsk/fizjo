@@ -6113,8 +6113,8 @@ svg path {
 /* Wskazówka „osobna usługa” na liście funkcji: mała plakietka przed nazwą. */
 .grupa__lista .ofr-tag--opt {
   margin-right: 6px;
-  padding: 6px 10px;
-  font-size: 0.68rem;
+  padding: 7px 10px;
+  font-size: 0.75rem;
 }
 
 /* Ceny jako element, który przyciąga wzrok: pełny niebieski panel. */
