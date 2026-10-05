@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/karta.css?v=29" />
+  <link rel="stylesheet" href="assets/css/karta.css?v=30" />
 </head>
 <body>
   <a class="skip" href="#tresc">Przejdź do treści</a>
@@ -134,7 +134,7 @@
         <div class="of-blok__text">
           <p class="of-blok__num">03</p>
           <h2 class="of-blok__h">Wybiera godzinę, zamiast czekać na oddzwonienie</h2>
-          <p class="of-blok__lead">Nie ma formularza „skontaktujemy się”. Są Twoje wolne godziny — te same, które widzisz w panelu. Pacjent bierze tę, która mu pasuje, o dowolnej porze dnia i nocy.</p>
+          <p class="of-blok__lead">Nie ma formularza „skontaktujemy się”. Są Twoje wolne godziny — te same, które włączasz w kalendarzu dostępności. Pacjent bierze tę, która mu pasuje, o dowolnej porze dnia i nocy.</p>
           <ul class="of-blok__punkty">
             <li>Może wskazać konkretną osobę z zespołu albo wziąć pierwszą wolną godzinę u kogokolwiek</li>
             <li>Zajęte terminy w ogóle się nie pokazują, więc nigdy nie ma dwóch osób na 10:00</li>
@@ -311,8 +311,11 @@
 
     <div class="of-widok" id="widok-gabinet" role="tabpanel" aria-labelledby="tab-gabinet" hidden>
       <p class="of-widok__wstep">
-        To jest <strong>pakiet Prowadzenie</strong> w całości: panel, wiadomości i karty pacjentów.
-        Nie trzeba się go uczyć — każdy ekran kończy się jedną decyzją i przyciskiem przy niej.
+        <strong>Kalendarz dostępności jest w każdym pakiecie.</strong> W Widoczności służy głównie do
+        włączania godzin, na które można się umówić, a rezerwacje wpadają do Kalendarza Google.
+        W <strong>pakiecie Prowadzenie</strong> ten sam kalendarz jest narzędziem do zarządzania wizytami,
+        a do tego dochodzi komunikacja z pacjentem i ćwiczenia: panel, wiadomości i karty pacjentów.
+        Nie trzeba się tego uczyć — każdy ekran kończy się jedną decyzją i przyciskiem przy niej.
       </p>
     <section class="of-blok">
       <div class="of-blok__in">
@@ -383,9 +386,12 @@
       <div class="of-blok__in">
         <div class="of-blok__text">
           <p class="of-blok__num">04</p>
+          <p class="of-pakiet of-pakiet--oba">Widoczność i Prowadzenie</p>
           <h2 class="of-blok__h">Tydzień, w którym widać każdą lukę</h2>
           <p class="of-blok__lead">Kolor paska mówi, jaki to problem, inicjały — kto przyjmuje. Wolne godziny są klikalne: klikasz i od razu umawiasz. Urlop albo szkolenie wycinasz z grafiku jednym oknem, na jeden dzień albo na tydzień.</p>
           <ul class="of-blok__punkty">
+            <li>W Widoczności to tu włączasz godziny, na które pacjent może się umówić — rezerwacje wpadają wtedy do Kalendarza Google</li>
+            <li>W Prowadzeniu ten sam kalendarz prowadzi wizyty: statusy, przekładanie, odwoływanie i seria</li>
             <li>Blokada może dotyczyć jednej osoby albo całego gabinetu</li>
             <li>Przy wolnej godzinie widać, kto z zespołu może ją wziąć</li>
             <li>Terminy z przeszłości nigdy nie pokazują się jako wolne</li>
