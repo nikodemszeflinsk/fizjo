@@ -6360,3 +6360,42 @@ svg path {
 .ofr-pilotblok > .ofr-pilotblok__waznosc {
   margin-top: 18px !important;
 }
+
+/* Podtytuły pakietów: większe i pogrubione. */
+.ofr-ceny .ofr-cena__podtytul {
+  margin: 0 0 14px;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.ofr-ceny .ofr-cena--wylaczona .ofr-cena__podtytul {
+  color: #b7bcc1;
+}
+
+/* „W rozwoju”: wyśrodkowana, siedzi na górnej krawędzi karty, nie wchodzi na nią. */
+.ofr-ceny .ofr-cena__znak--rozwoj {
+  left: 50%;
+  bottom: calc(100% + 1px);
+  margin: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+/* Pilotaż w żółci „W rozwoju”: plakietka i okienka z cenami. */
+.ofr-pilotblok .ofr-pilotblok__znak {
+  background: #f2b705;
+  color: #14171a;
+}
+
+.ofr-pilotblok .ofr-pilotceny__rzad {
+  background: #f2b705;
+  color: #14171a;
+}
+
+.ofr-pilotblok .ofr-pilotceny__rzad .ofr-pilotceny__etykieta,
+.ofr-pilotblok .ofr-pilotceny__rzad .ofr-pilotceny__nowa,
+.ofr-pilotblok .ofr-pilotceny__rzad .ofr-pilotceny__stara {
+  color: #14171a;
+}
