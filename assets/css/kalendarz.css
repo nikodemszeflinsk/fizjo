@@ -171,7 +171,7 @@ dialog::backdrop { background: rgba(20, 23, 26, 0.5); }
 .sg-czas, .sg-rez b, .t-dzien, .terminy b, .dzis-lista b, .liczby dd, .nast b { font-family: var(--f-num); font-feature-settings: 'tnum'; }
 .sg-czas { font-weight: 600; font-size: 0.8rem; }
 .sg-pod { font-size: 0.84rem; }
-.sg-glowa--dzis .sg-dzien::after { content: 'dziś'; font-family: var(--f-body); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: var(--accent); color: var(--on-accent); padding: 1px 7px; border-radius: 999px; }
+.sg-glowa--znacznik .sg-dzien::after { content: 'dziś'; font-family: var(--f-body); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: var(--accent); color: var(--on-accent); padding: 1px 7px; border-radius: 999px; }
 .sg-kom--wolne::after, .sg-kom--poza::after { content: attr(data-godz) ' · wpisz pacjenta'; position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-size: 0.74rem; font-weight: 700; color: color-mix(in srgb, var(--c, #555c63) 62%, #000); opacity: 0; transition: opacity 0.12s; pointer-events: none; white-space: nowrap; }
 .sg-kom--poza::after { content: attr(data-godz) ' · otwórz termin'; color: var(--muted); }
 .sg-kom:hover::after, .sg-kom:focus-visible::after { opacity: 1; }

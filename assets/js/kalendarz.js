@@ -279,7 +279,7 @@
       const glowa = stan.widok === 'dzien'
         ? `<span class="sg-dzien sg-dzien--os"><i style="background:${kolorTerap(t)}"></i>${esc(k.etykieta)}</span><span class="sg-pod">${esc(podpis(k.terap, k.data))}</span>`
         : `<span class="sg-dzien">${DNI_KR[d.getDay()]} ${d.getDate()}</span><span class="sg-pod">${esc(podpis(k.terap, k.data))}</span>`;
-      h += `<div class="sg-glowa${k.data === dzisIso ? ' sg-glowa--dzis' : ''}" style="grid-row:1;grid-column:${i + 2}">${glowa}</div>`;
+      h += `<div class="sg-glowa${k.data === dzisIso ? ' sg-glowa--dzis' : ''}${k.data === dzisIso && stan.widok === 'tydzien' ? ' sg-glowa--znacznik' : ''}" style="grid-row:1;grid-column:${i + 2}">${glowa}</div>`;
     });
     for (let r = 0; r < RZEDY; r++) {
       h += `<div class="sg-czas" style="grid-row:${r + 2};grid-column:1">${r % 2 === 0 ? godz(rzadNaMin(r)) : ''}</div>`;
@@ -616,6 +616,11 @@
   $('#demo-zamknij').addEventListener('click', () => $('#demo').remove());
   waski.addEventListener('change', render);
 
-  if (!localStorage.getItem(KLUCZ) && stan.widok === 'dzien') stan.data = najblizszyOtwartyDzien();
+  /* Link z oferty może od razu otworzyć wariant: kalendarz.html?tryb=ent */
+  const zLinku = new URLSearchParams(location.search).get('tryb');
+  if ((zLinku === 'ent' || zLinku === 'ind') && zLinku !== stan.tryb) {
+    stan.tryb = zLinku; stan.widok = zLinku === 'ent' ? 'dzien' : 'tydzien'; stan.terap = D().zespol[0].id; stan.data = iso(new Date());
+  }
+  if (stan.widok === 'dzien' && (zLinku || !localStorage.getItem(KLUCZ))) stan.data = najblizszyOtwartyDzien();
   render();
 })();
