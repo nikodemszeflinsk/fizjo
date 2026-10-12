@@ -138,6 +138,9 @@
   const terapeuta = (id) => D().zespol.find((t) => t.id === id) || D().zespol[0];
   const miejsce = (id) => D().miejsca.find((m) => m.id === id) || D().miejsca[0];
   const kolorTerap = (t) => KOLORY[t.kolor % KOLORY.length];
+  /* Na telefonie siatka pokazuje jedną kolumnę naraz (dzień albo terapeutę), wybieraną chipami. */
+  const waski = window.matchMedia('(max-width: 700px)');
+  let mobIdx = null;
 
   /* ── Obliczanie stanu komórek ────────────────────────────────────────── */
   function rezerwacjaW(terap, data, rzad) {
@@ -173,6 +176,18 @@
       if (komorka(terap, data, r).s === 'wolne' && komorka(terap, data, r + 1).s === 'wolne') { ile += 1; r += 1; }
     }
     return ile;
+  }
+
+  /** Podpis pod nazwą dnia: odróżnia „komplet” od „nie przyjmujesz” i od blokady. */
+  function podpis(terap, data) {
+    const ent = stan.tryb === 'ent';
+    if (data < iso(new Date())) return 'minął';
+    const bl = blokadaW(terap, data);
+    if (bl) return bl.powod;
+    const ma = (D().reguly[terap] || {})[zIso(data).getDay()] || Object.keys(D().wyjatki).some((k) => k.startsWith(`${terap}|${data}|`) && D().wyjatki[k] === 'open');
+    if (!ma) return ent ? 'nie przyjmuje' : 'nie przyjmujesz';
+    const w = wolneBloki(terap, data);
+    return w ? `wolne godziny: ${w}` : 'komplet';
   }
 
   /** Pierwszy dzień (od dziś), w którym zostało co najmniej trzy wolne godziny. Dzięki temu demo nie zaczyna od pustego, przeszłego dnia. */
@@ -220,7 +235,7 @@
     document.querySelectorAll('[data-tryb]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.tryb === stan.tryb)));
   }
 
-  function kolumny() {
+  function wszystkieKolumny() {
     const { od, dni } = zakres();
     if (stan.widok === 'tydzien') {
       const t = terapeuta(stan.terap);
@@ -229,21 +244,41 @@
     const data = iso(od);
     return D().zespol.map((t) => ({ data, terap: t.id, etykieta: t.nazwa.replace(/^mgr\s+/, '') }));
   }
+  function indeksMob(wsz) {
+    if (mobIdx !== null && mobIdx < wsz.length) return mobIdx;
+    if (stan.widok === 'tydzien') return Math.min(wsz.length - 1, (zIso(stan.data).getDay() + 6) % 7);
+    return 0;
+  }
+  function kolumny() {
+    const wsz = wszystkieKolumny();
+    return waski.matches ? [wsz[indeksMob(wsz)]] : wsz;
+  }
+  function renderChipy() {
+    const wsz = wszystkieKolumny();
+    const akt = indeksMob(wsz);
+    const dzisIso = iso(new Date());
+    $('#chipy').innerHTML = wsz.map((k, i) => {
+      const d = zIso(k.data);
+      const t = terapeuta(k.terap);
+      const wolne = wolneBloki(k.terap, k.data);
+      const nazwa = stan.widok === 'dzien' ? `<i style="background:${kolorTerap(t)}"></i>${esc(k.etykieta.split(' ')[0])}` : `${DNI_KR[d.getDay()]} <b>${d.getDate()}</b>`;
+      return `<button type="button" data-mob="${i}" aria-pressed="${i === akt}"${k.data === dzisIso && stan.widok === 'tydzien' ? ' class="dzis"' : ''}>${nazwa}<small>${wolne ? wolne + ' wolne' : '–'}</small></button>`;
+    }).join('');
+  }
 
   function renderSiatka() {
     const kol = kolumny();
     const ent = stan.tryb === 'ent';
     const dzisIso = iso(new Date());
-    const szer = stan.widok === 'tydzien' ? 'minmax(112px, 1fr)' : 'minmax(170px, 1fr)';
+    const szer = waski.matches ? 'minmax(0, 1fr)' : stan.widok === 'tydzien' ? 'minmax(112px, 1fr)' : 'minmax(170px, 1fr)';
     let h = '';
     h += `<div class="sg-rog" style="grid-row:1;grid-column:1"></div>`;
     kol.forEach((k, i) => {
       const d = zIso(k.data);
       const t = terapeuta(k.terap);
-      const wolne = wolneBloki(k.terap, k.data);
       const glowa = stan.widok === 'dzien'
-        ? `<span class="sg-dzien sg-dzien--os"><i style="background:${kolorTerap(t)}"></i>${esc(k.etykieta)}</span><span class="sg-pod">wolne godziny: ${wolne}</span>`
-        : `<span class="sg-dzien">${DNI_KR[d.getDay()]} ${d.getDate()}</span><span class="sg-pod">${wolne ? `wolne godziny: ${wolne}` : 'brak wolnych'}</span>`;
+        ? `<span class="sg-dzien sg-dzien--os"><i style="background:${kolorTerap(t)}"></i>${esc(k.etykieta)}</span><span class="sg-pod">${esc(podpis(k.terap, k.data))}</span>`
+        : `<span class="sg-dzien">${DNI_KR[d.getDay()]} ${d.getDate()}</span><span class="sg-pod">${esc(podpis(k.terap, k.data))}</span>`;
       h += `<div class="sg-glowa${k.data === dzisIso ? ' sg-glowa--dzis' : ''}" style="grid-row:1;grid-column:${i + 2}">${glowa}</div>`;
     });
     for (let r = 0; r < RZEDY; r++) {
@@ -277,13 +312,21 @@
         const kolor = c.s === 'wolne' ? (ent ? kolorTerap(t) : KOLORY[lok.kolor % KOLORY.length]) : '';
         const pierwsza = c.s === 'wolne' && (r === 0 || komorka(k.terap, k.data, r - 1).s !== 'wolne');
         const znak = pierwsza && !ent ? `<em>${esc(lok.kr)}</em>` : '';
-        h += `<button type="button" class="sg-kom sg-kom--${c.s}" data-r="${r}" data-d="${k.data}" data-t="${k.terap}" style="grid-row:${wiersz};grid-column:${kol_}${kolor ? `;--c:${kolor}` : ''}" aria-label="${etyk}: ${c.s === 'wolne' ? 'wolne' : c.s === 'minione' ? 'minęło' : 'nie przyjmujesz'}"${c.s === 'minione' ? ' tabindex="-1"' : ''}>${znak}</button>`;
+        h += `<button type="button" class="sg-kom sg-kom--${c.s}" data-r="${r}" data-d="${k.data}" data-t="${k.terap}" style="grid-row:${wiersz};grid-column:${kol_}${kolor ? `;--c:${kolor}` : ''}" data-godz="${godz(rzadNaMin(r))}" aria-label="${etyk}: ${c.s === 'wolne' ? 'wolne' : c.s === 'minione' ? 'minęło' : 'nie przyjmujesz'}"${c.s === 'minione' ? ' tabindex="-1"' : ''}>${znak}</button>`;
         r += 1;
       }
     });
+    const teraz = new Date();
+    const minTeraz = teraz.getHours() * 60 + teraz.getMinutes();
+    if (minTeraz >= START && minTeraz < KONIEC) {
+      kol.forEach((k, i) => {
+        if (k.data !== dzisIso) return;
+        h += `<div class="sg-teraz" aria-hidden="true" style="grid-row:${Math.floor((minTeraz - START) / KROK) + 2};grid-column:${i + 2};--f:${((minTeraz - START) % KROK) / KROK}"></div>`;
+      });
+    }
     const n = kol.length;
     const el = $('#siatka');
-    el.style.gridTemplateColumns = `54px repeat(${n}, ${szer})`;
+    el.style.gridTemplateColumns = `${waski.matches ? 46 : 54}px repeat(${n}, ${szer})`;
     el.style.gridTemplateRows = `auto repeat(${RZEDY}, var(--h))`;
     el.innerHTML = h;
   }
@@ -307,8 +350,9 @@
         for (let r = 0; r < RZEDY - 1; r += 2) {
           const a = komorka(t.id, data, r);
           if (a.s === 'wolne' && komorka(t.id, data, r + 1).s === 'wolne') {
-            const g = grupy.get(r) || { data, rzad: r, osoby: [], lok: a.lok };
+            const g = grupy.get(r) || { data, rzad: r, osoby: [], ids: [], lok: a.lok };
             g.osoby.push(t.nazwa.replace(/^mgr\s+/, '').split(' ')[0]);
+            g.ids.push(t.id);
             grupy.set(r, g);
           }
         }
@@ -329,20 +373,61 @@
 
   function renderBoki() {
     const dzisIso = iso(new Date());
-    const rez = D().rezerwacje.filter((r) => r.data === dzisIso).sort((a, b) => a.od - b.od);
+    const rez = D().rezerwacje.filter((r) => r.data === dzisIso).sort((x, y) => x.od - y.od);
     const wolneDzis = D().zespol.reduce((s, t) => s + wolneBloki(t.id, dzisIso), 0);
-    const ostrzezenie = '';
+    const nast = D().rezerwacje.filter((r) => !minione(r.data, r.od)).sort((x, y) => (x.data + pad(x.od)).localeCompare(y.data + pad(y.od)))[0];
+    const nastHtml = nast ? `<p class="nast">Następna wizyta: <b>${esc(wzgledna(nast.data))}, ${godz(rzadNaMin(nast.od))}</b> · ${esc(nast.imie)}</p>` : '';
     $('#dzis').innerHTML = `<h3>Dziś</h3>
       <dl class="liczby"><div><dt>Rezerwacje</dt><dd>${rez.length}</dd></div><div><dt>Wolne godziny</dt><dd>${wolneDzis}</dd></div></dl>
-      ${rez.length ? `<ul class="dzis-lista">${rez.slice(0, 5).map((r) => `<li><button type="button" data-rez="${r.id}"><b>${godz(rzadNaMin(r.od))}</b><span>${esc(r.imie)}<small>${esc(USLUGI[r.usluga].nazwa)}</small></span></button></li>`).join('')}</ul>` : '<p class="pusto">Dziś nie ma rezerwacji.</p>'}${ostrzezenie}`;
+      ${rez.length ? `<ul class="dzis-lista">${rez.slice(0, 5).map((r) => `<li><button type="button" data-rez="${r.id}"><b>${godz(rzadNaMin(r.od))}</b><span>${esc(r.imie)}<small>${esc(USLUGI[r.usluga].nazwa)}</small></span></button></li>`).join('')}</ul>${rez.length > 5 ? `<p class="wiecej">i jeszcze ${rez.length - 5} w kalendarzu</p>` : ''}` : `<p class="pusto">Dziś nie ma rezerwacji.</p>${nastHtml}`}`;
 
     const terminy = wolneTerminy(6);
     $('#pacjent').innerHTML = `<h3>Co widzi pacjent</h3>
-      <p class="pod">Najbliższe wolne terminy na Twojej stronie. Zmieniasz godziny, a lista zmienia się razem z nimi.</p>
-      ${terminy.length ? `<ul class="terminy">${terminy.map((t) => `<li><span class="t-dzien">${esc(wzgledna(t.data))}</span><b>${godz(rzadNaMin(t.rzad))}</b><span class="t-kto">${esc(stan.tryb === 'ent' ? t.osoby.join(', ') : miejsce(t.lok).kr)}</span></li>`).join('')}</ul>` : '<p class="pusto">Brak wolnych terminów. Pacjent zobaczy komunikat, że może zadzwonić.</p>'}`;
+      <p class="pod">Najbliższe wolne terminy na Twojej stronie. Zmieniasz godziny, a lista zmienia się razem z nimi. Kliknij termin, żeby zobaczyć go w kalendarzu.</p>
+      <div class="widget" aria-label="Podgląd widżetu rezerwacji na stronie gabinetu">
+        <div class="widget__bar" aria-hidden="true"><i></i><i></i><i></i><span>twoja-strona.pl › umow-wizyte</span></div>
+        <div class="widget__tresc">
+          <p class="widget__h">Wybierz termin wizyty</p>
+          ${terminy.length ? `<ul class="terminy">${terminy.map((t) => `<li><button type="button" data-skocz="${t.data}|${t.ids[0]}|${t.rzad}"><span class="t-dzien">${esc(wzgledna(t.data))}</span><b>${godz(rzadNaMin(t.rzad))}</b><span class="t-kto">${esc(stan.tryb === 'ent' ? t.osoby.join(', ') : miejsce(t.lok).kr)}</span></button></li>`).join('')}</ul>` : '<p class="pusto">Brak wolnych terminów. Pacjent zobaczy komunikat, że może zadzwonić.</p>'}
+        </div>
+      </div>`;
   }
 
-  function render() { renderPasek(); renderSiatka(); renderLegenda(); renderBoki(); }
+  const OPISY = { ind: 'Jeden terapeuta, kilka miejsc przyjęć', ent: 'Zespół, każdy z własnym grafikiem' };
+  function render() {
+    renderPasek(); renderChipy(); renderSiatka(); renderLegenda(); renderBoki();
+    $('#pakiet-opis').textContent = OPISY[stan.tryb];
+  }
+
+  /* ── Cofnij: po każdej zmianie migawka danych i krótki komunikat ───── */
+  let migawka = null;
+  let zegarToast = null;
+  function toast(tekst, snap) {
+    migawka = snap;
+    $('#toast-t').textContent = tekst;
+    $('#toast').hidden = false;
+    clearTimeout(zegarToast);
+    zegarToast = setTimeout(ukryjToast, 8000);
+  }
+  function ukryjToast() { $('#toast').hidden = true; migawka = null; clearTimeout(zegarToast); }
+  /** Wykonuje zmianę danych, zapisuje, odświeża i pozwala ją cofnąć. */
+  function zmien(tekst, fn) {
+    const snap = JSON.stringify(D());
+    fn();
+    zapisz(); zamknij(); render(); toast(tekst, snap);
+  }
+  function cofnij() {
+    if (!migawka) return;
+    stan.dane[stan.tryb] = JSON.parse(migawka);
+    zapisz(); ukryjToast(); render();
+  }
+  function blysnij(data, terap, rzad) {
+    const c = document.querySelector(`.sg-kom[data-d="${data}"][data-t="${terap}"][data-r="${rzad}"]`);
+    if (!c) return;
+    c.classList.add('blysk');
+    c.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    setTimeout(() => c.classList.remove('blysk'), 2200);
+  }
 
   /* ── Okna dialogowe ──────────────────────────────────────────────────── */
   const okno = $('#okno');
@@ -358,7 +443,7 @@
     otworz(`${naglowek('Rezerwacja', `${esc(dlugaData(d))}, ${godz(rzadNaMin(r.od))}–${godz(rzadNaMin(r.od + r.rzedy))}`)}
       <dl class="dane">
         <div><dt>Pacjent</dt><dd>${esc(r.imie)}</dd></div>
-        <div><dt>Telefon</dt><dd>${esc(r.tel)}</dd></div>
+        <div><dt>Telefon</dt><dd><a href="tel:${esc(r.tel.replace(/\s/g, ''))}">${esc(r.tel)}</a></dd></div>
         <div><dt>Usługa</dt><dd>${esc(USLUGI[r.usluga].nazwa)}</dd></div>
         <div><dt>${stan.tryb === 'ent' ? 'Terapeuta' : 'Miejsce'}</dt><dd>${stan.tryb === 'ent' ? esc(t.nazwa) : esc(miejsce(r.lok).nazwa)}</dd></div>
         <div><dt>Źródło</dt><dd>${r.zrodlo === 'strona' ? 'Rezerwacja ze strony' : 'Wpisana ręcznie (telefon)'}</dd></div>
@@ -448,9 +533,10 @@
       const sel = $(`[data-lok="${dz}"]`);
       nowe[dz] = reg(`${Math.floor(zH(od) / 60)}:${pad(zH(od) % 60)}`, `${Math.floor(zH(doo) / 60)}:${pad(zH(doo) % 60)}`, sel ? sel.value : D().miejsca[0].id);
     }
-    D().reguly[t.id] = nowe;
-    Object.keys(D().wyjatki).filter((k) => k.startsWith(t.id + '|')).forEach((k) => delete D().wyjatki[k]);
-    zapisz(); zamknij(); render();
+    zmien('Godziny przyjęć zapisane', () => {
+      D().reguly[t.id] = nowe;
+      Object.keys(D().wyjatki).filter((k) => k.startsWith(t.id + '|')).forEach((k) => delete D().wyjatki[k]);
+    });
   }
   function zapiszBlokade() {
     const od = $('#b-od').value, doo = $('#b-do').value, powod = $('#b-powod').value.trim();
@@ -459,8 +545,7 @@
     if (!powod) return bladW('#b-blad', 'Wpisz powód, żebyś wiedział, czego dotyczy blokada.');
     const kto = $('#b-kto') ? $('#b-kto').value : D().zespol[0].id;
     const konflikt = D().rezerwacje.filter((r) => (kto === '*' || r.terap === kto) && r.data >= od && r.data <= doo && !minione(r.data, r.od));
-    D().blokady.push({ id: `b${Date.now()}`, terap: kto, od, do: doo, powod });
-    zapisz(); zamknij(); render();
+    zmien('Blokada dodana, terminy zniknęły ze strony', () => D().blokady.push({ id: `b${Date.now()}`, terap: kto, od, do: doo, powod }));
     if (konflikt.length) {
       otworz(`${naglowek('Blokada dodana', `W tym czasie masz już ${konflikt.length} ${konflikt.length === 1 ? 'rezerwację' : 'rezerwacji'}`)}
         <p class="okno__nota">Blokada nie odwołuje istniejących rezerwacji. Zadzwoń do pacjentów albo odwołaj je w kalendarzu.</p>
@@ -476,12 +561,12 @@
       if (komorka(terap, data, rzad + i).s !== 'wolne' || rzad + i >= RZEDY) return bladW('#p-blad', 'Ta usługa nie mieści się w wolnym terminie. Wybierz krótszą albo inną godzinę.');
     }
     const c = komorka(terap, data, rzad);
-    D().rezerwacje.push({ id: `r${Date.now()}`, terap, data, od: rzad, rzedy, usluga: u, imie, tel, uwaga: '', zrodlo: 'telefon', lok: c.lok });
-    zapisz(); zamknij(); render();
+    zmien(`Wpisano pacjenta: ${imie}`, () => D().rezerwacje.push({ id: `r${Date.now()}`, terap, data, od: rzad, rzedy, usluga: u, imie, tel, uwaga: '', zrodlo: 'telefon', lok: c.lok }));
   }
   function ustawWyjatek(klucz, wartosc) {
-    if (wartosc) D().wyjatki[klucz] = wartosc; else delete D().wyjatki[klucz];
-    zapisz(); zamknij(); render();
+    zmien(wartosc === 'closed' ? 'Termin zamknięty, pacjent go nie widzi' : 'Termin otwarty, pacjent może go zarezerwować', () => {
+      if (wartosc) D().wyjatki[klucz] = wartosc; else delete D().wyjatki[klucz];
+    });
   }
 
   /* ── Zdarzenia ───────────────────────────────────────────────────────── */
@@ -489,13 +574,21 @@
     const b = e.target.closest('button');
     if (!b) return;
     if (b.dataset.tryb) {
-      stan.tryb = b.dataset.tryb; stan.widok = stan.tryb === 'ent' ? 'dzien' : 'tydzien'; stan.terap = D().zespol[0].id;
+      stan.tryb = b.dataset.tryb; stan.widok = stan.tryb === 'ent' ? 'dzien' : 'tydzien'; stan.terap = D().zespol[0].id; mobIdx = null; ukryjToast();
       stan.data = stan.widok === 'dzien' ? najblizszyOtwartyDzien() : iso(new Date());
       zapisz(); return render();
     }
-    if (b.dataset.widok) { stan.widok = b.dataset.widok; zapisz(); return render(); }
+    if (b.dataset.widok) { stan.widok = b.dataset.widok; mobIdx = null; zapisz(); return render(); }
+    if (b.dataset.mob !== undefined) { mobIdx = Number(b.dataset.mob); return render(); }
+    if (b.dataset.skocz) {
+      const [d, t, r] = b.dataset.skocz.split('|');
+      stan.data = d; stan.widok = stan.tryb === 'ent' ? 'dzien' : 'tydzien'; stan.terap = t;
+      mobIdx = stan.tryb === 'ent' ? D().zespol.findIndex((x) => x.id === t) : null;
+      zapisz(); render(); return blysnij(d, t, r);
+    }
     if (b.dataset.nawig !== undefined) {
       const n = Number(b.dataset.nawig);
+      mobIdx = null;
       stan.data = n === 0 ? iso(new Date()) : iso(dodaj(zIso(stan.data), n * (stan.widok === 'tydzien' ? 7 : 1)));
       zapisz(); return render();
     }
@@ -505,6 +598,7 @@
     const a = b.dataset.akcja;
     if (!a) return;
     if (a === 'zamknij') return zamknij();
+    if (a === 'cofnij') return cofnij();
     if (a === 'godziny') return oknoGodzin();
     if (a === 'blokada') return oknoNowejBlokady();
     if (a === 'zapisz-godziny') return zapiszGodziny();
@@ -512,14 +606,15 @@
     if (a === 'wpisz') return wpiszPacjenta(b.dataset.t, b.dataset.d, Number(b.dataset.r));
     if (a === 'zamknij-termin') return ustawWyjatek(`${b.dataset.t}|${b.dataset.d}|${b.dataset.r}`, 'closed');
     if (a === 'otworz-termin') return ustawWyjatek(`${b.dataset.t}|${b.dataset.d}|${b.dataset.r}`, 'open');
-    if (a === 'odwolaj') { D().rezerwacje = D().rezerwacje.filter((r) => r.id !== b.dataset.id); zapisz(); zamknij(); return render(); }
-    if (a === 'usun-blokade') { D().blokady = D().blokady.filter((x) => x.id !== b.dataset.id); zapisz(); zamknij(); return render(); }
+    if (a === 'odwolaj') return zmien('Rezerwacja odwołana, termin znów jest wolny', () => { D().rezerwacje = D().rezerwacje.filter((r) => r.id !== b.dataset.id); });
+    if (a === 'usun-blokade') return zmien('Blokada usunięta', () => { D().blokady = D().blokady.filter((x) => x.id !== b.dataset.id); });
   });
   document.addEventListener('change', (e) => {
-    if (e.target.id === 'sel-terap') { stan.terap = e.target.value; zapisz(); render(); }
+    if (e.target.id === 'sel-terap') { stan.terap = e.target.value; mobIdx = null; zapisz(); render(); }
   });
   okno.addEventListener('click', (e) => { if (e.target === okno) zamknij(); });
   $('#demo-zamknij').addEventListener('click', () => $('#demo').remove());
+  waski.addEventListener('change', render);
 
   if (!localStorage.getItem(KLUCZ) && stan.widok === 'dzien') stan.data = najblizszyOtwartyDzien();
   render();

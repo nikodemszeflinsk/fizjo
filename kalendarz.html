@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@600;800;900&family=Atkinson+Hyperlegible+Next:wght@400;500;700&display=swap" />
-  <link rel="stylesheet" href="assets/css/kalendarz.css?v=1" />
+  <link rel="stylesheet" href="assets/css/kalendarz.css?v=3" />
 </head>
 <body>
   <a class="skip" href="#kalendarz">Przejdź do kalendarza</a>
@@ -28,10 +28,13 @@
         <h1>Kalendarz dostępności</h1>
         <p class="gora__opis">Ustawiasz, kiedy przyjmujesz. Pacjent na stronie widzi tylko wolne terminy.</p>
       </div>
-      <div class="pakiet" role="group" aria-label="Pokaż jako pakiet">
-        <span class="pakiet__et">Pokaż jako</span>
-        <button type="button" data-tryb="ind" aria-pressed="true">Individual</button>
-        <button type="button" data-tryb="ent" aria-pressed="false">Enterprise</button>
+      <div class="pakiet-box">
+        <div class="pakiet" role="group" aria-label="Pokaż jako pakiet">
+          <span class="pakiet__et">Pokaż jako</span>
+          <button type="button" data-tryb="ind" aria-pressed="true">Individual</button>
+          <button type="button" data-tryb="ent" aria-pressed="false">Enterprise</button>
+        </div>
+        <p class="pakiet__opis" id="pakiet-opis"></p>
       </div>
     </div>
   </header>
@@ -40,6 +43,7 @@
     <div class="pasek" id="pasek"></div>
     <div class="uklad">
       <section class="kal-karta" aria-label="Kalendarz">
+        <div class="chipy" id="chipy" role="group" aria-label="Wybierz dzień"></div>
         <div class="kal-przew" id="siatka-przew"><div class="siatka" id="siatka"></div></div>
         <ul class="legenda" id="legenda"></ul>
       </section>
@@ -50,6 +54,8 @@
     </div>
   </main>
 
+  <div class="toast" id="toast" role="status" hidden><span id="toast-t"></span><button type="button" data-akcja="cofnij">Cofnij</button></div>
+
   <dialog id="okno" aria-labelledby="okno-tytul">
     <form method="dialog" class="okno__in" id="okno-tresc"></form>
   </dialog>
@@ -58,6 +64,6 @@
     <p>Demo kalendarza dostępności. Wbudowany kalendarz jest w cenie obu pakietów, a Kalendarz Google można połączyć zamiast niego.</p>
   </footer>
 
-  <script src="assets/js/kalendarz.js?v=1"></script>
+  <script src="assets/js/kalendarz.js?v=2"></script>
 </body>
 </html>
