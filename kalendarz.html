@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kalendarz dostępności · Studio Widok</title>
+  <meta name="description" content="Demo kalendarza dostępności: ustawiasz godziny przyjęć, a pacjent na stronie widzi tylko wolne terminy." />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#f8f9f7" />
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@600;800;900&family=Atkinson+Hyperlegible+Next:wght@400;500;700&display=swap" />
+  <link rel="stylesheet" href="assets/css/kalendarz.css?v=1" />
+</head>
+<body>
+  <a class="skip" href="#kalendarz">Przejdź do kalendarza</a>
+
+  <aside class="demo" id="demo" aria-label="Informacja o demo">
+    <p><strong>To jest demo.</strong> Kalendarz dostępności na przykładowych danych. Zmiany zapisują się tylko w tej przeglądarce.</p>
+    <button type="button" id="demo-zamknij" aria-label="Ukryj informację">Ukryj</button>
+  </aside>
+
+  <header class="gora">
+    <div class="in gora__in">
+      <div>
+        <p class="gora__marka">Studio Widok</p>
+        <h1>Kalendarz dostępności</h1>
+        <p class="gora__opis">Ustawiasz, kiedy przyjmujesz. Pacjent na stronie widzi tylko wolne terminy.</p>
+      </div>
+      <div class="pakiet" role="group" aria-label="Pokaż jako pakiet">
+        <span class="pakiet__et">Pokaż jako</span>
+        <button type="button" data-tryb="ind" aria-pressed="true">Individual</button>
+        <button type="button" data-tryb="ent" aria-pressed="false">Enterprise</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="in" id="kalendarz">
+    <div class="pasek" id="pasek"></div>
+    <div class="uklad">
+      <section class="kal-karta" aria-label="Kalendarz">
+        <div class="kal-przew" id="siatka-przew"><div class="siatka" id="siatka"></div></div>
+        <ul class="legenda" id="legenda"></ul>
+      </section>
+      <aside class="bok" aria-label="Podsumowanie">
+        <section class="karta" id="dzis"></section>
+        <section class="karta karta--pacjent" id="pacjent"></section>
+      </aside>
+    </div>
+  </main>
+
+  <dialog id="okno" aria-labelledby="okno-tytul">
+    <form method="dialog" class="okno__in" id="okno-tresc"></form>
+  </dialog>
+
+  <footer class="stopka in">
+    <p>Demo kalendarza dostępności. Wbudowany kalendarz jest w cenie obu pakietów, a Kalendarz Google można połączyć zamiast niego.</p>
+  </footer>
+
+  <script src="assets/js/kalendarz.js?v=1"></script>
+</body>
+</html>
