@@ -4,20 +4,20 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Kalendarz dostępności · Studio Widok</title>
-  <meta name="description" content="Demo kalendarza dostępności: ustawiasz godziny przyjęć, a pacjent na stronie widzi tylko wolne terminy." />
+  <meta name="description" content="Demo kalendarza dostępności: ustawiasz godziny przyjęć, zarządzasz rezerwacjami i widzisz to, co zobaczy pacjent na stronie." />
   <meta name="robots" content="noindex, nofollow" />
   <meta name="theme-color" content="#f8f9f7" />
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@600;800;900&family=Atkinson+Hyperlegible+Next:wght@400;500;700&display=swap" />
-  <link rel="stylesheet" href="assets/css/kalendarz.css?v=4" />
+  <link rel="stylesheet" href="assets/css/kalendarz.css?v=10" />
 </head>
 <body>
   <a class="skip" href="#kalendarz">Przejdź do kalendarza</a>
 
   <aside class="demo" id="demo" aria-label="Informacja o demo">
-    <p><strong>To jest demo.</strong> Kalendarz dostępności na przykładowych danych. Zmiany zapisują się tylko w tej przeglądarce.</p>
+    <p><strong>To jest demo.</strong> Kalendarz działa na przykładowych danych, a zmiany zapisują się tylko w tej przeglądarce.</p>
     <button type="button" id="demo-zamknij" aria-label="Ukryj informację">Ukryj</button>
   </aside>
 
@@ -26,7 +26,7 @@
       <div>
         <p class="gora__marka">Studio Widok</p>
         <h1>Kalendarz dostępności</h1>
-        <p class="gora__opis">Ustawiasz, kiedy przyjmujesz. Pacjent na stronie widzi tylko wolne terminy.</p>
+        <p class="gora__opis">Ustawiasz, kiedy przyjmujesz, a pacjent na stronie widzi tylko wolne terminy.</p>
       </div>
       <div class="pakiet-box">
         <div class="pakiet" role="group" aria-label="Pokaż jako pakiet">
@@ -41,29 +41,34 @@
 
   <main class="in" id="kalendarz">
     <div class="pasek" id="pasek"></div>
+    <div class="tryb-pasek" id="tryb-pasek" hidden></div>
     <div class="uklad">
       <section class="kal-karta" aria-label="Kalendarz">
+        <div class="przenos" id="przenos" hidden></div>
         <div class="chipy" id="chipy" role="group" aria-label="Wybierz dzień"></div>
-        <div class="kal-przew" id="siatka-przew"><div class="siatka" id="siatka"></div></div>
+        <div id="widok"></div>
         <ul class="legenda" id="legenda"></ul>
       </section>
       <aside class="bok" aria-label="Podsumowanie">
         <section class="karta" id="dzis"></section>
+        <section class="karta" id="uwaga"></section>
         <section class="karta karta--pacjent" id="pacjent"></section>
       </aside>
     </div>
   </main>
 
-  <div class="toast" id="toast" role="status" hidden><span id="toast-t"></span><button type="button" data-akcja="cofnij">Cofnij</button></div>
+  <aside class="szuflada" id="szuflada" role="dialog" aria-modal="false" aria-labelledby="szuflada-tytul" hidden>
+    <div class="szuflada__in" id="szuflada-tresc"></div>
+  </aside>
+  <div class="szuflada__tlo" id="szuflada-tlo" hidden></div>
 
-  <dialog id="okno" aria-labelledby="okno-tytul">
-    <form method="dialog" class="okno__in" id="okno-tresc"></form>
-  </dialog>
+  <div class="toast" id="toast" role="status" hidden><span id="toast-t"></span><button type="button" data-akcja="cofnij">Cofnij</button></div>
 
   <footer class="stopka in">
     <p>Demo kalendarza dostępności. Wbudowany kalendarz jest w cenie obu pakietów, a Kalendarz Google można połączyć zamiast niego.</p>
   </footer>
 
-  <script src="assets/js/kalendarz.js?v=4"></script>
+  <script src="assets/js/kalendarz-model.js?v=1"></script>
+  <script src="assets/js/kalendarz.js?v=7"></script>
 </body>
 </html>
