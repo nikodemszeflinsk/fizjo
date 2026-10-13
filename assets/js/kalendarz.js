@@ -19,7 +19,7 @@
   const MNOGA = { 0: 'niedziele', 1: 'poniedziałki', 2: 'wtorki', 3: 'środy', 4: 'czwartki', 5: 'piątki', 6: 'soboty' };
 
   /* ── Stan ───────────────────────────────────────────────────────────── */
-  const KLUCZ = 'kalendarz-demo-v3';
+  const KLUCZ = 'kalendarz-demo-v4';
   let stan;
   function nowyStan() {
     return { tryb: 'ind', widok: 'tydzien', data: K.dzisIso(), terap: 'jan', dane: { ind: K.ziarno('ind'), ent: K.ziarno('ent') } };
@@ -33,6 +33,8 @@
   }
   function zapisz() {
     try { localStorage.setItem(KLUCZ, JSON.stringify(stan)); } catch (e) { /* demo działa też bez zapisu */ }
+    /* Panel słucha tego zdarzenia, żeby odświeżyć swoje widoki po zmianie w kalendarzu. */
+    document.dispatchEvent(new CustomEvent('kal:zmiana'));
   }
   stan = wczytaj();
   const D = () => stan.dane[stan.tryb];
@@ -71,6 +73,8 @@
   }
   function cofnij() {
     if (!migawka) return;
+    /* Panel może podać własną funkcję cofania (np. dla treści strony). */
+    if (typeof migawka === 'function') { const f = migawka; ukryjToast(); f(); return; }
     stan.dane[stan.tryb] = JSON.parse(migawka);
     zapisz(); ukryjToast(); zamknijSzuflade(false); render();
   }
@@ -129,6 +133,7 @@
     const bl = K.blokady(D(), terap, data).find((x) => x.od <= START && x.do >= END);
     const n = K.rezDnia(D(), terap, data).length;
     if (bl) return bl.b.powod;
+    if (K.swietoZamkniete(D(), data) && !K.przedzialy(D(), terap, data).length) return `${K.swieto(data)}${n ? ', ' + wizyt(n) : ''}`;
     if (!K.przedzialy(D(), terap, data).length) return n ? `${wizyt(n)}, poza grafikiem` : ent() ? 'nie przyjmuje' : 'nie przyjmujesz';
     if (data < K.dzisIso()) return wizyt(n);
     const od = data === K.dzisIso() ? Math.max(START, Math.ceil(K.terazMin() / 15) * 15) : START;
@@ -160,9 +165,9 @@
       <div class="pasek__rzad pasek__rzad--akcje">
         <button type="button" class="przycisk" data-akcja="nowa"><span aria-hidden="true">+</span> Rezerwacja</button>
         <button type="button" class="przycisk przycisk--tryb" data-akcja="edycja" aria-pressed="${ui.edycja}">Zmień dostępność</button>
-        <button type="button" class="przycisk przycisk--cichy" data-akcja="godziny">Godziny przyjęć</button>
+        ${document.body.dataset.app === 'panel' ? '<a class="przycisk przycisk--cichy" href="#/dostepnosc">Grafik</a>' : '<button type="button" class="przycisk przycisk--cichy" data-akcja="godziny">Godziny przyjęć</button>'}
         <button type="button" class="przycisk przycisk--cichy" data-akcja="blokada">Blokada</button>
-        <button type="button" class="przycisk przycisk--cichy" data-akcja="ustawienia">Ustawienia</button>
+        ${document.body.dataset.app === 'panel' ? '' : '<button type="button" class="przycisk przycisk--cichy" data-akcja="ustawienia">Ustawienia</button>'}
         <div class="menu"><button type="button" class="przycisk przycisk--cichy" data-akcja="menu" aria-haspopup="true" aria-expanded="false" aria-label="Więcej">⋯</button>
           <ul class="menu__lista" id="menu-lista" hidden>
             <li class="tylko-tel"><button type="button" data-akcja="godziny">Godziny przyjęć</button></li>
@@ -176,7 +181,8 @@
           </ul></div>
       </div>`;
     $$('[data-tryb]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.tryb === stan.tryb)));
-    $('#pakiet-opis').textContent = ent() ? 'Zespół, każdy z własnym grafikiem' : 'Jeden terapeuta, kilka miejsc przyjęć';
+    const opisPakietu = $('#pakiet-opis');
+    if (opisPakietu) opisPakietu.textContent = ent() ? 'Zespół, każdy z własnym grafikiem' : 'Jeden terapeuta, kilka miejsc przyjęć';
   }
 
   function renderTryb() {
@@ -311,7 +317,7 @@
       const bl = ludzie.some((t) => K.blokady(D(), t.id, data).some((x) => x.od <= START && x.do >= END));
       h += `<button type="button" role="gridcell" class="mi__dzien${dd.getMonth() !== d.getMonth() ? ' mi__dzien--obcy' : ''}${data === K.dzisIso() ? ' mi__dzien--dzis' : ''}${zam ? ' mi__dzien--zam' : ''}" data-miesiac-dzien="${data}" aria-label="${esc(K.dlugaData(dd))}: ${wizyt(n)}${bl ? ', blokada' : zam ? ', nie przyjmujesz' : ''}">
         <span class="mi__nr">${dd.getDate()}</span>
-        ${zam ? `<span class="mi__stan">${bl ? 'blokada' : n ? wizyt(n) : 'wolne'}</span>` : `<span class="mi__n">${n ? wizyt(n) : '—'}</span><span class="mi__pasek" aria-hidden="true"><i style="width:${wyp.procent}%"></i></span><span class="mi__p">${wyp.procent}% zajęte</span>`}
+        ${zam ? `<span class="mi__stan">${bl ? 'blokada' : K.swietoZamkniete(D(), data) ? esc(K.swieto(data)) : n ? wizyt(n) : 'wolne'}</span>` : `<span class="mi__n">${n ? wizyt(n) : '—'}</span><span class="mi__pasek" aria-hidden="true"><i style="width:${wyp.procent}%"></i></span><span class="mi__p">${wyp.procent}% zajęte</span>`}
       </button>`;
     }
     $('#widok').innerHTML = h + '</div>';
@@ -387,7 +393,7 @@
       const kiedy = nast.data === dzis ? (roznica < 60 ? `za ${Math.max(1, roznica)} min` : `za ${Math.round(roznica / 60)} h`) : `${K.wzgledna(nast.data).toLowerCase()}, ${K.godz(nast.od)}`;
       nastTekst = `<button type="button" class="nast" data-rez="${nast.id}"><span>Następna wizyta</span><b>${esc(kiedy)}</b><em>${esc(nast.imie)}, ${esc(K.usluga(D(), nast.usluga).nazwa)}</em></button>`;
     }
-    $('#dzis').innerHTML = `<h3>Dziś</h3>
+    if ($('#dzis')) $('#dzis').innerHTML = `<h3>Dziś</h3>
       <dl class="liczby"><div><dt>Wizyty</dt><dd>${lista.length}</dd></div><div><dt>Wolne</dt><dd>${esc(K.godzTekst(wolneDzis))}</dd></div><div><dt>Zajęte</dt><dd>${wyp.procent}%</dd></div></dl>
       ${nastTekst}
       ${lista.length ? `<ul class="dzis-lista">${lista.slice(0, 5).map((r) => `<li><button type="button" data-rez="${r.id}" class="${r.status === 'przyszedl' ? 'ok' : r.status === 'nieobecny' ? 'x' : ''}"><b>${K.godz(r.od)}</b><span>${esc(r.imie)}<small>${esc(K.usluga(D(), r.usluga).nazwa)}</small></span></button></li>`).join('')}</ul>${lista.length > 5 ? `<p class="wiecej">i jeszcze ${lista.length - 5} <button type="button" class="link" data-widok="agenda">w agendzie</button></p>` : ''}` : '<p class="pusto">Dziś nie ma rezerwacji.</p>'}`;
@@ -401,12 +407,13 @@
     if (czeka.length) u += `<h4>Do potwierdzenia <i>${czeka.length}</i></h4><ul>${czeka.slice(0, 4).map((r) => wiersz(r, `<button type="button" class="przycisk przycisk--mini" data-status="${r.id}|potwierdzona">Potwierdź</button>`)).join('')}</ul>`;
     if (nowe.length) u += `<h4>Nowe ze strony <i>${nowe.length}</i></h4><ul>${nowe.slice(0, 4).map((r) => wiersz(r, `<button type="button" class="przycisk przycisk--mini przycisk--cichy" data-widziane="${r.id}">Widziałem</button>`)).join('')}</ul>`;
     if (ozn.length) u += `<h4>Oznacz, czy przyszedł <i>${ozn.length}</i></h4><ul>${ozn.slice(0, 4).map((r) => wiersz(r, `<button type="button" class="przycisk przycisk--mini" data-status="${r.id}|przyszedl" aria-label="Przyszedł: ${esc(r.imie)}">✓</button><button type="button" class="przycisk przycisk--mini przycisk--cichy" data-status="${r.id}|nieobecny" aria-label="Nie przyszedł: ${esc(r.imie)}">✕</button>`)).join('')}</ul>${ozn.length > 4 ? `<p class="wiecej">i jeszcze ${ozn.length - 4}</p>` : ''}`;
-    $('#uwaga').innerHTML = `<h3>Wymaga uwagi</h3>${u || '<p class="pusto">Wszystko ogarnięte. Nic nie czeka na Twoją decyzję.</p>'}`;
+    if ($('#uwaga')) $('#uwaga').innerHTML = `<h3>Wymaga uwagi</h3>${u || '<p class="pusto">Wszystko ogarnięte. Nic nie czeka na Twoją decyzję.</p>'}`;
 
     /* Co widzi pacjent: wybór usługi, lista terminów i symulacja rezerwacji. */
     const uslId = ui.uslugaPacjenta && D().uslugi.some((x) => x.id === ui.uslugaPacjenta) ? ui.uslugaPacjenta : D().uslugi[0].id;
     ui.uslugaPacjenta = uslId;
     const terminy = K.terminyPacjenta(D(), uslId, { ile: 6 });
+    if (!$('#pacjent')) return;
     $('#pacjent').innerHTML = `<h3>Co widzi pacjent</h3>
       <p class="pod">Najbliższe wolne terminy na Twojej stronie. Lista zmienia się razem z grafikiem. Kliknij termin, żeby zobaczyć go w kalendarzu.</p>
       <div class="widget" aria-label="Podgląd widżetu rezerwacji na stronie gabinetu">
@@ -486,6 +493,11 @@
   const pole = (id, etykieta, tresc, pod = '') => `<div class="pole"><label for="${id}">${etykieta}</label>${tresc}${pod ? `<p class="pod">${pod}</p>` : ''}</div>`;
 
   /* Szczegóły rezerwacji */
+  const DECYZJE = [
+    ['potwierdzona', 'Potwierdzona', ''],
+    ['przyszedl', '✓ Odbyta', 'ok'],
+    ['nieobecny', '✕ Nieodbyta', 'x'],
+  ];
   function szufladaRez(id) {
     const r = D().rezerwacje.find((x) => x.id === id);
     if (!r) return null;
@@ -493,52 +505,67 @@
     const t = terapeuta(r.terap);
     const d = K.zIso(r.data);
     const hist = K.pacjenci(D()).get(r.tel.replace(/\D/g, ''));
+    const odwolana = !K.aktywna(r);
+    const minela = K.minelo(r.data, r.od);
     const status = `<span class="stat stat--${r.status}">${esc(K.STATUSY[r.status])}</span>`;
     if (ui.odwolywanie) {
+      const godzinDo = Math.round((K.zIso(r.data).getTime() + r.od * 60000 - Date.now()) / 3600000);
       return `${naglowek('Odwołać wizytę?', `${esc(r.imie)}, ${esc(K.dlugaData(d))}, ${K.godz(r.od)}`)}
         <div class="formularz">
-          ${pole('f-powod', 'Powód', '<select id="f-powod" data-fokus><option>Pacjent odwołał</option><option>Pacjent nie odbiera</option><option>Gabinet odwołał</option><option>Inny powód</option></select>')}
-          ${r.zrodlo === 'strona' ? '<label class="check"><input type="checkbox" id="f-powiadom" checked /><span>Powiadom pacjenta e-mailem (w demie to symulacja)</span></label>' : '<p class="pod">Wizyta była wpisana po telefonie, więc nie wysyłamy e-maila.</p>'}
+          <fieldset class="zakres zakres--decyzja"><legend>Kto odwołuje</legend>
+            <label><input type="radio" name="kto-odwoluje" value="odwolana" checked data-fokus /> Pacjent odwołał</label>
+            <label><input type="radio" name="kto-odwoluje" value="anulowana" /> Gabinet anuluje (np. choroba terapeuty)</label>
+          </fieldset>
+          ${pole('f-powod', 'Powód <em>(widzisz tylko Ty)</em>', '<select id="f-powod"><option>Bez podania powodu</option><option>Choroba</option><option>Brak czasu, przełoży później</option><option>Nie odbiera telefonu</option><option>Choroba terapeuty</option><option>Inny powód</option></select>')}
+          <label class="check"><input type="checkbox" id="f-pozno"${godzinDo >= 0 && godzinDo < 24 ? ' checked' : ''} /><span>Odwołanie później niż 24 godziny przed wizytą</span></label>
+          ${r.zrodlo === 'strona' ? '<label class="check"><input type="checkbox" id="f-powiadom" checked /><span>Powiadom pacjenta e-mailem (w demie to symulacja)</span></label>' : ''}
           ${r.zal && D().ustawienia.zaliczki ? `<p class="okno__nota">Pacjent wpłacił zaliczkę ${r.zal.kwota} zł (${esc(r.zal.metoda)}). Zwrot robisz u operatora płatności, zgodnie ze swoim regulaminem.</p>` : ''}
-          <p class="okno__nota">Termin od razu wraca na stronę jako wolny. Tę zmianę możesz cofnąć.</p>
+          <p class="okno__nota">Termin od razu wraca na stronę jako wolny, a wizyta zostaje w historii jako odwołana. Możesz to cofnąć albo przywrócić wizytę później.</p>
         </div>
         <footer class="sz__st"><button type="button" class="przycisk przycisk--cichy" data-akcja="odwolaj-wroc">Wróć</button><button type="button" class="przycisk przycisk--alert" data-akcja="odwolaj-potwierdz" data-id="${r.id}">Odwołaj wizytę</button></footer>`;
     }
+    const decyzje = odwolana
+      ? `<p class="sz__odwolana">${esc(K.STATUSY[r.status])}${r.powod ? `: ${esc(r.powod)}` : ''}${r.pozno ? ' · późno (mniej niż 24 h)' : ''}. Termin jest wolny.</p>
+         <button type="button" class="przycisk" data-akcja="przywroc" data-id="${r.id}">Przywróć wizytę</button>`
+      : `${r.status === 'oczekuje' ? `<button type="button" class="przycisk" data-status="${r.id}|potwierdzona">Potwierdź wizytę</button>` : ''}
+         <div class="decyzje" role="group" aria-label="Decyzja o wizycie">${DECYZJE.map(([k, n, kl]) => `<button type="button" class="decyzja${kl ? ' decyzja--' + kl : ''}" data-status="${r.id}|${k}" aria-pressed="${r.status === k}"${k !== 'potwierdzona' && !minela ? ' title="Wizyta jeszcze się nie odbyła"' : ''}>${n}</button>`).join('')}</div>`;
     return `${naglowek(esc(r.imie), `${esc(K.dlugaData(d))}, ${K.czas(r.od, r.dl)}`)}
-      <div class="sz__chipy">${status}<span class="stat">${r.zrodlo === 'strona' ? 'ze strony' : 'wpisana ręcznie'}</span>${r.nowa ? '<span class="stat stat--nowa">nowa</span>' : ''}${r.zal && D().ustawienia.zaliczki ? `<span class="stat stat--zal">zaliczka ${r.zal.kwota} zł</span>` : ''}</div>
-      <div class="sz__glowne">
-        ${r.status === 'oczekuje' ? `<button type="button" class="przycisk" data-status="${r.id}|potwierdzona">Potwierdź wizytę</button>` : ''}
-        <button type="button" class="przycisk${r.status === 'przyszedl' ? '' : ' przycisk--cichy'}" data-status="${r.id}|${r.status === 'przyszedl' ? 'potwierdzona' : 'przyszedl'}" aria-pressed="${r.status === 'przyszedl'}">✓ Przyszedł</button>
-        <button type="button" class="przycisk${r.status === 'nieobecny' ? ' przycisk--alert' : ' przycisk--cichy'}" data-status="${r.id}|${r.status === 'nieobecny' ? 'potwierdzona' : 'nieobecny'}" aria-pressed="${r.status === 'nieobecny'}">✕ Nie przyszedł</button>
-      </div>
+      <div class="sz__chipy">${status}<span class="stat">${esc(K.ZRODLA_KR[r.zrodlo] || r.zrodlo)}</span>${r.nowa ? '<span class="stat stat--nowa">nowa</span>' : ''}${r.zal && D().ustawienia.zaliczki ? `<span class="stat stat--zal">zaliczka ${r.zal.kwota} zł</span>` : ''}</div>
+      <div class="sz__glowne">${decyzje}</div>
       <dl class="dane">
         <div><dt>Telefon</dt><dd><a href="tel:${esc(r.tel.replace(/\s/g, ''))}">${esc(r.tel)}</a></dd></div>
-        <div><dt>Usługa</dt><dd>${esc(u.nazwa)}, ${esc(K.dlTekst(r.dl))}${u.cena ? `, ${u.cena} zł` : ''}</dd></div>
+        <div><dt>Usługa</dt><dd>${esc(u.nazwa)}, ${esc(K.dlTekst(r.dl))}</dd></div>
         <div><dt>${ent() ? 'Terapeuta' : 'Miejsce'}</dt><dd>${ent() ? esc(t.nazwa) : esc(K.miejsce(D(), r.lok).nazwa)}</dd></div>
+        <div><dt>Skąd przyszedł</dt><dd><select class="dane__sel" data-zrodlo-rez="${r.id}" aria-label="Skąd przyszedł pacjent">${Object.entries(K.ZRODLA).map(([k, n]) => `<option value="${k}"${r.zrodlo === k ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select></dd></div>
         ${r.zal && D().ustawienia.zaliczki ? `<div><dt>Zaliczka online</dt><dd>${r.zal.kwota} zł, opłacona (${esc(r.zal.metoda)})</dd></div>` : ''}
         ${r.uwaga ? `<div><dt>Wiadomość od pacjenta</dt><dd>${esc(r.uwaga)}</dd></div>` : ''}
-        <div><dt>Historia</dt><dd>${hist && hist.razem > 1 ? `${wizyt(hist.razem)} u Was${hist.nieobecny ? `, ${hist.nieobecny}× nie przyszedł` : ''}` : 'pierwsza wizyta'}</dd></div>
+        <div><dt>Historia</dt><dd>${hist && hist.razem > 1 ? `${wizyt(hist.razem)} u Was${hist.nieobecny ? `, ${hist.nieobecny}× nieodbyta` : ''}${hist.odwolal ? `, ${hist.odwolal}× odwołana` : ''}` : 'pierwsza wizyta'}</dd></div>
       </dl>
+      <div class="pola2">
+        ${pole('f-cena', 'Cena wizyty <em>(zł)</em>', `<input id="f-cena" type="number" min="0" step="10" data-cena="${r.id}" value="${K.cena(D(), r)}" />`, r.cena != null && r.cena !== u.cena ? `W cenniku: ${u.cena} zł` : 'Liczy się do przychodu, gdy wizyta jest odbyta.')}
+      </div>
       ${pole('f-notatka', 'Notatka dla gabinetu <em>(nie widzi jej pacjent)</em>', `<textarea id="f-notatka" data-notatka="${r.id}" rows="2" placeholder="np. woli rano, ma zwolnienie">${esc(r.notatka || '')}</textarea>`)}
-      <div class="sz__drugie">
+      ${odwolana ? '' : `<div class="sz__drugie">
         <button type="button" class="przycisk przycisk--cichy" data-akcja="przenos" data-id="${r.id}">Przełóż</button>
         <button type="button" class="przycisk przycisk--cichy" data-akcja="edytuj" data-id="${r.id}">Zmień dane</button>
         <button type="button" class="przycisk przycisk--cichy" data-akcja="powtorz" data-id="${r.id}">Za tydzień</button>
         <button type="button" class="przycisk przycisk--cichy przycisk--ostrzez" data-akcja="odwolaj" data-id="${r.id}">Odwołaj</button>
       </div>
-      <p class="pod">Przełóż: kliknij nowy termin w kalendarzu albo przeciągnij wizytę.</p>`;
+      <p class="pod">Przełóż: kliknij nowy termin w kalendarzu albo przeciągnij wizytę.</p>`}`;
   }
 
   /* Nowa lub edytowana rezerwacja */
   function szufladaNowa(a) {
     const edytowana = a.id ? D().rezerwacje.find((x) => x.id === a.id) : null;
     if (a.id && !edytowana) return null;
-    const r = edytowana || {};
-    const usl = r.usluga || a.usluga || D().uslugi[0].id;
-    const dl = r.dl || a.dl || K.usluga(D(), usl).min;
+    const r = edytowana || { imie: a.imie || '', tel: a.tel || '', notatka: '' };
     const data = r.data || a.data || stan.data;
     const od = r.od != null ? r.od : a.od != null ? a.od : K.zH('9:00');
     const terap = r.terap || a.terap || stan.terap;
+    /* Kliknięty wolny termin: proponujemy pierwszą usługę, która się w nim mieści, zamiast od razu pokazywać kolizję. */
+    const miesci = (u) => { const w = K.sprawdz(D(), terap, data, od, u.min, null); return !w.kolizja && !w.zakres; };
+    const usl = r.usluga || a.usluga || (!edytowana && a.od != null ? (D().uslugi.find(miesci) || D().uslugi[0]).id : D().uslugi[0].id);
+    const dl = r.dl || a.dl || K.usluga(D(), usl).min;
     const lokId = r.lok || K.lok(D(), terap, data, od);
     const znani = [...K.pacjenci(D()).values()];
     return `${naglowek(edytowana ? 'Zmień rezerwację' : 'Nowa rezerwacja', edytowana ? esc(edytowana.imie) : 'Pacjent, który zadzwonił albo przyszedł do recepcji.')}
@@ -554,8 +581,15 @@
           ${pole('f-data', 'Data', `<input id="f-data" type="date" value="${data}" />`)}
           ${pole('f-od', 'Godzina', `<input id="f-od" type="time" step="900" value="${K.godz2(od)}" />`)}
         </div>
-        ${ent() ? pole('f-terap', 'Terapeuta', `<select id="f-terap">${D().zespol.map((t) => `<option value="${t.id}"${t.id === terap ? ' selected' : ''}>${esc(t.nazwa)}</option>`).join('')}</select>`) : (D().miejsca.length > 1 ? pole('f-lok', 'Miejsce', `<select id="f-lok">${D().miejsca.map((m) => `<option value="${m.id}"${m.id === lokId ? ' selected' : ''}>${esc(m.nazwa)}</option>`).join('')}</select>`) : '')}
+        ${ent() || D().miejsca.length > 1 ? `<div class="${ent() && D().miejsca.length > 1 ? 'pola2' : ''}">
+          ${ent() ? pole('f-terap', 'Terapeuta', `<select id="f-terap">${D().zespol.map((t) => `<option value="${t.id}"${t.id === terap ? ' selected' : ''}>${esc(t.nazwa)}</option>`).join('')}</select>`) : ''}
+          ${D().miejsca.length > 1 ? pole('f-lok', ent() ? 'Lokalizacja' : 'Miejsce', `<select id="f-lok">${D().miejsca.map((m) => `<option value="${m.id}"${m.id === lokId ? ' selected' : ''}>${esc(m.nazwa)}</option>`).join('')}</select>`, 'Podpowiadamy z grafiku, możesz zmienić.') : ''}
+        </div>` : ''}
         <p class="status-nowej" id="nowa-status" role="status"></p>
+        <div class="pola2">
+          ${pole('f-zrodlo', 'Skąd przyszedł pacjent', `<select id="f-zrodlo">${Object.entries(K.ZRODLA).map(([k, n]) => `<option value="${k}"${(r.zrodlo || a.zrodlo || 'telefon') === k ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select>`)}
+          ${pole('f-cena', 'Cena <em>(zł)</em>', `<input id="f-cena" type="number" min="0" step="10" value="${r.id ? K.cena(D(), r) : K.usluga(D(), usl).cena}" />`)}
+        </div>
         ${pole('f-notatka', 'Notatka <em>(dla gabinetu)</em>', `<textarea id="f-notatka" rows="2">${esc(r.notatka || '')}</textarea>`)}
         ${edytowana ? '' : pole('f-powt', 'Powtarzaj', `<select id="f-powt"><option value="0">Nie powtarzaj</option>${[1, 2, 3, 4, 5, 6, 7, 8].map((n) => `<option value="${n}">co tydzień, jeszcze ${n} ${lw(n, 'raz', 'razy', 'razy')}</option>`).join('')}</select>`, 'Seria wizyt o tej samej godzinie. Kolidujące terminy pomijamy i mówimy o tym.')}
       </div>
@@ -570,6 +604,7 @@
       imie: $('#f-imie').value.trim(), tel: $('#f-tel').value.trim(), usluga: $('#f-usl').value, dl: Number($('#f-dl').value),
       data: $('#f-data').value, od: K.zH($('#f-od').value || '0:00'), terap: $('#f-terap') ? $('#f-terap').value : (ui.szuflada.arg.terap || stan.terap),
       lok: $('#f-lok') ? $('#f-lok').value : null, notatka: $('#f-notatka').value.trim(), powt: $('#f-powt') ? Number($('#f-powt').value) : 0,
+      zrodlo: $('#f-zrodlo') ? $('#f-zrodlo').value : 'telefon', cena: $('#f-cena') ? Number($('#f-cena').value) || 0 : null,
       edytowana: $('[data-formularz="nowa"]').dataset.edytowana,
     };
   }
@@ -605,7 +640,7 @@
     if (f.edytowana) {
       zmien(`Zapisano zmiany: ${f.imie}`, () => {
         const r = D().rezerwacje.find((x) => x.id === f.edytowana);
-        Object.assign(r, { imie: f.imie, tel: f.tel, usluga: f.usluga, dl: f.dl, data: f.data, od: f.od, terap: f.terap, lok: f.lok || K.lok(D(), f.terap, f.data, f.od), notatka: f.notatka });
+        Object.assign(r, { imie: f.imie, tel: f.tel, usluga: f.usluga, dl: f.dl, data: f.data, od: f.od, terap: f.terap, lok: f.lok || K.lok(D(), f.terap, f.data, f.od), notatka: f.notatka, zrodlo: f.zrodlo, cena: f.cena });
       });
       return;
     }
@@ -615,7 +650,7 @@
       for (let i = 0; i <= f.powt; i++) {
         const data = K.iso(K.dodaj(K.zIso(f.data), i * 7));
         if (K.sprawdz(D(), f.terap, data, f.od, f.dl).kolizja) { pominiete.push(K.wzgledna(data)); continue; }
-        D().rezerwacje.push({ id: `r${Date.now()}${i}`, terap: f.terap, data, od: f.od, dl: f.dl, usluga: f.usluga, imie: f.imie, tel: f.tel, uwaga: '', notatka: f.notatka, zrodlo: 'telefon', lok: f.lok || K.lok(D(), f.terap, data, f.od), status: 'potwierdzona', nowa: false, zal: null });
+        D().rezerwacje.push({ id: `r${Date.now()}${i}`, terap: f.terap, data, od: f.od, dl: f.dl, usluga: f.usluga, cena: f.cena, imie: f.imie, tel: f.tel, uwaga: '', notatka: f.notatka, zrodlo: i === 0 ? f.zrodlo : 'powrot', lok: f.lok || K.lok(D(), f.terap, data, f.od), status: 'potwierdzona', nowa: false, zal: null });
         dodane += 1;
       }
     });
@@ -850,7 +885,8 @@
   function ustawStatus(id, status) {
     const r = D().rezerwacje.find((x) => x.id === id);
     if (!r) return;
-    const tekst = status === 'przyszedl' ? `${r.imie}: przyszedł` : status === 'nieobecny' ? `${r.imie}: nie przyszedł` : r.status === 'oczekuje' ? `Potwierdzono: ${r.imie}` : `${r.imie}: zdjęto oznaczenie`;
+    if (r.status === status && status !== 'potwierdzona') status = 'potwierdzona';
+    const tekst = status === 'przyszedl' ? `${r.imie}: wizyta odbyta${K.cena(D(), r) ? `, ${K.cena(D(), r)} zł do przychodu` : ''}` : status === 'nieobecny' ? `${r.imie}: wizyta nieodbyta` : r.status === 'oczekuje' ? `Potwierdzono: ${r.imie}` : `${r.imie}: zdjęto oznaczenie`;
     zmien(tekst, () => { r.status = status; r.nowa = false; }, { zamknij: false });
   }
   function przeniesRezerwacje(id, terap, data, od) {
@@ -872,7 +908,7 @@
     const w = K.sprawdz(D(), r.terap, data, r.od, r.dl);
     if (w.kolizja) { toast(`Za tydzień ten termin jest zajęty: ${w.kolizja.imie}.`); return; }
     zmien(`Wpisano za tydzień: ${r.imie}, ${K.dlugaData(K.zIso(data))}`, () => {
-      D().rezerwacje.push({ ...r, id: `r${Date.now()}`, data, status: 'potwierdzona', nowa: false, zrodlo: 'telefon', zal: null, lok: K.lok(D(), r.terap, data, r.od) });
+      D().rezerwacje.push({ ...r, id: `r${Date.now()}`, data, status: 'potwierdzona', nowa: false, zrodlo: 'powrot', zal: null, uwaga: '', lok: K.lok(D(), r.terap, data, r.od) });
     });
   }
   const IMIONA_SYM = [['Dorota Kamińska', '601 200 111'], ['Paweł Stolarz', '601 200 122'], ['Natalia Brzozowska', '601 200 133'], ['Łukasz Kubiak', '601 200 144'], ['Iwona Sadowska', '601 200 155'], ['Wojciech Marczak', '601 200 166']];
@@ -883,7 +919,7 @@
     if (!t) { toast('Brak wolnych terminów, więc pacjent nie ma co zarezerwować.'); return; }
     const p = IMIONA_SYM[Math.floor(Math.random() * IMIONA_SYM.length)];
     const ust = D().ustawienia;
-    const rez = { id: `r${Date.now()}`, terap: t.ids[0], data: t.data, od: t.od, dl: u.min, usluga: uslId, imie: p[0], tel: p[1], uwaga: 'Pierwsza wizyta u Was.', notatka: '', zrodlo: 'strona', lok: t.lok, status: ust.auto ? 'potwierdzona' : 'oczekuje', nowa: true, zal: ust.zaliczki && u.zaliczka ? { kwota: ust.zaliczkaKwota, metoda: 'BLIK' } : null };
+    const rez = { id: `r${Date.now()}`, terap: t.ids[0], data: t.data, od: t.od, dl: u.min, usluga: uslId, cena: u.cena, imie: p[0], tel: p[1], uwaga: 'Pierwsza wizyta u Was.', notatka: '', zrodlo: 'strona', lok: t.lok, status: ust.auto ? 'potwierdzona' : 'oczekuje', nowa: true, zal: ust.zaliczki && u.zaliczka ? { kwota: ust.zaliczkaKwota, metoda: 'BLIK' } : null };
     zmien(`Nowa rezerwacja ze strony: ${p[0]}, ${K.wzgledna(t.data).toLowerCase()} ${K.godz(t.od)}.`, () => { D().rezerwacje.push(rez); }, { zamknij: false });
     idzDoRezerwacji(t.ids[0], t.data);
     setTimeout(() => blysnijRez(rez.id), 60);
@@ -1041,14 +1077,14 @@
       .sort((a, b) => Math.abs(K.dniMiedzy(K.dzisIso(), a.data)) - Math.abs(K.dniMiedzy(K.dzisIso(), b.data)))
       .slice(0, 8);
     lista.hidden = false;
-    lista.innerHTML = wynik.length ? wynik.map((r) => `<li><button type="button" data-szukaj-rez="${r.id}"><b>${esc(r.imie)}</b><span>${esc(K.wzgledna(r.data))}, ${K.godz(r.od)} · ${esc(K.usluga(D(), r.usluga).nazwa)}</span></button></li>`).join('') : '<li class="pusto">Nic nie znaleziono.</li>';
+    lista.innerHTML = wynik.length ? wynik.map((r) => `<li><button type="button" data-szukaj-rez="${r.id}"><b>${esc(r.imie)}</b><span>${esc(K.wzgledna(r.data))}, ${K.godz(r.od)} · ${esc(K.usluga(D(), r.usluga).nazwa)}${K.aktywna(r) ? '' : ' · odwołana'}</span></button></li>`).join('') : '<li class="pusto">Nic nie znaleziono.</li>';
   }
   function eksportCsv() {
     const od = K.iso(K.dodaj(new Date(), -30));
     const wiersze = D().rezerwacje.filter((r) => r.data >= od).sort((a, b) => (a.data + K.pad(a.od)).localeCompare(b.data + K.pad(b.od)));
     const q = (s) => `"${String(s == null ? '' : s).replace(/"/g, '""')}"`;
-    const csv = ['Data;Od;Do;Pacjent;Telefon;Usługa;Terapeuta;Miejsce;Status;Źródło;Zaliczka;Notatka']
-      .concat(wiersze.map((r) => [r.data, K.godz(r.od), K.godz(r.od + r.dl), r.imie, r.tel, K.usluga(D(), r.usluga).nazwa, terapeuta(r.terap).nazwa, K.miejsce(D(), r.lok).nazwa, K.STATUSY[r.status], r.zrodlo === 'strona' ? 'strona' : 'telefon', r.zal ? `${r.zal.kwota} zł` : '', r.notatka].map(q).join(';'))).join('\r\n');
+    const csv = ['Data;Od;Do;Pacjent;Telefon;Usługa;Cena;Terapeuta;Miejsce;Status;Źródło;Zaliczka;Notatka']
+      .concat(wiersze.map((r) => [r.data, K.godz(r.od), K.godz(r.od + r.dl), r.imie, r.tel, K.usluga(D(), r.usluga).nazwa, K.cena(D(), r), terapeuta(r.terap).nazwa, K.miejsce(D(), r.lok).nazwa, K.STATUSY[r.status], K.ZRODLA[r.zrodlo] || r.zrodlo, r.zal ? `${r.zal.kwota} zł` : '', r.notatka].map(q).join(';'))).join('\r\n');
     try {
       const a = document.createElement('a');
       a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' }));
@@ -1156,8 +1192,18 @@
         const r = D().rezerwacje.find((x) => x.id === b.dataset.id);
         if (!r) return;
         const pow = $('#f-powiadom') && $('#f-powiadom').checked;
+        const kto = ($('input[name="kto-odwoluje"]:checked') || { value: 'odwolana' }).value;
+        const powod = $('#f-powod') ? $('#f-powod').value : '';
+        const pozno = !!($('#f-pozno') && $('#f-pozno').checked);
         ui.odwolywanie = false;
-        return zmien(`Odwołano: ${r.imie}. Termin znów jest wolny${pow ? ', e-mail do pacjenta wysłany (symulacja)' : ''}.`, () => { D().rezerwacje = D().rezerwacje.filter((x) => x.id !== r.id); });
+        return zmien(`${kto === 'anulowana' ? 'Anulowano' : 'Odwołano'}: ${r.imie}. Termin znów jest wolny${pow ? ', e-mail do pacjenta wysłany (symulacja)' : ''}.`, () => { Object.assign(r, { status: kto, powod, pozno, nowa: false, odwolano: new Date().toISOString() }); });
+      }
+      case 'przywroc': {
+        const r = D().rezerwacje.find((x) => x.id === b.dataset.id);
+        if (!r) return;
+        const w = K.sprawdz(D(), r.terap, r.data, r.od, r.dl, r.id);
+        if (w.kolizja) return toast(`Nie da się przywrócić: termin zajął już ${w.kolizja.imie}. Przełóż wizytę na inny termin.`);
+        return zmien(`Przywrócono wizytę: ${r.imie}`, () => { r.status = K.minelo(r.data, r.od) ? 'przyszedl' : 'potwierdzona'; delete r.powod; delete r.pozno; delete r.odwolano; }, { zamknij: false });
       }
       case 'zapisz-nowa': return zapiszNowa();
       case 'zamknij-termin': { const od = Number(b.dataset.od); return zastosujZakres([{ terap: b.dataset.t, data: b.dataset.d }], od, od + 30, false); }
@@ -1199,6 +1245,7 @@
     const t = e.target;
     if (t.id === 'szukaj') return szukaj(t.value);
     if (t.matches('[data-notatka]')) { const r = D().rezerwacje.find((x) => x.id === t.dataset.notatka); if (r) { r.notatka = t.value; zapisz(); } return; }
+    if (t.matches('[data-cena]')) { const r = D().rezerwacje.find((x) => x.id === t.dataset.cena); if (r) { r.cena = Number(t.value) || 0; zapisz(); } return; }
     if (t.closest('[data-formularz="nowa"]')) { t.removeAttribute('aria-invalid'); if (t.id === 'f-imie') uzupelnijZnanego(t); return statusNowej(); }
     if (t.closest('[data-formularz="blokada"]')) return statusBlokady();
     if (t.matches('#przedz-lista input')) { ui.szuflada.arg.przedz = odczytPrzedzialow(); return; }
@@ -1216,13 +1263,15 @@
   function uzupelnijZnanego(t) {
     const p = [...K.pacjenci(D()).values()].find((x) => x.imie.toLowerCase() === t.value.trim().toLowerCase());
     if (p && !$('#f-tel').value) $('#f-tel').value = p.tel;
+    if (p && $('#f-zrodlo') && !$('[data-formularz="nowa"]').dataset.edytowana) $('#f-zrodlo').value = 'powrot';
   }
   document.addEventListener('change', (e) => {
     const t = e.target;
     if (t.id === 'sel-terap') { stan.terap = t.value; ui.mobIdx = null; zapisz(); return render(); }
+    if (t.matches('[data-zrodlo-rez]')) { const r = D().rezerwacje.find((x) => x.id === t.dataset.zrodloRez); if (r) { r.zrodlo = t.value; zapisz(); toast(`Źródło: ${K.ZRODLA[t.value]}`); } return; }
     if (t.id === 'sel-usluga') { ui.uslugaPacjenta = t.value; return renderBoki(); }
     if (t.closest('[data-formularz="nowa"]')) {
-      if (t.id === 'f-usl') $('#f-dl').value = String(K.usluga(D(), t.value).min);
+      if (t.id === 'f-usl') { $('#f-dl').value = String(K.usluga(D(), t.value).min); if ($('#f-cena')) $('#f-cena').value = String(K.usluga(D(), t.value).cena); }
       if (['f-od', 'f-data', 'f-terap'].includes(t.id) && $('#f-lok') && $('#f-data').value) $('#f-lok').value = K.lok(D(), $('#f-terap') ? $('#f-terap').value : stan.terap, $('#f-data').value, K.zH($('#f-od').value || '9:00'));
       return statusNowej();
     }
@@ -1251,6 +1300,7 @@
   document.addEventListener('pointercancel', () => { ui.drag = null; pokazZaznaczenie(null); przesuwanie = null; document.body.classList.remove('ciagnie'); });
 
   document.addEventListener('keydown', (e) => {
+    if (window.KAL_UI && window.KAL_UI.aktywny && !window.KAL_UI.aktywny()) return;
     if (e.key === 'Escape') {
       const w = $('#szukaj-wyniki');
       if (w && !w.hidden) { w.hidden = true; return; }
@@ -1273,15 +1323,46 @@
     if (e.key === '?') return otworzSzuflade('skroty', {});
   });
   $('#szuflada-tlo').addEventListener('click', () => zamknijSzuflade());
-  $('#demo-zamknij').addEventListener('click', () => $('#demo').remove());
+  if ($('#demo-zamknij')) $('#demo-zamknij').addEventListener('click', () => $('#demo').remove());
   waski.addEventListener('change', render);
   /* Linia „teraz” i liczniki odświeżają się raz na minutę. */
-  setInterval(() => { if (!ui.drag && !przesuwanie && !ui.szuflada) { renderWidok(); renderBoki(); } }, 60000);
+  setInterval(() => {
+    if (window.KAL_UI && window.KAL_UI.aktywny && !window.KAL_UI.aktywny()) return;
+    if (!ui.drag && !przesuwanie && !ui.szuflada) { renderWidok(); renderBoki(); }
+  }, 60000);
+  /* Zmiana w innej karcie (np. w panelu) od razu trafia tutaj. */
+  window.addEventListener('storage', (e) => { if (e.key === KLUCZ && !ui.drag && !przesuwanie) { stan = wczytaj(); render(); } });
 
   /* Link z oferty: kalendarz.html?tryb=ent otwiera od razu wariant zespołu. */
   const zLinku = new URLSearchParams(location.search).get('tryb');
   if ((zLinku === 'ent' || zLinku === 'ind') && zLinku !== stan.tryb) {
     stan.tryb = zLinku; stan.widok = zLinku === 'ent' ? 'dzien' : 'tydzien'; stan.terap = D().zespol[0].id; stan.data = K.dzisIso();
   }
+
+  /* Interfejs dla panelu: ten sam stan, te same okna i to samo cofanie. */
+  window.KAL_UI = Object.assign(window.KAL_UI || {}, {
+    stan: () => stan,
+    D,
+    zapisz,
+    render,
+    zmien,
+    toast,
+    ukryjToast,
+    zamknijSzuflade: () => zamknijSzuflade(false),
+    otworzRez: (id) => otworzSzuflade('rez', id),
+    ustawStatus,
+    odwolaj: (id) => { otworzSzuflade('rez', id); ui.odwolywanie = true; odswiezSzuflade(true); },
+    przenies: (id) => akcja({ dataset: { akcja: 'przenos', id } }),
+    nowa: (arg) => otworzSzuflade('nowa', arg || { terap: stan.terap, data: K.dzisIso(), od: Math.min(END - 60, Math.max(START, Math.ceil((K.terazMin() + 30) / 15) * 15)) }),
+    blokada: (arg) => otworzSzuflade('blokada', arg || {}),
+    idzDo: (terap, data, widok) => { if (widok) stan.widok = widok; idzDoRezerwacji(terap, data); },
+    ustawTryb: (tryb) => {
+      if (tryb === stan.tryb) return;
+      stan.tryb = tryb; stan.widok = tryb === 'ent' ? 'dzien' : 'tydzien'; stan.terap = D().zespol[0].id; stan.data = K.dzisIso();
+      ui.mobIdx = null; ui.przenos = null; ui.uslugaPacjenta = null; ui.edycja = false; ukryjToast(); zamknijSzuflade(false); zapisz(); render();
+    },
+    przeladuj: () => { stan = wczytaj(); render(); },
+    nowyStan: () => { stan = nowyStan(); zapisz(); render(); },
+  });
   render();
 })();

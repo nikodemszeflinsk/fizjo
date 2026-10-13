@@ -28,9 +28,29 @@
   K.STATUSY = {
     potwierdzona: 'Potwierdzona',
     oczekuje: 'Do potwierdzenia',
-    przyszedl: 'Przyszedł',
-    nieobecny: 'Nie przyszedł',
+    przyszedl: 'Odbyta',
+    nieobecny: 'Nieodbyta',
+    odwolana: 'Odwołana przez pacjenta',
+    anulowana: 'Anulowana przez gabinet',
   };
+  /** Wizyta odwołana albo anulowana nie zajmuje terminu, ale zostaje w historii i w statystykach. */
+  K.ODWOLANE = ['odwolana', 'anulowana'];
+  K.aktywna = (r) => !K.ODWOLANE.includes(r.status);
+  /** Skąd przyszła rezerwacja. „strona” to system rezerwacji online. */
+  K.ZRODLA = {
+    strona: 'Strona (rezerwacja online)',
+    telefon: 'Telefon',
+    powrot: 'Powracający pacjent',
+    polecenie: 'Polecenie',
+    znanylekarz: 'ZnanyLekarz',
+    google: 'Wizytówka Google',
+    social: 'Instagram lub Facebook',
+    osobiscie: 'Przyszedł osobiście',
+    inne: 'Inne',
+  };
+  K.ZRODLA_KR = { strona: 'strona', telefon: 'telefon', powrot: 'powracający', polecenie: 'polecenie', znanylekarz: 'ZnanyLekarz', google: 'Google', social: 'social media', osobiscie: 'osobiście', inne: 'inne' };
+  /** Cena konkretnej wizyty (może różnić się od cennika, np. rabat). */
+  K.cena = (D, r) => (r.cena != null ? r.cena : (D.uslugi.find((u) => u.id === r.usluga) || { cena: 0 }).cena);
 
   /* ── Czas i daty ───────────────────────────────────────────────────── */
   const pad = (n) => String(n).padStart(2, '0');
@@ -93,10 +113,46 @@
   K.kolor = (i) => K.KOLORY[i % K.KOLORY.length];
   K.widoczni = (D) => D.zespol.filter((t) => t.widoczny !== false);
 
-  /** Godziny przyjęć w danym dniu po uwzględnieniu wyjątków (otwarte i zamknięte pojedyncze terminy). */
+  /* ── Święta (Polska) ──────────────────────────────────────────────── */
+  const wielkanoc = (y) => {
+    const a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4;
+    const f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
+    const i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451);
+    const mies = Math.floor((h + l - 7 * m + 114) / 31), dz = ((h + l - 7 * m + 114) % 31) + 1;
+    return new Date(y, mies - 1, dz);
+  };
+  const pamiecSwiat = new Map();
+  /** Dni ustawowo wolne w danym roku: data → nazwa. Od 2025 r. wolna jest też Wigilia. */
+  K.swieta = (rok) => {
+    if (pamiecSwiat.has(rok)) return pamiecSwiat.get(rok);
+    const w = wielkanoc(rok);
+    const s = new Map([
+      [`${rok}-01-01`, 'Nowy Rok'], [`${rok}-01-06`, 'Trzech Króli'],
+      [K.iso(w), 'Wielkanoc'], [K.iso(K.dodaj(w, 1)), 'Poniedziałek Wielkanocny'],
+      [`${rok}-05-01`, 'Święto Pracy'], [`${rok}-05-03`, 'Święto Konstytucji 3 Maja'],
+      [K.iso(K.dodaj(w, 49)), 'Zielone Świątki'], [K.iso(K.dodaj(w, 60)), 'Boże Ciało'],
+      [`${rok}-08-15`, 'Wniebowzięcie NMP'], [`${rok}-11-01`, 'Wszystkich Świętych'], [`${rok}-11-11`, 'Święto Niepodległości'],
+      [`${rok}-12-25`, 'Boże Narodzenie'], [`${rok}-12-26`, 'Drugi dzień świąt'],
+    ]);
+    if (rok >= 2025) s.set(`${rok}-12-24`, 'Wigilia');
+    pamiecSwiat.set(rok, s);
+    return s;
+  };
+  K.swieto = (data) => K.swieta(Number(data.slice(0, 4))).get(data) || null;
+  /** Czy gabinet ma tego dnia zamknięte z powodu święta (domyślnie tak, chyba że ktoś je otworzył). */
+  K.swietoZamkniete = (D, data) => !!K.swieto(data) && (D.ustawienia || {}).swietaZamkniete !== false && !(D.swietaOtwarte || []).includes(data);
+
+  /* ── Grafik: wersja obowiązująca w danym dniu ──────────────────────── */
+  /** Zaplanowane zmiany grafiku: od podanej daty obowiązuje inny stały grafik. */
+  K.wersjaGrafiku = (D, data) => (D.zmianyGrafiku || []).filter((z) => z.od <= data).sort((a, b) => b.od.localeCompare(a.od))[0] || null;
+  K.regulyOsoby = (D, terap, data) => {
+    const w = data ? K.wersjaGrafiku(D, data) : null;
+    return (w ? w.reguly[terap] : D.reguly[terap]) || {};
+  };
+
+  /** Godziny przyjęć w danym dniu po uwzględnieniu świąt i wyjątków (otwarte i zamknięte pojedyncze terminy). */
   K.przedzialy = (D, terap, data) => {
-    const dzien = K.zIso(data).getDay();
-    let o = K.scal(((D.reguly[terap] || {})[dzien] || []).map((r) => [r.od, r.do]));
+    let o = K.bazaDnia(D, terap, data);
     for (const w of D.wyjatki) {
       if (w.terap !== terap || w.data !== data) continue;
       o = w.typ === 'open' ? K.scal([...o, [w.od, w.do]]) : K.odejmij(o, [w.od, w.do]);
@@ -104,7 +160,9 @@
     return o;
   };
   K.lok = (D, terap, data, min) => {
-    const r = ((D.reguly[terap] || {})[K.zIso(data).getDay()] || []).find((x) => min >= x.od && min < x.do);
+    const w = D.wyjatki.find((x) => x.terap === terap && x.data === data && x.typ === 'open' && x.lok && min >= x.od && min < x.do);
+    if (w) return w.lok;
+    const r = (K.regulyOsoby(D, terap, data)[K.zIso(data).getDay()] || []).find((x) => min >= x.od && min < x.do);
     return r ? r.lok : D.miejsca[0].id;
   };
   /** Blokady dotyczące osoby i dnia, z godzinami (cały dzień, jeśli bez godzin). */
@@ -112,7 +170,7 @@
     D.blokady
       .filter((b) => (b.terap === terap || b.terap === '*') && data >= b.od && data <= b.do)
       .map((b) => ({ b, od: b.odMin == null ? K.START : b.odMin, do: b.doMin == null ? K.END : b.doMin }));
-  K.rezDnia = (D, terap, data) => D.rezerwacje.filter((r) => r.terap === terap && r.data === data).sort((a, b) => a.od - b.od);
+  K.rezDnia = (D, terap, data) => D.rezerwacje.filter((r) => r.terap === terap && r.data === data && K.aktywna(r)).sort((a, b) => a.od - b.od);
 
   /** Stan każdego 15-minutowego wiersza jednej kolumny: poza | wolne | blokada | rez. */
   K.stanyKolumny = (D, terap, data) => {
@@ -165,7 +223,9 @@
     const ust = D.ustawienia;
     const teraz = Date.now() + ust.wyprzedzenie * 3600000;
     const wynik = [];
-    const osoby = (terap ? D.zespol.filter((t) => t.id === terap) : K.widoczni(D));
+    /* Termin pokazujemy tylko u osób, które tę usługę wykonują i przyjmują przez internet. */
+    const osoby = (terap ? D.zespol.filter((t) => t.id === terap) : K.widoczni(D)).filter((t) => t.online !== false && (!t.uslugi || t.uslugi.includes(u.id)));
+    if (u.online === false) return [];
     for (let dz = 0; dz <= ust.horyzont && wynik.length < ile; dz++) {
       const data = K.iso(K.dodaj(new Date(), dz));
       const grupy = new Map();
@@ -215,43 +275,58 @@
   /** Wcześniejsze wizyty pacjenta (po telefonie), do podpowiedzi „bywał u Was”. */
   K.pacjenci = (D) => {
     const m = new Map();
-    for (const r of D.rezerwacje) {
+    const posortowane = [...D.rezerwacje].sort((a, b) => (a.data + K.pad(a.od)).localeCompare(b.data + K.pad(b.od)));
+    for (const r of posortowane) {
       const k = r.tel.replace(/\D/g, '');
-      const p = m.get(k) || { imie: r.imie, tel: r.tel, razem: 0, odwiedzil: 0, nieobecny: 0, ostatnia: null };
+      const p = m.get(k) || { imie: r.imie, tel: r.tel, razem: 0, odwiedzil: 0, nieobecny: 0, odwolal: 0, ostatnia: null, ostatniaOdbyta: null, nastepna: null, pierwsza: r.data, zrodlo: r.zrodlo, przychod: 0, terap: r.terap };
       p.razem += 1;
-      if (r.status === 'przyszedl') p.odwiedzil += 1;
+      if (r.status === 'przyszedl') { p.odwiedzil += 1; p.przychod += K.cena(D, r); p.ostatniaOdbyta = r.data; }
       if (r.status === 'nieobecny') p.nieobecny += 1;
-      if (!p.ostatnia || r.data > p.ostatnia) p.ostatnia = r.data;
+      if (K.ODWOLANE.includes(r.status)) p.odwolal += 1;
+      if (K.aktywna(r)) {
+        if (!p.ostatnia || r.data > p.ostatnia) p.ostatnia = r.data;
+        if (!K.minelo(r.data, r.od) && (!p.nastepna || r.data + K.pad(r.od) < p.nastepna.data + K.pad(p.nastepna.od))) p.nastepna = r;
+      }
+      p.terap = r.terap;
       m.set(k, p);
     }
     return m;
   };
 
+
   /* ── Zarządzanie dostępnością ──────────────────────────────────────── */
   /** Przedziały wynikające wyłącznie ze stałego grafiku, bez wyjątków. */
-  K.regulyDnia = (D, terap, data) => K.scal(((D.reguly[terap] || {})[K.zIso(data).getDay()] || []).map((r) => [r.od, r.do]));
+  K.regulyDnia = (D, terap, data) => K.scal((K.regulyOsoby(D, terap, data)[K.zIso(data).getDay()] || []).map((r) => [r.od, r.do]));
+  /** Godziny z grafiku, zanim nałożymy wyjątki: w święto zamknięte, poza tym według obowiązującej wersji grafiku. */
+  K.bazaDnia = (D, terap, data) => (K.swietoZamkniete(D, data) ? [] : K.regulyDnia(D, terap, data));
 
   /**
    * Ustawia, kiedy w danym dniu przyjmuje osoba `terap`: `koncowe` to docelowa lista przedziałów.
    * Zapisujemy tylko różnicę względem stałego grafiku (otwarcia i zamknięcia), żeby lista wyjątków była krótka.
    */
   K.ustawDzien = (D, terap, data, koncowe) => {
+    const lokacje = D.wyjatki.filter((w) => w.terap === terap && w.data === data && w.typ === 'open' && w.lok);
     D.wyjatki = D.wyjatki.filter((w) => !(w.terap === terap && w.data === data));
-    const baza = K.regulyDnia(D, terap, data);
+    const baza = K.bazaDnia(D, terap, data);
     const fin = K.scal(koncowe);
     let dodane = fin;
     for (const b of baza) dodane = K.odejmij(dodane, b);
     let zdjete = baza;
     for (const f of fin) zdjete = K.odejmij(zdjete, f);
-    dodane.forEach(([od, doo]) => D.wyjatki.push({ terap, data, od, do: doo, typ: 'open' }));
+    dodane.forEach(([od, doo]) => {
+      const stara = lokacje.find((w) => w.od < doo && w.do > od);
+      D.wyjatki.push({ terap, data, od, do: doo, typ: 'open', ...(stara ? { lok: stara.lok } : {}) });
+    });
     zdjete.forEach(([od, doo]) => D.wyjatki.push({ terap, data, od, do: doo, typ: 'closed' }));
   };
   /** Otwiera albo zamyka przedział w danym dniu. Zwraca true, jeśli coś się zmieniło. */
-  K.maluj = (D, terap, data, od, doo, otworz) => {
+  K.maluj = (D, terap, data, od, doo, otworz, lok) => {
     const przed = K.przedzialy(D, terap, data);
     const po = otworz ? K.scal([...przed, [od, doo]]) : K.odejmij(przed, [od, doo]);
     if (JSON.stringify(po) === JSON.stringify(przed)) return false;
     K.ustawDzien(D, terap, data, po);
+    /* Jednorazowo otwarte godziny mogą mieć własne miejsce przyjęć. */
+    if (otworz && lok) D.wyjatki.filter((w) => w.terap === terap && w.data === data && w.typ === 'open' && w.od < doo && w.do > od).forEach((w) => { w.lok = lok; });
     return true;
   };
   /** Zamienia godziny widoczne w tygodniu (z wyjątkami) w nowy stały grafik tej osoby. */
@@ -268,7 +343,7 @@
   /** Ile godzin w tygodniu przyjmuje osoba według stałego grafiku. */
   K.godzinyTygodnia = (D, terap) => K.DNI_PRACY.reduce((s, dz) => s + ((D.reguly[terap] || {})[dz] || []).reduce((x, r) => x + (r.do - r.od), 0), 0);
   /** Wizyty, które wypadną poza godziny po zmianie (przy zamknięciu przedziału lub blokadzie). */
-  K.wizytyWPrzedziale = (D, terap, data, od, doo) => D.rezerwacje.filter((r) => (terap === '*' || r.terap === terap) && r.data === data && r.od < doo && r.od + r.dl > od);
+  K.wizytyWPrzedziale = (D, terap, data, od, doo) => D.rezerwacje.filter((r) => (terap === '*' || r.terap === terap) && r.data === data && K.aktywna(r) && r.od < doo && r.od + r.dl > od);
 
   /* ── Dane przykładowe ──────────────────────────────────────────────── */
   function los(ziarno) {
@@ -282,13 +357,13 @@
     };
   }
   const reg = (od, doo, lok) => ({ od: K.zH(od), do: K.zH(doo), lok });
-  const PACJENCI = [
-    ['Anna Zielińska', '600 100 211'], ['Marek Wysocki', '600 100 232'], ['Ewa Malinowska', '600 100 247'], ['Tadeusz Bąk', '600 100 259'],
-    ['Zofia Rutkowska', '600 100 263'], ['Krzysztof Dąb', '600 100 271'], ['Maria Cichoń', '600 100 288'], ['Adam Wilk', '600 100 294'],
-    ['Barbara Nowicka', '600 100 305'], ['Grzegorz Pająk', '600 100 316'], ['Katarzyna Woźniak', '600 100 327'], ['Piotr Lis', '600 100 338'],
-    ['Joanna Kruk', '600 100 349'], ['Michał Sowa', '600 100 351'], ['Agnieszka Mróz', '600 100 362'], ['Tomasz Gajda', '600 100 373'],
-    ['Halina Kaczmarek', '600 100 384'], ['Robert Jasiński', '600 100 395'],
-  ];
+  const IMIONA = ['Anna Zielińska', 'Marek Wysocki', 'Ewa Malinowska', 'Tadeusz Bąk', 'Zofia Rutkowska', 'Krzysztof Dąb', 'Maria Cichoń', 'Adam Wilk',
+    'Barbara Nowicka', 'Grzegorz Pająk', 'Katarzyna Woźniak', 'Piotr Lis', 'Joanna Kruk', 'Michał Sowa', 'Agnieszka Mróz', 'Tomasz Gajda',
+    'Halina Kaczmarek', 'Robert Jasiński', 'Magdalena Pawlak', 'Łukasz Zając', 'Monika Wróbel', 'Jakub Michalski', 'Aleksandra Kozieł', 'Paweł Nowak',
+    'Ewelina Krawczyk', 'Dariusz Sikora', 'Natalia Baran', 'Sebastian Kubiak', 'Iwona Szymańska', 'Mateusz Górski', 'Karolina Wójcik', 'Henryk Lewicki',
+    'Beata Ostrowska', 'Wojciech Dudek', 'Patrycja Mazur', 'Rafał Czarnecki', 'Dorota Sadowska', 'Kamil Tomaszewski', 'Renata Pietrzak', 'Bartosz Jabłoński'];
+  const PACJENCI = IMIONA.map((n, i) => [n, `600 1${String(10 + Math.floor(i / 10)).padStart(2, '0')} ${String(200 + i * 7).padStart(3, '0')}`]);
+
   const UWAGI = ['', '', '', 'Proszę o termin po południu.', '', 'Pierwsza wizyta u Was.', '', 'Boli od tygodnia, proszę o szybki termin.', ''];
 
   K.ziarno = (tryb) => {
@@ -322,7 +397,10 @@
           { id: 'l1', nazwa: 'Gabinet, ul. Przykładowa 1', kr: 'Gabinet', kolor: 0 },
           { id: 'l2', nazwa: 'Studio, ul. Wzorcowa 7', kr: 'Studio', kolor: 1 },
         ]
-      : [{ id: 'l1', nazwa: 'ul. Przykładowa 1', kr: 'Przykładowa 1', kolor: 0 }];
+      : [
+          { id: 'l1', nazwa: 'Klinika Podgórze, ul. Przykładowa 1', kr: 'Podgórze', kolor: 0 },
+          { id: 'l2', nazwa: 'Filia Bronowice, ul. Wzorcowa 7', kr: 'Bronowice', kolor: 1 },
+        ];
     const reguly = ind
       ? {
           jan: {
@@ -334,17 +412,21 @@
           },
         }
       : {
-          jan: { 1: [reg('8:00', '12:00', 'l1'), reg('13:00', '16:00', 'l1')], 2: [reg('8:00', '12:00', 'l1'), reg('13:00', '16:00', 'l1')], 3: [reg('8:00', '16:00', 'l1')], 4: [reg('8:00', '16:00', 'l1')], 5: [reg('8:00', '14:00', 'l1')] },
-          anna: { 1: [reg('10:00', '18:00', 'l1')], 2: [reg('10:00', '18:00', 'l1')], 3: [reg('10:00', '18:00', 'l1')], 4: [reg('10:00', '18:00', 'l1')], 5: [reg('10:00', '16:00', 'l1')], 6: [reg('9:00', '13:00', 'l1')] },
-          piotr: { 2: [reg('8:00', '15:00', 'l1')], 4: [reg('8:00', '15:00', 'l1')], 6: [reg('9:00', '13:00', 'l1')] },
+          jan: { 1: [reg('8:00', '12:00', 'l1'), reg('13:00', '16:00', 'l1')], 2: [reg('8:00', '12:00', 'l1'), reg('14:00', '18:00', 'l2')], 3: [reg('8:00', '16:00', 'l1')], 4: [reg('8:00', '16:00', 'l1')], 5: [reg('8:00', '14:00', 'l2')] },
+          anna: { 1: [reg('10:00', '18:00', 'l1')], 2: [reg('10:00', '18:00', 'l1')], 3: [reg('10:00', '18:00', 'l2')], 4: [reg('10:00', '18:00', 'l1')], 5: [reg('10:00', '16:00', 'l1')], 6: [reg('9:00', '13:00', 'l1')] },
+          piotr: { 2: [reg('8:00', '13:00', 'l2')], 4: [reg('8:00', '15:00', 'l2')], 6: [reg('9:00', '13:00', 'l2')] },
         };
 
     const rnd = los(ind ? 11 : 29);
     const rezerwacje = [];
     let nr = 0;
     const teraz = Date.now();
+    /* Każdy pacjent ma jedno źródło pozyskania (pierwsza wizyta), kolejne wizyty umawia na stronie albo telefonicznie. */
+    const pozyskanie = PACJENCI.map(() => { const x = rnd(); return x < 0.5 ? 'strona' : x < 0.64 ? 'polecenie' : x < 0.76 ? 'znanylekarz' : x < 0.86 ? 'google' : x < 0.93 ? 'telefon' : 'social'; });
+    const byl = new Set();
+    const TYGODNIE = [-8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3];
     zespol.forEach((t) => {
-      for (let tydz = -1; tydz <= 2; tydz++) {
+      for (const tydz of TYGODNIE) {
         for (const dzien of K.DNI_PRACY) {
           const rr = reguly[t.id][dzien];
           if (!rr) continue;
@@ -352,23 +434,30 @@
           for (const przedzial of rr) {
             let w = przedzial.od;
             while (w < przedzial.do) {
-              if (rnd() < 0.55) {
+              if (rnd() < (tydz > 1 ? 0.38 : 0.58)) {
                 const u = uslugi[Math.floor(rnd() * uslugi.length)];
                 if (w + u.min <= przedzial.do) {
-                  const p = PACJENCI[Math.floor(rnd() * PACJENCI.length)];
-                  const strona = rnd() < 0.78;
+                  /* Baza pacjentów rośnie z tygodnia na tydzień, więc co tydzień przychodzą nowi. */
+                  const pula = Math.min(PACJENCI.length, (ind ? 10 : 16) + (tydz + 8) * (ind ? 3 : 4));
+                  const i = Math.floor(rnd() * pula);
+                  const p = PACJENCI[i];
+                  const pierwsza = !byl.has(i);
+                  byl.add(i);
+                  const zrodlo = pierwsza ? pozyskanie[i] : rnd() < 0.62 ? 'strona' : rnd() < 0.6 ? 'powrot' : 'telefon';
                   const minela = data.getTime() + (w + u.min) * 60000 <= teraz;
+                  const swieza = minela && teraz - data.getTime() < 2 * 86400000;
                   let status = 'potwierdzona';
-                  if (minela) {
-                    const x = rnd();
-                    status = x < 0.84 ? 'przyszedl' : x < 0.92 ? 'nieobecny' : 'potwierdzona';
-                  }
-                  rezerwacje.push({
-                    id: `r${tryb}${++nr}`, terap: t.id, data: K.iso(data), od: w, dl: u.min, usluga: u.id,
-                    imie: p[0], tel: p[1], uwaga: UWAGI[Math.floor(rnd() * UWAGI.length)], notatka: '',
-                    zrodlo: strona ? 'strona' : 'telefon', lok: przedzial.lok, status, nowa: false,
-                    zal: strona && u.zaliczka ? { kwota: 50, metoda: ['BLIK', 'BLIK', 'karta', 'przelew'][Math.floor(rnd() * 4)] } : null,
-                  });
+                  const x = rnd();
+                  if (minela) status = swieza && x < 0.35 ? 'potwierdzona' : x < 0.82 ? 'przyszedl' : x < 0.88 ? 'nieobecny' : x < 0.97 ? 'odwolana' : 'anulowana';
+                  else if (x < 0.05) status = 'odwolana';
+                  const r = {
+                    id: `r${tryb}${++nr}`, terap: t.id, data: K.iso(data), od: w, dl: u.min, usluga: u.id, cena: u.cena,
+                    imie: p[0], tel: p[1], uwaga: zrodlo === 'strona' ? UWAGI[Math.floor(rnd() * UWAGI.length)] : '', notatka: '',
+                    zrodlo, lok: przedzial.lok, status, nowa: false,
+                    zal: zrodlo === 'strona' && u.zaliczka ? { kwota: 50, metoda: ['BLIK', 'BLIK', 'karta', 'przelew'][Math.floor(rnd() * 4)] } : null,
+                  };
+                  if (K.ODWOLANE.includes(status)) { r.powod = status === 'odwolana' ? 'Pacjent odwołał' : 'Gabinet odwołał'; r.pozno = rnd() < 0.3; }
+                  rezerwacje.push(r);
                   w += u.min;
                 }
               }
@@ -379,7 +468,7 @@
       }
     });
     /* Dwie rezerwacje „świeżo ze strony”: lista „Wymaga uwagi” nie startuje pusta. */
-    const przyszle = rezerwacje.filter((r) => r.zrodlo === 'strona' && !K.minelo(r.data, r.od)).slice(1, 4);
+    const przyszle = rezerwacje.filter((r) => r.zrodlo === 'strona' && K.aktywna(r) && !K.minelo(r.data, r.od)).slice(1, 4);
     przyszle.slice(0, 2).forEach((r) => { r.nowa = true; });
 
     const blokady = ind

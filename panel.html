@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Panel gabinetu · Studio Widok</title>
+  <meta name="description" content="Prototyp panelu do zarządzania stroną gabinetu i systemem rezerwacji: kalendarz, dostępność, usługi, zespół, lokalizacje, treści strony i powiadomienia." />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#14171A" />
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@600;700;800;900&family=Atkinson+Hyperlegible+Next:wght@400;500;700&display=swap" />
+  <link rel="stylesheet" href="assets/css/kalendarz.css?v=11" />
+  <link rel="stylesheet" href="assets/css/panel.css?v=1" />
+</head>
+<body data-app="panel">
+  <a class="skip" href="#p-tresc">Przejdź do treści</a>
+
+  <aside class="p-demo" id="p-demo">
+    <p><strong>Prototyp panelu.</strong> Nic tu nie zmienia prawdziwej strony: zmiany zapisują się tylko w tej przeglądarce, a e-maile i SMS-y nie wychodzą.</p>
+    <button type="button" class="p-demo__x" id="p-demo-x" aria-label="Ukryj informację">×</button>
+  </aside>
+
+  <div class="p-app">
+    <nav class="p-rail" id="p-rail" aria-label="Sekcje panelu">
+      <a class="p-rail__marka" href="#/pulpit" aria-label="Pulpit">
+        <svg viewBox="0 0 40 40" aria-hidden="true">
+          <path d="M8 6v20a8 8 0 0 1-3 6" style="stroke:#1F5FD6" />
+          <path d="M15 6v28" style="stroke:#E8590C" />
+          <path d="M22 6v28" style="stroke:#13875A" />
+          <path d="M29 6v28" style="stroke:#C2255C" />
+          <path d="M36 6v28" style="stroke:#F2B705" />
+        </svg>
+        <span id="p-nazwa">Linia Ruchu</span>
+      </a>
+      <div class="p-rail__lista" id="p-menu"></div>
+      <div class="p-rail__stopka">
+        <div class="p-pakiet" role="group" aria-label="Pokaż jako pakiet">
+          <span>Demo pakietu</span>
+          <div class="p-pakiet__przel">
+            <button type="button" data-pakiet="ind" aria-pressed="true">Individual</button>
+            <button type="button" data-pakiet="ent" aria-pressed="false">Enterprise</button>
+          </div>
+        </div>
+        <p class="p-kto"><span class="p-awatar" id="p-awatar" aria-hidden="true">JK</span><span id="p-kto"></span></p>
+      </div>
+    </nav>
+
+    <header class="p-top">
+      <button type="button" class="p-top__menu" id="p-menu-btn" aria-label="Otwórz menu sekcji" aria-expanded="false" aria-controls="p-rail">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 6h13M3.5 10h13M3.5 14h13" /></svg>
+      </button>
+      <div class="p-top__tytul">
+        <h1 id="p-tytul">Pulpit</h1>
+        <p id="p-podtytul"></p>
+      </div>
+      <div class="p-szukaj">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M9 15.5a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13ZM17 17l-3.4-3.4" /></svg>
+        <label class="visually-hidden" for="p-szukaj">Szukaj w panelu</label>
+        <input id="p-szukaj" type="search" placeholder="Szukaj pacjenta, usługi, podstrony…" autocomplete="off" />
+        <ul class="p-szukaj__wyniki" id="p-szukaj-wyniki" hidden></ul>
+      </div>
+      <a class="p-btn p-btn--cichy p-top__podglad" href="demo.html" target="_blank" rel="noopener">Zobacz stronę</a>
+      <button type="button" class="p-btn p-btn--akcent" data-pa="nowa-rez">
+        <svg class="p-ik" viewBox="0 0 20 20" aria-hidden="true" style="stroke-width:2.2"><path d="M10 4.5v11M4.5 10h11" /></svg>
+        <span>Rezerwacja</span>
+      </button>
+    </header>
+
+    <main class="p-widok" id="p-tresc" tabindex="-1">
+      <!-- Kalendarz: ten sam moduł co kalendarz.html, z tymi samymi identyfikatorami -->
+      <section class="p-sekcja p-sekcja--kalendarz" id="p-kalendarz" hidden aria-label="Kalendarz">
+        <div class="pasek" id="pasek"></div>
+        <div class="tryb-pasek" id="tryb-pasek" hidden></div>
+        <div class="uklad">
+          <section class="kal-karta" aria-label="Siatka kalendarza">
+            <div class="przenos" id="przenos" hidden></div>
+            <div class="chipy" id="chipy" role="group" aria-label="Wybierz dzień"></div>
+            <div id="widok"></div>
+            <ul class="legenda" id="legenda"></ul>
+          </section>
+          <aside class="bok" aria-label="Podsumowanie kalendarza">
+            <section class="karta" id="uwaga"></section>
+            <section class="karta karta--pacjent" id="pacjent"></section>
+          </aside>
+        </div>
+      </section>
+      <section class="p-sekcja" id="p-inne" hidden></section>
+    </main>
+  </div>
+  <div class="p-tlo" id="p-tlo" hidden></div>
+
+  <!-- Szuflada kalendarza (rezerwacje, blokady) -->
+  <aside class="szuflada" id="szuflada" role="dialog" aria-modal="false" aria-labelledby="szuflada-tytul" hidden>
+    <div class="szuflada__in" id="szuflada-tresc"></div>
+  </aside>
+  <div class="szuflada__tlo" id="szuflada-tlo" hidden></div>
+
+  <!-- Szuflada panelu (formularze sekcji) -->
+  <aside class="szuflada p-szuflada" id="p-szuflada" role="dialog" aria-modal="false" aria-labelledby="p-szuflada-tytul" hidden>
+    <div class="szuflada__in" id="p-szuflada-tresc"></div>
+  </aside>
+
+  <div class="toast" id="toast" role="status" hidden><span id="toast-t"></span><button type="button" data-akcja="cofnij">Cofnij</button></div>
+
+  <script src="assets/js/kalendarz-model.js?v=2"></script>
+  <script src="assets/js/kalendarz.js?v=8"></script>
+  <script src="assets/js/panel-dane.js?v=1"></script>
+  <script src="assets/js/panel.js?v=1"></script>
+  <script src="assets/js/panel-codzienne.js?v=1"></script>
+  <script src="assets/js/panel-grafik.js?v=1"></script>
+  <script src="assets/js/panel-oferta.js?v=1"></script>
+  <script src="assets/js/panel-strona.js?v=1"></script>
+  <script src="assets/js/panel-online.js?v=1"></script>
+  <script src="assets/js/panel-konto.js?v=1"></script>
+  <script>window.PANEL.start();</script>
+</body>
+</html>
