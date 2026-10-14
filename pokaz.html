@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Pokaz w minutę · Studio Widok</title>
+  <meta name="description" content="Minutowy pokaz strony z rezerwacją online i kalendarza dla gabinetu fizjoterapii. Link przygotowany przez Studio Widok." />
+  <!-- Strona wysyłana SMS-em w trakcie rozmowy. Nie ma jej w nawigacji ani w wyszukiwarce. -->
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#14171A" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/pokaz.css?v=1" />
+</head>
+<body>
+  <header class="pk-gora">
+    <span class="pk-marka">
+      <svg viewBox="0 0 40 40" aria-hidden="true">
+        <path d="M8 6v20a8 8 0 0 1-3 6" style="stroke:#1F5FD6" />
+        <path d="M15 6v28" style="stroke:#E8590C" />
+        <path d="M22 6v28" style="stroke:#13875A" />
+        <path d="M29 6v28" style="stroke:#C2255C" />
+        <path d="M36 6v28" style="stroke:#F2B705" />
+      </svg>
+      Studio Widok
+    </span>
+    <p class="pk-dla" id="pk-dla" hidden>Pokaz dla: <b></b></p>
+    <p class="pk-licznik" id="pk-licznik" aria-live="polite">1 z 5</p>
+  </header>
+
+  <main id="pk-tor" class="pk-tor" tabindex="-1" aria-label="Pokaz: przesuń w bok albo użyj przycisku Dalej">
+
+    <section class="pk-slajd" id="s1" aria-labelledby="h1">
+      <div class="pk-tekst">
+        <p class="pk-et">1 · Twój pacjent</p>
+        <h2 id="h1">Umawia się sam, także o 22:00</h2>
+        <ul>
+          <li>Wybiera dzień i godzinę z <b>Twojego</b> kalendarza, bez dzwonienia.</li>
+          <li>Nie ma okienka, w którym nikt nie odbiera telefonu.</li>
+          <li>Od razu dostaje potwierdzenie e-mailem.</li>
+        </ul>
+      </div>
+      <figure class="pk-obraz pk-obraz--tel">
+        <img src="assets/img/zrzuty/strona-terminy-telefon.jpg" width="420" height="946" alt="Telefon: pacjent wybiera dzień i godzinę wizyty z wolnych terminów gabinetu." decoding="async" />
+      </figure>
+    </section>
+
+    <section class="pk-slajd" id="s2" aria-labelledby="h2">
+      <div class="pk-tekst">
+        <p class="pk-et">2 · Ty</p>
+        <h2 id="h2">Całość widzisz w jednym kalendarzu</h2>
+        <ul>
+          <li>Rezerwacje ze strony i te wpisane po telefonie są razem.</li>
+          <li>Godziny przyjęć ustawiasz kilkoma kliknięciami, a urlop jednym.</li>
+          <li>Wolny termin, który wynika z odwołania, wraca do sprzedaży sam.</li>
+        </ul>
+      </div>
+      <figure class="pk-obraz pk-obraz--okno">
+        <div class="pk-okno"><i></i><i></i><i></i></div>
+        <img src="assets/img/zrzuty/kal2-tydzien.jpg" width="1908" height="1170" alt="Kalendarz tygodnia: rezerwacje i godziny dostępności w jednym widoku." decoding="async" />
+      </figure>
+    </section>
+
+    <section class="pk-slajd" id="s3" aria-labelledby="h3">
+      <div class="pk-tekst">
+        <p class="pk-et">3 · Mniej telefonów</p>
+        <h2 id="h3">Pacjent sam przełoży albo odwoła wizytę</h2>
+        <ul>
+          <li>Link w e-mailu, bez zakładania konta.</li>
+          <li>Widzi tylko swoją wizytę, żadnych danych medycznych.</li>
+          <li>Ty ustalasz, ile godzin przed wizytą można ją zmienić.</li>
+        </ul>
+      </div>
+      <figure class="pk-obraz pk-obraz--tel">
+        <img src="assets/img/zrzuty/wizyta-telefon-1.jpg" width="780" height="1600" alt="Telefon: ekran wizyty z przyciskami zmiany terminu i odwołania." decoding="async" />
+      </figure>
+    </section>
+
+    <section class="pk-slajd pk-slajd--cena" id="s4" aria-labelledby="h4">
+      <div class="pk-tekst">
+        <p class="pk-et">4 · Ile i kiedy</p>
+        <h2 id="h4">Jedna cena, bez ukrytych kosztów</h2>
+        <p class="pk-lead">Ceny końcowe: nie jesteśmy płatnikiem VAT, więc kwota jest kwotą do zapłaty.</p>
+        <div class="pk-ceny">
+          <article class="pk-cena" id="pk-c-individual">
+            <h3>Individual</h3>
+            <p class="pk-cena__opis">Jeden terapeuta, do 3 miejsc przyjęć</p>
+            <p class="pk-cena__kwota"><b>2&nbsp;900&nbsp;zł</b> wdrożenie</p>
+            <p class="pk-cena__kwota pk-cena__kwota--m"><b>99&nbsp;zł</b> miesięcznie</p>
+          </article>
+          <article class="pk-cena" id="pk-c-enterprise">
+            <h3>Team</h3>
+            <p class="pk-cena__opis">Zespół i lokalizacje bez limitu</p>
+            <p class="pk-cena__kwota"><b>4&nbsp;499&nbsp;zł</b> wdrożenie</p>
+            <p class="pk-cena__kwota pk-cena__kwota--m"><b>149&nbsp;zł</b> miesięcznie</p>
+          </article>
+        </div>
+        <ul class="pk-fakty">
+          <li><b>Płacisz po zobaczeniu projektu</b>, a nie przed.</li>
+          <li><b>Bez umowy na lata:</b> rezygnujesz, kiedy chcesz.</li>
+          <li><b>Około 14 dni</b> od materiałów do działającej strony.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="pk-slajd pk-slajd--koniec" id="s5" aria-labelledby="h5">
+      <div class="pk-tekst">
+        <p class="pk-et">5 · Co dalej</p>
+        <h2 id="h5">Podoba się?</h2>
+        <p class="pk-lead">Wyślę pełną ofertę: dokładny zakres, odpowiedzi na typowe pytania i kalkulator, po ilu pacjentach inwestycja się zwraca. Zdecydujesz w swoim tempie.</p>
+        <div class="pk-akcje" id="pk-akcje">
+          <button type="button" class="pk-btn pk-btn--glowny" id="pk-chce">Tak, wyślij mi pełną ofertę</button>
+          <a class="pk-btn" href="demo.html" target="_blank" rel="noopener">Wolę najpierw obejrzeć pełne demo</a>
+        </div>
+        <p class="pk-dzieki" id="pk-dzieki" role="status" hidden><b>Dziękuję!</b> Powiedz mi o tym w rozmowie, a wyślę ofertę od razu. Jeśli już się rozłączyliśmy, napiszę do Ciebie wkrótce.</p>
+      </div>
+    </section>
+  </main>
+
+  <nav class="pk-dol" aria-label="Nawigacja pokazu">
+    <div class="pk-kropki" id="pk-kropki" role="group" aria-label="Przejdź do ekranu">
+      <button type="button" data-do="0" aria-label="Ekran 1" aria-current="true"></button>
+      <button type="button" data-do="1" aria-label="Ekran 2"></button>
+      <button type="button" data-do="2" aria-label="Ekran 3"></button>
+      <button type="button" data-do="3" aria-label="Ekran 4"></button>
+      <button type="button" data-do="4" aria-label="Ekran 5"></button>
+    </div>
+    <button type="button" class="pk-btn pk-btn--glowny pk-dalej" id="pk-dalej">Dalej <span aria-hidden="true">→</span></button>
+  </nav>
+
+  <script src="assets/js/odbiornik.js?v=4"></script>
+  <script src="assets/js/pokaz.js?v=1" defer></script>
+</body>
+</html>

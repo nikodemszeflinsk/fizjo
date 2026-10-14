@@ -23,7 +23,7 @@
   K.DNI_PRACY = [1, 2, 3, 4, 5, 6]; // pn–sb
   K.LIMITY = {
     ind: { terapeuci: 1, miejsca: 3, uslugi: 7, nazwa: 'Individual' },
-    ent: { terapeuci: Infinity, miejsca: 2, uslugi: Infinity, nazwa: 'Enterprise' },
+    ent: { terapeuci: Infinity, miejsca: Infinity, uslugi: Infinity, nazwa: 'Team' },
   };
   /** „3 z 7” albo „3 · bez limitu”, gdy pakiet nie ogranicza liczby. */
   K.zLimitu = (n, max) => (max === Infinity ? `${n} · bez limitu` : `${n} z ${max}`);
@@ -441,7 +441,7 @@
     'Beata Ostrowska', 'Wojciech Dudek', 'Patrycja Mazur', 'Rafał Czarnecki', 'Dorota Sadowska', 'Kamil Tomaszewski', 'Renata Pietrzak', 'Bartosz Jabłoński'];
   const PACJENCI = IMIONA.map((n, i) => [n, `600 1${String(10 + Math.floor(i / 10)).padStart(2, '0')} ${String(200 + i * 7).padStart(3, '0')}`]);
 
-  /* Kto z zespołu Enterprise prowadzi które usługi (te same listy podpowiada panel). */
+  /* Kto z zespołu Team prowadzi które usługi (te same listy podpowiada panel). */
   const USLUGI_TERAP = { jan: ['pierwsza', 'manualna', 'kontrola', 'sport'], anna: ['pierwsza', 'manualna', 'kontrola', 'uro'], piotr: ['pierwsza', 'kontrola', 'dzieci', 'sport'] };
   const kobieta = (imie) => /a$/i.test(imie.split(' ')[0]) && !/^kuba/i.test(imie);
   const UWAGI = ['', '', '', 'Proszę o termin po południu.', '', 'Pierwsza wizyta u Was.', '', 'Boli od tygodnia, proszę o szybki termin.', ''];

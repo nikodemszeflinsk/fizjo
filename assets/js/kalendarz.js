@@ -871,7 +871,7 @@
       ${ent() ? `<section class="ust"><h3>Zespół <small>${K.zLimitu(D().zespol.length, lim.terapeuci)} w pakiecie</small></h3><div class="ust-lista">${zespol}</div>
         <button type="button" class="przycisk przycisk--cichy przycisk--mini" data-akcja="terap-dodaj"${D().zespol.length >= lim.terapeuci ? ' disabled' : ''}>+ Dodaj terapeutę</button>
         ${D().zespol.length >= lim.terapeuci ? '<p class="pod">Limit pakietu osiągnięty. Więcej terapeutów wyceniamy osobno.</p>' : ''}</section>` : ''}
-      <section class="ust"><h3>${ent() ? 'Lokalizacje' : 'Miejsca przyjęć'} <small>${D().miejsca.length} z ${lim.miejsca} w pakiecie</small></h3><div class="ust-lista">${miejsca}</div>
+      <section class="ust"><h3>${ent() ? 'Lokalizacje' : 'Miejsca przyjęć'} <small>${K.zLimitu(D().miejsca.length, lim.miejsca)}${lim.miejsca === Infinity ? '' : ' w pakiecie'}</small></h3><div class="ust-lista">${miejsca}</div>
         <button type="button" class="przycisk przycisk--cichy przycisk--mini" data-akcja="miejsce-dodaj"${D().miejsca.length >= lim.miejsca ? ' disabled' : ''}>+ Dodaj ${ent() ? 'lokalizację' : 'miejsce'}</button>
         ${D().miejsca.length >= lim.miejsca ? '<p class="pod">Limit pakietu osiągnięty.</p>' : ''}</section>
       <section class="ust"><h3>Dodatek: zaliczki online</h3>

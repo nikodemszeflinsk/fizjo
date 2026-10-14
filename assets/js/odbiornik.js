@@ -1,9 +1,9 @@
 /*
  * Odbiornik zdarzeń Studio Widok.
  *
- * Strona jest statyczna, więc dane od klienta (otwarcie oferty, dane do umowy, podpisana umowa)
- * wysyłamy do małego skryptu Google Apps Script, który zapisuje je w arkuszu i wysyła Ci e-mail.
- * CRM pobiera je stamtąd jednym kliknięciem.
+ * Strona jest statyczna, więc dane od klienta (otwarcie oferty, dane do umowy, podpisana umowa, pliki)
+ * wysyłamy do małego skryptu Google Apps Script, który zapisuje je w arkuszu i na Dysku oraz wysyła Ci e-mail.
+ * Ten sam skrypt wysyła klientowi kod SMS do podpisu umowy i sprawdza go. CRM pobiera zdarzenia jednym kliknięciem.
  *
  * Instrukcja wdrożenia: _wewnetrzne/CRM-instrukcja.md. Dopóki `url` jest pusty, nic nie jest wysyłane,
  * a klient dostaje „kod”, który wklejasz w CRM ręcznie.
@@ -13,15 +13,54 @@
   var CFG = {
     url: 'https://script.google.com/macros/s/AKfycbwKZb3lPZKXibtU6-euI37PeJy4b--ABgWmkIyS0BXUA3-RPqZtdgSTLtO_MemqWgtb/exec' /* wdrożenie Apps Script (zapisuje w arkuszu „Zdarzenia Studio Widok”) */
   };
+  var KOD_PROBNY = '123456';
+
+  /* Lokalnie (testy, podgląd z dysku) nic nie wysyłamy, żeby nie zaśmiecać arkusza, Dysku i skrzynki, ani nie wysyłać prawdziwych SMS-ów.
+     Kod SMS i pliki są wtedy symulowane (kod próbny 123456). Żeby przetestować prawdziwą wysyłkę z własnego komputera:
+     localStorage.setItem('odbiornik-test', '1'). */
+  function lokalnie() {
+    var lok = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname) || location.protocol === 'file:';
+    if (!lok) return false;
+    try { return localStorage.getItem('odbiornik-test') !== '1'; } catch (e) { return true; }
+  }
+
+  function symuluj(p) {
+    if (p.typ === 'sms_kod') return { ok: true, symulacja: true, maska: '*** *** ' + String(p.telefon || '').replace(/\D/g, '').slice(-3), waznyS: 600 };
+    if (p.typ === 'sms_potwierdz') {
+      return String(p.kod) === KOD_PROBNY
+        ? { ok: true, symulacja: true, czas: new Date().toISOString(), numer: (p.umowa && p.umowa.numer) || '', mail: false }
+        : { ok: false, blad: 'kod', zostalo: 4 };
+    }
+    if (p.typ === 'plik') return { ok: true, symulacja: true };
+    return { ok: true, symulacja: true };
+  }
+
+  function wczytajObraz(plik) {
+    return new Promise(function (ok, blad) {
+      var u = URL.createObjectURL(plik), img = new Image();
+      img.onload = function () { URL.revokeObjectURL(u); ok(img); };
+      img.onerror = function () { URL.revokeObjectURL(u); blad(new Error('obraz')); };
+      img.src = u;
+    });
+  }
+  function doBase64(blob) {
+    return new Promise(function (ok, blad) {
+      var r = new FileReader();
+      r.onload = function () { ok(String(r.result).split(',')[1] || ''); };
+      r.onerror = function () { blad(new Error('odczyt')); };
+      r.readAsDataURL(blob);
+    });
+  }
+  var MAX_PLIK = 8 * 1024 * 1024;
+  var DOZWOLONE_TYPY = /^(image\/(jpeg|png|webp|gif)|application\/(pdf|msword|vnd\.openxmlformats-officedocument\.(wordprocessingml\.document|spreadsheetml\.sheet)|vnd\.ms-excel)|text\/plain)$/;
+
   window.ODBIORNIK = {
     aktywny: function () { return !!CFG.url; },
+    lokalnie: lokalnie,
+    kodProbny: KOD_PROBNY,
     /** Wysyła paczkę (obiekt). Zwraca Promise<boolean>: true, gdy żądanie wyszło. Odpowiedź jest nieczytelna (no-cors). */
     wyslij: function (paczka) {
-      if (!CFG.url) return Promise.resolve(false);
-      /* Lokalnie (testy, podgląd z dysku) nic nie wysyłamy, żeby nie zaśmiecać arkusza i skrzynki prawdziwymi powiadomieniami.
-         Żeby przetestować wysyłkę z własnego komputera: localStorage.setItem('odbiornik-test', '1'). */
-      var lokalnie = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname) || location.protocol === 'file:';
-      try { if (lokalnie && localStorage.getItem('odbiornik-test') !== '1') return Promise.resolve(false); } catch (e) { if (lokalnie) return Promise.resolve(false); }
+      if (!CFG.url || lokalnie()) return Promise.resolve(false);
       try {
         return fetch(CFG.url, {
           method: 'POST',
@@ -33,6 +72,40 @@
       } catch (e) {
         return Promise.resolve(false);
       }
+    },
+    /** Wysyła paczkę i czyta odpowiedź skryptu (kod SMS, pliki). Zawsze rozwiązuje się obiektem; {ok:false, blad:'siec'} przy braku połączenia. */
+    zapytaj: function (paczka) {
+      if (!CFG.url) return Promise.resolve({ ok: false, blad: 'brak_odbiornika' });
+      if (lokalnie()) return Promise.resolve(symuluj(paczka));
+      var ster = typeof AbortController === 'function' ? new AbortController() : null;
+      var limit = setTimeout(function () { if (ster) ster.abort(); }, 90000);
+      return fetch(CFG.url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(paczka), signal: ster ? ster.signal : undefined })
+        .then(function (r) { return r.json(); })
+        .then(function (j) { clearTimeout(limit); return j && typeof j === 'object' ? j : { ok: false, blad: 'odpowiedz' }; })
+        .catch(function () { clearTimeout(limit); return { ok: false, blad: 'siec' }; });
+    },
+    /** Przygotowuje plik do wysyłki: zmniejsza duże zdjęcia, sprawdza typ i rozmiar. Rozwiązuje się {nazwa, mime, b64, rozmiar} albo odrzuca z .kod. */
+    przygotujPlik: function (plik) {
+      var odrzuc = function (kod) { var e = new Error(kod); e.kod = kod; return Promise.reject(e); };
+      var mime = plik.type || '';
+      if (!DOZWOLONE_TYPY.test(mime)) return odrzuc('typ');
+      if (!/^image\/(jpeg|png|webp)$/.test(mime)) {
+        if (plik.size > MAX_PLIK) return odrzuc('rozmiar');
+        return doBase64(plik).then(function (b64) { return { nazwa: plik.name, mime: mime, b64: b64, rozmiar: plik.size }; });
+      }
+      return wczytajObraz(plik).then(function (img) {
+        var maks = 2400, sk = Math.min(1, maks / Math.max(img.naturalWidth, img.naturalHeight));
+        if (sk === 1 && plik.size <= 2 * 1024 * 1024) return doBase64(plik).then(function (b64) { return { nazwa: plik.name, mime: mime, b64: b64, rozmiar: plik.size }; });
+        var c = document.createElement('canvas');
+        c.width = Math.round(img.naturalWidth * sk); c.height = Math.round(img.naturalHeight * sk);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        var wyj = mime === 'image/png' ? 'image/png' : 'image/jpeg';
+        return new Promise(function (ok) { c.toBlob(ok, wyj, 0.86); }).then(function (blob) {
+          if (!blob || blob.size > MAX_PLIK) return odrzuc('rozmiar');
+          var nazwa = wyj === mime ? plik.name : plik.name.replace(/\.[^.]+$/, '') + '.jpg';
+          return doBase64(blob).then(function (b64) { return { nazwa: nazwa, mime: wyj, b64: b64, rozmiar: blob.size }; });
+        });
+      }, function () { return odrzuc('obraz'); });
     },
     /** Kod do wklejenia w CRM, gdy odbiornik nie jest ustawiony albo klient jest offline. */
     kod: function (paczka) {

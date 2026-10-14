@@ -93,7 +93,7 @@
       <div class="dz-suma">${suma ? godzTekst(suma) : '–'}</div>
     </div>`;
   }
-  /** Wiersz nad tygodniem: kto (tylko Enterprise) oraz szybkie ustawienia. */
+  /** Wiersz nad tygodniem: kto (tylko Team) oraz szybkie ustawienia. */
   function pasekNarzedzi() {
     const D = P.D();
     const t = osoba();

@@ -1,0 +1,92 @@
+/*
+ * Pokaz w minutę: pięć ekranów do przesuwania, oglądanych na telefonie w trakcie rozmowy.
+ * Samodzielny arkusz (bez karta.css), żeby strona ładowała się natychmiast.
+ */
+:root {
+  --ink: #14171a; --ink-2: #1d2226; --paper: #f8f9f7; --muted: #aab1b6; --text: #e9ecea;
+  --accent: #1f5fd6; --accent-jasny: #7fa8f0; --zolty: #f2b705;
+  --f-display: 'Overpass', system-ui, sans-serif; --f-body: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; display: flex; flex-direction: column; height: 100svh; background: var(--ink); color: var(--text); font-family: var(--f-body); font-size: 1.05rem; line-height: 1.5; overflow: hidden; }
+:focus-visible { outline: 3px solid var(--zolty); outline-offset: 2px; }
+
+/* ── Górny pasek ─────────────────────────────────────────────────────── */
+.pk-gora { display: flex; align-items: center; gap: 10px 16px; padding: calc(10px + env(safe-area-inset-top)) 18px 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+.pk-marka { display: inline-flex; align-items: center; gap: 8px; font-family: var(--f-display); font-weight: 800; color: #fff; white-space: nowrap; }
+.pk-marka svg { width: 22px; height: 22px; fill: none; stroke-width: 3.4; stroke-linecap: round; }
+.pk-dla { margin: 0; min-width: 0; flex: 1; color: var(--muted); font-size: 0.92rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pk-dla b { color: #fff; }
+.pk-licznik { margin: 0 0 0 auto; color: var(--muted); font-size: 0.9rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ── Tor ekranów ─────────────────────────────────────────────────────── */
+.pk-tor { flex: 1; min-height: 0; display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; }
+.pk-tor::-webkit-scrollbar { display: none; }
+.pk-tor:focus { outline: none; }
+.pk-slajd { flex: 0 0 100%; min-width: 0; scroll-snap-align: start; scroll-snap-stop: always; overflow-y: auto; padding: 22px 20px 26px; display: grid; gap: 22px; align-content: start; }
+.pk-tekst { max-width: 560px; }
+.pk-et { margin: 0 0 8px; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-jasny); }
+.pk-slajd h2 { margin: 0 0 14px; font-family: var(--f-display); font-weight: 900; font-size: clamp(1.7rem, 7vw, 2.5rem); line-height: 1.08; letter-spacing: -0.02em; color: #fff; text-wrap: balance; }
+.pk-lead { margin: 0 0 16px; color: #c7ced3; }
+.pk-tekst ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.pk-tekst li { position: relative; padding-left: 26px; color: #dfe4e7; }
+.pk-tekst li::before { content: ''; position: absolute; left: 2px; top: 0.5em; width: 12px; height: 7px; border-left: 3px solid var(--zolty); border-bottom: 3px solid var(--zolty); transform: rotate(-45deg); }
+.pk-tekst li b { color: #fff; }
+
+/* ── Obrazy: telefon i okno przeglądarki ─────────────────────────────── */
+.pk-obraz { margin: 0; display: grid; justify-items: center; align-self: start; }
+.pk-obraz img { display: block; max-width: 100%; height: auto; }
+.pk-obraz--tel img { width: auto; height: min(46svh, 430px); border: 7px solid #2c3236; border-radius: 28px; box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5); background: #fff; }
+.pk-obraz--okno { width: 100%; max-width: 760px; border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5); justify-items: stretch; }
+.pk-okno { display: flex; gap: 6px; padding: 9px 12px; background: #e6e8e5; }
+.pk-okno i { width: 9px; height: 9px; border-radius: 50%; background: #b9bdb8; display: block; }
+.pk-obraz--okno img { width: 100%; }
+
+/* ── Ceny ────────────────────────────────────────────────────────────── */
+.pk-ceny { display: grid; gap: 12px; margin: 0 0 18px; }
+.pk-cena { padding: 16px 18px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 16px; }
+.pk-cena--polecana { background: #fff; color: var(--ink); border-color: #fff; }
+.pk-cena h3 { margin: 0; font-family: var(--f-display); font-size: 1.25rem; font-weight: 900; color: #fff; }
+.pk-cena--polecana h3 { color: var(--ink); }
+.pk-cena__opis { margin: 0 0 8px; color: var(--muted); font-size: 0.92rem; }
+.pk-cena--polecana .pk-cena__opis { color: #535a61; }
+.pk-cena__kwota { margin: 0; color: #c7ced3; }
+.pk-cena--polecana .pk-cena__kwota { color: #2b3035; }
+.pk-cena__kwota b { font-family: var(--f-display); font-size: 1.7rem; font-weight: 900; color: #fff; margin-right: 4px; letter-spacing: -0.02em; }
+.pk-cena--polecana .pk-cena__kwota b { color: var(--ink); }
+.pk-cena__kwota--m b { font-size: 1.25rem; }
+.pk-fakty { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.pk-fakty li { padding-left: 26px; position: relative; color: #dfe4e7; }
+.pk-fakty li::before { content: ''; position: absolute; left: 2px; top: 0.5em; width: 12px; height: 7px; border-left: 3px solid var(--zolty); border-bottom: 3px solid var(--zolty); transform: rotate(-45deg); }
+.pk-fakty b { color: #fff; }
+
+/* ── Przyciski i dolny pasek ─────────────────────────────────────────── */
+.pk-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 12px 24px; border: 2px solid rgba(255, 255, 255, 0.35); border-radius: 999px; background: transparent; color: #fff; font: inherit; font-weight: 700; text-decoration: none; cursor: pointer; text-align: center; }
+.pk-btn:hover { border-color: #fff; }
+.pk-btn--glowny { background: var(--accent); border-color: var(--accent); }
+.pk-btn--glowny:hover { filter: brightness(1.12); border-color: var(--accent); }
+.pk-btn:disabled { opacity: 0.5; cursor: default; }
+.pk-akcje { display: grid; gap: 12px; margin-top: 6px; }
+.pk-dzieki { margin: 16px 0 0; padding: 14px 16px; border-radius: 12px; background: #eef8f2; color: #14633f; }
+.pk-dzieki b { display: block; font-family: var(--f-display); font-size: 1.15rem; }
+.pk-dol { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 18px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid rgba(255, 255, 255, 0.1); background: var(--ink); }
+.pk-kropki { display: flex; gap: 4px; }
+.pk-kropki button { position: relative; width: 28px; height: 36px; padding: 0; border: 0; background: none; cursor: pointer; }
+.pk-kropki button::after { content: ''; position: absolute; left: 50%; top: 50%; width: 10px; height: 10px; border-radius: 50%; background: rgba(255, 255, 255, 0.3); transform: translate(-50%, -50%); transition: width 0.2s, background 0.2s; }
+.pk-kropki button[aria-current='true']::after { width: 24px; border-radius: 6px; background: var(--zolty); }
+.pk-dalej[hidden] { display: none; }
+
+/* ── Większe ekrany: tekst obok obrazu ───────────────────────────────── */
+@media (min-width: 900px) {
+  .pk-slajd { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); align-content: center; align-items: center; gap: 56px; padding: 32px max(40px, calc((100% - 1160px) / 2)); }
+  .pk-slajd--cena, .pk-slajd--koniec { grid-template-columns: minmax(0, 1fr); justify-items: start; }
+  .pk-slajd--cena .pk-tekst, .pk-slajd--koniec .pk-tekst { max-width: 760px; }
+  .pk-slajd--cena .pk-ceny { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pk-obraz--tel img { height: min(66svh, 640px); }
+  .pk-slajd h2 { font-size: clamp(2.2rem, 3.4vw, 3rem); }
+  .pk-akcje { grid-template-columns: repeat(2, auto); justify-content: start; }
+}
+@media (max-height: 640px) and (max-width: 899px) { .pk-obraz--tel img { height: 36svh; } }
+@media (prefers-reduced-motion: no-preference) { .pk-tor { scroll-behavior: smooth; } }
+@media (prefers-reduced-motion: reduce) { .pk-kropki button::after { transition: none; } }
