@@ -172,7 +172,7 @@ main { padding-block: 20px 40px; }
 .sg-rez--x { background: repeating-linear-gradient(135deg, #f4e4e2 0 6px, #fbefed 6px 8px); border-left-color: var(--alert); }
 .sg-rez--x .sg-rez__l { text-decoration: line-through; text-decoration-thickness: 1px; }
 .sg-rez--czeka { background: repeating-linear-gradient(135deg, #fff4d6 0 6px, #fffaf0 6px 8px); border-left-style: dashed; }
-.sg-rez--nowa { box-shadow: 0 0 0 2px var(--accent), 0 2px 8px rgba(31, 95, 214, 0.35); }
+.sg-rez--nowa { box-shadow: 0 0 0 2px var(--accent), 0 2px 6px rgba(20, 23, 26, 0.18); }
 .sg-rez--przenos { outline: 3px dashed var(--fg); outline-offset: -3px; opacity: 0.75; }
 .sg-rez--ciagnie { opacity: 0.55; }
 .sg-rez.blysk { animation: blysk-rez 2.4s ease-out; }
