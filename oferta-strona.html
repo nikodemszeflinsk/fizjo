@@ -14,10 +14,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/karta.css?v=63" />
-  <link rel="stylesheet" href="assets/css/oferta-strona.css?v=6" />
+  <link rel="stylesheet" href="assets/css/oferta-strona.css?v=7" />
 </head>
 <body class="ofr-body">
   <a class="skip" href="#tresc">Przejdź do treści</a>
+
+  <!-- Pasek pojawia się tylko po wejściu z linku z CRM (?dla=...). -->
+  <aside class="ofs-dla" id="ofs-dla" hidden>Oferta przygotowana dla: <b></b></aside>
 
   <header class="ofr-pasek">
     <span class="ofr-pasek__marka">
@@ -806,6 +809,8 @@
       update();
     })();
   </script>
+  <script src="assets/js/odbiornik.js?v=1"></script>
+  <script src="assets/js/oferta-lead.js?v=1" defer></script>
   <script src="assets/js/droga-strona.js?v=2" defer></script>
 </body>
 </html>

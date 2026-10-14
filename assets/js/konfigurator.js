@@ -1,4 +1,5 @@
-/* Konfigurator strony i umowy: treść umowy i walidacje z artefaktu, krok „Twoja strona” przed umową. */
+/* Konfigurator strony i umowy: treść umowy i walidacje z artefaktu, krok „Twoja strona” przed umową.
+   Z linku z CRM (?d=...) startuje od wskazanego kroku, z ustawionym pakietem i dodatkami. */
   (function () {
     'use strict';
     var root = document.getElementById('konf');
@@ -31,7 +32,7 @@
     var STYLE = { niebieski: { nazwa: 'Spokojny niebieski', kolor: '#1f5fd6' }, zielony: { nazwa: 'Naturalny zielony', kolor: '#13875a' }, cieply: { nazwa: 'Ciepły pomarańcz', kolor: '#e8590c' }, grafit: { nazwa: 'Elegancki grafit', kolor: '#2f353a' } };
 
     var S = {
-      krok: 0, pakiet: 'individual', sms: false, zaliczki: false, operator: 'pomoc', w_podstrony: false, w_kalendarze: false, w_kampania: false,
+      lead: '', krok: 0, pakiet: 'individual', sms: false, zaliczki: false, operator: 'pomoc', w_podstrony: false, w_kalendarze: false, w_kampania: false,
       firma: '', nip: '', adres: '', osoba: '', email: '', telefon: '',
       terapeuci: '1', miejsca: '1', adresyGab: '', kalendarz: 'wbudowany', domena: '', wizytowka: '',
       nazwa: '', miasto: '', problemy: [], uslugi: '', styl: 'niebieski', nowaDomena: '', teksty: 'my', zdjecia: 'klient',
@@ -226,6 +227,50 @@
     }
     var DOK_CSS = '.dok{font-family:"Segoe UI",Arial,sans-serif;font-size:10.5pt;line-height:1.5;color:#14171a;background:#fff}.dok h1{font-size:15pt;text-align:center;margin:0 0 14px;line-height:1.3}.dok h2{font-size:12pt;margin:18px 0 6px;page-break-after:avoid}.dok p{margin:0 0 6px}.dok .ust{display:flex;gap:8px}.dok .ust .n{flex:none;width:22px;font-weight:700}.dok table{width:100%;border-collapse:collapse;margin:10px 0}.dok th,.dok td{border:1px solid #bbb;padding:5px 8px;text-align:left;vertical-align:top}.dok th{background:#eef0ed}.dok .luka{background:#fff3c4}.dok .projekt{margin-bottom:12px;padding:8px 12px;background:#fdecea;color:#7a1c15;font-weight:700;text-align:center}';
 
+    /* ── Link z CRM: ?d=<base64url(JSON)> ── */
+    function odczytajToken() {
+      var d = new URLSearchParams(location.search).get('d');
+      if (!d) return null;
+      try {
+        var b = d.replace(/-/g, '+').replace(/_/g, '/');
+        while (b.length % 4) b += '=';
+        var j = JSON.parse(decodeURIComponent(escape(atob(b))));
+        return j && j.l ? j : null;
+      } catch (e) { return null; }
+    }
+    var TOKEN = odczytajToken();
+    function zastosujToken() {
+      if (!TOKEN) return;
+      var inny = S.lead !== TOKEN.l;
+      if (inny) {
+        /* Zapisany stan dotyczy kogoś innego (albo nikogo): zaczynamy czysto z danymi z linku. */
+        S.firma = ''; S.nip = ''; S.adres = ''; S.osoba = ''; S.email = ''; S.telefon = '';
+        S.problemy = []; S.uslugi = ''; S.adresyGab = ''; S.nowaDomena = ''; S.domena = ''; S.wizytowka = '';
+        S.nazwa = TOKEN.g || ''; S.miasto = TOKEN.m || '';
+        S.terapeuci = '1'; S.miejsca = '1';
+      }
+      S.lead = TOKEN.l;
+      if (PAK[TOKEN.p]) S.pakiet = TOKEN.p;
+      if (TOKEN.p === 'enterprise' && Number(S.terapeuci) < 2) S.terapeuci = '2';
+      S.sms = !!TOKEN.s; S.zaliczki = !!TOKEN.z;
+      if (!S.firma && TOKEN.g) S.firma = TOKEN.g;
+      var start = TOKEN.k === 1 ? 1 : 2;
+      S.krok = inny ? start : Math.max(Math.min(S.krok, 2), start === 1 ? 1 : 2);
+    }
+    /** Dane do odbiornika i do kodu: bez zgód, podpisu i błędów. */
+    function paczka(typ) {
+      var o = {}, c = ceny();
+      ['pakiet', 'sms', 'zaliczki', 'operator', 'w_podstrony', 'w_kalendarze', 'w_kampania', 'firma', 'nip', 'adres', 'osoba', 'email', 'telefon', 'terapeuci', 'miejsca', 'adresyGab', 'kalendarz', 'domena', 'wizytowka', 'nazwa', 'miasto', 'problemy', 'uslugi', 'styl', 'nowaDomena', 'teksty', 'zdjecia'].forEach(function (k) { o[k] = S[k]; });
+      return {
+        typ: typ, lead: S.lead, kiedy: new Date().toISOString(), konf: o, ceny: { wdr: c.wdr, utr: c.utr },
+        umowa: S.wynik ? { numer: S.numer, czas: S.wynik.czas.toISOString(), hash: S.wynik.hash, wersja: KONF.wersja, osoba: S.osoba } : null
+      };
+    }
+    function wyslij(typ) {
+      if (!S.lead || !window.ODBIORNIK) return Promise.resolve(false);
+      return window.ODBIORNIK.wyslij(paczka(typ));
+    }
+
     /* ── Pomocnicze konfiguratora strony ── */
     function ascii(s) {
       var m = { 'ą': 'a', 'ć': 'c', 'ę': 'e', 'ł': 'l', 'ń': 'n', 'ó': 'o', 'ś': 's', 'ź': 'z', 'ż': 'z' };
@@ -386,7 +431,7 @@
       var w = S.wynik;
       return '<div class="kf-wynik"><div class="ok"><div><h4>Umowa zaakceptowana</h4><p class="kf-lead" style="margin-top:2px">Teraz pobierz plik i wyślij go do nas. Dopiero nasze potwierdzenie zawiera umowę.</p></div></div>' +
         '<dl class="kf-dl"><dt>Numer umowy</dt><dd>' + esc(S.numer) + '</dd><dt>Pakiet</dt><dd>' + esc(PAK[S.pakiet].nazwa) + ' · ' + zl(ceny().wdr) + ' wdrożenie · ' + zl(ceny().utr) + ' / mies.</dd><dt>Osoba podpisująca</dt><dd>' + esc(S.osoba) + '</dd><dt>Czas akceptacji</dt><dd>' + esc(czasPL(w.czas)) + '</dd><dt>Skrót SHA-256</dt><dd>' + esc(w.hash) + '</dd></dl>' +
-        '<div class="kf-pobierz" id="kf-pobierz"><button type="button" class="kf-btn" data-akcja="html">Pobierz umowę (plik)</button><button type="button" class="kf-btn kf-btn--cichy" data-akcja="drukuj">Drukuj / zapisz jako PDF</button><a class="kf-btn kf-btn--cichy" href="' + mailtoHref() + '">Otwórz e-mail do nas</a><button type="button" class="kf-btn kf-btn--cichy" data-akcja="kopiuj">Kopiuj podsumowanie</button></div>' +
+        '<div class="kf-pobierz" id="kf-pobierz"><button type="button" class="kf-btn" data-akcja="html">Pobierz umowę (plik)</button><button type="button" class="kf-btn kf-btn--cichy" data-akcja="drukuj">Drukuj / zapisz jako PDF</button><a class="kf-btn kf-btn--cichy" href="' + mailtoHref() + '">Otwórz e-mail do nas</a><button type="button" class="kf-btn kf-btn--cichy" data-akcja="kopiuj">Kopiuj podsumowanie</button>' + (S.lead ? '<button type="button" class="kf-btn kf-btn--cichy" data-akcja="kod">Kopiuj kod dla Studio Widok</button>' : '') + '</div>' +
         '<div class="kf-info" id="kf-info" role="status"></div>' +
         '<div class="kf-nast"><b>Co dalej</b><ol><li>Pobierz plik umowy (albo zapisz ją jako PDF).</li><li>Wyślij go z adresu <b>' + esc(S.email) + '</b> na <b>' + esc(KONF.email) + '</b>. Przycisk „Otwórz e-mail do nas” przygotuje wiadomość, wystarczy dołączyć plik.</li><li>Potwierdzimy odbiór e-mailem lub SMS-em w ciągu doby. Wtedy umowa zaczyna obowiązywać, a my wracamy z listą rzeczy do zebrania.</li></ol></div>' +
         '<div class="kf-przyciski"><button type="button" class="kf-btn kf-btn--cichy" data-akcja="od-nowa">Zacznij od nowa</button></div></div>';
@@ -438,7 +483,10 @@
       var baner = '';
       if (!KONF.zatwierdzona) baner = '<p class="kf-baner"><b>Wersja próbna.</b> Wzór umowy jest w przeglądzie prawnym, więc wygenerowany dokument ma znak PROJEKT i nie ma mocy prawnej.</p>';
       var miekki = (!S.wynik && S.krok >= 1) ? '<p class="kf-miekki">Nie jesteś jeszcze gotowy na umowę? <a href="' + mailtoKonfiguracja() + '">Wyślij nam samą konfigurację</a> i umówmy się na rozmowę.</p>' : '';
-      root.innerHTML = '<h3>Skonfiguruj swoją stronę i zawrzyj umowę</h3><p class="kf-lead">Najpierw układasz stronę swojego gabinetu i widzisz ją na żywo, potem wpisujesz dane firmy i dostajesz gotową umowę. Zajmuje to kilka minut, a do niczego Cię nie zobowiązuje, dopóki nie wyślesz nam pliku.</p>' + baner +
+      var naglowek = S.lead
+        ? '<h3>Umowa dla: ' + esc(S.nazwa || S.firma || 'Twojego gabinetu') + '</h3><p class="kf-lead">Pakiet i dodatki ustawiliśmy razem na rozmowie. Wpisz dane firmy, przeczytaj umowę i zaakceptuj ją. Jeśli coś się nie zgadza, wróć do poprzedniego kroku albo napisz do nas. Do niczego Cię to nie zobowiązuje, dopóki nie wyślesz nam pliku.</p>'
+        : '<h3>Skonfiguruj swoją stronę i zawrzyj umowę</h3><p class="kf-lead">Najpierw układasz stronę swojego gabinetu i widzisz ją na żywo, potem wpisujesz dane firmy i dostajesz gotową umowę. Zajmuje to kilka minut, a do niczego Cię nie zobowiązuje, dopóki nie wyślesz nam pliku.</p>';
+      root.innerHTML = naglowek + baner +
         '<ol class="kf-kroki" aria-label="Kroki">' + st + '</ol><div class="kf-cialo">' + cialo + '</div>' + prz + miekki;
       if (S.krok === 1 && !S.wynik) pokazLimit();
     }
@@ -533,6 +581,7 @@
       if (a === 'dalej') {
         var er = waliduj(S.krok);
         if (Object.keys(er).length) { S.bledy = er; render(); return fokusBledu(); }
+        if (S.krok === 2) wyslij('dane');
         return ustawKrok(S.krok + 1);
       }
       if (a === 'podpisz') {
@@ -541,11 +590,16 @@
         var czas = new Date();
         var tmp = document.createElement('div');
         tmp.innerHTML = umowaHtml({ czas: czas });
-        return sha256(tmp.textContent).then(function (hash) { S.wynik = { czas: czas, hash: hash }; render(); var h = root.querySelector('.kf-wynik'); if (h && h.scrollIntoView) h.scrollIntoView({ block: 'start', behavior: 'smooth' }); });
+        return sha256(tmp.textContent).then(function (hash) { S.wynik = { czas: czas, hash: hash }; render(); var h = root.querySelector('.kf-wynik'); if (h && h.scrollIntoView) h.scrollIntoView({ block: 'start', behavior: 'smooth' }); if (S.lead) { wyslij('umowa').then(function (ok) { if (window.ODBIORNIK && window.ODBIORNIK.aktywny()) komunikat(ok ? 'Umowa została wysłana do Studio Widok. Plik pobierz i wyślij mailem, tak jak niżej, żeby mieć ją u siebie.' : 'Nie udało się wysłać umowy automatycznie. Skopiuj kod poniżej i wklej go w e-mailu do nas.', !ok); }); } });
       }
       if (a === 'html') return pobierz();
       if (a === 'drukuj') return drukuj();
       if (a === 'kopiuj') return kopiuj();
+      if (a === 'kod') {
+        var kod = window.ODBIORNIK ? window.ODBIORNIK.kod(paczka('umowa')) : '';
+        try { navigator.clipboard.writeText(kod).then(function () { komunikat('Kod skopiowany. Wklej go w e-mailu do nas razem z plikiem umowy.'); }, function () { komunikat(kod); }); } catch (x) { komunikat(kod); }
+        return;
+      }
       if (a === 'od-nowa') { S.wynik = null; S.numer = ''; S.zgody = { a: false, b: false, c: false, d: false }; S.podpis = ''; return ustawKrok(0); }
     });
 
@@ -561,5 +615,10 @@
     });
 
     wczytajStan();
+    zastosujToken();
     render();
+    /* Raz na sesję dajemy znać, że klient otworzył umowę z linku. */
+    try {
+      if (TOKEN && !sessionStorage.getItem('umowa-otwarta-' + TOKEN.l)) { sessionStorage.setItem('umowa-otwarta-' + TOKEN.l, '1'); wyslij('umowa_otwarta'); }
+    } catch (e) { /* bez sessionStorage nic się nie dzieje */ }
   })();
