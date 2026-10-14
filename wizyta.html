@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Twoja wizyta</title>
+  <meta name="description" content="Zmień termin albo odwołaj wizytę. Bez logowania, bez podawania danych o zdrowiu." />
+  <!-- Strona z linku w e-mailu z potwierdzeniem wizyty. Nie ma jej w nawigacji ani w wyszukiwarce. -->
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#14171A" />
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/wizyta.css?v=1" />
+</head>
+<body>
+  <a class="skip" href="#app">Przejdź do treści</a>
+
+  <aside class="demo" id="demo" hidden>
+    <p><strong>To demo.</strong> Tak pacjent zmienia wizytę z linku w e-mailu. Zmiany zapisują się w tej przeglądarce i od razu widać je w <a id="demo-kal" href="kalendarz.html">kalendarzu gabinetu</a>.</p>
+    <button type="button" id="demo-cofnij" hidden>Cofnij zmianę (demo)</button>
+  </aside>
+
+  <header class="gora">
+    <span class="gora__marka">
+      <svg viewBox="0 0 40 40" aria-hidden="true">
+        <path d="M8 6v20a8 8 0 0 1-3 6" stroke="#1F5FD6" />
+        <path d="M15 6v28" stroke="#E8590C" />
+        <path d="M22 6v28" stroke="#13875A" />
+        <path d="M29 6v28" stroke="#C2255C" />
+        <path d="M36 6v28" stroke="#F2B705" />
+      </svg>
+      <span id="gabinet">Gabinet</span>
+    </span>
+    <a class="gora__tel" id="gora-tel" href="#" hidden></a>
+  </header>
+
+  <main id="app" tabindex="-1" aria-live="polite">
+    <p class="ladowanie">Wczytuję wizytę…</p>
+  </main>
+
+  <footer class="stopka">
+    <p>Nie pytamy o zdrowie. Wystarczy termin: o szczegółach terapii porozmawiasz z terapeutą na wizycie.</p>
+  </footer>
+
+  <script src="assets/js/kalendarz-model.js?v=5"></script>
+  <script src="assets/js/wizyta.js?v=1"></script>
+</body>
+</html>

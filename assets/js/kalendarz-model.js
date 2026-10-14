@@ -249,6 +249,81 @@
     return wynik;
   };
 
+  /* ── Zmiana wizyty przez pacjenta (link w e-mailu, bez konta i bez danych zdrowotnych) ─────── */
+  K.POWODY_PACJENTA = ['Zmiana planów', 'Nie mogę w tym terminie', 'Umówiłem się gdzie indziej', 'Wolę nie podawać'];
+  /** Zasady gabinetu: czy pacjent może zmieniać wizyty sam i do ilu godzin przed wizytą. */
+  K.polityka = (D) => {
+    const u = D.ustawienia || {};
+    return { wl: u.pacjentZmiany !== false, godz: u.pacjentGodz == null ? 24 : Number(u.pacjentGodz) };
+  };
+  /** Czy pacjent może teraz sam zmienić albo odwołać wizytę. `kod` mówi, dlaczego nie. */
+  K.zmianaPacjenta = (D, r) => {
+    const p = K.polityka(D);
+    if (!K.aktywna(r)) return { ok: false, kod: 'odwolana' };
+    if (r.status === 'przyszedl' || r.status === 'nieobecny' || K.minelo(r.data, r.od)) return { ok: false, kod: 'minela' };
+    if (!p.wl) return { ok: false, kod: 'wylaczone', godz: p.godz };
+    const doWizyty = (K.zIso(r.data).getTime() + r.od * 60000 - Date.now()) / 3600000;
+    if (doWizyty < p.godz) return { ok: false, kod: 'za-pozno', godz: p.godz };
+    return { ok: true, godz: p.godz };
+  };
+  /**
+   * Wolne terminy, na które pacjent może przełożyć wizytę: ta sama usługa i długość, ten sam terapeuta
+   * (albo `terap: 'any'`, czyli ktokolwiek, kto ją wykonuje). Własny termin wizyty liczy się jako wolny.
+   * Zwraca listę dni z godzinami, od najbliższego.
+   */
+  K.terminyDoZmiany = (D, r, { dni = 21, terap = null } = {}) => {
+    const ust = D.ustawienia;
+    const bezTej = Object.assign({}, D, { rezerwacje: D.rezerwacje.filter((x) => x.id !== r.id) });
+    const teraz = Date.now() + ust.wyprzedzenie * 3600000;
+    const osoby = terap === 'any'
+      ? K.widoczni(D).filter((t) => t.online !== false && (!t.uslugi || t.uslugi.includes(r.usluga)))
+      : [K.terap(D, terap || r.terap)];
+    const wynik = [];
+    const max = Math.min(dni, ust.horyzont);
+    for (let dz = 0; dz <= max; dz++) {
+      const data = K.iso(K.dodaj(new Date(), dz));
+      const sloty = new Map();
+      for (const t of osoby) {
+        const wolne = K.wolnePrzedzialy(bezTej, t.id, data, { bufor: ust.bufor });
+        for (let st = K.START; st + r.dl <= K.END; st += 30) {
+          if (K.zIso(data).getTime() + st * 60000 < teraz) continue;
+          if (!wolne.some(([x, y]) => st >= x && st + r.dl <= y)) continue;
+          if (data === r.data && st === r.od && t.id === r.terap) continue;
+          const g = sloty.get(st) || { data, od: st, dl: r.dl, osoby: [] };
+          g.osoby.push({ id: t.id, nazwa: t.nazwa, lok: K.lok(D, t.id, data, st) });
+          sloty.set(st, g);
+        }
+      }
+      if (sloty.size) wynik.push({ data, sloty: [...sloty.values()].sort((a, b) => a.od - b.od) });
+    }
+    return wynik;
+  };
+  /** Opis zmiany zrobionej przez pacjenta, do pokazania gabinetowi. */
+  K.opisZmiany = (r, krotko = false) => {
+    if (!r.zmiana) return '';
+    const bylo = r.zmiana.bylo ? `${K.wzgledna(r.zmiana.bylo.data)}, ${K.godz(r.zmiana.bylo.od)}`.toLowerCase() : '';
+    const co = r.zmiana.typ === 'odwolana' ? 'odwołał wizytę z' : 'przełożył wizytę z';
+    return krotko ? `${co[0].toUpperCase()}${co.slice(1)} ${bylo}` : `Pacjent ${co} ${bylo}`;
+  };
+  /** Zapis przełożenia. Zwraca false, gdy termin w międzyczasie ktoś zajął. */
+  K.przelozPacjent = (D, r, { data, od, terap }) => {
+    const kto = terap || r.terap;
+    const w = K.sprawdz(D, kto, data, od, r.dl, r.id);
+    if (w.kolizja || w.poza || w.blokada) return false;
+    const bylo = { data: r.data, od: r.od, terap: r.terap };
+    Object.assign(r, { data, od, terap: kto, lok: K.lok(D, kto, data, od), zmiana: { typ: 'przelozona', kiedy: new Date().toISOString(), bylo, widziana: false }, nowa: false });
+    (r.zmiany = r.zmiany || []).push({ kiedy: new Date().toISOString(), typ: 'przelozona', bylo, jest: { data, od, terap: kto } });
+    return true;
+  };
+  K.odwolajPacjent = (D, r, powod) => {
+    const bylo = { data: r.data, od: r.od, terap: r.terap };
+    Object.assign(r, {
+      status: 'odwolana', powod: `Pacjent odwołał z linku: ${powod || 'bez podania powodu'}`, pozno: false, odwolano: new Date().toISOString(), nowa: false,
+      zmiana: { typ: 'odwolana', kiedy: new Date().toISOString(), bylo, widziana: false },
+    });
+    (r.zmiany = r.zmiany || []).push({ kiedy: new Date().toISOString(), typ: 'odwolana', bylo });
+  };
+
   /* ── Liczby do podsumowań ──────────────────────────────────────────── */
   /** Minuty wolne dla pacjentów w danym dniu (od `odMin` w górę). */
   K.wolneMinuty = (D, osoby, data, odMin = K.START) => {
@@ -487,7 +562,7 @@
         ];
     return {
       zespol, miejsca, uslugi, reguly, rezerwacje, blokady, wyjatki: [],
-      ustawienia: { wyprzedzenie: 2, horyzont: 60, bufor: 0, auto: true, zaliczki: true, zaliczkaKwota: 50 },
+      ustawienia: { wyprzedzenie: 2, horyzont: 60, bufor: 0, auto: true, zaliczki: true, zaliczkaKwota: 50, pacjentZmiany: true, pacjentGodz: 24 },
     };
   };
 })();

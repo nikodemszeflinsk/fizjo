@@ -331,3 +331,8 @@
 .ofs-dla[hidden] { display: none; }
 .ofs-polecany { display: inline-block; margin: 0 0 10px; padding: 5px 12px; border-radius: 999px; background: #f2b705; color: #14171a; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
 .ofs-cena--polecana { border-color: #f2b705; }
+
+/* Zakładka „Zmiana wizyty”: przycisk pod listą punktów i akapit pod demem */
+.ofs-galeria__link { margin-top: 20px; margin-right: 10px; }
+.ofs-demo-wiz { margin-top: 20px; }
+.ofs-demo-wiz a { font-weight: 700; }

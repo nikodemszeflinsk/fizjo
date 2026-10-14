@@ -107,7 +107,7 @@
     }
     function OPERATORY_PLACE() { return OPERATORZY[S.operator] || OPERATORZY.pomoc; }
     function opisPakietu() {
-      var wspolne = 'potwierdzenia i przypomnienia o wizytach e-mailem, wizytówka Google, podstawowe SEO, polityka prywatności, cookies i regulamin rezerwacji, domena i hosting';
+      var wspolne = 'potwierdzenia i przypomnienia o wizytach e-mailem z linkiem do zmiany lub odwołania wizyty przez pacjenta (bez konta i bez danych zdrowotnych), wizytówka Google, podstawowe SEO, polityka prywatności, cookies i regulamin rezerwacji, domena i hosting';
       return S.pakiet === 'individual'
         ? '1 terapeuta, do 3 miejsc przyjęć, do 7 usług, do 5 podstron, ' + wspolne
         : 'terapeuci z osobnymi grafikami bez limitu, wybór terapeuty albo pierwszy wolny termin, do 2 lokalizacji, usługi bez limitu, do 10 podstron, ' + wspolne;

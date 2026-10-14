@@ -59,7 +59,7 @@
   function liczbaUwagi() {
     const D = P.D();
     const d0 = K.iso(K.dodaj(new Date(), -2));
-    return D.rezerwacje.filter((r) => (r.nowa && !K.minelo(r.data, r.od)) || r.status === 'oczekuje' || (r.data >= d0 && r.status === 'potwierdzona' && K.minelo(r.data, r.od + r.dl))).length;
+    return D.rezerwacje.filter((r) => (r.nowa && !K.minelo(r.data, r.od)) || (r.zmiana && !r.zmiana.widziana) || r.status === 'oczekuje' || (r.data >= d0 && r.status === 'potwierdzona' && K.minelo(r.data, r.od + r.dl))).length;
   }
   P.liczbaUwagi = liczbaUwagi;
   function renderMenu() {
@@ -142,6 +142,8 @@
     if (P.szuflada && P.szuflada.odswiez) P.szuflada.odswiez();
   };
   let cichy = false;
+  /* Pacjent zmienił wizytę na stronie w innej karcie: kalendarz już wczytał nowy stan, my odświeżamy widok. */
+  window.addEventListener('storage', (e) => { if (e.key === 'kalendarz-demo-v4' && P.aktualny) P.odswiez(); });
   document.addEventListener('kal:zmiana', () => {
     if (cichy || !P.aktualny) return;
     clearTimeout(P._odsw);

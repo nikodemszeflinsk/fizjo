@@ -65,7 +65,7 @@
 
   /* Akcje wspólne dla list wizyt */
   P.akcje.status = (b) => window.KAL_UI.ustawStatus(b.dataset.id, b.dataset.s);
-  P.akcje.widziane = (b) => { const r = P.D().rezerwacje.find((x) => x.id === b.dataset.id); if (r) { r.nowa = false; window.KAL_UI.zapisz(); } };
+  P.akcje.widziane = (b) => { const r = P.D().rezerwacje.find((x) => x.id === b.dataset.id); if (r) { r.nowa = false; if (r.zmiana) r.zmiana.widziana = true; window.KAL_UI.zapisz(); } };
   P.akcje.umow = (b) => {
     P.zamknij(false);
     window.KAL_UI.nowa({ imie: b.dataset.imie || '', tel: b.dataset.tel || '', terap: b.dataset.terap || P.D().zespol[0].id, data: b.dataset.data || dzis(), od: b.dataset.od ? Number(b.dataset.od) : Math.min(K.END - 60, Math.max(K.START, Math.ceil((K.terazMin() + 30) / 15) * 15)), zrodlo: b.dataset.zrodlo || (b.dataset.tel ? 'powrot' : 'telefon') });
@@ -99,7 +99,8 @@
     const czeka = D.rezerwacje.filter((r) => r.status === 'oczekuje' && wFiltrze(r));
     const nowe = D.rezerwacje.filter((r) => r.nowa && K.aktywna(r) && !K.minelo(r.data, r.od) && wFiltrze(r));
     const ozn = D.rezerwacje.filter((r) => r.data >= d0 && r.data < dzis() && r.status === 'potwierdzona' && wFiltrze(r)).sort((a, b) => klucz(a).localeCompare(klucz(b)));
-    return { czeka, nowe, ozn };
+    const zmiany = D.rezerwacje.filter((r) => r.zmiana && !r.zmiana.widziana && wFiltrze(r) && (K.aktywna(r) ? !K.minelo(r.data, r.od) : r.data >= d0));
+    return { czeka, nowe, ozn, zmiany };
   }
   /** Pacjenci, którzy byli niedawno, a nie mają kolejnej wizyty. */
   P.bezKolejnej = () => {
@@ -173,12 +174,12 @@
       let zaj = 0;
       for (let i = 0; i < 6; i++) { const w = K.wypelnienie(D, osobyF, K.iso(K.dodaj(pon, i))); otw += w.otwarte; zaj += w.zajete; }
       const wyp = otw ? Math.round((zaj / otw) * 100) : 0;
-      const { czeka, nowe, ozn } = doDecyzji();
+      const { czeka, nowe, ozn, zmiany } = doDecyzji();
       const bk = P.bezKolejnej();
       const zw = zwolnione();
       const zrodla = paskiZrodel(K.iso(K.dodaj(teraz, -90)), dzis());
       const terminy = K.terminyPacjenta(D, D.uslugi[0].id, { ile: 4 });
-      const uwagi = czeka.length + nowe.length + ozn.length;
+      const uwagi = czeka.length + nowe.length + ozn.length + zmiany.length;
 
       const kpi = `<div class="p-kpi">
         <a class="p-kpi__k" href="#/kalendarz"><span>Wizyty dziś</span><b>${lista.length}</b><small>${lista.length ? `${odbyteDzis} odbytych, ${przed} przed Tobą` : 'dziś wolne'}</small></a>
@@ -190,6 +191,7 @@
       const decyzje = (() => {
         const w = (r, akcje) => `<li class="p-wiersz"><button type="button" class="p-wiersz__glowny" data-pa="rez" data-id="${r.id}"><b>${esc(r.imie)}</b><small>${esc(K.wzgledna(r.data))}, ${K.godz(r.od)} · ${esc(K.usluga(D, r.usluga).nazwa)}${P.ent() ? ` · ${esc(P.osobaNazwa(osoba(r.terap)))}` : ''}</small></button><span class="p-wiersz__akcje">${akcje}</span></li>`;
         let h = '';
+        if (zmiany.length) h += `<h3 class="p-podp"><b>Zmiany od pacjentów</b> (${zmiany.length})</h3><ul class="p-lista">${zmiany.slice(0, 5).map((r) => `<li class="p-wiersz"><button type="button" class="p-wiersz__glowny" data-pa="rez" data-id="${r.id}"><b>${esc(r.imie)}</b><small>${esc(K.opisZmiany(r, true))}${r.zmiana.typ === 'odwolana' ? '. Termin jest znów wolny' : `. Teraz: ${esc(K.wzgledna(r.data).toLowerCase())}, ${K.godz(r.od)}`}${P.ent() ? ` · ${esc(P.osobaNazwa(osoba(r.terap)))}` : ''}</small></button><span class="p-wiersz__akcje"><button type="button" class="p-btn p-btn--maly p-btn--cichy" data-pa="widziane" data-id="${r.id}">Widziałem</button></span></li>`).join('')}</ul>`;
         if (czeka.length) h += `<h3 class="p-podp"><b>Do potwierdzenia</b> (${czeka.length})</h3><ul class="p-lista">${czeka.slice(0, 4).map((r) => w(r, `<button type="button" class="p-btn p-btn--maly p-btn--akcent" data-pa="status" data-id="${r.id}" data-s="potwierdzona">Potwierdź</button><button type="button" class="p-btn p-btn--maly p-btn--cichy p-btn--ostrzez" data-pa="odwolaj" data-id="${r.id}">Odrzuć</button>`)).join('')}</ul>`;
         if (ozn.length) h += `<h3 class="p-podp"><b>Odbyła się?</b> (${ozn.length}) Bez tej decyzji wizyta nie wejdzie do przychodu.</h3><ul class="p-lista">${ozn.slice(0, 5).map((r) => w(r, `<button type="button" class="p-btn p-btn--maly p-btn--ok" data-pa="status" data-id="${r.id}" data-s="przyszedl">Odbyta</button><button type="button" class="p-btn p-btn--maly p-btn--cichy" data-pa="status" data-id="${r.id}" data-s="nieobecny">Nieodbyta</button>`)).join('')}</ul>${ozn.length > 5 ? `<a class="p-btn p-btn--tekst" href="#/rezerwacje/oznacz">Pokaż wszystkie (${ozn.length})</a>` : ''}`;
         if (nowe.length) h += `<h3 class="p-podp"><b>Nowe rezerwacje ze strony</b> (${nowe.length})</h3><ul class="p-lista">${nowe.slice(0, 4).map((r) => w(r, `<button type="button" class="p-btn p-btn--maly p-btn--cichy" data-pa="widziane" data-id="${r.id}">Widziałem</button>`)).join('')}</ul>`;

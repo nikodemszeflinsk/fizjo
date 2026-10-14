@@ -232,6 +232,7 @@
   function badge(r) {
     const znaki = [];
     if (r.nowa) znaki.push('<i class="b b--nowa" title="Nowa rezerwacja ze strony">nowa</i>');
+    if (r.zmiana && r.zmiana.typ === 'przelozona' && !r.zmiana.widziana) znaki.push('<i class="b b--nowa" title="Pacjent przełożył wizytę">przełożona</i>');
     if (r.status === 'przyszedl') znaki.push('<i class="b b--ok" title="Przyszedł">✓</i>');
     if (r.status === 'nieobecny') znaki.push('<i class="b b--x" title="Nie przyszedł">✕</i>');
     if (r.status === 'oczekuje') znaki.push('<i class="b b--czeka" title="Do potwierdzenia">?</i>');
@@ -401,10 +402,12 @@
     /* Wymaga uwagi: do potwierdzenia, nowe ze strony, do oznaczenia. */
     const nowe = D().rezerwacje.filter((r) => r.nowa && !K.minelo(r.data, r.od));
     const czeka = D().rezerwacje.filter((r) => r.status === 'oczekuje');
+    const zmiany = D().rezerwacje.filter((r) => r.zmiana && !r.zmiana.widziana && (K.aktywna(r) ? !K.minelo(r.data, r.od) : true));
     const ozn = doOznaczenia();
     const wiersz = (r, akcje) => `<li><button type="button" class="uw__glowny" data-rez="${r.id}"><b>${esc(K.wzgledna(r.data))}, ${K.godz(r.od)}</b><span>${esc(r.imie)}<small>${esc(K.usluga(D(), r.usluga).nazwa)}</small></span></button><span class="uw__akcje">${akcje}</span></li>`;
     let u = '';
     if (czeka.length) u += `<h4>Do potwierdzenia <i>${czeka.length}</i></h4><ul>${czeka.slice(0, 4).map((r) => wiersz(r, `<button type="button" class="przycisk przycisk--mini" data-status="${r.id}|potwierdzona">Potwierdź</button>`)).join('')}</ul>`;
+    if (zmiany.length) u += `<h4>Zmiany od pacjentów <i>${zmiany.length}</i></h4><ul>${zmiany.slice(0, 4).map((r) => `<li><button type="button" class="uw__glowny" data-rez="${r.id}"><b>${esc(r.imie)}</b><span>${esc(K.opisZmiany(r, true))}<small>${r.zmiana.typ === 'odwolana' ? 'Termin jest znów wolny' : `Teraz: ${esc(K.wzgledna(r.data).toLowerCase())}, ${K.godz(r.od)}`}</small></span></button><span class="uw__akcje"><button type="button" class="przycisk przycisk--mini przycisk--cichy" data-widziane="${r.id}">Widziałem</button></span></li>`).join('')}</ul>`;
     if (nowe.length) u += `<h4>Nowe ze strony <i>${nowe.length}</i></h4><ul>${nowe.slice(0, 4).map((r) => wiersz(r, `<button type="button" class="przycisk przycisk--mini przycisk--cichy" data-widziane="${r.id}">Widziałem</button>`)).join('')}</ul>`;
     if (ozn.length) u += `<h4>Oznacz, czy przyszedł <i>${ozn.length}</i></h4><ul>${ozn.slice(0, 4).map((r) => wiersz(r, `<button type="button" class="przycisk przycisk--mini" data-status="${r.id}|przyszedl" aria-label="Przyszedł: ${esc(r.imie)}">✓</button><button type="button" class="przycisk przycisk--mini przycisk--cichy" data-status="${r.id}|nieobecny" aria-label="Nie przyszedł: ${esc(r.imie)}">✕</button>`)).join('')}</ul>${ozn.length > 4 ? `<p class="wiecej">i jeszcze ${ozn.length - 4}</p>` : ''}`;
     if ($('#uwaga')) $('#uwaga').innerHTML = `<h3>Wymaga uwagi</h3>${u || '<p class="pusto">Wszystko ogarnięte. Nic nie czeka na Twoją decyzję.</p>'}`;
@@ -531,6 +534,7 @@
          <div class="decyzje" role="group" aria-label="Decyzja o wizycie">${DECYZJE.map(([k, n, kl]) => `<button type="button" class="decyzja${kl ? ' decyzja--' + kl : ''}" data-status="${r.id}|${k}" aria-pressed="${r.status === k}"${k !== 'potwierdzona' && !minela ? ' title="Wizyta jeszcze się nie odbyła"' : ''}>${n}</button>`).join('')}</div>`;
     return `${naglowek(esc(r.imie), `${esc(K.dlugaData(d))}, ${K.czas(r.od, r.dl)}`)}
       <div class="sz__chipy">${status}<span class="stat">${esc(K.ZRODLA_KR[r.zrodlo] || r.zrodlo)}</span>${r.nowa ? '<span class="stat stat--nowa">nowa</span>' : ''}${r.zal && D().ustawienia.zaliczki ? `<span class="stat stat--zal">zaliczka ${r.zal.kwota} zł</span>` : ''}</div>
+      ${r.zmiana ? `<p class="sz__zmiana">${esc(K.opisZmiany(r))}.${r.zmiana.widziana ? '' : ` <button type="button" class="przycisk przycisk--mini przycisk--cichy" data-widziane="${r.id}">Widziałem</button>`}</p>` : ''}
       <div class="sz__glowne">${decyzje}</div>
       <dl class="dane">
         <div><dt>Telefon</dt><dd><a href="tel:${esc(r.tel.replace(/\s/g, ''))}">${esc(r.tel)}</a></dd></div>
@@ -539,6 +543,7 @@
         <div><dt>Skąd przyszedł</dt><dd><select class="dane__sel" data-zrodlo-rez="${r.id}" aria-label="Skąd przyszedł pacjent">${Object.entries(K.ZRODLA).map(([k, n]) => `<option value="${k}"${r.zrodlo === k ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select></dd></div>
         ${r.zal && D().ustawienia.zaliczki ? `<div><dt>Zaliczka online</dt><dd>${r.zal.kwota} zł, opłacona (${esc(r.zal.metoda)})</dd></div>` : ''}
         ${r.uwaga ? `<div><dt>Wiadomość od pacjenta</dt><dd>${esc(r.uwaga)}</dd></div>` : ''}
+        ${K.aktywna(r) ? `<div><dt>Zmiana wizyty przez pacjenta</dt><dd><a href="wizyta.html?r=${esc(r.id)}&amp;t=${stan.tryb}" target="_blank" rel="noopener">Zobacz stronę, którą dostaje pacjent</a><br /><small>W prawdziwym systemie link jest w e-mailu z potwierdzeniem.</small></dd></div>` : ''}
         <div><dt>Historia</dt><dd>${hist && hist.razem > 1 ? `${wizyt(hist.razem)} u Was${hist.nieobecny ? `, ${hist.nieobecny}× nieodbyta` : ''}${hist.odwolal ? `, ${hist.odwolal}× odwołana` : ''}` : 'pierwsza wizyta'}</dd></div>
       </dl>
       <div class="pola2">
@@ -1151,7 +1156,7 @@
       return void blysnijKom(d, t, K.minNaRzad(Number(od)));
     }
     if (b.dataset.status) { const [id, s] = b.dataset.status.split('|'); return ustawStatus(id, s); }
-    if (b.dataset.widziane) { const r = D().rezerwacje.find((x) => x.id === b.dataset.widziane); if (r) { r.nowa = false; zapisz(); render(); } return; }
+    if (b.dataset.widziane) { const r = D().rezerwacje.find((x) => x.id === b.dataset.widziane); if (r) { r.nowa = false; if (r.zmiana) r.zmiana.widziana = true; zapisz(); render(); } return; }
     if (b.dataset.pedzel) { ui.pedzel = b.dataset.pedzel; return renderTryb(); }
     akcja(b);
   });

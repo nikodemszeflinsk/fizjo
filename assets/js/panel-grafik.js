@@ -275,6 +275,8 @@
         ${P.wybor({ etykieta: 'Przerwa po wizycie', pf: rez('bufor'), wartosc: U.bufor, opcje: [[0, 'bez przerwy'], [5, '5 min'], [10, '10 min'], [15, '15 min'], [30, '30 min']], atr: 'data-typ="liczba"', pod: 'Czas na notatki i przygotowanie gabinetu.' })}
         ${P.wybor({ etykieta: 'Potwierdzanie wizyt', pf: rez('auto'), wartosc: U.auto ? '1' : '0', opcje: [['1', 'Automatyczne'], ['0', 'Ręcznie przez gabinet']], atr: 'data-typ="bool"', pod: 'Przy ręcznym wizyty czekają na Twoje „Potwierdź” na pulpicie.' })}
       </div>
+      ${P.przelacznik({ etykieta: 'Pacjent może sam zmienić albo odwołać wizytę', pf: rez('pacjentZmiany'), wartosc: U.pacjentZmiany !== false, pod: 'Dostaje link w e-mailu z potwierdzeniem i przypomnieniem. Bez konta, bez logowania i bez pytania o zdrowie.' })}
+      ${U.pacjentZmiany !== false ? P.wybor({ etykieta: 'Pacjent może to zrobić najpóźniej', pf: rez('pacjentGodz'), wartosc: U.pacjentGodz == null ? 24 : U.pacjentGodz, opcje: [[2, '2 godziny przed wizytą'], [12, '12 godzin przed'], [24, 'dzień przed (24 godziny)'], [48, '2 dni przed']], atr: 'data-typ="liczba"', pod: 'Później pacjent zobaczy numer do gabinetu. Dzięki temu nie dostajesz odwołań w ostatniej chwili.' }) : ''}
       ${P.ent() ? `${P.przelacznik({ etykieta: 'Pacjent może wybrać terapeutę', pf: rez('wyborTerapeuty'), wartosc: U.wyborTerapeuty })}${U.wyborTerapeuty ? P.przelacznik({ etykieta: 'Pokaż opcję „Pierwszy wolny termin”', pf: rez('pierwszyWolny'), wartosc: U.pierwszyWolny }) : ''}` : ''}
       </div>`);
   }
