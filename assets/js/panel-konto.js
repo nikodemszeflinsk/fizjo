@@ -81,7 +81,7 @@
     const L = K.LIMITY[P.tryb()];
     const podstron = C.strona.problemy.length;
     const maxPod = P.ent() ? 10 : 5;
-    const pasek = (n, max, nazwa) => `<div class="p-limit${n >= max ? ' p-limit--pelny' : ''}"><span>${nazwa}: <b>${n} z ${max}</b></span><span class="p-limit__tor"><i style="width:${Math.min(100, (n / max) * 100)}%"></i></span></div>`;
+    const pasek = (n, max, nazwa) => `<div class="p-limit${n >= max ? ' p-limit--pelny' : ''}"><span>${nazwa}: <b>${K.zLimitu(n, max)}</b></span>${max === Infinity ? '' : `<span class="p-limit__tor"><i style="width:${Math.min(100, (n / max) * 100)}%"></i></span>`}</div>`;
     const d = C.konto.dodatki;
     return `${P.karta(`Pakiet ${L.nazwa}`, `<div class="p-dwie">
         <div class="p-stos" style="gap:10px">${pasek(D.zespol.length, L.terapeuci, 'Terapeuci')}${pasek(D.miejsca.length, L.miejsca, P.ent() ? 'Lokalizacje' : 'Miejsca przyjęć')}${pasek(D.uslugi.length, L.uslugi, 'Usługi w cenniku')}${pasek(podstron, maxPod, 'Podstrony')}</div>
@@ -89,7 +89,7 @@
       </div>`)}
       ${P.karta('Dodatki', `<ul class="p-lista">
         <li class="p-wiersz"><div class="p-wiersz__glowny" style="cursor:default"><b>Przypomnienia SMS <span class="p-tag p-tag--${d.sms ? 'zielony' : ''}">${d.sms ? 'włączone' : 'wyłączone'}</span></b><small>49 zł miesięcznie za 200 SMS-ów. Pacjenci rzadziej zapominają o wizycie.</small></div><span class="p-wiersz__akcje"><button type="button" class="p-btn p-btn--maly ${d.sms ? 'p-btn--cichy' : 'p-btn--akcent'}" data-pa="dod-przelacz" data-k="sms">${d.sms ? 'Wyłącz' : 'Włącz'}</button></span></li>
-        <li class="p-wiersz"><div class="p-wiersz__glowny" style="cursor:default"><b>Zaliczki online <span class="p-tag p-tag--${d.zaliczki ? 'zielony' : ''}">${d.zaliczki ? 'włączone' : 'wyłączone'}</span></b><small>590 zł wdrożenie i 29 zł miesięcznie. Pacjent płaci przy rezerwacji.</small></div><span class="p-wiersz__akcje"><button type="button" class="p-btn p-btn--maly ${d.zaliczki ? 'p-btn--cichy' : 'p-btn--akcent'}" data-pa="dod-przelacz" data-k="zaliczki">${d.zaliczki ? 'Wyłącz' : 'Włącz'}</button></span></li>
+        <li class="p-wiersz"><div class="p-wiersz__glowny" style="cursor:default"><b>Zaliczki online <span class="p-tag p-tag--${d.zaliczki ? 'zielony' : ''}">${d.zaliczki ? 'włączone' : 'wyłączone'}</span></b><small>299 zł wdrożenie i 29 zł miesięcznie. Pacjent płaci przy rezerwacji.</small></div><span class="p-wiersz__akcje"><button type="button" class="p-btn p-btn--maly ${d.zaliczki ? 'p-btn--cichy' : 'p-btn--akcent'}" data-pa="dod-przelacz" data-k="zaliczki">${d.zaliczki ? 'Wyłącz' : 'Włącz'}</button></span></li>
         <li class="p-wiersz"><div class="p-wiersz__glowny" style="cursor:default"><b>Dodatkowe podstrony, inne kalendarze, kampania reklamowa</b><small>Wyceniamy osobno.</small></div><span class="p-wiersz__akcje"><a class="p-btn p-btn--maly p-btn--cichy" href="mailto:kontakt@studio-widok.pl?subject=Wycena%20dodatku">Zapytaj o wycenę</a></span></li>
       </ul><p class="p-podp">W prawdziwym panelu włączenie dodatku wysyła nam prośbę, a my zmieniamy umowę. W demie działa od razu.</p>`)}
       ${P.karta('Demo', `<div class="p-filtry"><button type="button" class="p-btn p-btn--cichy p-btn--ostrzez" data-pa="demo-reset">Przywróć dane przykładowe</button><span class="p-podp">Wraca do stanu początkowego w obu pakietach.</span></div>`)}`;

@@ -218,3 +218,110 @@
 
 .kf-miekki { margin: 18px 0 0; color: var(--muted); font-size: 0.95rem; }
 .kf-miekki a { color: var(--accent-text); font-weight: 700; }
+
+/* ══ Układ z 14.10.2026: wspólny rytm sekcji ══════════════════════════ */
+
+/* Jeden styl nagłówka sekcji w całej ofercie: żółta kreska + tekst, na ciemnym tle jaśniejszy. */
+.ofr-body .ofr-kicker { display: inline-flex; align-items: center; gap: 10px; }
+.ofr-body .ofr-kicker::before { content: ''; flex: none; width: 22px; height: 3px; border-radius: 2px; background: #f2b705; }
+.ofr-body .ofr-blok, .ofr-body .ofr-pilot { scroll-margin-top: 64px; }
+
+/* Hero: podkreślenie słowa „wizyty” i chipy z najważniejszymi faktami. */
+.ofs-hero .ofr-hero__h1 mark { background: linear-gradient(transparent 64%, #f2b705 64% 92%, transparent 92%); color: inherit; padding-inline: 2px; }
+.ofs-chipy { display: flex; flex-wrap: wrap; gap: 10px; margin: 26px 0 0; padding: 0; list-style: none; }
+.ofs-chipy li { display: inline-flex; align-items: center; gap: 10px; padding: 9px 16px; border: 1px solid var(--hair); border-radius: 999px; background: #fff; font-weight: 700; font-size: 0.95rem; }
+.ofs-chipy li::before { content: ''; flex: none; width: 12px; height: 6px; border-left: 2.5px solid var(--accent); border-bottom: 2.5px solid var(--accent); rotate: -45deg; translate: 0 -2px; }
+.ofs-hero .ofs-cta { margin-top: 26px; }
+.ofs-hero .ofr-obietnice { margin-top: 34px; }
+
+/* Korzyści: trzy karty z ikoną. */
+.ofs-korz { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin: 34px 0 0; padding: 0; list-style: none; }
+.ofs-korz li { padding: clamp(22px, 2.6vw, 30px); border: 1px solid var(--hair); border-radius: 16px; background: #fff; box-shadow: 0 1px 2px rgba(20, 23, 26, 0.05), 0 12px 30px -18px rgba(20, 23, 26, 0.25); }
+.ofs-korz__ik { display: grid; place-items: center; width: 50px; height: 50px; margin-bottom: 18px; border-radius: 14px; background: rgba(31, 95, 214, 0.1); color: var(--accent-dark); }
+.ofs-korz__ik svg { width: 25px; height: 25px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.ofs-korz h3 { margin: 0 0 8px; font-family: var(--f-display); font-size: 1.25rem; font-weight: 800; line-height: 1.15; letter-spacing: -0.02em; }
+.ofs-korz p { margin: 0; color: var(--ink-2); line-height: 1.6; }
+@media (max-width: 900px) { .ofs-korz { grid-template-columns: minmax(0, 1fr); } }
+
+/* Różnica: wiersz po wierszu, lewa kolumna to portal, prawa to Twoje miejsce. */
+.ofs-vs { margin-top: 34px; border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 16px; overflow: hidden; }
+.ofs-vs__glowa, .ofs-vs__w { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.ofs-vs__glowa p { margin: 0; padding: 16px 22px; color: #fff; font-family: var(--f-display); font-size: 1.1rem; font-weight: 800; }
+.ofs-vs__glowa p:last-child, .ofs-vs__w p:last-child { background: rgba(31, 95, 214, 0.22); }
+.ofs-vs__w p { position: relative; margin: 0; padding: 15px 22px 15px 50px; border-top: 1px solid rgba(255, 255, 255, 0.12); line-height: 1.5; }
+.ofs-vs__w p:first-child { color: #aab1b6; }
+.ofs-vs__w p:last-child { color: #fff; }
+.ofs-vs__w p::before { content: ''; position: absolute; left: 22px; top: 1.35em; width: 14px; height: 2px; background: #6c757c; }
+.ofs-vs__w p:last-child::before { top: 1.15em; width: 12px; height: 6px; background: none; border-left: 2.5px solid #7fa8ee; border-bottom: 2.5px solid #7fa8ee; rotate: -45deg; }
+@media (max-width: 720px) {
+  .ofs-vs__glowa { display: none; }
+  .ofs-vs__w { grid-template-columns: minmax(0, 1fr); }
+  .ofs-vs__w + .ofs-vs__w { border-top: 6px solid rgba(255, 255, 255, 0.06); }
+  .ofs-vs__w p::after { content: attr(data-et); display: block; margin-bottom: 2px; font-size: 0.74rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #7fa8ee; order: -1; }
+  .ofs-vs__w p { display: flex; flex-direction: column; }
+  .ofs-vs__w p:first-child::after { color: #8a9298; }
+}
+
+/* Galeria „co dostajesz”: zakładki zawijają się na komputerze, na telefonie przewijają się poziomo bez paska. */
+.ofs-zakl { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 32px; }
+.ofs-zakl button { flex: none; padding: 9px 14px; border: 1.5px solid var(--hair-2); border-radius: 999px; background: #fff; color: var(--ink); font: inherit; font-weight: 700; font-size: 0.93rem; cursor: pointer; transition: border-color 0.15s, background-color 0.15s; }
+.ofs-zakl button:hover { border-color: var(--ink); }
+.ofs-zakl button[aria-selected='true'] { border-color: var(--ink); background: var(--ink); color: #fff; }
+.ofs-zakl button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.ofs-galeria { display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(260px, 1fr); gap: clamp(24px, 4vw, 52px); align-items: start; margin-top: 24px; }
+.ofs-galeria__opis { padding-top: 8px; }
+.ofs-galeria[hidden] { display: none; }
+.ofs-okno { overflow: hidden; border: 1px solid var(--hair); border-radius: 14px; background: #fff; box-shadow: 0 1px 2px rgba(20, 23, 26, 0.06), 0 24px 50px -28px rgba(20, 23, 26, 0.45); }
+.ofs-okno__pasek { display: flex; align-items: center; gap: 7px; padding: 10px 14px; border-bottom: 1px solid var(--hair); background: var(--floor); }
+.ofs-okno__pasek i { display: block; flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--hair-2); }
+.ofs-okno__pasek span { margin-left: 10px; padding: 3px 14px; overflow: hidden; border-radius: 999px; background: #fff; color: var(--muted); font-size: 0.8rem; white-space: nowrap; text-overflow: ellipsis; }
+.ofs-okno img { display: block; width: 100%; height: auto; }
+.ofs-okno--waskie { width: min(290px, 100%); }
+.ofs-telefony { display: flex; justify-content: center; align-items: flex-start; gap: clamp(14px, 3vw, 30px); padding: clamp(18px, 3vw, 30px); border-radius: 14px; background: var(--floor-2); }
+.ofs-telefon { width: min(220px, 46%); overflow: hidden; border: 6px solid var(--ink); border-radius: 28px; background: #fff; box-shadow: 0 24px 40px -26px rgba(20, 23, 26, 0.55); }
+.ofs-telefon img { display: block; width: 100%; height: auto; }
+.ofs-galeria__nr { margin: 0 0 8px; color: var(--muted); font-size: 0.85rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.ofs-galeria__opis h3 { margin: 0; font-family: var(--f-display); font-size: clamp(1.3rem, 2.2vw, 1.6rem); font-weight: 800; line-height: 1.15; letter-spacing: -0.02em; }
+.ofs-galeria__opis > p:not(.ofs-galeria__nr) { margin: 12px 0 0; color: var(--ink-2); line-height: 1.6; }
+.ofs-galeria__opis ul { display: grid; gap: 10px; margin: 18px 0 0; padding: 0; list-style: none; }
+.ofs-galeria__opis li { position: relative; padding-left: 26px; line-height: 1.5; }
+.ofs-galeria__opis li::before { content: ''; position: absolute; left: 0; top: 0.45em; width: 12px; height: 6px; border-left: 2.5px solid var(--accent); border-bottom: 2.5px solid var(--accent); rotate: -45deg; }
+.ofs-galeria__dalej { display: inline-flex; align-items: center; gap: 8px; margin-top: 24px; padding: 10px 18px; border: 1.5px solid var(--hair-2); border-radius: 999px; background: transparent; color: var(--ink); font: inherit; font-weight: 700; cursor: pointer; }
+.ofs-galeria__dalej:hover { border-color: var(--ink); }
+.ofs-galeria__dalej svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+@media (max-width: 900px) {
+  .ofs-galeria { grid-template-columns: minmax(0, 1fr); }
+  .ofs-zakl { flex-wrap: nowrap; overflow-x: auto; margin-inline: calc(-1 * clamp(20px, 5vw, 56px)); padding-inline: clamp(20px, 5vw, 56px); scroll-snap-type: x proximity; scroll-padding-inline: clamp(20px, 5vw, 56px); scrollbar-width: none; }
+  .ofs-zakl::-webkit-scrollbar { display: none; }
+  .ofs-zakl button { scroll-snap-align: start; }
+}
+
+/* Zakres: „Czego nie robimy” jako wyraźnie oddzielona karta pod listą. */
+.ofs-nie { margin-top: 34px; padding: clamp(22px, 3vw, 34px); border: 1px solid var(--hair); border-radius: 16px; background: #fff; }
+.ofs-nie .ofr-h3 { margin-top: 0; }
+
+/* Pakiety: gwiazdka przy utrzymaniu i jej wyjaśnienie drobnym drukiem. */
+.ofs-gw { margin-left: 1px; color: #f2b705; font-weight: 800; text-decoration: none; }
+.ofs-gw:hover { text-decoration: underline; }
+.ofs-gwiazdka { max-width: 92ch; margin: 18px 0 0; color: #aab1b6; font-size: 0.86rem; line-height: 1.6; scroll-margin-top: 90px; }
+.ofs-gwiazdka b { color: #e9ecea; }
+
+/* Kalkulator: bez kreski u góry, bo stoi zaraz pod ciemnymi pakietami. */
+.ofs-blok-calc { border-top: 0; }
+
+/* Wdrożenie: trzy kroki z numerami i karta „Twoje zaangażowanie”. */
+.ofs-kroki { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin: 34px 0 0; padding: 0; list-style: none; counter-reset: kr; }
+.ofs-kroki li { padding: clamp(22px, 2.6vw, 28px); border: 1px solid var(--hair); border-radius: 16px; background: #fff; counter-increment: kr; }
+.ofs-kroki li::before { content: counter(kr); display: grid; place-items: center; width: 38px; height: 38px; margin-bottom: 16px; border-radius: 50%; background: var(--accent); color: #fff; font-family: var(--f-display); font-weight: 800; }
+.ofs-kroki h3 { margin: 0 0 8px; font-family: var(--f-display); font-size: 1.2rem; font-weight: 800; letter-spacing: -0.02em; }
+.ofs-kroki p { margin: 0; color: var(--ink-2); line-height: 1.6; }
+.ofs-zaang { margin-top: 18px; padding: clamp(22px, 3vw, 32px); border: 1px solid var(--hair); border-radius: 16px; background: #fff; }
+.ofs-zaang h3 { margin: 0; font-family: var(--f-display); font-size: 1.25rem; font-weight: 800; }
+.ofs-zaang > p { margin: 6px 0 0; color: var(--ink-2); }
+.ofs-zaang ul { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px 26px; margin: 20px 0 0; padding: 20px 0 0; border-top: 1px solid var(--hair); list-style: none; }
+.ofs-zaang li { color: var(--ink-2); font-size: 0.95rem; line-height: 1.5; }
+.ofs-zaang li b { display: block; margin-bottom: 4px; color: var(--ink); }
+@media (max-width: 1000px) { .ofs-zaang ul { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 900px) { .ofs-kroki { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 560px) { .ofs-zaang ul { grid-template-columns: minmax(0, 1fr); } }
+.ofr-body #pytania .faq { max-width: 860px; }

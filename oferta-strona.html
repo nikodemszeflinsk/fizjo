@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Strona z rezerwacją dla gabinetu fizjoterapii · Studio Widok</title>
-  <meta name="description" content="Strona, która zdobywa pacjentów z wyszukiwarki, i kalendarz, który przyjmuje rezerwacje także nocą. Dwa pakiety, ceny końcowe, konfigurator strony i umowy." />
+  <meta name="description" content="Strona, która zdobywa pacjentów z wyszukiwarki, i kalendarz, który przyjmuje rezerwacje także nocą. Dwa pakiety, ceny końcowe." />
   <!-- Strona wysyłana linkiem po rozmowie. Nie ma jej w nawigacji ani w wyszukiwarce. -->
   <meta name="robots" content="noindex, nofollow" />
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/karta.css?v=63" />
-  <link rel="stylesheet" href="assets/css/oferta-strona.css?v=5" />
+  <link rel="stylesheet" href="assets/css/oferta-strona.css?v=6" />
 </head>
 <body class="ofr-body">
   <a class="skip" href="#tresc">Przejdź do treści</a>
@@ -32,23 +32,23 @@
     </span>
     <nav class="ofr-pasek__nav" aria-label="Na skróty">
       <a href="#jak">Jak to działa</a>
-      <a href="#zakres">Co dostajesz</a>
-      <a href="#zobacz">Zobacz demo</a>
-      <a href="#cena">Cena</a>
+      <a href="#co-dostajesz">Co dostajesz</a>
+      <a href="#zakres">Zakres</a>
+      <a href="#demo">Demo</a>
       <a href="#wdrozenie">Wdrożenie</a>
       <a href="#pytania">Pytania</a>
-      <a class="ofr-pasek__oferta" href="#konfigurator">Skonfiguruj stronę</a>
+      <a class="ofr-pasek__oferta" href="#cena">Pakiety i ceny</a>
     </nav>
   </header>
 
   <main id="tresc">
 
     <!-- ── Hero ───────────────────────────────────────────────────────── -->
-    <section class="ofr-hero">
+    <section class="ofr-hero ofs-hero">
       <div class="ofr-hero__in">
         <div class="ofr-hero__tekst">
           <p class="ofr-hero__dla">Strona z rezerwacją online dla gabinetów fizjoterapii</p>
-          <h1 class="ofr-hero__h1">Wyszukiwania zamieniamy<br />w wizyty w Twoim grafiku.</h1>
+          <h1 class="ofr-hero__h1">Wyszukiwania zamieniamy<br />w <mark>wizyty</mark> w Twoim grafiku.</h1>
           <h2 class="ofr-hero__h2">
             Strona, która prowadzi pacjenta do wyboru Twojej terapii, i kalendarz, który przyjmuje
             rezerwacje także wtedy, gdy nie odbierasz telefonu.
@@ -67,9 +67,15 @@
             </p>
           </div>
 
+          <ul class="ofs-chipy" aria-label="W skrócie">
+            <li>Gotowe w około 14 dni</li>
+            <li>Godziny przyjęć ustawiasz w prostym kalendarzu</li>
+            <li>Bez prowizji od pacjenta</li>
+          </ul>
+
           <div class="ofs-cta">
-            <a class="cta cta--blue" href="#konfigurator">Skonfiguruj swoją stronę <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></a>
-            <a class="cta cta--line" href="#zobacz">Zobacz demo</a>
+            <a class="cta cta--blue" href="#cena">Zobacz pakiety <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></a>
+            <a class="cta cta--line" href="#demo">Zobacz demo</a>
             <p class="ofs-cta__cena">od <b>2&nbsp;900&nbsp;zł</b> wdrożenia i <b>99&nbsp;zł</b> miesięcznie. Ceny końcowe.</p>
           </div>
 
@@ -104,8 +110,33 @@
         <ul>
           <li><b>Ceny końcowe</b><span>Bez VAT i bez ukrytych opłat. Wdrożenie plus stały abonament.</span></li>
           <li><b>Płacisz po zobaczeniu projektu</b><span>Faktura za wdrożenie po akceptacji projektu, a strona rusza po wpłacie.</span></li>
-          <li><b>Bez umowy na lata</b><span>Brak okresu minimalnego. Wypowiedzenie z końcem następnego miesiąca.</span></li>
+          <li><b>Bez umowy na lata</b><span>Rezygnujesz w każdej chwili, ze skutkiem natychmiastowym. Pliki strony dostajesz w 7 dni.</span></li>
           <li><b>Około 14 dni</b><span>od materiałów do działającej strony. Po Twojej stronie 2–3 godziny.</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ── Co z tego masz ─────────────────────────────────────────────── -->
+    <section class="ofr-blok ofr-blok--paper" id="korzysci">
+      <div class="ofr-blok__in">
+        <p class="ofr-kicker">Co z tego masz</p>
+        <h2 class="ofr-h2">Trzy rzeczy, które zmienia nowa strona</h2>
+        <ul class="ofs-korz">
+          <li>
+            <span class="ofs-korz__ik" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z" /></svg></span>
+            <h3>Umawiają się, gdy Ty nie odbierasz</h3>
+            <p>Wieczorem, w trakcie zabiegu, w weekend. Pacjent wybiera prawdziwy wolny termin i od razu go ma, zamiast czekać na oddzwonienie.</p>
+          </li>
+          <li>
+            <span class="ofs-korz__ik" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4.5 4.5" /></svg></span>
+            <h3>Trafia do Ciebie ten, kto ma konkretny problem</h3>
+            <p>Każda dolegliwość, którą leczysz, ma własną stronę. Człowiek, który wpisuje „rwa kulszowa”, ląduje na stronie o rwie kulszowej, a nie na liście porównawczej.</p>
+          </li>
+          <li>
+            <span class="ofs-korz__ik" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 4.5 6v5.5c0 4.5 3.2 8 7.5 9.5 4.3-1.5 7.5-5 7.5-9.5V6L12 3Z" /><path d="m8.5 12 2.5 2.5L15.5 10" /></svg></span>
+            <h3>Własny kanał bez prowizji</h3>
+            <p>Pacjent jest Twój, a nie portalu. Płacisz za stronę i jej utrzymanie, a nie za każdą umówioną wizytę.</p>
+          </li>
         </ul>
       </div>
     </section>
@@ -143,7 +174,7 @@
       </div>
     </section>
 
-    <!-- ── Na czym polega różnica ─────────────────────────────────────── -->
+    <!-- ── Na czym polega różnica: wiersz po wierszu ──────────────────── -->
     <section class="ofr-blok ofr-blok--ink">
       <div class="ofr-blok__in">
         <p class="ofr-kicker ofr-kicker--jasny">Na czym polega różnica</p>
@@ -152,27 +183,31 @@
           To ta sama osoba, szukająca tej samej pomocy. Różni się tylko to, gdzie trafia i co tam robi.
         </p>
 
-        <div class="ofr-vs">
-          <article class="ofr-vs__kol">
-            <h3>Na cudzej liście</h3>
-            <ul>
-              <li>Pacjent widzi Ciebie i pięciu innych w jednym rzędzie</li>
-              <li>Porównuje ceny i liczbę opinii, bo nie ma czego innego porównać</li>
-              <li>Prowizja od pacjenta, którego portal tylko wypożycza</li>
-              <li>Numer, historia i zgody zostają na platformie</li>
-              <li>Pozycję da się odebrać jedną zmianą algorytmu portalu</li>
-            </ul>
-          </article>
-          <article class="ofr-vs__kol ofr-vs__kol--my">
-            <h3>W Twoim miejscu</h3>
-            <ul>
-              <li>Pacjent wpisuje „rwa kulszowa”, trafia na stronę o rwie kulszowej</li>
-              <li>Czyta o swoim problemie i wybiera termin, bo nie ma z kim Cię porównywać</li>
-              <li>Płacisz za system, nigdy za pojedynczego pacjenta</li>
-              <li>Numery i zgody pacjentów zostają u Ciebie</li>
-              <li>Domena, treści i wizytówka są Twoje — także gdy się rozstaniemy</li>
-            </ul>
-          </article>
+        <div class="ofs-vs" role="table" aria-label="Porównanie: portal i własna strona">
+          <div class="ofs-vs__glowa" role="row">
+            <p role="columnheader">Na cudzej liście</p>
+            <p role="columnheader">W Twoim miejscu</p>
+          </div>
+          <div class="ofs-vs__w" role="row">
+            <p role="cell" data-et="Na cudzej liście">Pacjent widzi Ciebie i pięciu innych w jednym rzędzie</p>
+            <p role="cell" data-et="W Twoim miejscu">Na stronie jest tylko Twój gabinet, Twój zespół i Twoje wolne godziny</p>
+          </div>
+          <div class="ofs-vs__w" role="row">
+            <p role="cell" data-et="Na cudzej liście">Porównuje ceny i liczbę opinii, bo nie ma czego innego porównać</p>
+            <p role="cell" data-et="W Twoim miejscu">Czyta, jak pracujesz z jego problemem, i wybiera godzinę, a nie najtańszego z listy</p>
+          </div>
+          <div class="ofs-vs__w" role="row">
+            <p role="cell" data-et="Na cudzej liście">Prowizja od pacjenta, którego portal tylko wypożycza</p>
+            <p role="cell" data-et="W Twoim miejscu">Stały abonament: piąty i pięćdziesiąty pacjent w miesiącu kosztują tyle samo</p>
+          </div>
+          <div class="ofs-vs__w" role="row">
+            <p role="cell" data-et="Na cudzej liście">Numer, historia i zgody zostają na platformie</p>
+            <p role="cell" data-et="W Twoim miejscu">Rezerwacja trafia prosto do Twojego kalendarza, a kolejną wizytę umawiacie już bez pośrednika</p>
+          </div>
+          <div class="ofs-vs__w" role="row">
+            <p role="cell" data-et="Na cudzej liście">Pozycję da się odebrać jedną zmianą algorytmu portalu</p>
+            <p role="cell" data-et="W Twoim miejscu">Każda nowa podstrona i opinia w wizytówce pracuje na Twoją domenę, nie na cudzy ranking</p>
+          </div>
         </div>
 
         <p class="ofr-fine ofr-fine--jasny">
@@ -199,53 +234,16 @@
         </div>
 
         <ol class="path" aria-label="Droga pacjenta"><li class="path__stop"><span class="path__num" aria-hidden="true">1</span><p class="path__verb">Znajdzie Cię</p><p class="path__mod">Wizytówka i strona zoptymalizowana pod wyszukiwania</p><p class="path__tag"><span class="ofr-tag ofr-tag--wid">W cenie</span></p><p class="path__opis">Aktualne godziny, usługi, zdjęcia i opinie w Mapach Google oraz osobna strona dla każdej dolegliwości — tak, żeby fraza „fizjoterapeuta [miasto]” albo „rwa kulszowa” prowadziła prosto do Ciebie.</p></li><li class="path__stop"><span class="path__num" aria-hidden="true">2</span><p class="path__verb">Umówi się</p><p class="path__mod">System rezerwacji i kalendarz dostępności</p><p class="path__tag"><span class="ofr-tag ofr-tag--wid">W cenie</span></p><p class="path__opis">Wybiera problem, terapeutę i godzinę, bez formularza „zapytaj o ofertę”. Widzi tylko te godziny, które sam włączyłeś w kalendarzu, a termin od razu trafia do Twojego kalendarza.</p></li><li class="path__stop"><span class="path__num" aria-hidden="true">3</span><p class="path__verb">Przyjdzie</p><p class="path__mod">Potwierdzenie i przypomnienie</p><p class="path__tag"><span class="ofr-tag ofr-tag--wid">W cenie</span> <span class="ofr-tag ofr-tag--opt">Dodatek</span></p><p class="path__opis">Dzień przed wizytą dostaje przypomnienie e-mailem, a za dopłatą także SMS-em. Rzadziej zapomina, a Ty rzadziej odwołujesz okienko w ostatniej chwili. Za dopłatą może też wpłacić zaliczkę przy rezerwacji.</p></li><li class="path__stop path__stop--opt"><span class="path__num" aria-hidden="true"><svg class="plus" viewBox="0 0 20 20"><path d="M10 2.6v14.8M2.6 10h14.8" /></svg></span><p class="path__verb">Zobaczy Cię szybciej</p><p class="path__mod">Reklamy Google i Meta · opcja</p><p class="path__tag"><span class="ofr-tag ofr-tag--opt">Osobne zlecenie</span></p><p class="path__opis">Gdy chcesz zapełnić nowy gabinet albo grafik nowego terapeuty. Strona jest już przygotowana pod kampanię. Włączasz i wyłączasz w dowolnym momencie.</p></li></ol>
+      </div>
+    </section>
 
-        <div class="bramy">
-          <article class="brama">
-            <div class="brama__text">
-              <p class="brama__kicker">Oczami pacjenta</p>
-              <h3 class="brama__h">Strona, na którą trafia z wyszukiwarki</h3>
-              <p class="brama__lead">
-                Wybiera to, co go boli, widzi Twoje wolne godziny i umawia się w minutę —
-                bez telefonu i bez czekania do rana. Każda dolegliwość ma własną stronę,
-                bo to ona odpowiada na pytanie wpisane w Google.
-              </p>
-              <ul class="brama__punkty">
-                <li>Rezerwacja w trzy kroki, z wyborem terapeuty</li>
-                <li>Kwalifikator dla tych, którzy nie wiedzą, co wybrać</li>
-                <li>Osobna strona dla każdego problemu</li>
-                <li>Potwierdzenie i przypomnienie o wizycie e-mailem</li>
-                <li>Pasek „Zadzwoń” na telefonie, bo część pacjentów i tak zadzwoni</li>
-              </ul>
-            </div>
-            <div class="brama__obraz brama__obraz--telefon">
-              <img src="assets/img/zrzuty/strona-terminy-telefon.jpg" alt="Strona gabinetu na telefonie: wybór dnia i godziny, przy każdej godzinie imię terapeuty." width="420" height="946" loading="lazy" />
-            </div>
-          </article>
-
-          <article class="brama brama--ciemna">
-            <div class="brama__text">
-              <p class="brama__kicker">Oczami gabinetu</p>
-              <h3 class="brama__h">Kalendarz, w którym ustawiasz, kiedy przyjmujesz</h3>
-              <p class="brama__lead">
-                Godziny przyjęć ustawiasz raz w tygodniu albo po prostu zaznaczasz je w kalendarzu:
-                przeciągasz po wybranych godzinach i otwierają się lub zamykają dla pacjentów.
-                Urlop to jedna blokada, a każdą zmianę możesz cofnąć.
-              </p>
-              <ul class="brama__punkty">
-                <li>Zaznacz godziny przeciągnięciem, nawet w kilku dniach naraz</li>
-                <li>Kilka miejsc przyjęć, każde w swoim kolorze</li>
-                <li>Rezerwacje ze strony i wpisane po telefonie, oznaczone osobno</li>
-                <li>Przełóż wizytę przeciągnięciem, odwołaj jednym kliknięciem</li>
-                <li>Enterprise: osobny grafik każdego terapeuty</li>
-              </ul>
-            </div>
-            <div class="brama__obraz">
-              <span class="screen__bar"><i></i><i></i><i></i></span>
-              <img src="assets/img/zrzuty/kal-dostepnosc.jpg" alt="Kalendarz dostępności w trybie zmiany godzin: zielone godziny są otwarte dla pacjentów, kreskowane zamknięte, a wizyty widać jako tło." width="1872" height="1520" loading="lazy" />
-            </div>
-          </article>
-        </div>
+    <!-- ── Zobacz, co dostajesz: galeria z zakładkami ─────────────────── -->
+    <section class="ofr-blok" id="co-dostajesz">
+      <div class="ofr-blok__in">
+        <p class="ofr-kicker">Zobacz, co dostajesz</p>
+        <h2 class="ofr-h2">Tak wygląda strona i kalendarz Twojego gabinetu</h2>
+        <p class="ofr-lead">Zrzuty pochodzą z działającego demo przykładowego gabinetu „Linia Ruchu”. Nazwiska, ceny i zdjęcia są fikcyjne, a u Ciebie będą Twoje.</p>
+        <div class="ofs-zakl" role="tablist" aria-label="Elementy strony i kalendarza"><button type="button" role="tab" id="zk-0" aria-controls="zp-0" aria-selected="true" tabindex="0">Strona główna</button><button type="button" role="tab" id="zk-1" aria-controls="zp-1" aria-selected="false" tabindex="-1">Podstrona problemu</button><button type="button" role="tab" id="zk-2" aria-controls="zp-2" aria-selected="false" tabindex="-1">Rezerwacja</button><button type="button" role="tab" id="zk-3" aria-controls="zp-3" aria-selected="false" tabindex="-1">Zespół</button><button type="button" role="tab" id="zk-4" aria-controls="zp-4" aria-selected="false" tabindex="-1">Na telefonie</button><button type="button" role="tab" id="zk-5" aria-controls="zp-5" aria-selected="false" tabindex="-1">Kalendarz</button><button type="button" role="tab" id="zk-6" aria-controls="zp-6" aria-selected="false" tabindex="-1">Kalendarz zespołu</button><button type="button" role="tab" id="zk-7" aria-controls="zp-7" aria-selected="false" tabindex="-1">Wizyta</button></div><div class="ofs-galeria" role="tabpanel" id="zp-0" aria-labelledby="zk-0"><div class="ofs-galeria__obraz"><div class="ofs-okno"><div class="ofs-okno__pasek"><i></i><i></i><i></i><span>twoj-gabinet.pl</span></div><img src="assets/img/zrzuty/strona-pierwszy-ekran.jpg" alt="Pierwszy ekran strony gabinetu: pytanie „Co Cię boli?”, najbliższe wolne terminy i cztery kolorowe problemy do wyboru." width="1400" height="836" loading="lazy" decoding="async" /></div></div><div class="ofs-galeria__opis"><p class="ofs-galeria__nr">1 / 8</p><h3>Pierwszy ekran zadaje pytanie, a nie wymienia usługi</h3><p>Pacjent wybiera swój problem, a obok od razu widzi najbliższe wolne godziny z Twojego grafiku.</p><ul><li>Problemy w kolorach, każdy prowadzi do właściwej podstrony</li><li>Najbliższe wolne terminy na wierzchu</li><li>Godziny otwarcia i numer telefonu pod ręką</li></ul><button type="button" class="ofs-galeria__dalej" data-zk-dalej>Dalej: Podstrona problemu <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></button></div></div><div class="ofs-galeria" role="tabpanel" id="zp-1" aria-labelledby="zk-1" hidden><div class="ofs-galeria__obraz"><div class="ofs-okno"><div class="ofs-okno__pasek"><i></i><i></i><i></i><span>twoj-gabinet.pl/fizjoterapia-kregoslupa</span></div><img src="assets/img/zrzuty/strona-podstrona-problemu.jpg" alt="Podstrona o fizjoterapii kręgosłupa: nagłówek, objawy i najbliższy wolny termin." width="1400" height="972" loading="lazy" decoding="async" /></div></div><div class="ofs-galeria__opis"><p class="ofs-galeria__nr">2 / 8</p><h3>Osobna strona pod każdą dolegliwość</h3><p>Tyle stron, ile problemów leczysz. Każda odpowiada na konkretne wyszukiwanie i kończy się wolnym terminem.</p><ul><li>Własny tytuł i opis w Google</li><li>Objawy opisane językiem pacjenta</li><li>Przycisk rezerwacji i najbliższy termin</li></ul><button type="button" class="ofs-galeria__dalej" data-zk-dalej>Dalej: Rezerwacja <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></button></div></div><div class="ofs-galeria" role="tabpanel" id="zp-2" aria-labelledby="zk-2" hidden><div class="ofs-galeria__obraz"><div class="ofs-okno"><div class="ofs-okno__pasek"><i></i><i></i><i></i><span>twoj-gabinet.pl/rezerwacja</span></div><img src="assets/img/zrzuty/strona-terminy.jpg" alt="Krok rezerwacji: wybór terapeuty, dnia i godziny, a obok podsumowanie wizyty." width="1400" height="665" loading="lazy" decoding="async" /></div></div><div class="ofs-galeria__opis"><p class="ofs-galeria__nr">3 / 8</p><h3>Rezerwacja w trzy kroki, tylko wolne terminy</h3><p>Usługa, termin i dane. Pacjent widzi podsumowanie wizyty i cenę, a zajęte godziny w ogóle się nie pokazują.</p><ul><li>Enterprise: wybór terapeuty albo pierwszego wolnego terminu</li><li>Individual: wybór miejsca przyjęć</li><li>Potwierdzenie i przypomnienie e-mailem</li></ul><button type="button" class="ofs-galeria__dalej" data-zk-dalej>Dalej: Zespół <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></button></div></div><div class="ofs-galeria" role="tabpanel" id="zp-3" aria-labelledby="zk-3" hidden><div class="ofs-galeria__obraz"><div class="ofs-okno"><div class="ofs-okno__pasek"><i></i><i></i><i></i><span>twoj-gabinet.pl/zespol</span></div><img src="assets/img/zrzuty/strona-zespol.jpg" alt="Karty trzech terapeutów: zdjęcie, specjalizacja, godziny przyjęć i najbliższy termin." width="1400" height="1061" loading="lazy" decoding="async" /></div></div><div class="ofs-galeria__opis"><p class="ofs-galeria__nr">4 / 8</p><h3>Pacjent widzi człowieka, do którego idzie</h3><p>Karta każdego terapeuty: zdjęcie, specjalizacja, godziny przyjęć i przycisk, który zaczyna rezerwację właśnie do niego.</p><ul><li>Individual: strona o Tobie</li><li>Enterprise: karty całego zespołu</li><li>Godziny biorą się z grafiku, więc nie obiecujesz terminu, którego nie ma</li></ul><button type="button" class="ofs-galeria__dalej" data-zk-dalej>Dalej: Na telefonie <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></button></div></div><div class="ofs-galeria" role="tabpanel" id="zp-4" aria-labelledby="zk-4" hidden><div class="ofs-galeria__obraz"><div class="ofs-telefony"><div class="ofs-telefon"><img src="assets/img/zrzuty/strona-telefon.jpg" alt="Strona gabinetu na telefonie: kolorowe problemy i przyklejony pasek „Zadzwoń” i „Umów wizytę”." width="420" height="860" loading="lazy" decoding="async" /></div><div class="ofs-telefon"><img src="assets/img/zrzuty/strona-terminy-telefon.jpg" alt="Rezerwacja na telefonie: wybór dnia i godziny." width="420" height="946" loading="lazy" decoding="async" /></div></div></div><div class="ofs-galeria__opis"><p class="ofs-galeria__nr">5 / 8</p><h3>Większość pacjentów szuka z telefonu</h3><p>Strona jest zbudowana pod ten ekran: duże przyciski, przyklejony pasek „Zadzwoń” i „Umów wizytę” oraz rezerwacja, którą da się zrobić jednym kciukiem.</p><ul><li>Pasek z telefonem i rezerwacją zawsze pod kciukiem</li><li>Sygnał „otwarte teraz”, liczony z grafiku</li><li>Rezerwacja bez przewijania w poziomie</li></ul><button type="button" class="ofs-galeria__dalej" data-zk-dalej>Dalej: Kalendarz <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></button></div></div><div class="ofs-galeria" role="tabpanel" id="zp-5" aria-labelledby="zk-5" hidden><div class="ofs-galeria__obraz"><div class="ofs-okno"><div class="ofs-okno__pasek"><i></i><i></i><i></i><span>Twój kalendarz dostępności</span></div><img src="assets/img/zrzuty/kal2-tydzien.jpg" alt="Kalendarz dostępności w pakiecie Individual: tydzień z dwoma miejscami przyjęć, rezerwacjami i blokadą, a z prawej dzisiejsze wizyty i nowe rezerwacje ze strony." width="1908" height="1170" loading="lazy" decoding="async" /></div></div><div class="ofs-galeria__opis"><p class="ofs-galeria__nr">6 / 8</p><h3>Ustawiasz, kiedy przyjmujesz. Pacjent widzi tylko wolne terminy</h3><p>Godziny przyjęć ustawiasz raz na tydzień, z miejscem przyjęć. Pojedyncze godziny otwierasz albo zamykasz zaznaczeniem, a urlop to jedna blokada.</p><ul><li>Kilka miejsc przyjęć, każde w swoim kolorze</li><li>Rezerwacje ze strony i wpisane po telefonie w jednym kalendarzu</li><li>Z boku dzisiejsze wizyty i nowe rezerwacje do przejrzenia</li></ul><button type="button" class="ofs-galeria__dalej" data-zk-dalej>Dalej: Kalendarz zespołu <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></button></div></div><div class="ofs-galeria" role="tabpanel" id="zp-6" aria-labelledby="zk-6" hidden><div class="ofs-galeria__obraz"><div class="ofs-okno"><div class="ofs-okno__pasek"><i></i><i></i><i></i><span>Twój kalendarz dostępności</span></div><img src="assets/img/zrzuty/kal2-zespol.jpg" alt="Kalendarz dostępności w pakiecie Enterprise: dzień zespołu z osobną kolumną dla każdego terapeuty." width="1908" height="1170" loading="lazy" decoding="async" /></div></div><div class="ofs-galeria__opis"><p class="ofs-galeria__nr">7 / 8</p><h3>Grafik każdego terapeuty w jednym widoku</h3><p>Dzień zespołu pokazuje kolumnę każdej osoby: jej godziny, rezerwacje i wolny czas. Na tydzień jednego terapeuty przełączasz się, gdy chcesz zmienić jego grafik.</p><ul><li>Własne godziny, lokalizacje, urlopy i blokady każdej osoby</li><li>Pacjent wybiera terapeutę albo pierwszy wolny termin</li><li>Wolny czas każdej osoby widać w nagłówku kolumny</li></ul><button type="button" class="ofs-galeria__dalej" data-zk-dalej>Dalej: Wizyta <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></button></div></div><div class="ofs-galeria" role="tabpanel" id="zp-7" aria-labelledby="zk-7" hidden><div class="ofs-galeria__obraz"><div class="ofs-telefony ofs-telefony--panel"><div class="ofs-okno ofs-okno--waskie"><img src="assets/img/zrzuty/kal2-rezerwacja.jpg" alt="Szczegóły wizyty w kalendarzu: status, telefon, usługa, terapeuta, skąd przyszedł pacjent, zaliczka, cena i notatka." width="660" height="1416" loading="lazy" decoding="async" /></div></div></div><div class="ofs-galeria__opis"><p class="ofs-galeria__nr">8 / 8</p><h3>Wiesz, kto przyjdzie, skąd się wziął i czy zapłacił zaliczkę</h3><p>Kliknięcie wizyty pokazuje telefon, usługę i terapeutę. Po wizycie oznaczasz, czy się odbyła, a odwołanie od razu zwalnia termin na stronie.</p><ul><li>Odbyta albo nieodbyta jednym kliknięciem</li><li>Skąd przyszedł pacjent: strona, telefon, polecenie</li><li>Zaliczka online i jej status (dodatek)</li></ul><button type="button" class="ofs-galeria__dalej" data-zk-dalej>Dalej: Strona główna <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></button></div></div>
       </div>
     </section>
 
@@ -282,39 +280,13 @@
       </div>
     </section>
 
-    <!-- ── Co dokładnie dostajesz ─────────────────────────────────────── -->
+    <!-- ── Zakres: wszystko, co wchodzi, i czego nie robimy ──────────── -->
     <section class="ofr-blok ofr-blok--paper" id="zakres">
       <div class="ofr-blok__in">
-        <p class="ofr-kicker">Co dokładnie dostajesz</p>
-        <h2 class="ofr-h2 ofr-h2--szeroki">Więcej wypełnionych godzin, mniej telefonów po godzinach i strona, o którą nie musisz się martwić.</h2>
+        <p class="ofr-kicker">Zakres</p>
+        <h2 class="ofr-h2">Wszystko, co wchodzi w zakres</h2>
+        <p class="ofr-lead">Pełna lista, bez gwiazdek. Stronę i kalendarz możesz obejrzeć i poklikać w demie poniżej.</p>
 
-        <div class="gains">
-          <article class="gain">
-            <p class="gain__num">1</p>
-            <h3>Umawiają się, gdy Ty nie odbierasz</h3>
-            <p>Pacjent wybiera problem, terapeutę i godzinę o 23:00 tak samo jak o 9:00. Termin ląduje w kalendarzu, a Ty widzisz go rano.</p>
-          </article>
-          <article class="gain">
-            <p class="gain__num">2</p>
-            <h3>Pacjent z konkretnym problemem trafia na Ciebie</h3>
-            <p>Każda dolegliwość ma własną stronę, która odpowiada na to, co ktoś wpisuje w Google. Nie porównuje Cię z pięcioma innymi na liście.</p>
-          </article>
-          <article class="gain">
-            <p class="gain__num">3</p>
-            <h3>Własny kanał, bez prowizji</h3>
-            <p>Płacisz za system, nigdy za pacjenta. Numery i zgody zostają u Ciebie, a strona jest Twoja także wtedy, gdy portal zmieni zasady.</p>
-          </article>
-          <article class="gain">
-            <p class="gain__num">4</p>
-            <h3>Mniej pustych okienek</h3>
-            <p>Potwierdzenie i przypomnienie przed wizytą wychodzą same. Pacjent rzadziej zapomina, a odwołany termin od razu wraca na stronę jako wolny.</p>
-          </article>
-        </div>
-
-        <h3 class="ofr-h3">Wszystko, co wchodzi w zakres</h3>
-        <p class="ofr-lead">
-          Strony i kalendarz poniżej możesz obejrzeć i poklikać w demie.
-        </p>
         <div class="funkcje">
           <article class="grupa">
             <h3 class="grupa__h">Strona, na którą trafia pacjent</h3>
@@ -336,8 +308,8 @@
               <li><b>Godziny przyjęć</b> ustawiasz raz w tygodniu, także z przerwą w środku dnia i z miejscem przyjęć.</li>
               <li><b>Dostępność zmieniasz przeciągnięciem</b>: zaznaczasz prostokąt, a godziny otwierają się albo zamykają, także w kilku dniach naraz.</li>
               <li><b>Jeden dzień</b> poprawiasz kliknięciem w jego nazwę, a urlop dodajesz jako blokadę z listą wizyt do przełożenia.</li>
-              <li><b>Rezerwacje ze strony i wpisane po telefonie</b> obok siebie, także jako seria co tydzień.</li>
-              <li><b>Przełożenie wizyty</b> przeciągnięciem, odwołanie jednym kliknięciem, a <b>każdą zmianę możesz cofnąć</b>.</li>
+              <li><b>Rezerwacje ze strony i wpisane po telefonie</b> obok siebie, także jako seria co tydzień, z informacją, skąd przyszedł pacjent.</li>
+              <li><b>Po wizycie</b> oznaczasz, czy się odbyła. Przełożenie to przeciągnięcie, odwołanie jedno kliknięcie, a <b>każdą zmianę możesz cofnąć</b>.</li>
               <li><b>Widoki</b>: tydzień, dzień, miesiąc i agenda, do tego wyszukiwarka pacjentów i eksport do pliku.</li>
               <li><b>Podgląd tego, co widzi pacjent</b>, zmienia się razem z Twoim grafikiem.</li>
               <li><b>Osobny grafik każdego terapeuty</b> i widok „dzień zespołu” (Enterprise).</li>
@@ -368,7 +340,7 @@
           </article>
         </div>
 
-        <div class="ofr-nie" id="czego-nie-robimy">
+        <div class="ofr-nie ofs-nie" id="czego-nie-robimy">
           <h3 class="ofr-h3">Czego nie robimy</h3>
           <p>
             Nie prowadzimy dokumentacji medycznej ani kartoteki pacjentów. Wywiad, badanie i historię
@@ -391,8 +363,8 @@
       </div>
     </section>
 
-    <!-- ── Zobacz zanim zdecydujesz ───────────────────────────────────── -->
-    <section class="ofr-blok" id="zobacz">
+    <!-- ── Demo ───────────────────────────────────────────────────────── -->
+    <section class="ofr-blok" id="demo">
       <div class="ofr-blok__in">
         <p class="ofr-kicker">Demo</p>
         <h2 class="ofr-h2 ofr-h2--szeroki">Zobacz i poklikaj, zanim zdecydujesz — dowolnie, nic się nie zepsuje</h2>
@@ -400,7 +372,7 @@
 
         <div class="ofr-zobacz">
           <article class="ofr-kafel ofr-kafel--duzy">
-            <img src="assets/img/zrzuty/strona-pierwszy-ekran.jpg" alt="Pierwszy ekran strony gabinetu: pytanie „Co Cię boli?”, najbliższe wolne terminy i cztery problemy do wyboru." width="1400" height="836" loading="lazy" />
+            <img src="assets/img/zrzuty/strona-pierwszy-ekran.jpg" alt="Pierwszy ekran strony gabinetu: pytanie „Co Cię boli?”, najbliższe wolne terminy i cztery problemy do wyboru." width="1400" height="836" loading="lazy" decoding="async" />
             <div class="ofr-kafel__tresc">
               <h3>Strona gabinetu</h3>
               <p>To, co widzi pacjent: wybór problemu, kwalifikator i rezerwacja.</p>
@@ -411,7 +383,7 @@
           </article>
 
           <article class="ofr-kafel">
-            <img src="assets/img/zrzuty/kal-tydzien.jpg" alt="Kalendarz dostępności pakietu Individual: tydzień z dwoma miejscami przyjęć." width="1872" height="1400" loading="lazy" />
+            <img src="assets/img/zrzuty/kal2-tydzien.jpg" alt="Kalendarz dostępności pakietu Individual: tydzień z dwoma miejscami przyjęć." width="1908" height="1170" loading="lazy" decoding="async" />
             <div class="ofr-kafel__tresc">
               <h3>Kalendarz: Individual</h3>
               <p>Jeden terapeuta, kilka miejsc przyjęć. Zaznacz godziny, żeby je otworzyć albo zamknąć, przeciągnij wizytę na inny termin i zobacz, co widzi pacjent.</p>
@@ -422,7 +394,7 @@
           </article>
 
           <article class="ofr-kafel">
-            <img src="assets/img/zrzuty/kal-zespol.jpg" alt="Kalendarz dostępności pakietu Enterprise: dzień zespołu z osobną kolumną dla każdego terapeuty." width="1872" height="1400" loading="lazy" />
+            <img src="assets/img/zrzuty/kal2-zespol.jpg" alt="Kalendarz dostępności pakietu Enterprise: dzień zespołu z osobną kolumną dla każdego terapeuty." width="1908" height="1170" loading="lazy" decoding="async" />
             <div class="ofr-kafel__tresc">
               <h3>Kalendarz: Enterprise</h3>
               <p>Zespół i osobny grafik każdego terapeuty w jednym widoku dnia.</p>
@@ -435,11 +407,11 @@
       </div>
     </section>
 
-    <!-- ── Cena ───────────────────────────────────────────────────────── -->
+    <!-- ── Pakiety i cena (ciemne) ────────────────────────────────────── -->
     <section class="ofr-pilot" id="cena">
       <div class="ofr-blok__in">
-        <p class="ofr-kicker ofr-kicker--jasny">Cena</p>
-        <h2 class="ofr-h2">Dwa pakiety. Ceny końcowe.</h2>
+        <p class="ofr-kicker ofr-kicker--jasny">Pakiety</p>
+        <h2 class="ofr-h2">Dla jednego terapeuty albo dla całej kliniki</h2>
         <p class="ofr-lead ofr-lead--jasny">
           Płacisz raz za wdrożenie i co miesiąc za utrzymanie. Nie jesteśmy płatnikiem VAT, więc podane kwoty
           są kwotami do zapłaty. Wdrożenie fakturujemy po akceptacji projektu, a nie przed.
@@ -452,12 +424,12 @@
             <p class="ofr-cena__opis">Jedna osoba, jedna lub kilka lokalizacji. Pacjenci znajdują Cię w wyszukiwarce i umawiają się sami, do Twojego kalendarza.</p>
             <div class="ofr-cena__ceny">
               <p class="ofr-cena__kwota">2&nbsp;900&nbsp;zł <span>wdrożenie</span></p>
-              <p class="ofr-cena__kwota ofr-cena__kwota--sub">99&nbsp;zł <span class="ofr-cena__dwa"><span>utrzymanie</span><span>miesięcznie</span></span></p>
+              <p class="ofr-cena__kwota ofr-cena__kwota--sub">99&nbsp;zł <span class="ofr-cena__dwa"><span>utrzymanie<a class="ofs-gw" href="#gwiazdka" aria-label="Co obejmuje utrzymanie i jak z niego zrezygnować">*</a></span><span>miesięcznie</span></span></p>
             </div>
             <dl class="ofs-limity">
               <div><dt>Terapeuci</dt><dd>1</dd></div>
               <div><dt>Miejsca przyjęć</dt><dd>do 3</dd></div>
-              <div><dt>Usługi w cenniku</dt><dd>do 6</dd></div>
+              <div><dt>Usługi w cenniku</dt><dd>do 7</dd></div>
               <div><dt>Podstrony</dt><dd>do 5</dd></div>
             </dl>
             <ul class="ofr-cena__lista">
@@ -469,7 +441,7 @@
               <li>Domena, hosting i dwie tury poprawek w cenie</li>
             </ul>
             <p class="ofr-cena__stopka">Utrzymanie kosztuje mniej niż jedna typowa wizyta miesięcznie.</p>
-            <div class="ofs-wybierz"><a class="cta cta--blue" href="#konfigurator" data-wybierz-pakiet="individual">Wybieram Individual <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></a></div>
+            <div class="ofs-wybierz"><a class="cta cta--blue" href="mailto:kontakt@studio-widok.pl?subject=Pakiet%20Individual">Wybieram Individual <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></a></div>
           </article>
 
           <article class="ofr-cena ofr-cena--wid">
@@ -478,12 +450,12 @@
             <p class="ofr-cena__opis">Każdy terapeuta ma własny grafik, a pacjent wybiera osobę albo pierwszy wolny termin u kogokolwiek z zespołu.</p>
             <div class="ofr-cena__ceny">
               <p class="ofr-cena__kwota">4&nbsp;499&nbsp;zł <span>wdrożenie</span></p>
-              <p class="ofr-cena__kwota ofr-cena__kwota--sub">149&nbsp;zł <span class="ofr-cena__dwa"><span>utrzymanie</span><span>miesięcznie</span></span></p>
+              <p class="ofr-cena__kwota ofr-cena__kwota--sub">149&nbsp;zł <span class="ofr-cena__dwa"><span>utrzymanie<a class="ofs-gw" href="#gwiazdka" aria-label="Co obejmuje utrzymanie i jak z niego zrezygnować">*</a></span><span>miesięcznie</span></span></p>
             </div>
             <dl class="ofs-limity">
-              <div><dt>Terapeuci</dt><dd>do 8</dd></div>
+              <div><dt>Terapeuci</dt><dd>bez limitu</dd></div>
               <div><dt>Lokalizacje</dt><dd>do 2</dd></div>
-              <div><dt>Usługi w cenniku</dt><dd>do 15</dd></div>
+              <div><dt>Usługi w cenniku</dt><dd>bez limitu</dd></div>
               <div><dt>Podstrony</dt><dd>do 10</dd></div>
             </dl>
             <ul class="ofr-cena__lista">
@@ -491,31 +463,39 @@
               <li>Osobny kalendarz dostępności na każdego terapeutę</li>
               <li>Wybór terapeuty albo „pierwszy wolny termin”</li>
               <li>Widok „dzień zespołu” w kalendarzu</li>
-              <li>Więcej terapeutów niż 8: wycena indywidualna</li>
+              <li>Dowolna liczba terapeutów i usług w tej samej cenie</li>
             </ul>
             <p class="ofr-cena__stopka">Przy zespole koszt na terapeutę spada: 149 zł dzieli się na wszystkich.</p>
-            <div class="ofs-wybierz"><a class="cta cta--blue" href="#konfigurator" data-wybierz-pakiet="enterprise">Wybieram Enterprise <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></a></div>
+            <div class="ofs-wybierz"><a class="cta cta--blue" href="mailto:kontakt@studio-widok.pl?subject=Pakiet%20Enterprise">Wybieram Enterprise <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></a></div>
           </article>
         </div>
+
+        <p class="ofs-gwiazdka" id="gwiazdka">
+          <b>* Utrzymanie</b> to hosting, domena, certyfikat, aktualizacje, naprawa błędów i do godziny drobnych zmian
+          treści miesięcznie, fakturowane z góry na początku miesiąca. Rezygnujesz w każdej chwili, e-mailem, ze skutkiem
+          natychmiastowym. W ciągu 7 dni dostajesz pliki strony oraz dostęp do domeny i wizytówki Google. System rezerwacji
+          działa na naszej infrastrukturze, więc po rezygnacji przestaje działać, dopóki nie skonfigurujesz własnego.
+          Szczegóły niżej i w umowie.
+        </p>
 
         <div class="ofs-dodatki">
           <h3>Dodatki</h3>
           <p>Wybierasz tylko to, czego potrzebujesz. Dodatki możesz włączyć przy umowie albo dołożyć później.</p>
           <ul>
             <li>
-              <div><h4>Przypomnienia SMS</h4><p>Oprócz przypomnienia e-mailem pacjent dostaje SMS dzień przed wizytą. W cenie 200 wiadomości miesięcznie, a pacjent musi się na nie zgodzić przy rezerwacji.</p></div>
+              <div><h4>Przypomnienia SMS</h4><p>Oprócz przypomnienia e-mailem pacjent dostaje SMS dzień przed wizytą. W cenie 200 wiadomości miesięcznie, a pacjent musi się na nie zgodzić przy rezerwacji. Każdy SMS ponad limit doliczamy według taryfy operatora bramki SMS — dziś to około 0,17 zł za wiadomość.</p></div>
               <p class="ofs-dodatki__cena">49 zł<small>miesięcznie</small></p>
             </li>
             <li>
               <div><h4>Zaliczki płatne online</h4><p>Pacjent płaci zaliczkę przy rezerwacji (BLIK, karta lub szybki przelew), a termin potwierdza się po zaksięgowaniu wpłaty. Ty wybierasz kwotę, usługi, których dotyczy, i zasady zwrotu. Pieniądze trafiają prosto na Twoje konto u operatora płatności (Przelewy24, Tpay lub Stripe), a prowizję pobiera operator.</p></div>
-              <p class="ofs-dodatki__cena">590 zł + 29 zł<small>wdrożenie i miesięcznie</small></p>
+              <p class="ofs-dodatki__cena">299 zł + 29 zł<small>wdrożenie i miesięcznie</small></p>
             </li>
             <li>
               <div><h4>Dodatkowe podstrony i artykuły</h4><p>Gdy jedna strona na problem to dla Ciebie za mało. Teksty piszemy my albo Ty.</p></div>
               <p class="ofs-dodatki__cena">wycena<small>zależnie od zakresu</small></p>
             </li>
             <li>
-              <div><h4>Inne kalendarze niż Google</h4><p>Jeśli używasz innego programu do umawiania, sprawdzamy na początku, czy da się go połączyć. Nie obiecujemy integracji z każdym.</p></div>
+              <div><h4>Integracja z zewnętrznym kalendarzem innym niż Google</h4><p>Domyślnie dostajesz nasz kalendarz dostępności, a jeśli wolisz, łączymy Twój Kalendarz Google — oba są w cenie. Jeśli umawiasz pacjentów w innym programie, na początku sprawdzamy, czy da się go połączyć. Nie obiecujemy integracji z każdym.</p></div>
               <p class="ofs-dodatki__cena">wycena<small>po sprawdzeniu</small></p>
             </li>
           </ul>
@@ -535,7 +515,7 @@
             <h3>Umowa i płatności</h3>
             <ul>
               <li>Czas nieokreślony, bez okresu minimalnego</li>
-              <li>Wypowiedzenie z końcem miesiąca następującego po miesiącu, w którym je złożysz</li>
+              <li>Rezygnujesz w każdej chwili, e-mailem, ze skutkiem natychmiastowym</li>
               <li>Faktura za wdrożenie po akceptacji projektu, termin płatności 7 dni, uruchomienie po wpłacie</li>
               <li>Utrzymanie fakturujemy z góry, na początku miesiąca</li>
               <li>Licencja na korzystanie ze strony: niewyłączna i bezterminowa</li>
@@ -544,7 +524,7 @@
           <div>
             <h3>Jeśli zrezygnujesz z utrzymania</h3>
             <ul>
-              <li>Dostajesz pliki strony i dostęp do domeny oraz wizytówki, możesz opublikować je gdzie chcesz</li>
+              <li>W ciągu 7 dni dostajesz pliki strony i dostęp do domeny oraz wizytówki, możesz opublikować je gdzie chcesz</li>
               <li>System rezerwacji działa na naszej infrastrukturze, więc po zakończeniu umowy przestaje działać, dopóki nie skonfigurujesz własnego</li>
               <li>Nie wspieramy samodzielnej konfiguracji. Hosting, aktualizacje i kopie przechodzą na Ciebie</li>
             </ul>
@@ -567,15 +547,15 @@
 
         <p class="ofr-fine ofr-fine--jasny">
           Jeśli faktura za utrzymanie nie zostanie zapłacona w terminie, wyślemy przypomnienie w dniu terminu
-          i po trzech dniach. Gdy zaległość trwa 7 dni od terminu, możemy wypowiedzieć umowę ze skutkiem
+          i po trzech dniach. Gdy zaległość trwa 14 dni od terminu, możemy wypowiedzieć umowę ze skutkiem
           natychmiastowym, a system rezerwacji zostaje wyłączony. Pliki strony przekazujemy po uregulowaniu zaległości.
-          Pełne warunki znajdziesz w umowie, którą widzisz w całości przed jej zawarciem.
+          Pełne warunki znajdziesz w umowie, którą dostajesz w całości przed jej zawarciem.
         </p>
       </div>
     </section>
 
     <!-- ── Kalkulator ─────────────────────────────────────────────────── -->
-    <section class="ofr-blok">
+    <section class="ofr-blok ofs-blok-calc">
       <div class="ofr-blok__in">
         <section class="calc" aria-labelledby="h-calc">
           <div class="calc__head">
@@ -641,36 +621,39 @@
         <h2 class="ofr-h2">Od pierwszej rozmowy do działającej strony</h2>
         <p class="ofr-lead">
           Tempo wyznacza to, jak szybko dostajemy materiały i Twoje akceptacje. Orientacyjnie strona
-          powstaje w około 14 dni. Jeśli czegoś brakuje, mówimy o tym od razu, a nie w ostatnim dniu.
+          z rezerwacją powstaje w około 14 dni. Jeśli czegoś brakuje, mówimy o tym od razu, a nie w ostatnim dniu.
         </p>
-
-        <div class="ofr-tory">
-          <article class="ofr-tor">
-            <h3>Co robimy my</h3>
-            <p class="ofr-tor__czas">Orientacyjnie około 14 dni</p>
-            <ol class="ofr-etapy ofr-etapy--tor">
-              <li><strong>Poznajemy Twój gabinet</strong> Rozmawiamy o specjalizacjach, zespole, godzinach i cennikach. Planujemy układ podstron.</li>
-              <li><strong>Przygotowujemy treści i projekt</strong> Piszemy teksty (albo korzystamy z Twoich) i robimy projekt wizualny do Twojej akceptacji. W cenie są dwie tury poprawek.</li>
-              <li><strong>Uruchamiamy stronę</strong> Po akceptacji projektu wystawiamy fakturę, a po wpłacie stawiamy stronę na Twojej domenie, konfigurujemy kalendarz i podpinamy wizytówkę Google. Na końcu jest próbna rezerwacja z telefonu.</li>
-            </ol>
-          </article>
-          <article class="ofr-tor">
-            <h3>Co robisz Ty</h3>
-            <p class="ofr-tor__czas">Razem około 2–3 godzin</p>
-            <ol class="ofr-etapy ofr-etapy--tor">
-              <li><strong>Rozmowa startowa</strong> Opowiadasz o gabinecie i o tym, jakich pacjentów chcesz mieć więcej. Wypełniasz krótki formularz.</li>
-              <li><strong>Materiały</strong> Zdjęcia, godziny przyjęć, usługi i cennik oraz dostęp do domeny i wizytówki Google, jeśli już je masz.</li>
-              <li><strong>Akceptacja</strong> Jedna runda uwag do tekstów i projektu: przy każdym fragmencie piszesz „OK” albo „zmień”. Na koniec razem próbujemy umówić wizytę.</li>
-            </ol>
-          </article>
+        <ol class="ofs-kroki">
+          <li>
+            <h3>Poznajemy Twój gabinet</h3>
+            <p>Rozmawiamy o specjalizacjach, zespole, godzinach i cennikach. Planujemy układ podstron i strukturę informacji.</p>
+          </li>
+          <li>
+            <h3>Przygotowujemy treści i projekt</h3>
+            <p>Zbieramy materiały, piszemy teksty (albo korzystamy z Twoich) i robimy projekt wizualny do Twojej akceptacji. W cenie są dwie tury poprawek.</p>
+          </li>
+          <li>
+            <h3>Uruchamiamy stronę</h3>
+            <p>Po akceptacji projektu i wpłacie stawiamy stronę, konfigurujemy system rezerwacji i kalendarz dostępności, podpinamy domenę i wizytówkę Google. Na końcu próbna wizyta z telefonu.</p>
+          </li>
+        </ol>
+        <div class="ofs-zaang">
+          <h3>Twoje zaangażowanie: około 2–3 godzin</h3>
+          <p>Strona ma być Twoja, więc potrzebujemy Ciebie przy tym, czego nikt za Ciebie nie wie.</p>
+          <ul>
+            <li><b>Formularz startowy, 20–30 min</b>Godziny, usługi z cenami, zespół, zdjęcia i dostępy.</li>
+            <li><b>Rozmowa, 30–45 min</b>Specjalizacje i to, czym Twój gabinet się wyróżnia.</li>
+            <li><b>Przegląd tekstów</b>Jeden dokument, przy każdej sekcji „OK” albo „zmień”, jedna runda uwag.</li>
+            <li><b>Próbne rezerwacje, 30 min</b>Sprawdzasz, jak to działa, i akceptujesz przed startem.</li>
+          </ul>
         </div>
       </div>
     </section>
 
-    <!-- ── Zanim zapytasz ─────────────────────────────────────────────── -->
+    <!-- ── Zanim zdecydujesz ──────────────────────────────────────────── -->
     <section class="ofr-blok" id="pytania">
-      <div class="ofr-blok__in ofr-blok__in--waski">
-        <p class="ofr-kicker">Zanim zapytasz</p>
+      <div class="ofr-blok__in">
+        <p class="ofr-kicker">Zanim zdecydujesz</p>
         <h2 class="ofr-h2">Pytania, które warto zadać przed decyzją</h2>
         <div class="faq">
           <details>
@@ -691,54 +674,36 @@
           </details>
           <details>
             <summary>Mam już program do umawiania albo Kalendarz Google. Trzeba to wymieniać?<span class="faq__icon" aria-hidden="true"></span></summary>
-            <p>Nie. Możesz zostać przy Kalendarzu Google: rezerwacje ze strony wpadają wtedy do niego, a wolne terminy czytamy z niego. Jeśli używasz innego programu do umawiania, sprawdzamy na początku, czy da się go połączyć — nie obiecujemy integracji z każdym, a taką integrację wyceniamy osobno. Wbudowany kalendarz jest w cenie obu pakietów.</p>
+            <p>Nie. Domyślnie dostajesz nasz kalendarz dostępności, ale możesz zostać przy Kalendarzu Google: rezerwacje ze strony wpadają wtedy do niego, a wolne terminy czytamy z niego. Jeśli używasz innego programu do umawiania, sprawdzamy na początku, czy da się go połączyć — nie obiecujemy integracji z każdym, a taką integrację wyceniamy osobno.</p>
           </details>
           <details>
-            <summary>Jestem na ZnanyLekarz. Co z tym?<span class="faq__icon" aria-hidden="true"></span></summary>
-            <p>Portal może zostać. Na stronie dodamy link do Twojego profilu albo widżet rezerwacji tego portalu, jeśli Twoje konto go udostępnia i wygenerujesz kod. Nie zapewniamy integracji z systemami zewnętrznymi poza tym, co jest opisane w umowie.</p>
+            <summary>Jestem na ZnanyLekarz. Muszę z niego rezygnować?<span class="faq__icon" aria-hidden="true"></span></summary>
+            <p>Nie. Portal może zostać, chodzi o to, żeby nie był jedynym kanałem. Na stronie dodamy link do Twojego profilu albo widżet rezerwacji tego portalu, jeśli Twoje konto go udostępnia i wygenerujesz kod. Nie zapewniamy integracji z systemami zewnętrznymi poza tym, co jest opisane w umowie.</p>
           </details>
           <details>
             <summary>Co z danymi pacjentów? Czy to zgodne z RODO?<span class="faq__icon" aria-hidden="true"></span></summary>
             <p>Dane pacjentów należą do Ciebie: to Ty jesteś ich administratorem, a my przetwarzamy je wyłącznie na Twoje zlecenie, na podstawie umowy powierzenia przetwarzania, która jest częścią umowy. Formularz zbiera tylko to, co potrzebne do umówienia wizyty. Pole z wiadomością do gabinetu jest dobrowolne, a formularz prosi, żeby nie wpisywać w nim danych zdrowotnych. Przypomnienia trafiają tylko do pacjentów, którzy się na nie zgodzili.</p>
           </details>
           <details>
-            <summary>Czy mogę wysyłać pacjentom SMS-y? Czy potrzebuję zgód?<span class="faq__icon" aria-hidden="true"></span></summary>
-            <p>Tak, jako dodatek (49 zł miesięcznie za 200 wiadomości). Przypomnienie o umówionej wizycie wysyłamy tylko pacjentom, którzy przy rezerwacji zaznaczyli taką zgodę. Treść zgody i klauzul informacyjnych ustalamy razem, a odpowiadasz za nie jako administrator danych.</p>
+            <summary>Czy pacjent może zapłacić zaliczkę online?<span class="faq__icon" aria-hidden="true"></span></summary>
+            <p>Tak, jako dodatek (299 zł za wdrożenie i 29 zł miesięcznie). Pacjent płaci przy rezerwacji (BLIK, karta albo szybki przelew), a termin potwierdza się po zaksięgowaniu wpłaty. Ty ustalasz kwotę zaliczki, usługi, których dotyczy, i zasady zwrotu. Pieniądze trafiają prosto na Twoje konto u operatora płatności, a my ich nie przyjmujemy. Prowizję pobiera operator według własnego cennika, a umowę z nim zawierasz Ty. Zaliczka wymaga regulaminu, w którym opisujesz, kiedy ją zwracasz. Pomożemy go przygotować, ale warto, żeby sprawdził go prawnik lub księgowa.</p>
           </details>
           <details>
-            <summary>Czy pacjent może zapłacić zaliczkę online?<span class="faq__icon" aria-hidden="true"></span></summary>
-            <p>Tak, jako dodatek. Pacjent płaci przy rezerwacji (BLIK, karta albo szybki przelew), a termin potwierdza się po zaksięgowaniu wpłaty. Ty ustalasz kwotę zaliczki, usługi, których dotyczy, i zasady zwrotu. Pieniądze trafiają prosto na Twoje konto u operatora płatności, a my ich nie przyjmujemy. Prowizję pobiera operator według własnego cennika, a umowę z nim zawierasz Ty. Zaliczka wymaga regulaminu, w którym opisujesz, kiedy ją zwracasz. Pomożemy go przygotować, ale warto, żeby sprawdził go prawnik lub księgowa.</p>
+            <summary>Czy mogę wysyłać pacjentom SMS-y? Czy potrzebuję zgód?<span class="faq__icon" aria-hidden="true"></span></summary>
+            <p>Tak, jako dodatek: 49 zł miesięcznie za 200 wiadomości, a każda wiadomość ponad limit według taryfy operatora bramki SMS (dziś około 0,17 zł). Przypomnienie o umówionej wizycie wysyłamy tylko pacjentom, którzy przy rezerwacji zaznaczyli taką zgodę. Treść zgody i klauzul informacyjnych ustalamy razem, a odpowiadasz za nie jako administrator danych.</p>
           </details>
           <details>
             <summary>Ile mojego czasu to zajmie i co, gdy coś przestanie działać?<span class="faq__icon" aria-hidden="true"></span></summary>
-            <p>Po Twojej stronie to około 2–3 godzin: rozmowa na start, materiały, jedna runda uwag do tekstów i projektu oraz próbne rezerwacje. Resztę robimy my. Gdy coś nie działa, dzwonisz albo piszesz bezpośrednio do osoby, która to zrobiła, a nie na infolinię. Hosting i aktualizacje są w utrzymaniu. Jeśli system rezerwacji nie działa z naszej winy dłużej niż 14 dni, możesz wypowiedzieć umowę natychmiast.</p>
+            <p>Po Twojej stronie to około 2–3 godzin: rozmowa na start, materiały, jedna runda uwag do tekstów i projektu oraz próbne rezerwacje. Resztę robimy my. Gdy coś nie działa, dzwonisz albo piszesz bezpośrednio do osoby, która to zrobiła, a nie na infolinię. Hosting i aktualizacje są w utrzymaniu.</p>
           </details>
           <details>
             <summary>A jeśli zrezygnuję?<span class="faq__icon" aria-hidden="true"></span></summary>
-            <p>Nie ma okresu minimalnego. Rezygnujesz e-mailem, a wypowiedzenie kończy się z końcem miesiąca następującego po miesiącu, w którym je złożysz. Dostajesz pliki strony i dostęp do domeny oraz wizytówki. Jedna rzecz jest ważna: system rezerwacji działa na naszej infrastrukturze, więc po zakończeniu umowy przestaje działać, dopóki nie skonfigurujesz własnego, a w tym już Ci nie pomagamy. Strona i treści zostają, ale rezerwacje trzeba wtedy przenieść gdzie indziej. Mówimy to przed umową, a nie po niej.</p>
+            <p>Nie ma okresu minimalnego. Rezygnujesz e-mailem, w każdej chwili, ze skutkiem natychmiastowym. W ciągu 7 dni dostajesz pliki strony i dostęp do domeny oraz wizytówki. Jedna rzecz jest ważna: system rezerwacji działa na naszej infrastrukturze, więc po zakończeniu umowy przestaje działać, dopóki nie skonfigurujesz własnego, a w tym już Ci nie pomagamy. Strona i treści zostają, ale rezerwacje trzeba wtedy przenieść gdzie indziej. Mówimy to przed umową, a nie po niej.</p>
           </details>
           <details>
             <summary>Kto za tym stoi?<span class="faq__icon" aria-hidden="true"></span></summary>
             <p>Studio Widok, czyli Nikodem Szefliński. Strony i systemy rezerwacji dla gabinetów robię i utrzymuję osobiście, więc rozmawiasz z osobą, która napisała Twoją stronę, a nie z działem obsługi. Telefon: 783 480 341.</p>
           </details>
-        </div>
-      </div>
-    </section>
-
-    <!-- ── Konfigurator i umowa ───────────────────────────────────────── -->
-    <section class="ofr-koniec ofs-konf" id="konfigurator" aria-labelledby="h-konf">
-      <div class="ofr-blok__in">
-        <p class="ofr-kicker ofr-kicker--jasny">Co dalej</p>
-        <h2 class="ofr-h2 ofr-h2--duzy" id="h-konf">Ułóż swoją stronę i zobacz umowę, zanim cokolwiek podpiszesz</h2>
-        <div class="konf" id="konf">
-          <noscript>Konfigurator wymaga włączonego JavaScriptu. Napisz na kontakt@studio-widok.pl albo zadzwoń: 783 480 341, a przygotujemy umowę ręcznie.</noscript>
-        </div>
-        <div class="ofs-kontakt">
-          <p><b>Wolisz najpierw porozmawiać?</b> Zadzwoń albo napisz. Odpowiadamy w dni robocze, a rozmowa o stronie do niczego nie zobowiązuje.</p>
-          <div class="ofs-kontakt__linki">
-            <a class="cta cta--line" href="tel:+48783480341">Zadzwoń: 783 480 341</a>
-            <a class="cta cta--line" href="mailto:kontakt@studio-widok.pl?subject=Strona%20z%20rezerwacją%20dla%20gabinetu">kontakt@studio-widok.pl</a>
-          </div>
         </div>
       </div>
     </section>
@@ -754,9 +719,9 @@
       <nav class="foot__col" aria-labelledby="foot-nav">
         <p class="foot__h" id="foot-nav">Na stronie</p>
         <a href="#jak">Jak to działa</a>
-        <a href="#zakres">Co dostajesz</a>
-        <a href="#zobacz">Zobacz demo</a>
-        <a href="#cena">Cena</a>
+        <a href="#co-dostajesz">Co dostajesz</a>
+        <a href="#zakres">Zakres</a>
+        <a href="#cena">Pakiety i ceny</a>
         <a href="#wdrozenie">Wdrożenie</a>
       </nav>
 
@@ -786,9 +751,38 @@
     (() => {
       document.getElementById('rok').textContent = new Date().getFullYear();
 
+      /* Galeria „co dostajesz”: zakładki ze strzałkami jak w systemowych kartach. */
+      const lista = document.querySelector('.ofs-zakl');
+      if (lista) {
+        const karty = [...lista.querySelectorAll('[role="tab"]')];
+        const pokaz = (i, fokus) => {
+          karty.forEach((k, j) => {
+            const on = j === i;
+            k.setAttribute('aria-selected', String(on));
+            k.tabIndex = on ? 0 : -1;
+            document.getElementById(k.getAttribute('aria-controls')).hidden = !on;
+          });
+          karty[i].scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+          if (fokus) karty[i].focus({ preventScroll: true });
+        };
+        const akt = () => karty.findIndex((k) => k.getAttribute('aria-selected') === 'true');
+        karty.forEach((k, i) => k.addEventListener('click', () => pokaz(i)));
+        lista.addEventListener('keydown', (e) => {
+          const n = karty.length, i = akt();
+          const cel = { ArrowRight: (i + 1) % n, ArrowLeft: (i - 1 + n) % n, Home: 0, End: n - 1 }[e.key];
+          if (cel === undefined) return;
+          e.preventDefault();
+          pokaz(cel, true);
+        });
+        document.querySelectorAll('[data-zk-dalej]').forEach((b) => b.addEventListener('click', () => {
+          pokaz((akt() + 1) % karty.length);
+          lista.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }));
+      }
+
       /* Kalkulator zwrotu: liczby przykładowe, wpisuje je właściciel gabinetu. */
       const PAK = { individual: { wdr: 2900, utr: 99 }, enterprise: { wdr: 4499, utr: 149 } };
-      const zl = (n) => `${String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} zł`;
+      const zl = (n) => `${String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} zł`;
       const el = (k) => document.querySelector(`[data-calc="${k}"]`);
       const val = (k) => Number(el(k).value);
       const out = (k, t) => (document.querySelector(`[data-out="${k}"]`).textContent = t);
@@ -812,7 +806,6 @@
       update();
     })();
   </script>
-  <script src="assets/js/konfigurator.js?v=2" defer></script>
   <script src="assets/js/droga-strona.js?v=2" defer></script>
 </body>
 </html>

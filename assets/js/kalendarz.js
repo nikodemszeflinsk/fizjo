@@ -277,7 +277,7 @@
           const lok = K.miejsce(D(), rez.lok);
           const kolor = ent() ? kolorT : K.kolor(lok.kolor);
           const u = K.usluga(D(), rez.usluga);
-          const klasa = `sg-rez${e - r <= 2 ? ' sg-rez--k' : ''}${rez.status === 'przyszedl' ? ' sg-rez--ok' : ''}${rez.status === 'nieobecny' ? ' sg-rez--x' : ''}${rez.status === 'oczekuje' ? ' sg-rez--czeka' : ''}${rez.nowa ? ' sg-rez--nowa' : ''}${ui.przenos === rez.id ? ' sg-rez--przenos' : ''}`;
+          const klasa = `sg-rez${e - r <= 2 ? ' sg-rez--k' : e - r === 3 ? ' sg-rez--s' : ''}${rez.status === 'przyszedl' ? ' sg-rez--ok' : ''}${rez.status === 'nieobecny' ? ' sg-rez--x' : ''}${rez.status === 'oczekuje' ? ' sg-rez--czeka' : ''}${rez.nowa ? ' sg-rez--nowa' : ''}${ui.przenos === rez.id ? ' sg-rez--przenos' : ''}`;
           h += `<button type="button" class="${klasa}" data-rez="${rez.id}" style="grid-row:${r + 2} / span ${e - r};grid-column:${i + 2};--c:${kolor}" aria-label="Rezerwacja: ${esc(rez.imie)}, ${esc(u.nazwa)}, ${esc(DNI[d.getDay()])} ${d.getDate()} ${MIES[d.getMonth()]}, ${K.godz(rez.od)}">
             <span class="sg-rez__l"><b>${K.godz(rez.od)}</b> ${esc(rez.imie)}</span><small>${esc(u.nazwa)}</small><span class="sg-rez__b">${badge(rez)}</span></button>`;
           r = e;
@@ -858,12 +858,12 @@
           ${pole('s-aut', 'Potwierdzanie', `<select id="s-aut" data-s="auto">${opcje([['1', 'automatyczne'], ['0', 'ręcznie przez gabinet']], U.auto ? '1' : '0')}</select>`, 'Przy ręcznym wizyty ze strony czekają na „Potwierdź”.')}
         </div>
       </section>
-      <section class="ust"><h3>Usługi <small>${D().uslugi.length} z ${lim.uslugi} w pakiecie</small></h3>
+      <section class="ust"><h3>Usługi <small>${K.zLimitu(D().uslugi.length, lim.uslugi)} w pakiecie</small></h3>
         <div class="ust-lista">${uslugi}</div>
         <button type="button" class="przycisk przycisk--cichy przycisk--mini" data-akcja="usluga-dodaj"${D().uslugi.length >= lim.uslugi ? ' disabled' : ''}>+ Dodaj usługę</button>
         ${D().uslugi.length >= lim.uslugi ? '<p class="pod">Limit pakietu osiągnięty. Kolejne usługi wyceniamy osobno.</p>' : ''}
       </section>
-      ${ent() ? `<section class="ust"><h3>Zespół <small>${D().zespol.length} z ${lim.terapeuci} w pakiecie</small></h3><div class="ust-lista">${zespol}</div>
+      ${ent() ? `<section class="ust"><h3>Zespół <small>${K.zLimitu(D().zespol.length, lim.terapeuci)} w pakiecie</small></h3><div class="ust-lista">${zespol}</div>
         <button type="button" class="przycisk przycisk--cichy przycisk--mini" data-akcja="terap-dodaj"${D().zespol.length >= lim.terapeuci ? ' disabled' : ''}>+ Dodaj terapeutę</button>
         ${D().zespol.length >= lim.terapeuci ? '<p class="pod">Limit pakietu osiągnięty. Więcej terapeutów wyceniamy osobno.</p>' : ''}</section>` : ''}
       <section class="ust"><h3>${ent() ? 'Lokalizacje' : 'Miejsca przyjęć'} <small>${D().miejsca.length} z ${lim.miejsca} w pakiecie</small></h3><div class="ust-lista">${miejsca}</div>

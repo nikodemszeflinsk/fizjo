@@ -22,9 +22,11 @@
   K.KOLORY = ['#1f5fd6', '#e8590c', '#13875a', '#c2255c', '#7048e8', '#0c8599', '#a16207', '#5f6b73'];
   K.DNI_PRACY = [1, 2, 3, 4, 5, 6]; // pn–sb
   K.LIMITY = {
-    ind: { terapeuci: 1, miejsca: 3, uslugi: 6, nazwa: 'Individual' },
-    ent: { terapeuci: 8, miejsca: 2, uslugi: 15, nazwa: 'Enterprise' },
+    ind: { terapeuci: 1, miejsca: 3, uslugi: 7, nazwa: 'Individual' },
+    ent: { terapeuci: Infinity, miejsca: 2, uslugi: Infinity, nazwa: 'Enterprise' },
   };
+  /** „3 z 7” albo „3 · bez limitu”, gdy pakiet nie ogranicza liczby. */
+  K.zLimitu = (n, max) => (max === Infinity ? `${n} · bez limitu` : `${n} z ${max}`);
   K.STATUSY = {
     potwierdzona: 'Potwierdzona',
     oczekuje: 'Do potwierdzenia',
@@ -364,6 +366,9 @@
     'Beata Ostrowska', 'Wojciech Dudek', 'Patrycja Mazur', 'Rafał Czarnecki', 'Dorota Sadowska', 'Kamil Tomaszewski', 'Renata Pietrzak', 'Bartosz Jabłoński'];
   const PACJENCI = IMIONA.map((n, i) => [n, `600 1${String(10 + Math.floor(i / 10)).padStart(2, '0')} ${String(200 + i * 7).padStart(3, '0')}`]);
 
+  /* Kto z zespołu Enterprise prowadzi które usługi (te same listy podpowiada panel). */
+  const USLUGI_TERAP = { jan: ['pierwsza', 'manualna', 'kontrola', 'sport'], anna: ['pierwsza', 'manualna', 'kontrola', 'uro'], piotr: ['pierwsza', 'kontrola', 'dzieci', 'sport'] };
+  const kobieta = (imie) => /a$/i.test(imie.split(' ')[0]) && !/^kuba/i.test(imie);
   const UWAGI = ['', '', '', 'Proszę o termin po południu.', '', 'Pierwsza wizyta u Was.', '', 'Boli od tygodnia, proszę o szybki termin.', ''];
 
   K.ziarno = (tryb) => {
@@ -435,11 +440,14 @@
             let w = przedzial.od;
             while (w < przedzial.do) {
               if (rnd() < (tydz > 1 ? 0.38 : 0.58)) {
-                const u = uslugi[Math.floor(rnd() * uslugi.length)];
+                const mozliwe = ind ? uslugi : uslugi.filter((x) => USLUGI_TERAP[t.id].includes(x.id));
+                const u = mozliwe[Math.floor(rnd() * mozliwe.length)];
                 if (w + u.min <= przedzial.do) {
                   /* Baza pacjentów rośnie z tygodnia na tydzień, więc co tydzień przychodzą nowi. */
                   const pula = Math.min(PACJENCI.length, (ind ? 10 : 16) + (tydz + 8) * (ind ? 3 : 4));
-                  const i = Math.floor(rnd() * pula);
+                  let i = Math.floor(rnd() * pula);
+                  /* Fizjoterapia uroginekologiczna: w przykładowych danych tylko pacjentki. */
+                  if (u.id === 'uro') for (let k = 0; k < pula && !kobieta(PACJENCI[i][0]); k++) i = (i + 1) % pula;
                   const p = PACJENCI[i];
                   const pierwsza = !byl.has(i);
                   byl.add(i);

@@ -180,7 +180,7 @@
       const doZwrotu = zal.filter((r) => r.status === 'anulowana' || (r.status === 'odwolana' && !r.pozno));
       const dodatek = C.konto.dodatki.zaliczki;
       return `<div class="p-stos">
-        ${!dodatek ? `<div class="p-ostrz p-ostrz--info">${P.ikona('uwaga')}<span>Zaliczki online to dodatek: 590 zł wdrożenie i 29 zł miesięcznie. <a href="#/ustawienia/pakiet">Zobacz w ustawieniach pakietu</a>.</span></div>` : ''}
+        ${!dodatek ? `<div class="p-ostrz p-ostrz--info">${P.ikona('uwaga')}<span>Zaliczki online to dodatek: 299 zł wdrożenie i 29 zł miesięcznie. <a href="#/ustawienia/pakiet">Zobacz w ustawieniach pakietu</a>.</span></div>` : ''}
         <div class="p-kpi">
           <div class="p-kpi__k"><span>Zaliczki w tym miesiącu</span><b>${P.zl(wMies.reduce((s, r) => s + r.zal.kwota, 0))}</b><small>${wMies.length} wpłat</small></div>
           <div class="p-kpi__k${doZwrotu.length ? ' p-kpi__k--uwaga' : ''}"><span>Do zwrotu</span><b>${doZwrotu.length}</b><small>wizyty odwołane z wyprzedzeniem albo anulowane przez gabinet</small></div>

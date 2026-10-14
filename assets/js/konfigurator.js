@@ -16,11 +16,13 @@
     };
 
     var PAK = {
-      individual: { nazwa: 'Individual', wdr: 2900, utr: 99, terapeuci: 1, miejsca: 3, uslugi: 6, podstrony: 5 },
-      enterprise: { nazwa: 'Enterprise', wdr: 4499, utr: 149, terapeuci: 8, miejsca: 2, uslugi: 15, podstrony: 10 }
+      individual: { nazwa: 'Individual', wdr: 2900, utr: 99, terapeuci: 1, miejsca: 3, uslugi: 7, podstrony: 5 },
+      enterprise: { nazwa: 'Enterprise', wdr: 4499, utr: 149, terapeuci: 99, miejsca: 2, uslugi: 99, podstrony: 10 }
     };
     var SMS = { cena: 49, limit: 200 };
-    var ZAL = { wdr: 590, utr: 29 };
+    var ZAL = { wdr: 299, utr: 29 };
+    /* 99 = bez limitu w pakiecie. */
+    function doLim(n) { return n >= 99 ? 'bez limitu' : 'do ' + n; }
     var OPERATORZY = { p24: 'Przelewy24', tpay: 'Tpay', stripe: 'Stripe', pomoc: 'wybrany wspólnie z Wykonawcą (Przelewy24, Tpay lub Stripe)' };
     var MIES = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'];
     var KROKI = ['Pakiet i dodatki', 'Twoja strona', 'Dane firmy', 'Umowa'];
@@ -106,8 +108,8 @@
     function opisPakietu() {
       var wspolne = 'potwierdzenia i przypomnienia o wizytach e-mailem, wizytówka Google, podstawowe SEO, polityka prywatności, cookies i regulamin rezerwacji, domena i hosting';
       return S.pakiet === 'individual'
-        ? '1 terapeuta, do 3 miejsc przyjęć, do 6 usług, do 5 podstron, ' + wspolne
-        : 'do 8 terapeutów z osobnymi grafikami (więcej za dopłatą), wybór terapeuty albo pierwszy wolny termin, do 2 lokalizacji, do 15 usług, do 10 podstron, ' + wspolne;
+        ? '1 terapeuta, do 3 miejsc przyjęć, do 7 usług, do 5 podstron, ' + wspolne
+        : 'terapeuci z osobnymi grafikami bez limitu, wybór terapeuty albo pierwszy wolny termin, do 2 lokalizacji, usługi bez limitu, do 10 podstron, ' + wspolne;
     }
     function tabela(wiersze) {
       return '<table>' + wiersze.map(function (r) {
@@ -116,7 +118,7 @@
     }
     function umowaHtml(wynik) {
       var v = zmienne(wynik), P = PAK[S.pakiet];
-      var wycena = [S.w_podstrony && 'dodatkowe podstrony i artykuły', S.w_kalendarze && 'inne kalendarze niż Google', S.w_kampania && 'struktura pod kampanię reklamową (osobne zlecenie)'].filter(Boolean).join(', ');
+      var wycena = [S.w_podstrony && 'dodatkowe podstrony i artykuły', S.w_kalendarze && 'integracja z zewnętrznym kalendarzem innym niż Google', S.w_kampania && 'struktura pod kampanię reklamową (osobne zlecenie)'].filter(Boolean).join(', ');
       v.OPIS_PAK = esc(opisPakietu());
       var wybor = [
         { cells: ['Pakiet', esc(P.nazwa)] },
@@ -180,10 +182,10 @@
 
       h += '<h2>§6. Czas trwania i rezygnacja</h2>' + ust([
         'Umowa jest zawarta na **czas nieokreślony**, bez okresu minimalnego.',
-        'Każda ze stron może **zrezygnować w dowolnym momencie**, e-mailem. Okres wypowiedzenia wynosi miesiąc i kończy się z końcem miesiąca następującego po miesiącu, w którym złożono oświadczenie.',
-        'W ciągu 14 dni od zakończenia umowy Wykonawca przekazuje Zamawiającemu **pliki Strony** w formie umożliwiającej publikację na dowolnym hostingu, dostęp do domeny i wizytówki oraz eksport rezerwacji, jeśli go ma.',
+        'Zamawiający może **zrezygnować w dowolnym momencie, ze skutkiem natychmiastowym**, e-mailem. Wykonawca może wypowiedzieć umowę z miesięcznym wyprzedzeniem, na koniec miesiąca kalendarzowego.',
+        'W ciągu **7 dni** od zakończenia umowy Wykonawca przekazuje Zamawiającemu **pliki Strony** w formie umożliwiającej publikację na dowolnym hostingu, dostęp do domeny i wizytówki oraz eksport rezerwacji, jeśli go ma.',
         '**System rezerwacji działa na infrastrukturze Wykonawcy, więc po zakończeniu umowy przestaje działać**, dopóki Zamawiający nie skonfiguruje go sam albo nie zleci tego innej firmie. Wykonawca nie wspiera takiej konfiguracji i nie przekazuje swojej infrastruktury. Zamawiający został o tym poinformowany przed zawarciem umowy. Od zakończenia umowy hosting, aktualizacje, kopie zapasowe i opłaty za usługi zewnętrzne ponosi Zamawiający.',
-        '**Brak płatności.** Jeśli faktura za utrzymanie nie zostanie zapłacona w terminie, Wykonawca w dniu terminu i po trzech dniach wyśle przypomnienie e-mailem. Jeśli zaległość nie zostanie zapłacona w ciągu **7 dni od terminu**, Wykonawca może wypowiedzieć umowę ze skutkiem natychmiastowym e-mailem, a system rezerwacji zostanie wyłączony. Pliki Strony Wykonawca przekazuje po uregulowaniu zaległości.',
+        '**Brak płatności.** Jeśli faktura za utrzymanie nie zostanie zapłacona w terminie, Wykonawca w dniu terminu i po trzech dniach wyśle przypomnienie e-mailem. Jeśli zaległość nie zostanie zapłacona w ciągu **14 dni od terminu**, Wykonawca może wypowiedzieć umowę ze skutkiem natychmiastowym e-mailem, a system rezerwacji zostanie wyłączony. Pliki Strony Wykonawca przekazuje po uregulowaniu zaległości.',
         'Zamawiający może wypowiedzieć umowę ze skutkiem natychmiastowym, gdy system rezerwacji nie działa dłużej niż 14 dni z winy Wykonawcy.',
         'Wynagrodzenie za wdrożenie nie jest zwracane po uruchomieniu Strony. Przy rezygnacji przed uruchomieniem strony rozliczają się proporcjonalnie do wykonanych prac.'
       ], v);
@@ -265,7 +267,7 @@
     function widokPakiet() {
       var kart = Object.keys(PAK).map(function (id) {
         var P = PAK[id];
-        var opis = id === 'individual' ? 'Jeden terapeuta, do 3 miejsc przyjęć, do 5 podstron' : 'Klinika: do 8 terapeutów, każdy z własnym grafikiem, do 10 podstron';
+        var opis = id === 'individual' ? 'Jeden terapeuta, do 3 miejsc przyjęć, do 5 podstron' : 'Klinika: dowolna liczba terapeutów, każdy z własnym grafikiem, do 10 podstron';
         return '<label class="kf-pakiet"><input type="radio" name="pakiet" data-k="pakiet" value="' + id + '"' + (S.pakiet === id ? ' checked' : '') + ' /><b>' + P.nazwa + '</b><span>' + opis + '</span><em>' + zl(P.wdr) + ' wdrożenie · ' + zl(P.utr) + ' / mies.</em></label>';
       }).join('');
       return '<h4>Wybierz pakiet</h4><div class="kf-pakiety" role="radiogroup" aria-label="Pakiet">' + kart + '</div>' +
@@ -275,7 +277,7 @@
         (S.zaliczki ? '<div class="kf-pole" style="margin-top:12px;max-width:420px"><label for="f-operator">Operator płatności</label><select id="f-operator" data-k="operator">' + Object.keys(OPERATORZY).map(function (k) { return '<option value="' + k + '"' + (S.operator === k ? ' selected' : '') + '>' + (k === 'pomoc' ? 'Jeszcze nie wiem, doradzicie' : OPERATORZY[k]) + '</option>'; }).join('') + '</select></div>' : '') +
         '<div class="kf-wycena"><b>Chcesz wycenę czegoś jeszcze?</b> Te rzeczy wyceniamy osobno i nie wchodzą do tej umowy.<br />' +
         '<label><input type="checkbox" data-k="w_podstrony"' + (S.w_podstrony ? ' checked' : '') + ' /> dodatkowe podstrony i artykuły</label>' +
-        '<label><input type="checkbox" data-k="w_kalendarze"' + (S.w_kalendarze ? ' checked' : '') + ' /> inne kalendarze niż Google</label>' +
+        '<label><input type="checkbox" data-k="w_kalendarze"' + (S.w_kalendarze ? ' checked' : '') + ' /> integracja z zewnętrznym kalendarzem innym niż Google</label>' +
         '<label><input type="checkbox" data-k="w_kampania"' + (S.w_kampania ? ' checked' : '') + ' /> struktura pod kampanię reklamową</label></div>' +
         '<div id="kf-podsum">' + podsumowanie() + '</div>';
     }
@@ -300,7 +302,7 @@
         '<div class="kf-pr__term"><p>' + terap + '</p><div><span>Jutro 9:00</span><span>Jutro 12:00</span><span>Pt 10:30</span></div></div>' +
         (uslugi.length ? '<ul class="kf-pr__cennik">' + uslugi.map(function (u) { return '<li>' + esc(u) + '</li>'; }).join('') + '</ul>' : '') +
         '</div></div>' +
-        '<ul class="kf-pr__licz"><li><b>' + pr.length + ' z ' + P.podstrony + '</b> podstron</li><li><b>' + liczLinie(S.uslugi) + ' z ' + P.uslugi + '</b> usług w cenniku</li><li><b>' + (S.pakiet === 'enterprise' ? S.terapeuci : 1) + ' z ' + P.terapeuci + '</b> terapeutów</li></ul>';
+        '<ul class="kf-pr__licz"><li><b>' + pr.length + ' z ' + P.podstrony + '</b> podstron</li><li><b>' + liczLinie(S.uslugi) + ' z ' + (P.uslugi >= 99 ? '∞' : P.uslugi) + '</b> usług w cenniku</li><li><b>' + (S.pakiet === 'enterprise' ? S.terapeuci : 1) + ' z ' + (P.terapeuci >= 99 ? '∞' : P.terapeuci) + '</b> terapeutów</li></ul>';
     }
     function widokStrona() {
       var ind = S.pakiet === 'individual', P = PAK[S.pakiet];
@@ -318,7 +320,7 @@
         '<div class="kf-pole kf-pole--pelne"><label id="l-problemy">Na jakie problemy robić osobne podstrony? <em>(do ' + P.podstrony + ')</em></label><div class="kf-chipy" role="group" aria-labelledby="l-problemy">' + chipy + '</div>' +
         '<p class="pod" id="kf-pod-problemy">' + (pelne ? 'Limit pakietu osiągnięty. Kolejne podstrony wyceniamy osobno.' : 'Każdy problem to osobna strona, która odpowiada na to, co ktoś wpisuje w Google.') + '</p>' + bl('problemy') + '</div>' +
         pole('uslugi', 'Usługi i cennik <em>(po jednej w linii, do ' + P.uslugi + ')</em>', { pelne: true, tekst: true, wiersze: 4, ph: 'Konsultacja z terapią, 50 min, 200 zł\nTerapia manualna, 50 min, 180 zł', pod: 'Wystarczą nazwy. Ceny i czas dopiszemy razem na rozmowie startowej.' }) +
-        (ind ? '' : pole('terapeuci', 'Liczba terapeutów <em>(do ' + P.terapeuci + ')</em>', { typ: 'number', inputmode: 'numeric' })) +
+        (ind ? '' : pole('terapeuci', 'Liczba terapeutów <em>(' + doLim(P.terapeuci) + ')</em>', { typ: 'number', inputmode: 'numeric' })) +
         pole('miejsca', ind ? 'Miejsca przyjęć <em>(do ' + P.miejsca + ')</em>' : 'Lokalizacje <em>(do ' + P.miejsca + ')</em>', { typ: 'number', inputmode: 'numeric' }) +
         pole('adresyGab', 'Adres gabinetu <em>(każdy w osobnej linii)</em>', { pelne: true, tekst: true }) +
         '<div class="kf-pole kf-pole--pelne"><label id="l-styl">Styl strony</label><div class="kf-style" role="radiogroup" aria-labelledby="l-styl">' + stylHtml + '</div></div>' +

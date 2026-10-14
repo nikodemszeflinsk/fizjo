@@ -158,6 +158,7 @@ main { padding-block: 20px 40px; }
 
 /* Rezerwacje i blokady */
 .sg-rez { margin: 1px 4px; padding: 3px 8px; border: 0; border-left: 4px solid var(--c); border-radius: 8px; background: color-mix(in srgb, var(--c) 17%, white); color: var(--fg); text-align: left; cursor: pointer; font-size: 0.85rem; line-height: 1.2; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-start; min-width: 0; z-index: 2; box-shadow: 0 1px 2px rgba(20, 23, 26, 0.14); position: relative; }
+.sg-rez > * { flex-shrink: 0; }
 .sg-rez:hover { background: color-mix(in srgb, var(--c) 26%, white); }
 .sg-rez__l, .sg-rez small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sg-rez b { font-family: var(--f-num); font-variant-numeric: tabular-nums; margin-right: 3px; }
@@ -168,6 +169,11 @@ main { padding-block: 20px 40px; }
 .sg-rez__b:empty { display: none; }
 .sg-rez--k .sg-rez__b { margin: 0 0 0 auto; flex: none; }
 .sg-rez--k .sg-rez__l { flex: 1 1 auto; min-width: 0; }
+/* 45 minut: znaczki w pierwszej linii, żeby nie wypadały poza blok. */
+.sg-rez--s { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-content: start; column-gap: 6px; }
+.sg-rez--s .sg-rez__l { grid-column: 1; grid-row: 1; }
+.sg-rez--s .sg-rez__b { grid-column: 2; grid-row: 1; margin: 0; align-self: center; }
+.sg-rez--s small { grid-column: 1 / -1; grid-row: 2; }
 .sg-rez--ok { background: color-mix(in srgb, var(--c) 8%, white); }
 .sg-rez--x { background: repeating-linear-gradient(135deg, #f4e4e2 0 6px, #fbefed 6px 8px); border-left-color: var(--alert); }
 .sg-rez--x .sg-rez__l { text-decoration: line-through; text-decoration-thickness: 1px; }

@@ -12,7 +12,7 @@
   const esc = P.esc;
   const OPCJE_DL = Array.from({ length: 12 }, (_, i) => [(i + 1) * 15, K.dlTekst((i + 1) * 15)]);
   const lim = () => K.LIMITY[P.tryb()];
-  const limit = (n, max, nazwa) => `<div class="p-limit${n >= max ? ' p-limit--pelny' : ''}"><span>${nazwa}: <b>${n} z ${max}</b> w pakiecie ${lim().nazwa}</span><span class="p-limit__tor"><i style="width:${Math.min(100, (n / max) * 100)}%"></i></span></div>`;
+  const limit = (n, max, nazwa) => `<div class="p-limit${n >= max ? ' p-limit--pelny' : ''}"><span>${nazwa}: <b>${K.zLimitu(n, max)}</b> w pakiecie ${lim().nazwa}</span>${max === Infinity ? '' : `<span class="p-limit__tor"><i style="width:${Math.min(100, (n / max) * 100)}%"></i></span>`}</div>`;
   const avatar = (t, rozm = 34) => `<span class="p-osoba__av" style="background:${K.kolor(t.kolor)};width:${rozm}px;height:${rozm}px;font-size:${rozm < 40 ? '0.76rem' : '1rem'}" title="${esc(t.nazwa)}">${P.inicjaly(t.nazwa)}</span>`;
   const sumaGodzin = (D, terap, lok) => K.DNI_PRACY.reduce((s, dz) => s + ((D.reguly[terap] || {})[dz] || []).filter((r) => !lok || r.lok === lok).reduce((x, r) => x + (r.do - r.od), 0), 0);
 
