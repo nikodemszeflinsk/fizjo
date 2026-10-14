@@ -152,11 +152,10 @@
   }
 
   P.widoki.pulpit = {
-    tytul: 'Pulpit',
+    tytul: 'Dziś',
     podtytul: () => K.dlugaData(new Date()).replace(/^./, (c) => c.toUpperCase()),
     render() {
       const D = P.D();
-      const C = P.C();
       const lista = D.rezerwacje.filter((r) => r.data === dzis() && K.aktywna(r) && wFiltrze(r)).sort((a, b) => a.od - b.od);
       const odbyteDzis = lista.filter((r) => r.status === 'przyszedl').length;
       const przed = lista.filter((r) => !K.minelo(r.data, r.od)).length;
@@ -178,14 +177,13 @@
       const bk = P.bezKolejnej();
       const zw = zwolnione();
       const zrodla = paskiZrodel(K.iso(K.dodaj(teraz, -90)), dzis());
-      const zmianyStrony = P.zmianyStrony();
       const terminy = K.terminyPacjenta(D, D.uslugi[0].id, { ile: 4 });
       const uwagi = czeka.length + nowe.length + ozn.length;
 
       const kpi = `<div class="p-kpi">
         <a class="p-kpi__k" href="#/kalendarz"><span>Wizyty dziś</span><b>${lista.length}</b><small>${lista.length ? `${odbyteDzis} odbytych, ${przed} przed Tobą` : 'dziś wolne'}</small></a>
-        <a class="p-kpi__k p-kpi__k--ciemny" href="#/statystyki"><span>Przychód w tym miesiącu</span><b>${P.zl(suma(mies))}</b><small>${wizyt(mies.length)} odbytych ${zmiana(suma(mies), suma(miesPop))}</small></a>
-        <a class="p-kpi__k" href="#/pacjenci"><span>Nowi pacjenci w tym miesiącu</span><b>${nowiMies.length}</b><small>w tym <b>${nowiSystem}</b> z rezerwacji online</small></a>
+        <a class="p-kpi__k p-kpi__k--ciemny" href="#/rezerwacje"><span>Przychód w tym miesiącu</span><b>${P.zl(suma(mies))}</b><small>${wizyt(mies.length)} odbytych ${zmiana(suma(mies), suma(miesPop))}</small></a>
+        <a class="p-kpi__k" href="#/rezerwacje"><span>Nowi pacjenci w tym miesiącu</span><b>${nowiMies.length}</b><small>w tym <b>${nowiSystem}</b> z rezerwacji online</small></a>
         <a class="p-kpi__k${uwagi ? ' p-kpi__k--uwaga' : ''}" href="#/kalendarz"><span>${uwagi ? 'Czeka na decyzję' : 'Wypełnienie tygodnia'}</span><b>${uwagi || `${wyp}%`}</b><small>${uwagi ? 'wizyt do potwierdzenia lub oznaczenia' : 'zajęte godziny z grafiku'}</small></a>
       </div>`;
 
@@ -199,20 +197,12 @@
       })();
 
       const bkHtml = bk.length
-        ? `<ul class="p-lista">${bk.slice(0, 5).map((p) => `<li class="p-wiersz"><span class="p-osoba__av" style="background:${kolorOsoby(p.terap)};width:36px;height:36px;font-size:0.78rem">${esc(P.inicjaly(p.imie))}</span><button type="button" class="p-wiersz__glowny" data-pa="idz" data-cel="pacjenci/${tel(p.tel)}"><b>${esc(p.imie)}</b><small>${p.dni} dni od ostatniej wizyty · ${wizyt(p.odwiedzil)} odbytych${P.ent() ? ` · ${esc(P.osobaNazwa(osoba(p.terap)))}` : ''}</small></button><span class="p-wiersz__akcje"><a class="p-btn p-btn--maly p-btn--cichy" href="tel:${tel(p.tel)}">${P.ikona('telefon')}<span>Zadzwoń</span></a><button type="button" class="p-btn p-btn--maly p-btn--akcent" data-pa="umow" data-imie="${esc(p.imie)}" data-tel="${esc(p.tel)}" data-terap="${p.terap}">Umów</button></span></li>`).join('')}</ul>${bk.length > 5 ? `<a class="p-btn p-btn--tekst" href="#/pacjenci/bez-kolejnej">Wszyscy (${bk.length})</a>` : ''}`
+        ? `<ul class="p-lista">${bk.slice(0, 5).map((p) => `<li class="p-wiersz"><span class="p-osoba__av" style="background:${kolorOsoby(p.terap)};width:36px;height:36px;font-size:0.78rem">${esc(P.inicjaly(p.imie))}</span><button type="button" class="p-wiersz__glowny" data-pa="pacjent" data-id="${tel(p.tel)}"><b>${esc(p.imie)}</b><small>${p.dni} dni od ostatniej wizyty · ${wizyt(p.odwiedzil)} odbytych${P.ent() ? ` · ${esc(P.osobaNazwa(osoba(p.terap)))}` : ''}</small></button><span class="p-wiersz__akcje"><a class="p-btn p-btn--maly p-btn--cichy" href="tel:${tel(p.tel)}">${P.ikona('telefon')}<span>Zadzwoń</span></a><button type="button" class="p-btn p-btn--maly p-btn--akcent" data-pa="umow" data-imie="${esc(p.imie)}" data-tel="${esc(p.tel)}" data-terap="${p.terap}">Umów</button></span></li>`).join('')}</ul>${bk.length > 5 ? `<p class="p-podp">i jeszcze ${bk.length - 5}</p>` : ''}`
         : P.pusto('Każdy, kto był u Ciebie w ostatnich dwóch miesiącach, ma już kolejny termin.');
 
       const zwHtml = zw.length
         ? `<ul class="p-lista">${zw.slice(0, 4).map((r) => `<li class="p-wiersz"><span class="p-wiersz__czas">${K.godz(r.od)}</span><div class="p-wiersz__glowny" style="cursor:default"><b>${esc(K.wzgledna(r.data))}, ${K.dlTekst(r.dl)}${P.ent() ? ` · ${esc(P.osobaNazwa(osoba(r.terap)))}` : ''}</b><small>Zwolnione: ${esc(r.imie)} ${r.status === 'anulowana' ? '(anulował gabinet)' : 'odwołał'}${bk[0] ? ` · może wskoczyć: ${bk.slice(0, 2).map((p) => esc(p.imie)).join(', ')}` : ''}</small></div><span class="p-wiersz__akcje">${bk[0] ? `<button type="button" class="p-btn p-btn--maly p-btn--akcent" data-pa="umow" data-imie="${esc(bk[0].imie)}" data-tel="${esc(bk[0].tel)}" data-terap="${r.terap}" data-data="${r.data}" data-od="${r.od}">Wpisz: ${esc(bk[0].imie.split(' ')[0])}</button>` : ''}<button type="button" class="p-btn p-btn--maly p-btn--cichy" data-pa="umow" data-terap="${r.terap}" data-data="${r.data}" data-od="${r.od}">Wpisz kogoś</button></span></li>`).join('')}</ul>`
         : P.pusto('W najbliższym tygodniu nikt nie odwołał wizyty.');
-
-      const listaKontrolna = [
-        { ok: !zmianyStrony, tekst: zmianyStrony ? `${zmianyStrony} ${lw(zmianyStrony, 'zmiana czeka', 'zmiany czekają', 'zmian czeka')} na publikację` : 'Strona jest opublikowana, bez zaległych zmian', cel: 'strona' },
-        { ok: !C.strona.problemy.some((x) => x.status === 'szkic'), tekst: C.strona.problemy.some((x) => x.status === 'szkic') ? 'Jedna z podstron jest szkicem i nie widać jej w Google' : 'Wszystkie podstrony są opublikowane', cel: 'strona/podstrony' },
-        { ok: !C.strona.wyglad.zdjecia.some((z) => !z.alt), tekst: C.strona.wyglad.zdjecia.some((z) => !z.alt) ? 'Zdjęcia bez opisu: pomagają w Google i czytnikach ekranu' : 'Zdjęcia mają opisy', cel: 'strona/wyglad' },
-        { ok: D.zespol.every((t) => t.bio), tekst: D.zespol.every((t) => t.bio) ? 'Profile zespołu są uzupełnione' : 'Uzupełnij opis w profilu terapeuty', cel: 'zespol' },
-      ];
-      const gotowosc = Math.round((listaKontrolna.filter((x) => x.ok).length / listaKontrolna.length) * 100);
 
       return `<div class="p-stos">
         ${P.chipyZespolu()}
@@ -220,21 +210,11 @@
         <div class="p-siatka">
           ${P.karta('Dzisiejszy grafik', lista.length ? `<ul class="p-lista">${lista.map(wierszDzis).join('')}</ul>` : P.pusto('Dziś nie masz wizyt.', '<button type="button" class="p-btn p-btn--akcent p-btn--maly" data-pa="nowa-rez">Wpisz wizytę</button>'), { klasa: 'p-s7', pod: K.dlugaData(new Date()), akcje: `<a class="p-btn p-btn--maly p-btn--cichy" href="#/kalendarz">Kalendarz</a><button type="button" class="p-btn p-btn--maly p-btn--akcent" data-pa="nowa-rez">${P.ikona('plus')}<span>Wizyta</span></button>` })}
           ${P.karta('Czeka na Twoją decyzję', decyzje, { klasa: 'p-s5', pod: 'Potwierdzenia, nowe rezerwacje i wizyty do oznaczenia.' })}
-          ${P.karta('Przychód: ostatnie 8 tygodni', wykresTygodni(P.tygodnie(8)), { klasa: 'p-s7', pod: 'Z wizyt oznaczonych jako odbyte, według ceny wizyty.', akcje: '<a class="p-btn p-btn--maly p-btn--cichy" href="#/statystyki">Statystyki</a>' })}
+          ${P.karta('Przychód: ostatnie 8 tygodni', wykresTygodni(P.tygodnie(8)), { klasa: 'p-s7', pod: 'Z wizyt oznaczonych jako odbyte, według ceny wizyty.' })}
           ${P.karta('Skąd przychodzą nowi pacjenci', zrodla.html, { klasa: 'p-s5', pod: `Ostatnie 90 dni: ${pacjentow(zrodla.nowi.length)}, z czego ${zrodla.nowi.filter((p) => p.zrodlo === 'strona').length} z rezerwacji online.` })}
           ${P.karta('Nie umówili kolejnej wizyty', bkHtml, { klasa: 'p-s6', pod: 'Byli u Ciebie w ostatnich 2 miesiącach i nie mają następnego terminu.' })}
           ${P.karta('Zwolnione terminy', zwHtml, { klasa: 'p-s6', pod: 'Odwołane wizyty w najbliższym tygodniu. Termin jest wolny, można kogoś wpisać.' })}
-          ${P.karta('Strona i rezerwacje online', `<div class="p-dwie">
-              <div class="p-stos" style="gap:8px">
-                <div class="p-limit${gotowosc < 100 ? ' p-limit--pelny' : ''}"><span>Gotowość strony: <b>${gotowosc}%</b></span><span class="p-limit__tor"><i style="width:${gotowosc}%"></i></span></div>
-                <ul class="p-lista">${listaKontrolna.map((x) => `<li class="p-wiersz"><span class="p-tag p-tag--${x.ok ? 'zielony' : 'zolty'}">${x.ok ? 'gotowe' : 'do zrobienia'}</span><a class="p-wiersz__glowny" href="#/${x.cel}" style="text-decoration:none;color:inherit"><b>${esc(x.tekst)}</b></a></li>`).join('')}</ul>
-              </div>
-              <div class="p-stos" style="gap:8px">
-                <p class="p-podp"><b>Pacjent widzi teraz na stronie najbliższe terminy:</b></p>
-                ${terminy.length ? `<div class="p-tagi">${terminy.map((t) => `<span class="p-tag p-tag--niebieski">${esc(K.wzgledna(t.data))}, ${K.godz(t.od)}</span>`).join('')}</div>` : P.pusto('Brak wolnych terminów na stronie.')}
-                <p class="p-podp">Zmienisz je w <a href="#/dostepnosc">Dostępności</a>. Treść strony w <a href="#/strona">Treściach strony</a>.</p>
-              </div>
-            </div>`, { klasa: 'p-s12', akcje: zmianyStrony ? '<a class="p-btn p-btn--maly p-btn--akcent" href="#/strona">Przejrzyj i opublikuj</a>' : '' })}
+          ${P.karta('Co widzi pacjent na stronie', terminy.length ? `<div class="p-tagi">${terminy.map((t) => `<span class="p-tag p-tag--niebieski">${esc(K.wzgledna(t.data))}, ${K.godz(t.od)}</span>`).join('')}</div>` : P.pusto('Brak wolnych terminów. Dodaj godziny w Dostępności.'), { klasa: 'p-s12', pod: 'Najbliższe wolne terminy, które teraz można zarezerwować online.', akcje: '<a class="p-btn p-btn--maly p-btn--cichy" href="#/dostepnosc">Zmień dostępność</a>' })}
         </div>
       </div>`;
     },
@@ -375,61 +355,8 @@
     setTimeout(() => URL.revokeObjectURL(a.href), 3000);
   };
 
-  /* ── Pacjenci ───────────────────────────────────────────────────────── */
-  const PF = { q: '', segment: 'wszyscy', zrodlo: '', sort: 'ostatnia' };
-  const SEGMENTY = [['wszyscy', 'Wszyscy'], ['bez-kolejnej', 'Bez kolejnej wizyty'], ['nowi', 'Nowi w tym miesiącu'], ['nieodbyte', 'Z nieodbytymi wizytami'], ['system', 'Pozyskani przez stronę']];
+  /* ── Karta pacjenta ───────────────────────────────────────────────────────── */
   const notatkiPacjentow = () => { const C = P.C(); if (!C.pacjenci) C.pacjenci = {}; return C.pacjenci; };
-  P.widoki.pacjenci = {
-    tytul: 'Pacjenci',
-    podtytul: 'Kontakty i historia wizyt. Bez dokumentacji medycznej.',
-    render(arg) {
-      if (arg === 'bez-kolejnej') { PF.segment = 'bez-kolejnej'; }
-      else if (arg && /^\d+$/.test(arg)) setTimeout(() => P.otworzPacjenta(arg), 0);
-      P.arg = '';
-      const mapa = pacjenci();
-      const bk = new Set(P.bezKolejnej().map((p) => tel(p.tel)));
-      const q = PF.q.trim().toLowerCase();
-      const cyfry = q.replace(/\D/g, '');
-      const lista = [...mapa.entries()].filter(([k, p]) => {
-        if (wybrani() && !wybrani().includes(p.terap)) return false;
-        if (q && !(p.imie.toLowerCase().includes(q) || (cyfry.length >= 3 && k.includes(cyfry)))) return false;
-        if (PF.zrodlo && p.zrodlo !== PF.zrodlo) return false;
-        if (PF.segment === 'bez-kolejnej' && !bk.has(k)) return false;
-        if (PF.segment === 'nowi' && p.pierwsza < poczMies()) return false;
-        if (PF.segment === 'nieodbyte' && !p.nieobecny) return false;
-        if (PF.segment === 'system' && p.zrodlo !== 'strona') return false;
-        return true;
-      }).sort((a, b) => (PF.sort === 'przychod' ? b[1].przychod - a[1].przychod : PF.sort === 'nazwisko' ? a[1].imie.split(' ').pop().localeCompare(b[1].imie.split(' ').pop(), 'pl') : (b[1].ostatnia || '').localeCompare(a[1].ostatnia || '')));
-      const zSys = [...mapa.values()].filter((p) => p.zrodlo === 'strona');
-      const przychodSys = zSys.reduce((s, p) => s + p.przychod, 0);
-      const przychodWsz = [...mapa.values()].reduce((s, p) => s + p.przychod, 0);
-      return `<div class="p-stos">
-        ${P.chipyZespolu()}
-        <div class="p-kpi">
-          <div class="p-kpi__k"><span>Pacjenci w bazie</span><b>${mapa.size}</b><small>od kiedy działa system</small></div>
-          <div class="p-kpi__k"><span>Pozyskani przez stronę</span><b>${zSys.length}</b><small>${mapa.size ? Math.round((zSys.length / mapa.size) * 100) : 0}% wszystkich pacjentów</small></div>
-          <div class="p-kpi__k p-kpi__k--ciemny"><span>Przychód od nich</span><b>${P.zl(przychodSys)}</b><small>${przychodWsz ? Math.round((przychodSys / przychodWsz) * 100) : 0}% całego przychodu</small></div>
-          <a class="p-kpi__k" href="#/pacjenci/bez-kolejnej"><span>Bez kolejnej wizyty</span><b>${bk.size}</b><small>warto zadzwonić</small></a>
-        </div>
-        ${P.karta('', `<div class="p-filtry">
-            <input type="search" placeholder="Imię, nazwisko lub telefon" aria-label="Szukaj pacjenta" value="${esc(PF.q)}" id="pf-q" />
-            <label class="wybor"><span class="visually-hidden">Źródło</span><select data-pzm="pf-zrodlo"><option value="">Każde źródło pozyskania</option>${Object.entries(K.ZRODLA).filter(([k]) => k !== 'powrot').map(([k, n]) => `<option value="${k}"${PF.zrodlo === k ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select></label>
-            <label class="wybor"><span class="visually-hidden">Sortuj</span><select data-pzm="pf-sort"><option value="ostatnia"${PF.sort === 'ostatnia' ? ' selected' : ''}>Ostatnia wizyta</option><option value="nazwisko"${PF.sort === 'nazwisko' ? ' selected' : ''}>Nazwisko</option><option value="przychod"${PF.sort === 'przychod' ? ' selected' : ''}>Przychód</option></select></label>
-          </div>
-          <div class="p-filtry" role="group" aria-label="Grupa">${SEGMENTY.map(([k, n]) => `<button type="button" class="p-chip p-chip--bez" data-pa="pf-seg" data-s="${k}" aria-pressed="${PF.segment === k}">${n}</button>`).join('')}</div>
-          ${lista.length ? `<div class="p-tabela-przew"><table class="p-tabela"><thead><tr><th>Pacjent</th><th>Pozyskany</th><th class="p-liczba">Odbyte</th><th class="p-liczba">Nieodbyte</th><th>Ostatnia</th><th>Następna</th><th class="p-liczba">Przychód</th></tr></thead><tbody>
-            ${lista.map(([k, p]) => `<tr><td><button type="button" class="p-link" data-pa="pacjent" data-id="${k}">${esc(p.imie)}</button><small>${esc(p.tel)}</small></td><td>${zrodloTag(p.zrodlo)}<small>${P.dataKrotka(p.pierwsza)}</small></td><td class="p-liczba">${p.odwiedzil}</td><td class="p-liczba">${p.nieobecny || '–'}</td><td>${p.ostatnia ? esc(K.wzgledna(p.ostatnia)) : '–'}</td><td>${p.nastepna ? `${esc(K.wzgledna(p.nastepna.data))}, ${K.godz(p.nastepna.od)}` : bk.has(k) ? `<button type="button" class="p-btn p-btn--maly p-btn--akcent" data-pa="umow" data-imie="${esc(p.imie)}" data-tel="${esc(p.tel)}" data-terap="${p.terap}">Umów</button>` : '–'}</td><td class="p-liczba">${P.zl(p.przychod)}</td></tr>`).join('')}
-          </tbody></table></div>` : P.pusto('Brak pacjentów dla tych filtrów.')}`)}
-      </div>`;
-    },
-    po(el) {
-      const q = el.querySelector('#pf-q');
-      if (q) q.addEventListener('input', () => { PF.q = q.value; clearTimeout(P._pfq); P._pfq = setTimeout(P.odswiez, 160); });
-    },
-  };
-  P.akcje['pf-seg'] = (b) => { PF.segment = b.dataset.s; P.odswiez(); };
-  P.akcje['pf-zrodlo'] = (t) => { PF.zrodlo = t.value; P.odswiez(); };
-  P.akcje['pf-sort'] = (t) => { PF.sort = t.value; P.odswiez(); };
   P.akcje.pacjent = (b) => P.otworzPacjenta(b.dataset.id);
 
   /** Karta pacjenta: kontakt, decyzje, historia wizyt, notatka i dane osobowe (RODO). */
@@ -491,93 +418,4 @@
     P.cichoCms(() => { delete notatkiPacjentow()[k]; });
   };
 
-  /* ── Statystyki ─────────────────────────────────────────────────────── */
-  const SF = { okres: '30' };
-  const OKRESY = [['30', 'Ostatnie 30 dni'], ['90', 'Ostatnie 90 dni'], ['miesiac', 'Ten miesiąc'], ['poprzedni', 'Poprzedni miesiąc']];
-  function okresDat(o) {
-    const t = new Date();
-    if (o === 'miesiac') return [poczMies(), dzis()];
-    if (o === 'poprzedni') { const p = new Date(t.getFullYear(), t.getMonth() - 1, 1); return [poczMies(p), konMies(p)]; }
-    return [K.iso(K.dodaj(t, -Number(o) + 1)), dzis()];
-  }
-  function okresPoprzedni([od, doo]) {
-    const dni = K.dniMiedzy(od, doo) + 1;
-    return [K.iso(K.dodaj(K.zIso(od), -dni)), K.iso(K.dodaj(K.zIso(od), -1))];
-  }
-  function policz([od, doo]) {
-    const D = P.D();
-    const mapa = pacjenci();
-    const R = D.rezerwacje.filter((r) => r.data >= od && r.data <= doo && wFiltrze(r));
-    const minione = R.filter((r) => K.minelo(r.data, r.od));
-    const odbyte = R.filter((r) => r.status === 'przyszedl');
-    const nieodb = R.filter((r) => r.status === 'nieobecny');
-    const odw = R.filter((r) => !K.aktywna(r));
-    const nowi = [...mapa.values()].filter((p) => p.pierwsza >= od && p.pierwsza <= doo && (!wybrani() || wybrani().includes(p.terap)));
-    const sysOdb = odbyte.filter((r) => P.zSystemu(r, mapa));
-    return {
-      R, odbyte, nieodb, odw, nowi, sysOdb,
-      przychod: suma(odbyte),
-      przychodSys: suma(sysOdb),
-      utracone: suma(nieodb) + suma(odw.filter((r) => r.pozno)),
-      nieobecnosc: minione.filter((r) => K.aktywna(r)).length ? Math.round((nieodb.length / minione.filter((r) => K.aktywna(r)).length) * 100) : 0,
-      online: R.filter((r) => r.zrodlo === 'strona').length,
-    };
-  }
-  P.widoki.statystyki = {
-    tytul: 'Statystyki',
-    podtytul: 'Przychód, pacjenci i to, ile przynosi system rezerwacji.',
-    render() {
-      const D = P.D();
-      const zakres = okresDat(SF.okres);
-      const a = policz(zakres);
-      const b = policz(okresPoprzedni(zakres));
-      const dni = K.dniMiedzy(zakres[0], zakres[1]) + 1;
-      const abonament = (P.ent() ? 149 : 99) + (D.ustawienia.zaliczki ? 29 : 0);
-      const koszt = Math.round((abonament * dni) / 30);
-      const zwrot = koszt ? (a.przychodSys / koszt).toFixed(1).replace('.', ',') : '0';
-      const zr = paskiZrodel(...zakres);
-      const tyg = P.tygodnie(SF.okres === '90' ? 13 : 6);
-      const uslugi = D.uslugi.map((u) => { const l = a.odbyte.filter((r) => r.usluga === u.id); return { u, n: l.length, p: suma(l) }; }).sort((x, y) => y.p - x.p);
-      const maxU = Math.max(1, ...uslugi.map((x) => x.p));
-      const kanaly = {};
-      a.R.filter((r) => K.aktywna(r)).forEach((r) => { kanaly[r.zrodlo] = (kanaly[r.zrodlo] || 0) + 1; });
-      const sumaK = Object.values(kanaly).reduce((s, n) => s + n, 0) || 1;
-      let ruch = 0;
-      for (let i = 0; i < dni; i++) ruch += P.ruch(K.iso(K.dodaj(K.zIso(zakres[0]), i)));
-      const terapeuci = P.ent() ? D.zespol.map((t) => {
-        const odb = a.odbyte.filter((r) => r.terap === t.id);
-        let otw = 0;
-        let zaj = 0;
-        for (let i = 0; i < dni; i++) { const w = K.wypelnienie(D, [t], K.iso(K.dodaj(K.zIso(zakres[0]), i))); otw += w.otwarte; zaj += w.zajete; }
-        return { t, n: odb.length, p: suma(odb), nie: a.nieodb.filter((r) => r.terap === t.id).length, wyp: otw ? Math.round((zaj / otw) * 100) : 0 };
-      }) : [];
-      return `<div class="p-stos">
-        <div class="p-sekcja-g"><div class="p-filtry" role="group" aria-label="Okres">${OKRESY.map(([k, n]) => `<button type="button" class="p-chip p-chip--bez" data-pa="sf-okres" data-s="${k}" aria-pressed="${SF.okres === k}">${n}</button>`).join('')}</div>${P.chipyZespolu()}</div>
-        <div class="p-kpi">
-          <div class="p-kpi__k p-kpi__k--ciemny"><span>Przychód</span><b>${P.zl(a.przychod)}</b><small>${zmiana(a.przychod, b.przychod)} wobec poprzedniego okresu</small></div>
-          <div class="p-kpi__k"><span>Odbyte wizyty</span><b>${a.odbyte.length}</b><small>średnio ${P.zl(a.odbyte.length ? a.przychod / a.odbyte.length : 0)} za wizytę</small></div>
-          <div class="p-kpi__k"><span>Nowi pacjenci</span><b>${a.nowi.length}</b><small>w tym ${a.nowi.filter((p) => p.zrodlo === 'strona').length} ze strony ${zmiana(a.nowi.length, b.nowi.length)}</small></div>
-          <div class="p-kpi__k"><span>Nieodbyte i późne odwołania</span><b>${a.nieobecnosc}%</b><small>utracone ok. ${P.zl(a.utracone)}</small></div>
-        </div>
-        <div class="p-siatka">
-          ${P.karta('Ile przyniósł system rezerwacji', `<div class="p-dwie">
-              <div class="p-stos" style="gap:6px"><span class="p-podp" style="color:#aab1b6">Przychód od pacjentów pozyskanych przez stronę</span><b style="font-family:var(--f-display);font-size:2.2rem;font-weight:900">${P.zl(a.przychodSys)}</b><span style="color:#aab1b6">${a.przychod ? Math.round((a.przychodSys / a.przychod) * 100) : 0}% całego przychodu w tym okresie</span></div>
-              <div class="p-stos" style="gap:6px"><span class="p-podp" style="color:#aab1b6">Koszt systemu w tym okresie</span><b style="font-family:var(--f-display);font-size:2.2rem;font-weight:900">${P.zl(koszt)}</b><span style="color:#aab1b6">Na każdą złotówkę abonamentu: <b style="color:#fff">${zwrot} zł</b> przychodu</span></div>
-            </div>
-            <p class="p-podp" style="color:#aab1b6">Pacjent „ze strony” to ten, którego pierwsza wizyta przyszła przez rezerwację online. Liczymy wszystkie jego późniejsze wizyty, także umówione telefonicznie.</p>`, { klasa: 'p-s12 p-karta--ciemna' })}
-          ${P.karta('Przychód tydzień po tygodniu', wykresTygodni(tyg, { wysokosc: 200 }), { klasa: 'p-s8' })}
-          ${P.karta('Jak umawiają się pacjenci', `<div class="p-paski">${Object.entries(kanaly).sort((x, y) => y[1] - x[1]).map(([z, n]) => `<div class="p-pasek${z === 'strona' ? ' p-pasek--system' : ''}"><span>${esc(K.ZRODLA_KR[z] || z)}</span><span class="p-pasek__tor"><i style="width:${(n / sumaK) * 100}%"></i></span><b>${Math.round((n / sumaK) * 100)}%</b></div>`).join('') || P.pusto('Brak wizyt.')}</div>`, { klasa: 'p-s4', pod: 'Wszystkie wizyty w okresie, według sposobu umówienia.' })}
-          ${P.karta('Skąd przyszli nowi pacjenci', zr.html, { klasa: 'p-s6', pod: `${pacjentow(zr.nowi.length)} w tym okresie.` })}
-          ${P.karta('Usługi', `<div class="p-paski">${uslugi.map((x) => `<div class="p-pasek"><span>${esc(x.u.nazwa)}</span><span class="p-pasek__tor"><i style="width:${(x.p / maxU) * 100}%"></i></span><b>${P.zl(x.p)}</b></div>`).join('')}</div>`, { klasa: 'p-s6', pod: 'Przychód z odbytych wizyt.' })}
-          ${P.ent() ? P.karta('Terapeuci', `<div class="p-tabela-przew"><table class="p-tabela"><thead><tr><th>Terapeuta</th><th class="p-liczba">Odbyte</th><th class="p-liczba">Nieodbyte</th><th class="p-liczba">Wypełnienie</th><th class="p-liczba">Przychód</th></tr></thead><tbody>${terapeuci.map((x) => `<tr><td><span class="p-kropka" style="background:${K.kolor(x.t.kolor)}"></span> ${esc(x.t.nazwa)}</td><td class="p-liczba">${x.n}</td><td class="p-liczba">${x.nie}</td><td class="p-liczba">${x.wyp}%</td><td class="p-liczba p-wazne">${P.zl(x.p)}</td></tr>`).join('')}</tbody></table></div>`, { klasa: 'p-s12' }) : ''}
-          ${P.karta('Ruch na stronie a rezerwacje', `<div class="p-trzy">
-              <div class="p-kpi__k" style="box-shadow:none;background:var(--floor)"><span>Odwiedziny strony</span><b>${ruch.toLocaleString('pl-PL')}</b><small>dane przykładowe w demie</small></div>
-              <div class="p-kpi__k" style="box-shadow:none;background:var(--floor)"><span>Rezerwacje online</span><b>${a.online}</b><small>z kalendarza</small></div>
-              <div class="p-kpi__k" style="box-shadow:none;background:var(--floor)"><span>Konwersja</span><b>${ruch ? ((a.online / ruch) * 100).toFixed(1).replace('.', ',') : 0}%</b><small>odwiedziny, które kończą się rezerwacją</small></div>
-            </div>`, { klasa: 'p-s12', pod: 'W prawdziwym systemie odwiedziny pochodzą z analityki strony (bez ciasteczek).' })}
-        </div>
-      </div>`;
-    },
-  };
-  P.akcje['sf-okres'] = (b) => { SF.okres = b.dataset.s; P.odswiez(); };
 })();

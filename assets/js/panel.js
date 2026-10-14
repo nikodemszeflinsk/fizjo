@@ -53,11 +53,8 @@
 
   /* ── Menu ──────────────────────────────────────────────────────────── */
   P.MENU = () => [
-    { grupa: null, poz: [['pulpit', 'Pulpit'], ['kalendarz', 'Kalendarz'], ['rezerwacje', 'Rezerwacje'], ['pacjenci', 'Pacjenci']] },
-    { grupa: 'Grafik i oferta', poz: [['dostepnosc', 'Dostępność'], ['uslugi', 'Usługi i cennik'], ['zespol', P.ent() ? 'Zespół' : 'Mój profil'], ['lokalizacje', P.ent() ? 'Lokalizacje' : 'Miejsca przyjęć']] },
-    { grupa: 'Strona', poz: [['strona', 'Treści strony']] },
-    { grupa: 'Rezerwacje online', poz: [['formularz', 'Formularz i zasady'], ['powiadomienia', 'Powiadomienia'], ['platnosci', 'Płatności']] },
-    { grupa: 'Konto', poz: [['statystyki', 'Statystyki'], ['ustawienia', 'Ustawienia']] },
+    { grupa: null, poz: [['pulpit', 'Dziś'], ['kalendarz', 'Kalendarz'], ['rezerwacje', 'Rezerwacje']] },
+    { grupa: 'Gabinet', poz: [['dostepnosc', 'Dostępność'], ['uslugi', 'Usługi i ceny'], ['zespol', P.ent() ? 'Zespół' : 'Mój profil'], ['lokalizacje', P.ent() ? 'Lokalizacje' : 'Miejsca przyjęć'], ['ustawienia', 'Ustawienia']] },
   ];
   function liczbaUwagi() {
     const D = P.D();
@@ -66,16 +63,16 @@
   }
   P.liczbaUwagi = liczbaUwagi;
   function renderMenu() {
-    const odznaki = { kalendarz: liczbaUwagi(), strona: P.zmianyStrony() };
+    const odznaki = { kalendarz: liczbaUwagi() };
     $('#p-menu').innerHTML = P.MENU().map((g) => `
       ${g.grupa ? `<p class="p-rail__grupa">${g.grupa}</p>` : ''}
-      <ul>${g.poz.map(([id, nazwa]) => `<li><a class="p-rail__btn" href="#/${id}" ${P.aktualny === id ? 'aria-current="page"' : ''}>${P.ikona(id)}<span>${nazwa}</span>${odznaki[id] ? `<i class="p-rail__odznaka${id === 'strona' ? ' p-rail__odznaka--szkic' : ''}" title="${id === 'strona' ? 'Niezapublikowane zmiany' : 'Wymaga uwagi'}">${odznaki[id]}</i>` : ''}</a></li>`).join('')}</ul>`).join('');
+      <ul>${g.poz.map(([id, nazwa]) => `<li><a class="p-rail__btn" href="#/${id}" ${P.aktualny === id ? 'aria-current="page"' : ''}>${P.ikona(id)}<span>${nazwa}</span>${odznaki[id] ? `<i class="p-rail__odznaka" title="Wymaga uwagi">${odznaki[id]}</i>` : ''}</a></li>`).join('')}</ul>`).join('');
     $$('[data-pakiet]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.pakiet === P.tryb())));
     const C = P.C();
-    $('#p-nazwa').textContent = C.strona.nazwa;
-    const wl = C.konto.uzytkownicy[0];
-    $('#p-kto').innerHTML = `${P.esc(wl.imie)}<em>${P.ent() ? 'właściciel' : 'Twoje konto'}</em>`;
-    $('#p-awatar').textContent = wl.imie.split(' ').map((x) => x[0]).join('').slice(0, 2);
+    $('#p-nazwa').textContent = C.nazwa;
+    const wl = C.konto.wlasciciel;
+    $('#p-kto').innerHTML = `${P.esc(wl)}<em>${P.ent() ? 'właściciel' : 'Twoje konto'}</em>`;
+    $('#p-awatar').textContent = wl.split(' ').map((x) => x[0]).join('').slice(0, 2);
   }
 
   /* ── Router ────────────────────────────────────────────────────────── */
@@ -303,36 +300,26 @@
 
   /* ── Wyszukiwarka całego panelu ────────────────────────────────────── */
   const SEKCJE = [
-    ['dostepnosc', 'Dostępność: stały grafik, zmiany, urlopy, święta', 'godziny grafik urlop święta zmiany przerwa'],
-    ['uslugi', 'Usługi i cennik', 'cena cennik usługa czas'],
-    ['zespol', 'Zespół i profile', 'terapeuta zespół profil bio'],
-    ['lokalizacje', 'Lokalizacje i godziny otwarcia', 'adres dojazd parking godziny otwarcia'],
-    ['strona/glowna', 'Strona główna', 'nagłówek strona główna hero'],
-    ['strona/seo', 'SEO i Google', 'seo google tytuł opis wizytówka'],
-    ['strona/komunikat', 'Komunikat na stronie', 'komunikat baner urlop'],
-    ['formularz', 'Formularz rezerwacji i zasady', 'formularz zgody wyprzedzenie bufor potwierdzanie'],
-    ['powiadomienia', 'Powiadomienia e-mail i SMS', 'e-mail sms przypomnienie potwierdzenie'],
-    ['platnosci', 'Płatności i zaliczki', 'zaliczka płatność blik operator zwrot'],
-    ['statystyki', 'Statystyki', 'statystyki raport ruch'],
-    ['ustawienia', 'Ustawienia konta', 'konto nip użytkownicy integracje domena rodo eksport'],
+    ['dostepnosc', 'Dostępność: godziny przyjęć, urlopy, święta', 'godziny grafik urlop święta przerwa zasady rezerwacji'],
+    ['uslugi', 'Usługi i ceny', 'cena cennik usługa czas zaliczka'],
+    ['zespol', 'Zespół i profile', 'terapeuta zespół profil'],
+    ['lokalizacje', 'Miejsca przyjęć i godziny otwarcia', 'adres dojazd parking godziny otwarcia'],
+    ['ustawienia', 'Ustawienia: przypomnienia, dane gabinetu, pakiet', 'przypomnienia sms e-mail konto nip pakiet eksport dane'],
   ];
   function szukaj(q) {
     const w = $('#p-szukaj-wyniki');
     const t = q.trim().toLowerCase();
     if (t.length < 2) { w.hidden = true; return; }
     const D = P.D();
-    const C = P.C();
     const cyfry = t.replace(/\D/g, '');
     const pacjenci = [...K.pacjenci(D).values()].filter((p) => p.imie.toLowerCase().includes(t) || (cyfry.length >= 3 && p.tel.replace(/\D/g, '').includes(cyfry))).slice(0, 5);
     const uslugi = D.uslugi.filter((u) => u.nazwa.toLowerCase().includes(t)).slice(0, 3);
-    const strony = C.strona.problemy.filter((x) => x.tytul.toLowerCase().includes(t)).slice(0, 3);
     const osoby = D.zespol.filter((x) => x.nazwa.toLowerCase().includes(t)).slice(0, 3);
     const sekcje = SEKCJE.filter(([, n, s]) => n.toLowerCase().includes(t) || s.includes(t)).slice(0, 4);
     const grupa = (n, lista) => (lista.length ? `<li class="p-szukaj__g">${n}</li>${lista.join('')}` : '');
     const html = [
-      grupa('Pacjenci', pacjenci.map((p) => `<li><button type="button" data-pa="idz" data-cel="pacjenci/${encodeURIComponent(p.tel.replace(/\D/g, ''))}"><b>${P.esc(p.imie)}</b><span>${P.esc(p.tel)} · ${p.razem} wiz.</span></button></li>`)),
+      grupa('Pacjenci', pacjenci.map((p) => `<li><button type="button" data-pa="pacjent" data-id="${p.tel.replace(/\D/g, '')}"><b>${P.esc(p.imie)}</b><span>${P.esc(p.tel)} · ${p.razem} wiz.</span></button></li>`)),
       grupa('Usługi', uslugi.map((u) => `<li><button type="button" data-pa="idz" data-cel="uslugi/${u.id}"><b>${P.esc(u.nazwa)}</b><span>${K.dlTekst(u.min)} · ${P.zl(u.cena)}</span></button></li>`)),
-      grupa('Podstrony', strony.map((x) => `<li><button type="button" data-pa="idz" data-cel="strona/podstrona-${x.id}"><b>${P.esc(x.tytul)}</b><span>/${P.esc(x.slug)}</span></button></li>`)),
       grupa('Zespół', osoby.map((x) => `<li><button type="button" data-pa="idz" data-cel="zespol/${x.id}"><b>${P.esc(x.nazwa)}</b><span>profil i grafik</span></button></li>`)),
       grupa('Ustawienia', sekcje.map(([id, n]) => `<li><button type="button" data-pa="idz" data-cel="${id}"><b>${P.esc(n)}</b></button></li>`)),
     ].join('');
