@@ -11,13 +11,17 @@
 (function () {
   'use strict';
   var CFG = {
-    url: '' /* adres wdrożenia Apps Script, np. https://script.google.com/macros/s/.../exec */
+    url: 'https://script.google.com/macros/s/AKfycbwKZb3lPZKXibtU6-euI37PeJy4b--ABgWmkIyS0BXUA3-RPqZtdgSTLtO_MemqWgtb/exec' /* wdrożenie Apps Script (zapisuje w arkuszu „Zdarzenia Studio Widok”) */
   };
   window.ODBIORNIK = {
     aktywny: function () { return !!CFG.url; },
     /** Wysyła paczkę (obiekt). Zwraca Promise<boolean>: true, gdy żądanie wyszło. Odpowiedź jest nieczytelna (no-cors). */
     wyslij: function (paczka) {
       if (!CFG.url) return Promise.resolve(false);
+      /* Lokalnie (testy, podgląd z dysku) nic nie wysyłamy, żeby nie zaśmiecać arkusza i skrzynki prawdziwymi powiadomieniami.
+         Żeby przetestować wysyłkę z własnego komputera: localStorage.setItem('odbiornik-test', '1'). */
+      var lokalnie = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname) || location.protocol === 'file:';
+      try { if (lokalnie && localStorage.getItem('odbiornik-test') !== '1') return Promise.resolve(false); } catch (e) { if (lokalnie) return Promise.resolve(false); }
       try {
         return fetch(CFG.url, {
           method: 'POST',
