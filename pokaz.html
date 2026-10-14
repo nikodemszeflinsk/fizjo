@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Pokaz w minutę · Studio Widok</title>
-  <meta name="description" content="Minutowy pokaz strony z rezerwacją online i kalendarza dla gabinetu fizjoterapii. Link przygotowany przez Studio Widok." />
+  <meta name="description" content="Minutowy pokaz: jak gabinet fizjoterapii pozyskuje pacjentów z Google. Link przygotowany przez Studio Widok." />
   <!-- Strona wysyłana SMS-em w trakcie rozmowy. Nie ma jej w nawigacji ani w wyszukiwarce. -->
   <meta name="robots" content="noindex, nofollow" />
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/pokaz.css?v=1" />
+  <link rel="stylesheet" href="assets/css/pokaz.css?v=3" />
 </head>
 <body>
   <header class="pk-gora">
@@ -27,34 +27,84 @@
       Studio Widok
     </span>
     <p class="pk-dla" id="pk-dla" hidden>Pokaz dla: <b></b></p>
-    <p class="pk-licznik" id="pk-licznik" aria-live="polite">1 z 5</p>
+    <p class="pk-licznik" id="pk-licznik" aria-live="polite">1 z 6</p>
   </header>
 
   <main id="pk-tor" class="pk-tor" tabindex="-1" aria-label="Pokaz: przesuń w bok albo użyj przycisku Dalej">
 
     <section class="pk-slajd" id="s1" aria-labelledby="h1">
       <div class="pk-tekst">
-        <p class="pk-et">1 · Twój pacjent</p>
-        <h2 id="h1">Umawia się sam, także o 22:00</h2>
+        <p class="pk-et">1 · Pacjent już Cię szuka</p>
+        <h2 id="h1">Wpisuje w Google to, co go boli</h2>
         <ul>
-          <li>Wybiera dzień i godzinę z <b>Twojego</b> kalendarza, bez dzwonienia.</li>
-          <li>Nie ma okienka, w którym nikt nie odbiera telefonu.</li>
-          <li>Od razu dostaje potwierdzenie e-mailem.</li>
+          <li>Wieczorem, z telefonu. Wpisuje to, co go boli, a nie nazwę gabinetu.</li>
+          <li>Na portalu jesteś jednym z kilkudziesięciu. <b>U siebie jesteś jedyny.</b></li>
+          <li>Dbamy, żeby pierwszym wynikiem była Twoja strona.</li>
         </ul>
       </div>
-      <figure class="pk-obraz pk-obraz--tel">
-        <img src="assets/img/zrzuty/strona-terminy-telefon.jpg" width="420" height="946" alt="Telefon: pacjent wybiera dzień i godzinę wizyty z wolnych terminów gabinetu." decoding="async" />
+      <figure class="pk-obraz" role="img" aria-label="Przykład wyników wyszukiwania frazy „ból krzyża fizjoterapeuta”: na górze strona gabinetu o fizjoterapii kręgosłupa i wizytówka w Mapach, niżej lista specjalistów z portalu.">
+        <div class="pk-serp">
+          <div class="pk-serp__pasek"><span class="pk-serp__lupa" aria-hidden="true"></span>ból krzyża fizjoterapeuta [Twoje miasto]</div>
+          <div class="pk-serp__wynik pk-serp__wynik--nasz">
+            <p class="pk-serp__url">twoj-gabinet.pl › fizjoterapia-kregoslupa</p>
+            <p class="pk-serp__tytul">Fizjoterapia kręgosłupa [Twoje miasto]</p>
+            <p class="pk-serp__opis">Ból pleców, rwa kulszowa, dyskopatia. Najbliższy wolny termin: jutro.</p>
+            <span class="pk-serp__znak">Twoja strona</span>
+          </div>
+          <div class="pk-serp__mapa">
+            <b>Twój gabinet</b><span>Fizjoterapeuta · <i>Otwarte teraz</i> do 20:00</span>
+            <span class="pk-serp__znak pk-serp__znak--m">Twoja wizytówka</span>
+          </div>
+          <div class="pk-serp__wynik pk-serp__wynik--obcy">
+            <p class="pk-serp__url">portal-z-lekarzami.pl › fizjoterapeuci</p>
+            <p class="pk-serp__tytul">Fizjoterapeuci: 148 specjalistów</p>
+            <p class="pk-serp__opis">Porównaj opinie i terminy…</p>
+          </div>
+          <p class="pk-serp__przyp">Przykład poglądowy</p>
+        </div>
       </figure>
     </section>
 
     <section class="pk-slajd" id="s2" aria-labelledby="h2">
       <div class="pk-tekst">
-        <p class="pk-et">2 · Ty</p>
-        <h2 id="h2">Całość widzisz w jednym kalendarzu</h2>
+        <p class="pk-et">2 · Trafia na Twoją stronę</p>
+        <h2 id="h2">Na stronę o swoim problemie</h2>
+        <ul>
+          <li>Każda dolegliwość, którą leczysz, ma <b>własną stronę</b>: kręgosłup, kolano, bark, rehabilitacja po operacji.</li>
+          <li>Pisana językiem pacjenta i kończy się wolnym terminem, a nie formularzem „zapytaj o ofertę”.</li>
+          <li>Wizytówka w Mapach Google z aktualnymi godzinami, zdjęciami i usługami.</li>
+        </ul>
+      </div>
+      <figure class="pk-obraz pk-obraz--okno">
+        <div class="pk-okno"><i></i><i></i><i></i><span>twoj-gabinet.pl/fizjoterapia-kregoslupa</span></div>
+        <img src="assets/img/zrzuty/strona-podstrona-problemu.jpg" width="1400" height="972" alt="Podstrona gabinetu o fizjoterapii kręgosłupa: nagłówek, przyciski „Umów wizytę” i „Zadzwoń” oraz najbliższy wolny termin." decoding="async" />
+      </figure>
+    </section>
+
+    <section class="pk-slajd" id="s3" aria-labelledby="h3">
+      <div class="pk-tekst">
+        <p class="pk-et">3 · Umawia się sam</p>
+        <h2 id="h3">Także o 22:00, a potem sam zmieni termin</h2>
+        <ul>
+          <li>Wybiera dzień i godzinę z <b>Twojego</b> kalendarza, bez dzwonienia i czekania na oddzwonienie.</li>
+          <li>Dostaje potwierdzenie i przypomnienie. W e-mailu jest link, z którego sam przełoży albo odwoła wizytę.</li>
+          <li>Zwolniony termin wraca na stronę. Bez konta i bez danych medycznych.</li>
+        </ul>
+      </div>
+      <figure class="pk-obraz pk-obraz--tel pk-obraz--dwa">
+        <img src="assets/img/zrzuty/strona-terminy-telefon.jpg" width="420" height="946" alt="Telefon: pacjent wybiera dzień i godzinę z wolnych terminów gabinetu." decoding="async" />
+        <img src="assets/img/zrzuty/wizyta-telefon-1.jpg" width="780" height="1600" alt="Telefon: ekran wizyty z przyciskami zmiany terminu i odwołania." decoding="async" />
+      </figure>
+    </section>
+
+    <section class="pk-slajd" id="s4" aria-labelledby="h4">
+      <div class="pk-tekst">
+        <p class="pk-et">4 · Ty</p>
+        <h2 id="h4">Wszystko widzisz w jednym kalendarzu</h2>
         <ul>
           <li>Rezerwacje ze strony i te wpisane po telefonie są razem.</li>
-          <li>Godziny przyjęć ustawiasz kilkoma kliknięciami, a urlop jednym.</li>
-          <li>Wolny termin, który wynika z odwołania, wraca do sprzedaży sam.</li>
+          <li>Godziny przyjęć ustawiasz kilkoma kliknięciami, a urlop jednym. Pacjent widzi tylko to, co otworzysz.</li>
+          <li>Jeden gabinet albo cały zespół z osobnymi grafikami i wieloma lokalizacjami.</li>
         </ul>
       </div>
       <figure class="pk-obraz pk-obraz--okno">
@@ -63,53 +113,32 @@
       </figure>
     </section>
 
-    <section class="pk-slajd" id="s3" aria-labelledby="h3">
+    <section class="pk-slajd pk-slajd--lista" id="s5" aria-labelledby="h5">
       <div class="pk-tekst">
-        <p class="pk-et">3 · Mniej telefonów</p>
-        <h2 id="h3">Pacjent sam przełoży albo odwoła wizytę</h2>
+        <p class="pk-et">5 · Robimy to za Ciebie</p>
+        <h2 id="h5">Ty leczysz, my pozyskujemy pacjentów</h2>
         <ul>
-          <li>Link w e-mailu, bez zakładania konta.</li>
-          <li>Widzi tylko swoją wizytę, żadnych danych medycznych.</li>
-          <li>Ty ustalasz, ile godzin przed wizytą można ją zmienić.</li>
+          <li>Piszemy teksty o każdym problemie, który leczysz.</li>
+          <li>Stawiamy stronę, która działa na telefonie, wraz z domeną i hostingiem.</li>
+          <li>Zakładamy i porządkujemy wizytówkę w Mapach Google.</li>
+          <li>Ustawiamy rezerwację i kalendarz dostępności.</li>
+          <li>Utrzymujemy całość: poprawki, aktualizacje, bezpieczeństwo.</li>
+          <li><b>Opcjonalnie:</b> reklamy Google i Meta, gdy chcesz szybciej zapełnić grafik.</li>
         </ul>
       </div>
-      <figure class="pk-obraz pk-obraz--tel">
-        <img src="assets/img/zrzuty/wizyta-telefon-1.jpg" width="780" height="1600" alt="Telefon: ekran wizyty z przyciskami zmiany terminu i odwołania." decoding="async" />
-      </figure>
-    </section>
-
-    <section class="pk-slajd pk-slajd--cena" id="s4" aria-labelledby="h4">
-      <div class="pk-tekst">
-        <p class="pk-et">4 · Ile i kiedy</p>
-        <h2 id="h4">Jedna cena, bez ukrytych kosztów</h2>
-        <p class="pk-lead">Ceny końcowe: nie jesteśmy płatnikiem VAT, więc kwota jest kwotą do zapłaty.</p>
-        <div class="pk-ceny">
-          <article class="pk-cena" id="pk-c-individual">
-            <h3>Individual</h3>
-            <p class="pk-cena__opis">Jeden terapeuta, do 3 miejsc przyjęć</p>
-            <p class="pk-cena__kwota"><b>2&nbsp;900&nbsp;zł</b> wdrożenie</p>
-            <p class="pk-cena__kwota pk-cena__kwota--m"><b>99&nbsp;zł</b> miesięcznie</p>
-          </article>
-          <article class="pk-cena" id="pk-c-enterprise">
-            <h3>Team</h3>
-            <p class="pk-cena__opis">Zespół i lokalizacje bez limitu</p>
-            <p class="pk-cena__kwota"><b>4&nbsp;499&nbsp;zł</b> wdrożenie</p>
-            <p class="pk-cena__kwota pk-cena__kwota--m"><b>149&nbsp;zł</b> miesięcznie</p>
-          </article>
-        </div>
-        <ul class="pk-fakty">
-          <li><b>Płacisz po zobaczeniu projektu</b>, a nie przed.</li>
-          <li><b>Bez umowy na lata:</b> rezygnujesz, kiedy chcesz.</li>
-          <li><b>Około 14 dni</b> od materiałów do działającej strony.</li>
-        </ul>
+      <div class="pk-kafle" aria-label="W skrócie">
+        <p><b>Około 14 dni</b>od materiałów do działającej strony</p>
+        <p><b>2–3 godziny</b>Twojego czasu w całym wdrożeniu</p>
+        <p><b>Bez prowizji</b>pacjent jest Twój, a nie portalu</p>
+        <p><b>Bez umowy na lata</b>rezygnujesz, kiedy chcesz</p>
       </div>
     </section>
 
-    <section class="pk-slajd pk-slajd--koniec" id="s5" aria-labelledby="h5">
+    <section class="pk-slajd pk-slajd--koniec" id="s6" aria-labelledby="h6">
       <div class="pk-tekst">
-        <p class="pk-et">5 · Co dalej</p>
-        <h2 id="h5">Podoba się?</h2>
-        <p class="pk-lead">Wyślę pełną ofertę: dokładny zakres, odpowiedzi na typowe pytania i kalkulator, po ilu pacjentach inwestycja się zwraca. Zdecydujesz w swoim tempie.</p>
+        <p class="pk-et">6 · Co dalej</p>
+        <h2 id="h6">Podoba się?</h2>
+        <p class="pk-lead">Wyślę pełną ofertę: dokładny zakres, warunki, odpowiedzi na typowe pytania i kalkulator, po ilu pacjentach inwestycja się zwraca. Zdecydujesz w swoim tempie.</p>
         <div class="pk-akcje" id="pk-akcje">
           <button type="button" class="pk-btn pk-btn--glowny" id="pk-chce">Tak, wyślij mi pełną ofertę</button>
           <a class="pk-btn" href="demo.html" target="_blank" rel="noopener">Wolę najpierw obejrzeć pełne demo</a>
@@ -126,11 +155,12 @@
       <button type="button" data-do="2" aria-label="Ekran 3"></button>
       <button type="button" data-do="3" aria-label="Ekran 4"></button>
       <button type="button" data-do="4" aria-label="Ekran 5"></button>
+      <button type="button" data-do="5" aria-label="Ekran 6"></button>
     </div>
     <button type="button" class="pk-btn pk-btn--glowny pk-dalej" id="pk-dalej">Dalej <span aria-hidden="true">→</span></button>
   </nav>
 
   <script src="assets/js/odbiornik.js?v=4"></script>
-  <script src="assets/js/pokaz.js?v=1" defer></script>
+  <script src="assets/js/pokaz.js?v=2" defer></script>
 </body>
 </html>

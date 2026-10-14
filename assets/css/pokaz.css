@@ -43,23 +43,35 @@ body { margin: 0; display: flex; flex-direction: column; height: 100svh; backgro
 .pk-okno i { width: 9px; height: 9px; border-radius: 50%; background: #b9bdb8; display: block; }
 .pk-obraz--okno img { width: 100%; }
 
-/* ── Ceny ────────────────────────────────────────────────────────────── */
-.pk-ceny { display: grid; gap: 12px; margin: 0 0 18px; }
-.pk-cena { padding: 16px 18px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 16px; }
-.pk-cena--polecana { background: #fff; color: var(--ink); border-color: #fff; }
-.pk-cena h3 { margin: 0; font-family: var(--f-display); font-size: 1.25rem; font-weight: 900; color: #fff; }
-.pk-cena--polecana h3 { color: var(--ink); }
-.pk-cena__opis { margin: 0 0 8px; color: var(--muted); font-size: 0.92rem; }
-.pk-cena--polecana .pk-cena__opis { color: #535a61; }
-.pk-cena__kwota { margin: 0; color: #c7ced3; }
-.pk-cena--polecana .pk-cena__kwota { color: #2b3035; }
-.pk-cena__kwota b { font-family: var(--f-display); font-size: 1.7rem; font-weight: 900; color: #fff; margin-right: 4px; letter-spacing: -0.02em; }
-.pk-cena--polecana .pk-cena__kwota b { color: var(--ink); }
-.pk-cena__kwota--m b { font-size: 1.25rem; }
-.pk-fakty { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
-.pk-fakty li { padding-left: 26px; position: relative; color: #dfe4e7; }
-.pk-fakty li::before { content: ''; position: absolute; left: 2px; top: 0.5em; width: 12px; height: 7px; border-left: 3px solid var(--zolty); border-bottom: 3px solid var(--zolty); transform: rotate(-45deg); }
-.pk-fakty b { color: #fff; }
+/* ── Wyniki wyszukiwania (przykład poglądowy) ────────────────────────── */
+.pk-serp { width: 100%; max-width: 560px; display: grid; gap: 10px; padding: 16px; border-radius: 16px; background: #fff; color: #202124; box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5); }
+.pk-serp__pasek { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border: 1px solid #dfe1e5; border-radius: 999px; font-size: 0.95rem; box-shadow: 0 1px 4px rgba(32, 33, 36, 0.12); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.pk-serp__lupa { flex: none; width: 14px; height: 14px; border: 2px solid #70757a; border-radius: 50%; position: relative; }
+.pk-serp__lupa::after { content: ''; position: absolute; width: 2px; height: 7px; background: #70757a; right: -4px; bottom: -6px; transform: rotate(-45deg); }
+.pk-serp__wynik { position: relative; display: grid; gap: 2px; padding: 12px 14px; border-radius: 12px; }
+.pk-serp__wynik--nasz { background: #eef3fd; border: 2px solid var(--accent); }
+.pk-serp__wynik--obcy { opacity: 0.55; }
+.pk-serp p { margin: 0; }
+.pk-serp__url { font-size: 0.8rem; color: #4d5156; }
+.pk-serp__tytul { font-size: 1.12rem; line-height: 1.25; color: #1a0dab; font-weight: 500; }
+.pk-serp__opis { font-size: 0.9rem; color: #4d5156; line-height: 1.45; }
+.pk-serp__znak { justify-self: start; margin-top: 6px; padding: 3px 10px; border-radius: 999px; background: var(--accent); color: #fff; font-size: 0.74rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
+.pk-serp__mapa { position: relative; display: grid; gap: 2px; padding: 12px 14px; border-radius: 12px; border: 1px solid #dfe1e5; font-size: 0.92rem; }
+.pk-serp__mapa b { font-size: 1rem; }
+.pk-serp__mapa span { color: #4d5156; }
+.pk-serp__mapa i { font-style: normal; color: #188038; font-weight: 700; }
+.pk-serp__mapa .pk-serp__znak--m { background: #188038; color: #fff; }
+.pk-serp__mapa .pk-serp__znak { justify-self: start; margin-top: 6px; }
+@media (max-width: 899px) { .pk-serp { gap: 8px; padding: 12px; } .pk-serp__wynik, .pk-serp__mapa { padding: 9px 12px; } .pk-serp__znak { margin-top: 4px; } }
+.pk-serp__przyp { font-size: 0.74rem; color: #70757a; text-align: right; }
+
+/* ── Dwa telefony obok siebie, okno z adresem, kafle faktów ──────────── */
+.pk-obraz--dwa { grid-auto-flow: column; justify-content: center; gap: 14px; }
+.pk-obraz--dwa img { height: min(40svh, 380px); border-width: 6px; border-radius: 24px; }
+.pk-okno span { margin-left: 8px; padding: 1px 10px; border-radius: 999px; background: #fff; color: #535a61; font-size: 0.72rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.pk-kafle { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.pk-kafle p { margin: 0; padding: 14px 16px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 14px; color: var(--muted); font-size: 0.92rem; line-height: 1.35; }
+.pk-kafle b { display: block; margin-bottom: 2px; font-family: var(--f-display); font-size: 1.15rem; font-weight: 900; color: #fff; }
 
 /* ── Przyciski i dolny pasek ─────────────────────────────────────────── */
 .pk-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 12px 24px; border: 2px solid rgba(255, 255, 255, 0.35); border-radius: 999px; background: transparent; color: #fff; font: inherit; font-weight: 700; text-decoration: none; cursor: pointer; text-align: center; }
@@ -80,9 +92,9 @@ body { margin: 0; display: flex; flex-direction: column; height: 100svh; backgro
 /* ── Większe ekrany: tekst obok obrazu ───────────────────────────────── */
 @media (min-width: 900px) {
   .pk-slajd { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); align-content: center; align-items: center; gap: 56px; padding: 32px max(40px, calc((100% - 1160px) / 2)); }
-  .pk-slajd--cena, .pk-slajd--koniec { grid-template-columns: minmax(0, 1fr); justify-items: start; }
-  .pk-slajd--cena .pk-tekst, .pk-slajd--koniec .pk-tekst { max-width: 760px; }
-  .pk-slajd--cena .pk-ceny { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pk-slajd--koniec { grid-template-columns: minmax(0, 1fr); justify-items: start; }
+  .pk-slajd--koniec .pk-tekst { max-width: 760px; }
+  .pk-obraz--dwa img { height: min(62svh, 600px); }
   .pk-obraz--tel img { height: min(66svh, 640px); }
   .pk-slajd h2 { font-size: clamp(2.2rem, 3.4vw, 3rem); }
   .pk-akcje { grid-template-columns: repeat(2, auto); justify-content: start; }

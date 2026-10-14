@@ -1,6 +1,6 @@
 /*
  * Pokaz w minutę: nawigacja po ekranach i zdarzenia dla CRM.
- * Link z CRM: pokaz.html?l=<id leada>&dla=<nazwa gabinetu>&p=<individual|enterprise>
+ * Link z CRM: pokaz.html?l=<id leada>&dla=<nazwa gabinetu>
  *  - „pokaz_otwarty” raz na sesję, „pokaz_chce” po kliknięciu „Tak, wyślij mi pełną ofertę”
  *    (zdarzenia lecą tylko z id leada i skonfigurowanym odbiornikiem).
  */
@@ -9,7 +9,6 @@
   var q = new URLSearchParams(location.search);
   var lead = (q.get('l') || '').slice(0, 40);
   var dla = (q.get('dla') || '').slice(0, 90);
-  var pakiet = q.get('p');
 
   var tor = document.getElementById('pk-tor');
   var slajdy = Array.prototype.slice.call(tor.querySelectorAll('.pk-slajd'));
@@ -23,11 +22,6 @@
     el.querySelector('b').textContent = dla;
     el.hidden = false;
   }
-  if (pakiet === 'individual' || pakiet === 'enterprise') {
-    var c = document.getElementById('pk-c-' + pakiet);
-    if (c) c.classList.add('pk-cena--polecana');
-  }
-
   function zdarzenie(typ, dane) {
     if (!lead || !window.ODBIORNIK || !window.ODBIORNIK.aktywny()) return;
     window.ODBIORNIK.wyslij({ typ: typ, lead: lead, kiedy: new Date().toISOString(), dane: dane || {} });
