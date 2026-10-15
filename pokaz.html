@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/pokaz.css?v=3" />
+  <link rel="stylesheet" href="assets/css/pokaz.css?v=4" />
 </head>
 <body>
   <header class="pk-gora">
@@ -143,6 +143,15 @@
           <button type="button" class="pk-btn pk-btn--glowny" id="pk-chce">Tak, wyślij mi pełną ofertę</button>
           <a class="pk-btn" href="demo.html" target="_blank" rel="noopener">Wolę najpierw obejrzeć pełne demo</a>
         </div>
+        <form class="pk-sms" id="pk-sms" hidden novalidate>
+          <label for="pk-tel">Na jaki numer wysłać SMS z ofertą?</label>
+          <div class="pk-sms__w">
+            <input id="pk-tel" name="tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="np. 600 700 800" />
+            <button type="submit" class="pk-btn pk-btn--glowny" id="pk-sms-wyslij">Wyślij SMS</button>
+          </div>
+          <p class="pk-sms__blad" id="pk-sms-blad" role="alert"></p>
+          <p class="pk-sms__pod">Numeru użyjemy tylko do wysłania tej oferty.</p>
+        </form>
         <p class="pk-dzieki" id="pk-dzieki" role="status" hidden><b>Dziękuję!</b> Powiedz mi o tym w rozmowie, a wyślę ofertę od razu. Jeśli już się rozłączyliśmy, napiszę do Ciebie wkrótce.</p>
       </div>
     </section>
@@ -161,7 +170,7 @@
   </nav>
 
   <script src="assets/js/chmura-config.js?v=2"></script>
-  <script src="assets/js/odbiornik.js?v=6"></script>
-  <script src="assets/js/pokaz.js?v=2" defer></script>
+  <script src="assets/js/odbiornik.js?v=7"></script>
+  <script src="assets/js/pokaz.js?v=3" defer></script>
 </body>
 </html>

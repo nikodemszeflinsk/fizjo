@@ -39,6 +39,7 @@
         ? { ok: true, symulacja: true, czas: new Date().toISOString(), numer: (p.umowa && p.umowa.numer) || '', mail: false }
         : { ok: false, blad: 'kod', zostalo: 4 };
     }
+    if (p.typ === 'sms_oferta') return { ok: true, symulacja: true, maska: '*** *** ' + String(p.telefon || '').replace(/\D/g, '').slice(-3) };
     if (p.typ === 'plik') return { ok: true, symulacja: true };
     return { ok: true, symulacja: true };
   }
@@ -99,7 +100,7 @@
       if (!CFG.url && !adresApi()) return Promise.resolve({ ok: false, blad: 'brak_odbiornika' });
       if (lokalnie()) return Promise.resolve(symuluj(paczka));
       if (adresApi()) {
-        var sciezka = { sms_kod: '/sms/kod', sms_potwierdz: '/sms/potwierdz' }[paczka.typ];
+        var sciezka = { sms_kod: '/sms/kod', sms_potwierdz: '/sms/potwierdz', sms_oferta: '/sms/oferta' }[paczka.typ];
         if (!sciezka) return Promise.resolve({ ok: false, blad: 'nieobslugiwane' });
         var sterA = typeof AbortController === 'function' ? new AbortController() : null;
         var limitA = setTimeout(function () { if (sterA) sterA.abort(); }, 60000);

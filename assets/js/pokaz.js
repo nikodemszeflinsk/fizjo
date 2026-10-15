@@ -56,12 +56,46 @@
     if (e.key === 'ArrowLeft') { e.preventDefault(); przejdz(teraz - 1); }
   });
 
+  /* SMS z ofertą: gdy działa chmura, klient podaje numer i dostaje link do pełnej oferty od razu. */
+  var BLEDY_SMS = { telefon: 'Ten numer nie wygląda na komórkowy. Wpisz 9 cyfr, np. 600 700 800.', limit: 'Na ten numer wysłaliśmy już ofertę. Sprawdź wiadomości albo daj znać w rozmowie.', limit_dzienny: 'Dziś nie możemy wysłać więcej wiadomości. Powiedz mi o tym w rozmowie, a prześlę ofertę.', siec: 'Brak połączenia. Spróbuj ponownie albo powiedz mi o tym w rozmowie.' };
+  function idLeada() {
+    if (lead) return lead;
+    try {
+      var z = sessionStorage.getItem('pokaz-lead');
+      if (!z) { z = 'web-' + Math.random().toString(36).slice(2, 10); sessionStorage.setItem('pokaz-lead', z); }
+      return z;
+    } catch (e) { return 'web-' + Math.random().toString(36).slice(2, 10); }
+  }
   document.getElementById('pk-chce').addEventListener('click', function () {
     var b = this;
     b.disabled = true;
     zdarzenie('pokaz_chce', { ekran: teraz + 1 });
-    document.getElementById('pk-dzieki').hidden = false;
     b.textContent = 'Zapisane';
+    var form = document.getElementById('pk-sms');
+    if (window.ODBIORNIK && window.ODBIORNIK.aktywny() && window.ODBIORNIK.zapytaj) {
+      form.hidden = false;
+      document.getElementById('pk-tel').focus();
+    } else document.getElementById('pk-dzieki').hidden = false;
+  });
+  document.getElementById('pk-sms').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var tel = document.getElementById('pk-tel').value;
+    var blad = document.getElementById('pk-sms-blad');
+    var wyslij = document.getElementById('pk-sms-wyslij');
+    blad.textContent = '';
+    if (String(tel).replace(/\D/g, '').replace(/^(48|0048)/, '').length !== 9) { blad.textContent = BLEDY_SMS.telefon; return; }
+    wyslij.disabled = true; wyslij.textContent = 'Wysyłam…';
+    window.ODBIORNIK.zapytaj({ typ: 'sms_oferta', lead: idLeada(), dla: dla, telefon: tel }).then(function (r) {
+      if (r && r.ok) {
+        document.getElementById('pk-sms').hidden = true;
+        var d = document.getElementById('pk-dzieki');
+        d.innerHTML = '<b>Wysłane!</b> SMS z pełną ofertą jest w drodze na numer ' + (r.maska ? r.maska : 'który podałeś') + '. Zadzwonię, żeby odpowiedzieć na pytania.';
+        d.hidden = false;
+        return;
+      }
+      blad.textContent = BLEDY_SMS[r && r.blad] || 'Nie udało się wysłać SMS-a. Powiedz mi o tym w rozmowie, a prześlę ofertę.';
+      wyslij.disabled = false; wyslij.textContent = 'Wyślij SMS';
+    });
   });
 
   try {
