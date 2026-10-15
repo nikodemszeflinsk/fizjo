@@ -145,11 +145,14 @@
   K.swietoZamkniete = (D, data) => !!K.swieto(data) && (D.ustawienia || {}).swietaZamkniete !== false && !(D.swietaOtwarte || []).includes(data);
 
   /* ── Grafik: wersja obowiązująca w danym dniu ──────────────────────── */
-  /** Zaplanowane zmiany grafiku: od podanej daty obowiązuje inny stały grafik. */
-  K.wersjaGrafiku = (D, data) => (D.zmianyGrafiku || []).filter((z) => z.od <= data).sort((a, b) => b.od.localeCompare(a.od))[0] || null;
+  /**
+   * Zaplanowane zmiany stałego grafiku jednej osoby: { id, terap, od, reguly }. Od daty `od` obowiązuje inny tygodniowy wzorzec,
+   * aż do kolejnej zaplanowanej zmiany. Wzorzec bez zaplanowanej zmiany to `D.reguly[terap]`.
+   */
+  K.wersjaGrafiku = (D, terap, data) => (D.zmianyGrafiku || []).filter((z) => z.terap === terap && z.od <= data).sort((a, b) => b.od.localeCompare(a.od))[0] || null;
   K.regulyOsoby = (D, terap, data) => {
-    const w = data ? K.wersjaGrafiku(D, data) : null;
-    return (w ? w.reguly[terap] : D.reguly[terap]) || {};
+    const w = data ? K.wersjaGrafiku(D, terap, data) : null;
+    return (w ? w.reguly : D.reguly[terap]) || {};
   };
 
   /** Godziny przyjęć w danym dniu po uwzględnieniu świąt i wyjątków (otwarte i zamknięte pojedyncze terminy). */
@@ -484,12 +487,14 @@
     r: D.reguly[terap] || {},
     w: D.wyjatki.filter((x) => x.terap === terap),
     b: D.blokady.filter((x) => x.terap === terap),
+    v: (D.zmianyGrafiku || []).filter((x) => x.terap === terap).sort((a, b) => a.od.localeCompare(b.od)).map((x) => ({ id: x.id, od: x.od, reguly: x.reguly })),
   });
   K.przywrocGrafik = (D, terap, migawka) => {
     const m = JSON.parse(migawka);
     D.reguly[terap] = m.r;
     D.wyjatki = D.wyjatki.filter((x) => x.terap !== terap).concat(m.w);
     D.blokady = D.blokady.filter((x) => x.terap !== terap).concat(m.b);
+    if (m.v) D.zmianyGrafiku = (D.zmianyGrafiku || []).filter((x) => x.terap !== terap).concat(m.v.map((x) => ({ ...x, terap })));
   };
   /** Czy grafik osoby mieści się w ramach: godziny otwarcia miejsc i miejsca, w których osoba przyjmuje. Zwraca listę naruszeń. */
   K.naruszeniaGrafiku = (D, terap) => {
@@ -502,6 +507,31 @@
       const o = m.otwarcie && m.otwarcie[dz];
       if (D.miejsca.some((x) => x.otwarcie) && (!o || r.od < o[0] || r.do > o[1])) wynik.push({ typ: 'otwarcie', dz, r, o: o || null });
     }));
+    return wynik;
+  };
+  /**
+   * Naruszenia ram grafiku w migawce osoby: stały grafik, zaplanowane zmiany stałego grafiku i jednorazowe otwarcia
+   * (godziny poza otwarciem miejsca albo w miejscu, którego osoba nie ma w profilu). Pozycje: { typ, dz, r, o?, data? }.
+   */
+  K.naruszeniaZMigawki = (D, terap, migawka) => {
+    const m = JSON.parse(migawka);
+    const t = D.zespol.find((x) => x.id === terap);
+    const wynik = [];
+    const maOtwarcie = D.miejsca.some((x) => x.otwarcie);
+    const dzis = K.dzisIso();
+    const sprawdz = (r, dz, data) => {
+      const mj = D.miejsca.find((x) => x.id === r.lok);
+      if (!mj || (t && t.lokalizacje && !t.lokalizacje.includes(r.lok))) { wynik.push({ typ: 'miejsce', dz, r, ...(data ? { data } : {}) }); return; }
+      const o = mj.otwarcie && mj.otwarcie[dz];
+      if (maOtwarcie && (!o || r.od < o[0] || r.do > o[1])) wynik.push({ typ: 'otwarcie', dz, r, o: o || null, ...(data ? { data } : {}) });
+    };
+    const reguly = (R, data) => K.DNI_PRACY.forEach((dz) => (R[dz] || []).forEach((r) => sprawdz(r, dz, data)));
+    reguly(m.r || {}, null);
+    (m.v || []).forEach((v) => reguly(v.reguly || {}, v.od));
+    (m.w || []).filter((w) => w.typ === 'open' && w.data >= dzis).forEach((w) => {
+      const lok = w.lok || K.lok(D, terap, w.data, w.od);
+      sprawdz({ od: w.od, do: w.do, lok }, K.zIso(w.data).getDay(), w.data);
+    });
     return wynik;
   };
   /** Opis różnicy w stałym grafiku dwóch migawek, np. „Pn 8:00–16:00 → 10:00–18:00; Śr: nie przyjmuje”. */
@@ -518,9 +548,149 @@
     const usu = A.b.filter((x) => !B.b.some((y) => y.id === x.id));
     dod.forEach((x) => cz.push(`${x.powod || 'blokada'} ${x.od === x.do ? x.od : `${x.od}–${x.do}`}`));
     usu.forEach((x) => cz.push(`usunięto: ${x.powod || 'blokada'} ${x.od}`));
-    if (JSON.stringify(A.w) !== JSON.stringify(B.w)) cz.push('zmiany pojedynczych dni');
+    if (JSON.stringify(A.w) !== JSON.stringify(B.w)) {
+      const daty = (l) => new Set((l || []).map((x) => x.data));
+      const a = daty(A.w), b = daty(B.w);
+      const zm = [...new Set([...a, ...b])].filter((d) => JSON.stringify(A.w.filter((x) => x.data === d)) !== JSON.stringify(B.w.filter((x) => x.data === d))).sort();
+      const krotko = (d) => `${K.zIso(d).getDate()} ${K.MIES[K.zIso(d).getMonth()].slice(0, 3)}`;
+      cz.push(zm.length > 3 ? `zmiany w ${zm.length} dniach (${krotko(zm[0])} – ${krotko(zm[zm.length - 1])})` : `zmiana: ${zm.map(krotko).join(', ')}`);
+    }
+    const va = JSON.stringify(A.v || []), vb = JSON.stringify(B.v || []);
+    if (va !== vb) {
+      const stare = new Set((A.v || []).map((x) => x.od));
+      const nowe = (B.v || []).filter((x) => !stare.has(x.od));
+      const usuniete = (A.v || []).filter((x) => !(B.v || []).some((y) => y.od === x.od));
+      nowe.forEach((x) => cz.push(`zaplanowano zmianę stałego grafiku od ${K.zIso(x.od).getDate()} ${K.MIES[K.zIso(x.od).getMonth()]}`));
+      usuniete.forEach((x) => cz.push(`usunięto zaplanowaną zmianę od ${K.zIso(x.od).getDate()} ${K.MIES[K.zIso(x.od).getMonth()]}`));
+      if (!nowe.length && !usuniete.length) cz.push('zmieniono zaplanowany grafik');
+    }
     return cz.length ? cz.join('; ') : 'zmiana grafiku';
   };
+
+
+  /* ── Planowanie z wyprzedzeniem: konkretne tygodnie ────────────────── */
+  /** Godziny osoby w danym dniu z miejscami: [{ od, do, lok }], po uwzględnieniu świąt i jednorazowych zmian (bez urlopów). */
+  K.efektywnyDzien = (D, terap, data) => {
+    const wynik = [];
+    for (const [a, b] of K.przedzialy(D, terap, data)) {
+      let od = a;
+      let lok = K.lok(D, terap, data, a);
+      for (let m = a + K.KROK; m < b; m += K.KROK) {
+        const l = K.lok(D, terap, data, m);
+        if (l !== lok) { wynik.push({ od, do: m, lok }); od = m; lok = l; }
+      }
+      wynik.push({ od, do: b, lok });
+    }
+    return wynik;
+  };
+  /** Ustawia godziny i miejsca osoby w jednym dniu jako jednorazową zmianę (zapisujemy tylko różnice względem stałego grafiku). */
+  K.ustawDzienZLok = (D, terap, data, zakresy) => {
+    K.ustawDzien(D, terap, data, zakresy.map((r) => [r.od, r.do]));
+    zakresy.forEach((r) => K.ustawMiejsce(D, terap, data, r.od, r.do, r.lok));
+  };
+  /** Data (ISO) dnia tygodnia 1–6 (pn–sb) w tygodniu zaczynającym się w poniedziałek `pon` (ISO). */
+  K.dataTygodnia = (pon, dz) => K.iso(K.dodaj(K.zIso(pon), dz - 1));
+  K.poniedzialekIso = (data) => K.iso(K.poniedzialek(K.zIso(data)));
+  /** Porządkuje tygodniowy wzorzec: sortuje przedziały, łączy sąsiednie w tym samym miejscu i usuwa puste dni. */
+  K.normalizujReguly = (R) => {
+    Object.keys(R).forEach((dz) => {
+      const rr = (R[dz] || []).slice().sort((a, b) => a.od - b.od);
+      if (!rr.length) { delete R[dz]; return; }
+      const w = [];
+      for (const r of rr) {
+        const o = w[w.length - 1];
+        if (o && o.lok === r.lok && r.od <= o.do) o.do = Math.max(o.do, r.do);
+        else w.push({ od: r.od, do: r.do, lok: r.lok });
+      }
+      R[dz] = w;
+    });
+    return R;
+  };
+  /**
+   * Zmienia stały grafik osoby od poniedziałku `pon`: funkcja `fn` dostaje tygodniowy wzorzec do zmiany.
+   * Dla tygodnia bieżącego lub minionego zmieniamy obowiązujący wzorzec, dla przyszłego zapisujemy zaplanowaną zmianę,
+   * która działa do kolejnej zaplanowanej zmiany tej osoby.
+   */
+  K.zmienOdTygodnia = (D, terap, pon, fn) => {
+    if (!D.zmianyGrafiku) D.zmianyGrafiku = [];
+    if (pon <= K.dzisIso()) {
+      if (!D.reguly[terap]) D.reguly[terap] = {};
+      fn(D.reguly[terap]);
+      K.normalizujReguly(D.reguly[terap]);
+      return;
+    }
+    let w = D.zmianyGrafiku.find((z) => z.terap === terap && z.od === pon);
+    if (!w) {
+      w = { id: `zg${Date.now().toString(36)}${Math.floor(Math.random() * 1000)}`, terap, od: pon, reguly: JSON.parse(JSON.stringify(K.regulyOsoby(D, terap, pon))) };
+      D.zmianyGrafiku.push(w);
+    }
+    fn(w.reguly);
+    K.normalizujReguly(w.reguly);
+    K.sprzatajWersje(D, terap);
+  };
+  /** Usuwa zaplanowane zmiany, które nic nie zmieniają (taki sam wzorzec jak poprzedni). */
+  K.sprzatajWersje = (D, terap) => {
+    const lista = (D.zmianyGrafiku || []).filter((z) => z.terap === terap).sort((a, b) => a.od.localeCompare(b.od));
+    let poprzedni = D.reguly[terap] || {};
+    lista.forEach((z) => {
+      if (JSON.stringify(z.reguly) === JSON.stringify(poprzedni)) D.zmianyGrafiku = D.zmianyGrafiku.filter((x) => x !== z);
+      else poprzedni = z.reguly;
+    });
+  };
+  /** Zaplanowane (przyszłe) zmiany stałego grafiku, od najbliższej. */
+  K.zaplanowaneZmiany = (D, terap = null) => (D.zmianyGrafiku || []).filter((z) => (!terap || z.terap === terap) && z.od > K.dzisIso()).sort((a, b) => a.od.localeCompare(b.od));
+  /** Godziny w święta: dzień jest zamknięty, więc nie planujemy go ręcznie. */
+  K.dzienZamkniety = (D, data) => K.swietoZamkniete(D, data);
+  /** Kopiuje godziny i miejsca osoby z jednego tygodnia na drugi (jako jednorazowe zmiany). Zwraca liczbę zmienionych dni. */
+  K.kopiujTydzien = (D, terap, ponZrodlo, ponCel) => {
+    let ile = 0;
+    for (const dz of K.DNI_PRACY) {
+      const z = K.dataTygodnia(ponZrodlo, dz);
+      const c = K.dataTygodnia(ponCel, dz);
+      if (K.swietoZamkniete(D, z) || K.swietoZamkniete(D, c)) continue;
+      const wzor = K.efektywnyDzien(D, terap, z);
+      if (JSON.stringify(wzor) === JSON.stringify(K.efektywnyDzien(D, terap, c))) continue;
+      K.ustawDzienZLok(D, terap, c, wzor);
+      ile++;
+    }
+    return ile;
+  };
+  /** Pokrycie miejsca w konkretnym dniu (z urlopami i jednorazowymi zmianami), w takiej samej postaci jak `K.pokrycie`. */
+  K.pokrycieData = (D, lokId, data) => {
+    const dz = K.zIso(data).getDay();
+    const m = D.miejsca.find((x) => x.id === lokId);
+    const zamkniete = K.swietoZamkniete(D, data);
+    const otw = !zamkniete && m && m.otwarcie && m.otwarcie[dz] ? [m.otwarcie[dz][0], m.otwarcie[dz][1]] : null;
+    const przedz = [];
+    D.zespol.forEach((t) => {
+      if (t.widoczny === false) return;
+      K.efektywnyDzien(D, t.id, data).filter((r) => r.lok === lokId).forEach((r) => {
+        let czesci = [[r.od, r.do]];
+        K.blokady(D, t.id, data).forEach(({ od, do: d }) => { czesci = K.odejmij(czesci, [od, d]); });
+        czesci.forEach(([a, b]) => przedz.push({ t: t.id, od: a, do: b }));
+      });
+    });
+    const punkty = [...new Set(przedz.flatMap((p) => [p.od, p.do]))].sort((a, b) => a - b);
+    const segmenty = [];
+    for (let i = 0; i < punkty.length - 1; i++) {
+      const a = punkty[i], b = punkty[i + 1];
+      const osoby = przedz.filter((p) => p.od <= a && p.do >= b).map((p) => p.t);
+      if (osoby.length) segmenty.push({ od: a, do: b, osoby });
+    }
+    let dziury = otw ? [otw] : [];
+    przedz.forEach((p) => { dziury = K.odejmij(dziury, [p.od, p.do]); });
+    const poza = [];
+    przedz.forEach((p) => {
+      const reszta = otw ? K.odejmij([[p.od, p.do]], otw) : [[p.od, p.do]];
+      reszta.forEach(([a, b]) => poza.push({ t: p.t, od: a, do: b }));
+    });
+    return { otw, zamkniete, segmenty, dziury, poza, przedz, osoby: [...new Set(przedz.map((p) => p.t))] };
+  };
+  /** Godziny przyjęć pokazywane pacjentom w dniu: minuty do rezerwacji (bez urlopów i zajętych wizyt) oraz liczba wizyt. */
+  K.podsumowanieDnia = (D, osoby, data) => ({
+    wolne: K.wolneMinuty(D, osoby, data),
+    wizyty: osoby.reduce((s, t) => s + K.rezDnia(D, t.id, data).length, 0),
+  });
 
   /** Wizyty, które wypadną poza godziny po zmianie (przy zamknięciu przedziału lub blokadzie). */
   K.wizytyWPrzedziale = (D, terap, data, od, doo) => D.rezerwacje.filter((r) => (terap === '*' || r.terap === terap) && r.data === data && K.aktywna(r) && r.od < doo && r.od + r.dl > od);

@@ -19,6 +19,7 @@
   const esc = P.esc;
   const KLUCZ = 'panel-rola-v1';
   const DOZWOLONE_TERAPEUTA = ['pulpit', 'kalendarz', 'rezerwacje', 'dostepnosc', 'grafik'];
+  const DOZWOLONE_REJESTRACJA = ['pulpit', 'kalendarz', 'rezerwacje', 'dostepnosc', 'grafik'];
 
   let rola = 'wl';
   try { rola = localStorage.getItem(KLUCZ) || 'wl'; } catch (e) { /* bez zapisu zaczynamy jako właściciel */ }
@@ -29,11 +30,14 @@
   const jestWlascicielem = (t) => !!P.C().konto.wlasciciel && t.nazwa.endsWith(P.C().konto.wlasciciel);
   P.rola = () => {
     if (!P.ent() || rola === 'wl') return 'wl';
+    if (rola === 'rej') return 'rej';
     const t = P.D().zespol.find((x) => x.id === rola);
     return t && !jestWlascicielem(t) ? rola : 'wl';
   };
-  P.rolaTerap = () => { const r = P.rola(); return r === 'wl' ? null : r; };
-  P.dostep = (id) => !P.rolaTerap() || DOZWOLONE_TERAPEUTA.includes(id);
+  /** Rejestracja widzi cały zespół (jak właściciel), ale tylko wybrane części panelu. */
+  P.rejestracja = () => P.rola() === 'rej';
+  P.rolaTerap = () => { const r = P.rola(); return r === 'wl' || r === 'rej' ? null : r; };
+  P.dostep = (id) => (P.rejestracja() ? DOZWOLONE_REJESTRACJA.includes(id) : !P.rolaTerap() || DOZWOLONE_TERAPEUTA.includes(id));
   /** Terapeuta nie ustawia grafiku, gdy właściciel to wyłączył (dla wszystkich albo dla niego). Właściciel zawsze może. */
   P.zablokowany = (id) => {
     if (!P.rolaTerap()) return false;
@@ -56,22 +60,22 @@
   let wTrakcie = false;
   function kto() { return P.rola(); }
   function powodOdrzucenia(D, t, ja, bylo) {
-    if (t.id !== ja) return 'Możesz zmieniać tylko własny grafik.';
-    if (P.zablokowany(t.id)) return 'Grafik ustawia właściciel, więc ta zmiana nie została zapisana.';
+    /* Rejestracja ustawia grafik każdej osoby, terapeuta tylko własny, o ile właściciel mu tego nie zablokował. */
+    if (ja !== 'rej') {
+      if (t.id !== ja) return 'Możesz zmieniać tylko własny grafik.';
+      if (P.zablokowany(t.id)) return 'Grafik ustawia właściciel, więc ta zmiana nie została zapisana.';
+    }
     /* Odrzucamy tylko nowe naruszenia: stare (np. ułożone przez właściciela) nie blokują drobnych zmian, jak urlop. */
-    const po = D.reguly[t.id];
-    D.reguly[t.id] = JSON.parse(bylo).r;
-    const przed = K.naruszeniaGrafiku(D, t.id);
-    D.reguly[t.id] = po;
-    const klucz = (x) => `${x.typ}|${x.dz}|${x.r.od}|${x.r.do}|${x.r.lok}`;
-    const stare = new Set(przed.map(klucz));
-    const n = K.naruszeniaGrafiku(D, t.id).filter((x) => !stare.has(klucz(x)));
+    const klucz = (x) => `${x.typ}|${x.dz}|${x.r.od}|${x.r.do}|${x.r.lok}|${x.data || ''}`;
+    const stare = new Set(K.naruszeniaZMigawki(D, t.id, bylo).map(klucz));
+    const n = K.naruszeniaZMigawki(D, t.id, K.migawkaGrafiku(D, t.id)).filter((x) => !stare.has(klucz(x)));
     if (n.some((x) => x.typ === 'otwarcie')) {
       const x = n.find((y) => y.typ === 'otwarcie');
       const m = K.miejsce(D, x.r.lok);
-      return `Godziny ${K.godz(x.r.od)}–${K.godz(x.r.do)} wychodzą poza godziny otwarcia (${esc(m.kr || m.nazwa)}${x.o ? `: ${K.godz(x.o[0])}–${K.godz(x.o[1])}` : ', zamknięte w tym dniu'}). Zmiana nie została zapisana.`;
+      const dzien = x.data ? ` w dniu ${K.zIso(x.data).getDate()} ${K.MIES[K.zIso(x.data).getMonth()]}` : '';
+      return `Godziny ${K.godz(x.r.od)}–${K.godz(x.r.do)}${dzien} wychodzą poza godziny otwarcia (${esc(m.kr || m.nazwa)}${x.o ? `: ${K.godz(x.o[0])}–${K.godz(x.o[1])}` : ', zamknięte w tym dniu'}). Zmiana nie została zapisana.`;
     }
-    if (n.some((x) => x.typ === 'miejsce')) return 'Nie przyjmujesz w tym miejscu, więc ta zmiana nie została zapisana. Właściciel może dodać Ci to miejsce.';
+    if (n.some((x) => x.typ === 'miejsce')) return ja === 'rej' ? 'Ta osoba nie przyjmuje w tym miejscu, więc zmiana nie została zapisana. Właściciel może dodać jej to miejsce w profilu.' : 'Nie przyjmujesz w tym miejscu, więc ta zmiana nie została zapisana. Właściciel może dodać Ci to miejsce.';
     return '';
   }
   function sledz() {
@@ -96,7 +100,7 @@
         /* Cofnięcie ostatniej własnej zmiany („Cofnij” w komunikacie): wpis znika. */
         dz.splice(dz.indexOf(ostatni), 1);
       } else {
-        dz.unshift({ id: `z${Date.now()}${Math.floor(Math.random() * 1000)}`, kiedy: new Date().toISOString(), kto: ja, kogo: t.id, opis: K.opisZmianyGrafiku(bylo, teraz), przed: bylo, po: teraz, widziane: ja === 'wl', widzianeT: ja !== 'wl' });
+        dz.unshift({ id: `z${Date.now()}${Math.floor(Math.random() * 1000)}`, kiedy: new Date().toISOString(), kto: ja, kogo: t.id, opis: K.opisZmianyGrafiku(bylo, teraz), przed: bylo, po: teraz, widziane: ja === 'wl', widzianeT: ja !== 'wl' && ja !== 'rej' });
         if (dz.length > 60) dz.length = 60;
       }
       D.grafikMigawki[t.id] = teraz;
@@ -112,15 +116,15 @@
   document.addEventListener('kal:zmiana', sledz);
 
   const niewidziane = () => (P.D().dziennikGrafiku || []).filter((w) => w.kto !== 'wl' && !w.widziane && !w.cofniete);
-  const dlaMnie = () => { const ja = P.rolaTerap(); return ja ? (P.D().dziennikGrafiku || []).filter((w) => w.kto === 'wl' && w.kogo === ja && !w.widzianeT) : []; };
+  const dlaMnie = () => { const ja = P.rolaTerap(); return ja ? (P.D().dziennikGrafiku || []).filter((w) => (w.kto === 'wl' || w.kto === 'rej') && w.kogo === ja && !w.widzianeT) : []; };
   P.niewidzianeZmianyGrafiku = niewidziane;
   const kogo = (id) => { const t = P.D().zespol.find((x) => x.id === id); return t ? P.osobaNazwa(t) : 'ktoś'; };
-  const ktoNazwa = (w) => (w.kto === 'wl' ? `Właściciel (${esc(P.C().konto.wlasciciel)})` : esc(kogo(w.kto)));
+  const ktoNazwa = (w) => (w.kto === 'wl' ? `Właściciel (${esc(P.C().konto.wlasciciel)})` : w.kto === 'rej' ? 'Rejestracja' : esc(kogo(w.kto)));
 
   /** Wiersz dziennika: kto, kogo, co i kiedy, z akcjami. */
   P.wierszZmianyGrafiku = (w, { akcje = true } = {}) => {
     const wlasne = w.kto === w.kogo;
-    const opis = wlasne ? `${ktoNazwa(w)} zmienił${/a$/i.test(kogo(w.kto).split(' ')[0]) ? 'a' : ''} własny grafik` : `${ktoNazwa(w)} zmienił grafik: ${esc(kogo(w.kogo))}`;
+    const opis = wlasne ? `${ktoNazwa(w)} zmienił${/a$/i.test(kogo(w.kto).split(' ')[0]) ? 'a' : ''} własny grafik` : `${ktoNazwa(w)} zmieni${w.kto === 'rej' ? 'ła' : 'ł'} grafik: ${esc(kogo(w.kogo))}`;
     const przyciski = akcje
       ? `<span class="p-wiersz__akcje">
           <button type="button" class="p-btn p-btn--maly p-btn--cichy" data-pa="zm-pokaz" data-terap="${w.kogo}">Zobacz grafik</button>
@@ -163,7 +167,7 @@
     if (!P.ent()) { el.innerHTML = ''; return; }
     const D = P.D();
     const wl = P.C().konto.wlasciciel;
-    const opcje = [['wl', `Właściciel: ${wl}`]].concat(D.zespol.filter((t) => !jestWlascicielem(t)).map((t) => [t.id, `Terapeuta: ${P.osobaNazwa(t)}`]));
+    const opcje = [['wl', `Właściciel: ${wl}`], ['rej', 'Rejestracja']].concat(D.zespol.filter((t) => !jestWlascicielem(t)).map((t) => [t.id, `Terapeuta: ${P.osobaNazwa(t)}`]));
     el.innerHTML = `<label class="p-konto__et" for="p-konto-sel">Zaloguj jako <em>(demo)</em></label>
       <select id="p-konto-sel" data-pzm="rola">${opcje.map(([v, n]) => `<option value="${esc(v)}"${v === P.rola() ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select>`;
     const ja = P.rolaTerap();
@@ -171,6 +175,9 @@
       const t = K.terap(D, ja);
       document.getElementById('p-kto').innerHTML = `${esc(P.osobaNazwa(t))}<em>terapeuta</em>`;
       document.getElementById('p-awatar').textContent = P.inicjaly(t.nazwa);
+    } else if (P.rejestracja()) {
+      document.getElementById('p-kto').innerHTML = 'Rejestracja<em>układa grafiki i wizyty</em>';
+      document.getElementById('p-awatar').textContent = 'R';
     }
   };
   P.akcje.rola = (t) => {
@@ -180,7 +187,7 @@
     if (!P.dostep(P.aktualny)) P.idz('pulpit');
     else P.odswiez();
     const ja = P.rolaTerap();
-    window.KAL_UI.toast(ja ? `Konto terapeuty: ${P.osobaNazwa(K.terap(P.D(), ja))}. Widzisz tylko swoje wizyty i swój grafik.` : 'Konto właściciela: widzisz cały zespół.');
+    window.KAL_UI.toast(ja ? `Konto terapeuty: ${P.osobaNazwa(K.terap(P.D(), ja))}. Widzisz tylko swoje wizyty i swój grafik.` : P.rejestracja() ? 'Konto rejestracji: układasz grafiki zespołu i zarządzasz wizytami. Ustawień, usług i rozliczeń nie widzisz.' : 'Konto właściciela: widzisz cały zespół.');
   };
 
   const stareMenu = P.MENU;
@@ -191,6 +198,12 @@
       return [
         { grupa: null, poz: [['pulpit', 'Dziś'], ['kalendarz', 'Kalendarz'], ['rezerwacje', 'Rezerwacje']] },
         { grupa: 'Mój grafik', poz: [['dostepnosc', 'Moja dostępność'], ['grafik', 'Grafik zespołu']] },
+      ];
+    }
+    if (P.rejestracja()) {
+      return [
+        { grupa: null, poz: [['pulpit', 'Dziś'], ['kalendarz', 'Kalendarz'], ['rezerwacje', 'Rezerwacje']] },
+        { grupa: 'Grafiki', poz: [['grafik', 'Grafik zespołu'], ['dostepnosc', 'Dostępność']] },
       ];
     }
     m[1].poz.unshift(['grafik', 'Grafik zespołu']);
@@ -206,7 +219,9 @@
     const h = starePulpit.apply(this, a);
     if (!P.ent()) return h;
     let karta = '';
-    if (!P.rolaTerap()) {
+    if (P.rejestracja()) {
+      karta = '';
+    } else if (!P.rolaTerap()) {
       const nowe = niewidziane();
       if (nowe.length) {
         karta = P.karta('Zmiany w grafikach od zespołu', `<ul class="p-lista">${nowe.slice(0, 5).map((w) => P.wierszZmianyGrafiku(w)).join('')}</ul>${nowe.length > 5 ? `<p class="p-podp">i jeszcze ${nowe.length - 5}</p>` : ''}`,
@@ -215,7 +230,7 @@
     } else {
       const dla = dlaMnie();
       if (dla.length) {
-        karta = P.karta('Właściciel zmienił Twój grafik', `<ul class="p-lista">${dla.slice(0, 4).map((w) => P.wierszZmianyGrafiku(w, { akcje: false })).join('')}</ul>`,
+        karta = P.karta(dla.some((w) => w.kto === 'rej') ? 'Zmieniono Twój grafik' : 'Właściciel zmienił Twój grafik', `<ul class="p-lista">${dla.slice(0, 4).map((w) => P.wierszZmianyGrafiku(w, { akcje: false })).join('')}</ul>`,
           { akcje: `<button type="button" class="p-btn p-btn--maly p-btn--akcent" data-pa="zm-widziane-t">Dziękuję, widzę</button>` });
       }
     }

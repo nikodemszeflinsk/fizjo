@@ -319,15 +319,25 @@
 
   P.GFX = { przedzialy, zmienGrafik, wiersz, pasekNarzedzi, kolizja, otwarcie, poza, domyslneMiejsce, kolorLok, ostrzezenia, kartaTygodnia, NAZWY };
 
-  /* Zmiana grafiku zaplanowana na datę, która już minęła, staje się obecnym grafikiem (zostało z poprzednich wersji danych). */
+  /*
+   * Zaplanowane zmiany stałego grafiku są zapisane osobno dla każdej osoby ({ id, terap, od, reguly }).
+   * Starszy format (jedna wersja z grafikami wszystkich osób) zamieniamy na nowy, a zmiany z datą, która już minęła,
+   * stają się obecnym stałym grafikiem tej osoby.
+   */
   const stareUzupelnij = P.uzupelnij;
   P.uzupelnij = (D, tryb) => {
     stareUzupelnij(D, tryb);
+    if (!D.zmianyGrafiku) D.zmianyGrafiku = [];
+    D.zmianyGrafiku = D.zmianyGrafiku.flatMap((z) => (z.terap ? [z] : Object.keys(z.reguly || {}).map((t) => ({ id: `${z.id || 'zg'}-${t}`, terap: t, od: z.od, reguly: z.reguly[t] }))));
     const dzis = K.dzisIso();
-    const minione = (D.zmianyGrafiku || []).filter((z) => z.od <= dzis).sort((a, b) => a.od.localeCompare(b.od));
-    if (minione.length) {
-      D.reguly = minione[minione.length - 1].reguly;
-      D.zmianyGrafiku = D.zmianyGrafiku.filter((z) => z.od > dzis);
-    }
+    D.zespol.forEach((t) => {
+      const minione = D.zmianyGrafiku.filter((z) => z.terap === t.id && z.od <= dzis).sort((a, b) => a.od.localeCompare(b.od));
+      if (minione.length) {
+        D.reguly[t.id] = minione[minione.length - 1].reguly;
+        D.zmianyGrafiku = D.zmianyGrafiku.filter((z) => !(z.terap === t.id && z.od <= dzis));
+        /* To nie jest zmiana zrobiona przez kogoś, tylko upływ czasu: dziennik zmian jej nie odnotowuje. */
+        if (D.grafikMigawki) D.grafikMigawki[t.id] = K.migawkaGrafiku(D, t.id);
+      }
+    });
   };
 })();

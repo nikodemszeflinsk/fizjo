@@ -21,9 +21,11 @@
   const H = K.godz;
 
   const PRESETY = [['rano', 'Rano', '8:00', '14:00'], ['popoludnie', 'Popołudnie', '14:00', '20:00'], ['caly', 'Cały dzień', '8:00', '16:00']];
-  const GZ = (P.GZ = { widok: 'osoby', fokus: null, pedzel: { on: false, gumka: false, preset: 'caly', od: '8:00', do: '16:00', lok: null }, drag: null });
+  const GZ = (P.GZ = { widok: 'plan', fokus: null, pedzel: { on: false, gumka: false, preset: 'caly', od: '8:00', do: '16:00', lok: null }, drag: null });
 
   const edytuje = () => !P.rolaTerap();
+  /** Godziny otwarcia miejsc i profile zespołu zmienia tylko właściciel. */
+  const wlasciciel = () => !P.rolaTerap() && !P.rejestracja();
   const kolorT = (t) => K.kolor(t.kolor);
   const widoczni = () => P.D().zespol.filter((t) => t.widoczny !== false);
   const wiele = () => P.D().miejsca.length > 1;
@@ -94,30 +96,29 @@
   const szer = (a, b) => `${(((b - a) / (K.END - K.START)) * 100).toFixed(2)}%`;
   function osDnia(m, dz) {
     const D = P.D();
-    const c = K.pokrycie(D, m.id, dz);
+    const data = K.dataTygodnia(P.PL.pon, dz);
+    const c = K.pokrycieData(D, m.id, data);
     const pasy = [];
-    D.zespol.forEach((t) => {
-      if (t.widoczny === false) return;
-      ((D.reguly[t.id] || {})[dz] || []).filter((r) => r.lok === m.id).forEach((r) => pasy.push({ t, r }));
-    });
+    c.przedz.forEach((p) => pasy.push({ t: D.zespol.find((x) => x.id === p.t), r: { od: p.od, do: p.do } }));
+    const poza = (r) => D.miejsca.some((x) => x.otwarcie) && (!c.otw || r.od < c.otw[0] || r.do > c.otw[1]);
     const lanes = [...new Set(pasy.map((p) => p.t.id))];
     const tla = (c.otw ? `<i class="gz-os__otw" style="left:${proc(c.otw[0])};width:${szer(c.otw[0], c.otw[1])}"></i>` : '') +
       c.dziury.filter(([a, b]) => b - a >= 30).map(([a, b]) => `<i class="gz-os__dziura" style="left:${proc(a)};width:${szer(a, b)}" title="Otwarte, a nikt nie przyjmuje: ${H(a)}–${H(b)}"></i>`).join('');
     const paski = pasy.map(({ t, r }) => {
-      const zle = GFX.poza({ od: r.od, do: r.do, lok: m.id }, dz);
+      const zle = poza(r);
       const tekst = `${esc(P.inicjaly(t.nazwa))} ${H(r.od)}–${H(r.do)}`;
       const styl = `left:${proc(r.od)};width:${szer(r.od, r.do)};top:${lanes.indexOf(t.id) * 28 + 4}px;--k:${kolorT(t)}`;
       const opis = `${P.osobaNazwa(t)} ${H(r.od)}–${H(r.do)}${zle ? ' (poza otwarciem)' : ''}`;
       return edytuje()
-        ? `<button type="button" class="gz-pasek${zle ? ' gz-pasek--zle' : ''}" style="${styl}" data-pa="gz-kom" data-terap="${t.id}" data-dz="${dz}" title="${esc(opis)}" aria-label="${esc(opis)}">${tekst}</button>`
+        ? `<button type="button" class="gz-pasek${zle ? ' gz-pasek--zle' : ''}" style="${styl}" data-pa="pl-edytuj" data-terap="${t.id}" data-dz="${dz}" title="${esc(opis)}" aria-label="${esc(opis)}">${tekst}</button>`
         : `<span class="gz-pasek${zle ? ' gz-pasek--zle' : ''}" style="${styl}" title="${esc(opis)}">${tekst}</span>`;
     }).join('');
     const wys = Math.max(1, lanes.length) * 28 + 8;
     const dz0 = c.dziury.filter(([a, b]) => b - a >= 30);
-    const info = !c.otw ? '<span class="gz-t gz-t--zamk">zamknięte</span>'
+    const info = !c.otw ? `<span class="gz-t gz-t--zamk">${c.zamkniete ? esc(K.swieto(data)) : 'zamknięte'}</span>`
       : dz0.length ? `<span class="gz-t gz-t--ost">Bez terapeuty: ${dz0.map(([a, b]) => `${H(a)}–${H(b)}`).join(', ')}</span>`
         : '<span class="gz-t gz-t--ok">pokryte</span>';
-    return `<div class="gz-lok-w"><div class="gz-lok-dzien"><b>${SK[dz]}</b><small>${c.otw ? `${H(c.otw[0])}–${H(c.otw[1])}` : 'zamknięte'}</small></div>
+    return `<div class="gz-lok-w"><div class="gz-lok-dzien"><b>${SK[dz]} ${K.zIso(data).getDate()}.${K.pad(K.zIso(data).getMonth() + 1)}</b><small>${c.otw ? `${H(c.otw[0])}–${H(c.otw[1])}` : 'zamknięte'}</small></div>
       <div class="gz-os" style="height:${wys}px" role="group" aria-label="${SK[dz]}, ${esc(m.nazwa)}">${tla}${paski}</div>
       <div class="gz-lok-info">${info}</div></div>`;
   }
@@ -131,7 +132,7 @@
     const kto = D.zespol.filter((t) => K.DNI_PRACY.some((dz) => ((D.reguly[t.id] || {})[dz] || []).some((r) => r.lok === m.id)));
     return `<section class="p-karta gz-lok"><header class="p-karta__g"><div><h2><i class="gz-kr" style="background:${K.kolor(m.kolor)}"></i>${esc(m.nazwa)}</h2>
         <p>${kto.length ? `Przyjmują: ${kto.map((t) => esc(P.osobaNazwa(t).split(' ')[0])).join(', ')}` : 'Nikt tu jeszcze nie przyjmuje.'}</p></div>
-        ${edytuje() ? `<div class="p-karta__akcje"><button type="button" class="p-btn p-btn--maly p-btn--cichy" data-pa="l-edytuj" data-id="${m.id}">Godziny otwarcia</button></div>` : ''}</header>
+        ${wlasciciel() ? `<div class="p-karta__akcje"><button type="button" class="p-btn p-btn--maly p-btn--cichy" data-pa="l-edytuj" data-id="${m.id}">Godziny otwarcia</button></div>` : ''}</header>
       <div class="gz-lok-tlo">${osGodzin()}${DNI.map((dz) => osDnia(m, dz)).join('')}</div></section>`;
   }
 
@@ -158,13 +159,13 @@
     const mn = (m) => esc(m.kr || m.nazwa);
     switch (x.typ) {
       case 'dziura':
-        return { tekst: `${mn(x.m)}, ${SK[x.dz]}: ${x.wszystko ? `otwarte ${H(x.a)}–${H(x.b)}, a nikt tu nie przyjmuje` : `nikt nie przyjmuje ${H(x.a)}–${H(x.b)}`}`, pod: 'Dodaj kogoś w tych godzinach albo skróć godziny otwarcia.', akcja: `<button type="button" class="p-btn p-btn--maly p-btn--cichy" data-pa="l-edytuj" data-id="${x.m.id}">Godziny otwarcia</button>` };
+        return { tekst: `${mn(x.m)}, ${SK[x.dz]}: ${x.wszystko ? `otwarte ${H(x.a)}–${H(x.b)}, a nikt tu nie przyjmuje` : `nikt nie przyjmuje ${H(x.a)}–${H(x.b)}`}`, pod: 'Dodaj kogoś w tych godzinach albo skróć godziny otwarcia.', akcja: !wlasciciel() ? '' : `<button type="button" class="p-btn p-btn--maly p-btn--cichy" data-pa="l-edytuj" data-id="${x.m.id}">Godziny otwarcia</button>` };
       case 'poza':
         return { tekst: `${nm(x.t)}, ${SK[x.dz]} ${H(x.od)}–${H(x.do)}: poza godzinami otwarcia (${mn(x.m)})`, pod: 'Pacjent nie wejdzie do zamkniętego gabinetu. Przesuń godziny albo zmień otwarcie.', akcja: `<button type="button" class="p-btn p-btn--maly p-btn--cichy" data-pa="gz-kom" data-terap="${x.t}" data-dz="${x.dz}">Popraw</button>` };
       case 'brak':
         return { tekst: `${esc(P.osobaNazwa(x.t))}: brak godzin przyjęć w tygodniu`, pod: 'Pacjent nie zarezerwuje u tej osoby.', akcja: `<button type="button" class="p-btn p-btn--maly p-btn--cichy" data-pa="gz-tydzien" data-terap="${x.t.id}">Ustaw godziny</button>` };
       case 'miejsce':
-        return { tekst: `${esc(P.osobaNazwa(x.t))}, ${SK[x.dz]}: przyjmuje w miejscu, którego nie ma w jej profilu`, pod: 'Dodaj to miejsce w profilu („Gdzie przyjmuje”) albo zmień miejsce w grafiku.', akcja: `<button type="button" class="p-btn p-btn--maly p-btn--cichy" data-pa="t-edytuj" data-terap="${x.t.id}">Profil</button>` };
+        return { tekst: `${esc(P.osobaNazwa(x.t))}, ${SK[x.dz]}: przyjmuje w miejscu, którego nie ma w jej profilu`, pod: 'Dodaj to miejsce w profilu („Gdzie przyjmuje”) albo zmień miejsce w grafiku.', akcja: !wlasciciel() ? '' : `<button type="button" class="p-btn p-btn--maly p-btn--cichy" data-pa="t-edytuj" data-terap="${x.t.id}">Profil</button>` };
       default:
         return { tekst: `${x.lista.length} ${lw(x.lista.length, 'wizyta wypada', 'wizyty wypadają', 'wizyt wypada')} poza godzinami przyjęć (najbliższe 4 tygodnie)`, pod: 'Po skróceniu grafiku albo urlopie te wizyty trzeba przełożyć.', akcja: x.lista.slice(0, 2).map((r) => `<button type="button" class="p-btn p-btn--maly p-btn--cichy" data-pa="rez" data-id="${r.id}">${esc(r.imie)}, ${esc(K.wzgledna(r.data))}</button>`).join('') };
     }
@@ -181,7 +182,7 @@
     /* Otwarte godziny bez terapeuty to nie błąd (może być recepcja), więc zbieramy je w jedną zwijaną listę na miejsce. */
     const poMiejscach = D.miejsca.map((m) => {
       const w = dziury.filter((x) => x.m.id === m.id);
-      return w.length ? `<li><b>${esc(m.kr || m.nazwa)}</b>: ${w.map((x) => `${SK[x.dz]} ${H(x.a)}–${H(x.b)}`).join(', ')} <button type="button" class="p-btn p-btn--maly p-btn--cichy" data-pa="l-edytuj" data-id="${m.id}">Godziny otwarcia</button></li>` : '';
+      return w.length ? `<li><b>${esc(m.kr || m.nazwa)}</b>: ${w.map((x) => `${SK[x.dz]} ${H(x.a)}–${H(x.b)}`).join(', ')} ${wlasciciel() ? `<button type="button" class="p-btn p-btn--maly p-btn--cichy" data-pa="l-edytuj" data-id="${m.id}">Godziny otwarcia</button>` : ''}</li>` : '';
     }).join('');
     const szczegoly = dziury.length
       ? `<details class="gz-dziury"><summary>Otwarte, a nikt nie przyjmuje (${dziury.length})</summary><p class="p-podp">To nie błąd, jeśli w tych godzinach jest otwarta recepcja. Jeśli nie, dodaj kogoś albo skróć godziny otwarcia.</p><ul>${poMiejscach}</ul></details>`
@@ -193,25 +194,28 @@
   function kartaHistorii() {
     const ja = P.rolaTerap();
     const lista = (P.D().dziennikGrafiku || []).filter((w) => !ja || w.kogo === ja || w.kto === ja).slice(0, 8);
-    return P.karta('Ostatnie zmiany w grafikach', lista.length ? `<ul class="p-lista">${lista.map((w) => P.wierszZmianyGrafiku(w, { akcje: !ja })).join('')}</ul>` : P.pusto('Jeszcze nikt nie zmieniał grafiku. Zmiany terapeutów i Twoje pojawią się tutaj.'),
+    return P.karta('Ostatnie zmiany w grafikach', lista.length ? `<ul class="p-lista">${lista.map((w) => P.wierszZmianyGrafiku(w, { akcje: wlasciciel() })).join('')}</ul>` : P.pusto('Jeszcze nikt nie zmieniał grafiku. Zmiany terapeutów i Twoje pojawią się tutaj.'),
       { pod: ja ? 'Zmiany Twojego grafiku.' : 'Kto, co i kiedy zmienił. Zmianę terapeuty możesz cofnąć.' });
   }
 
   /* ── Widok ──────────────────────────────────────────────────────────── */
   P.widoki.grafik = {
     tytul: 'Grafik zespołu',
-    podtytul: () => (P.rolaTerap() ? 'Kto, gdzie i kiedy przyjmuje. Swoje godziny ustawiasz w „Mojej dostępności”.' : 'Kto, gdzie i kiedy przyjmuje. Ułóż tydzień dla całego zespołu i sprawdź, czy otwarte godziny są pokryte.'),
+    podtytul: () => (P.rolaTerap() ? 'Kto, gdzie i kiedy przyjmuje, tydzień po tygodniu. Swoje godziny planujesz tutaj albo w „Mojej dostępności”.' : 'Kto, gdzie i kiedy przyjmuje, tydzień po tygodniu. Ułóż plan dla całego zespołu i sprawdź, czy otwarte godziny są pokryte.'),
     render() {
       const D = P.D();
       if (!P.ent()) return `<div class="p-stos">${P.pusto('Grafik zespołu jest w pakiecie Team. W pakiecie Individual godziny ustawiasz w „Dostępności”.')}</div>`;
       const w = GZ.widok;
       const przelacznik = `<div class="p-filtry gz-widok" role="group" aria-label="Widok grafiku">
-        <button type="button" class="p-chip p-chip--bez" data-pa="gz-widok" data-id="osoby" aria-pressed="${w === 'osoby'}">Osoby</button>
+        <button type="button" class="p-chip p-chip--bez" data-pa="gz-widok" data-id="plan" aria-pressed="${w === 'plan'}">Plan tygodni</button>
+        <button type="button" class="p-chip p-chip--bez" data-pa="gz-widok" data-id="osoby" aria-pressed="${w === 'osoby'}">Wzorzec tygodnia</button>
         <button type="button" class="p-chip p-chip--bez" data-pa="gz-widok" data-id="lokalizacje" aria-pressed="${w === 'lokalizacje'}">Lokalizacje</button>
         ${P.rolaTerap() ? `<a class="p-btn p-btn--maly p-btn--cichy" href="#/dostepnosc">Moja dostępność</a>` : ''}</div>`;
-      const glowna = w === 'osoby'
-        ? P.karta('Tydzień zespołu', tabelaOsoby(), { pod: 'Stały grafik, który powtarza się co tydzień. Urlopy i jednorazowe zmiany ustawiasz w „Dostępności” i w kalendarzu.' })
-        : `<div class="p-stos">${D.miejsca.map(blokLokalizacji).join('')}</div>`;
+      const glowna = w === 'plan'
+        ? P.PL.karta(widoczni(), { tytul: 'Plan tygodni' })
+        : w === 'osoby'
+          ? P.karta('Wzorzec tygodnia', tabelaOsoby(), { pod: 'Stały grafik, który powtarza się co tydzień. Konkretne tygodnie, zastępstwa i urlopy planujesz w „Planie tygodni”.' })
+          : `${P.karta('Tydzień w miejscach przyjęć', P.PL.nawigator(), { pod: 'Kto, gdzie i kiedy przyjmuje w wybranym tygodniu, razem z urlopami, świętami i jednorazowymi zmianami.' })}<div class="p-stos">${D.miejsca.map(blokLokalizacji).join('')}</div>`;
       return `<div class="p-stos gz">${przelacznik}${glowna}${kartaProblemow()}${kartaHistorii()}</div>`;
     },
     po() {
