@@ -10,7 +10,7 @@
       zatwierdzona: false, /* true dopiero po przeglądzie wzoru przez prawnika: wtedy znika znak PROJEKT */
       wersja: 'SW-2026-10-v3',
       wykonawca: { nazwa: 'Studio Widok (Nikodem Szefliński, osoba fizyczna prowadząca działalność nierejestrowaną)', nip: 'brak (działalność nierejestrowana)', adres: '' },
-      email: 'nikodemszefl@gmail.com',
+      email: 'kontakt@studio-widok.pl',
       telefon: '783 480 341',
       sad: '',
       hosting: 'Cloudflare, Inc. (baza danych z preferowaną lokalizacją w Europie Zachodniej, pliki w rozproszonym magazynie Cloudflare)',
