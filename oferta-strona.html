@@ -14,10 +14,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/karta.css?v=63" />
-  <link rel="stylesheet" href="assets/css/oferta-strona.css?v=9" />
+  <link rel="stylesheet" href="assets/css/oferta-strona.css?v=10" />
 </head>
 <body class="ofr-body">
   <a class="skip" href="#tresc">Przejdź do treści</a>
+  <div class="ofs-postep" aria-hidden="true"><i id="ofs-postep"></i></div>
 
   <!-- Pasek pojawia się tylko po wejściu z linku z CRM (?dla=...). -->
   <aside class="ofs-dla" id="ofs-dla" hidden>Oferta przygotowana dla: <b></b></aside>
@@ -803,6 +804,22 @@
   <script>
     (() => {
       document.getElementById('rok').textContent = new Date().getFullYear();
+
+      /* Pasek postępu czytania u góry strony: ile oferty już przewinięto. */
+      const postep = document.getElementById('ofs-postep');
+      if (postep) {
+        let czeka = false;
+        const licz = () => {
+          czeka = false;
+          const zakres = document.documentElement.scrollHeight - window.innerHeight;
+          const p = zakres > 0 ? Math.min(1, Math.max(0, window.scrollY / zakres)) : 0;
+          postep.style.transform = 'scaleX(' + p.toFixed(4) + ')';
+        };
+        const zmiana = () => { if (!czeka) { czeka = true; requestAnimationFrame(licz); } };
+        window.addEventListener('scroll', zmiana, { passive: true });
+        window.addEventListener('resize', zmiana);
+        licz();
+      }
 
       /* Galeria „co dostajesz”: zakładki ze strzałkami jak w systemowych kartach. */
       const lista = document.querySelector('.ofs-zakl');

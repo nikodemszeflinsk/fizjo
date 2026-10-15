@@ -327,6 +327,10 @@
 .ofr-body #pytania .faq { max-width: 860px; }
 
 /* ── Oferta wysłana z CRM: pasek „dla kogo” i polecany pakiet ───────── */
+/* Pasek postępu czytania: stały u góry okna, nad całą stroną. */
+.ofs-postep { position: fixed; inset: 0 0 auto 0; z-index: 200; height: 4px; background: rgba(20, 23, 26, 0.12); pointer-events: none; }
+.ofs-postep i { display: block; height: 100%; background: var(--accent, #1f5fd6); transform: scaleX(0); transform-origin: left center; will-change: transform; }
+
 .ofs-dla { padding: 9px 16px; background: #f2b705; color: #14171a; font-size: 0.92rem; text-align: center; }
 .ofs-dla[hidden] { display: none; }
 .ofs-polecany { display: inline-block; margin: 0 0 10px; padding: 5px 12px; border-radius: 999px; background: #f2b705; color: #14171a; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
