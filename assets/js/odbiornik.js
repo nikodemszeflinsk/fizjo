@@ -18,9 +18,17 @@
   /* Lokalnie (testy, podgląd z dysku) nic nie wysyłamy, żeby nie zaśmiecać arkusza, Dysku i skrzynki, ani nie wysyłać prawdziwych SMS-ów.
      Kod SMS i pliki są wtedy symulowane (kod próbny 123456). Żeby przetestować prawdziwą wysyłkę z własnego komputera:
      localStorage.setItem('odbiornik-test', '1'). */
+  /* Adres publicznego API w Cloudflare (assets/js/chmura-config.js). Na localhost można go podać w adresie: ?api=http://127.0.0.1:8788 (wtedy nic nie jest symulowane). */
+  function adresApi() {
+    var a = String(window.STUDIO_API || '');
+    var q = new URLSearchParams(location.search).get('api');
+    if (q && /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) a = q;
+    return a.replace(/\/$/, '');
+  }
   function lokalnie() {
     var lok = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname) || location.protocol === 'file:';
     if (!lok) return false;
+    if (new URLSearchParams(location.search).get('api')) return false;
     try { return localStorage.getItem('odbiornik-test') !== '1'; } catch (e) { return true; }
   }
 
@@ -55,12 +63,19 @@
   var DOZWOLONE_TYPY = /^(image\/(jpeg|png|webp|gif)|application\/(pdf|msword|vnd\.openxmlformats-officedocument\.(wordprocessingml\.document|spreadsheetml\.sheet)|vnd\.ms-excel)|text\/plain)$/;
 
   window.ODBIORNIK = {
-    aktywny: function () { return !!CFG.url; },
+    aktywny: function () { return !!(adresApi() || CFG.url); },
+    api: adresApi,
     lokalnie: lokalnie,
     kodProbny: KOD_PROBNY,
     /** Wysyła paczkę (obiekt). Zwraca Promise<boolean>: true, gdy żądanie wyszło. Odpowiedź jest nieczytelna (no-cors). */
     wyslij: function (paczka) {
-      if (!CFG.url || lokalnie()) return Promise.resolve(false);
+      if ((!CFG.url && !adresApi()) || lokalnie()) return Promise.resolve(false);
+      if (adresApi()) {
+        try {
+          return fetch(adresApi() + '/zdarzenie', { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(paczka), keepalive: true })
+            .then(function (r) { return r.ok; }, function () { return false; });
+        } catch (e) { return Promise.resolve(false); }
+      }
       try {
         return fetch(CFG.url, {
           method: 'POST',
@@ -75,8 +90,18 @@
     },
     /** Wysyła paczkę i czyta odpowiedź skryptu (kod SMS, pliki). Zawsze rozwiązuje się obiektem; {ok:false, blad:'siec'} przy braku połączenia. */
     zapytaj: function (paczka) {
-      if (!CFG.url) return Promise.resolve({ ok: false, blad: 'brak_odbiornika' });
+      if (!CFG.url && !adresApi()) return Promise.resolve({ ok: false, blad: 'brak_odbiornika' });
       if (lokalnie()) return Promise.resolve(symuluj(paczka));
+      if (adresApi()) {
+        var sciezka = { sms_kod: '/sms/kod', sms_potwierdz: '/sms/potwierdz' }[paczka.typ];
+        if (!sciezka) return Promise.resolve({ ok: false, blad: 'nieobslugiwane' });
+        var sterA = typeof AbortController === 'function' ? new AbortController() : null;
+        var limitA = setTimeout(function () { if (sterA) sterA.abort(); }, 60000);
+        return fetch(adresApi() + sciezka, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(paczka), signal: sterA ? sterA.signal : undefined })
+          .then(function (r) { return r.json(); })
+          .then(function (j) { clearTimeout(limitA); return j && typeof j === 'object' ? j : { ok: false, blad: 'odpowiedz' }; })
+          .catch(function () { clearTimeout(limitA); return { ok: false, blad: 'siec' }; });
+      }
       var ster = typeof AbortController === 'function' ? new AbortController() : null;
       var limit = setTimeout(function () { if (ster) ster.abort(); }, 90000);
       return fetch(CFG.url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(paczka), signal: ster ? ster.signal : undefined })

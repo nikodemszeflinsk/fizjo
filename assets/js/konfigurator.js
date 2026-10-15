@@ -26,18 +26,13 @@
     function doLim(n) { return n >= 99 ? 'bez limitu' : 'do ' + n; }
     var OPERATORZY = { p24: 'Przelewy24', tpay: 'Tpay', stripe: 'Stripe', pomoc: 'wybranego wspólnie z Wykonawcą spośród Przelewy24, Tpay i Stripe' };
     var MIES = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'];
-    var KROKI = ['Pakiet i dodatki', 'Treści i materiały', 'Dane firmy', 'Umowa i podpis'];
-    var MAX_PLIKOW = 20;
+    var KROKI = ['Pakiet i dodatki', 'Dane firmy', 'Umowa i podpis'];
     var KLUCZ = 'konfigurator-strony-v1';
-    var PROBLEMY = ['Ból kręgosłupa', 'Rwa kulszowa', 'Ból szyi i głowy', 'Ból barku', 'Ból kolana', 'Rehabilitacja po urazie', 'Rehabilitacja po operacji', 'Fizjoterapia sportowa', 'Terapia manualna', 'Fizjoterapia dzieci', 'Fizjoterapia uroginekologiczna', 'Inna specjalizacja'];
-    var STYLE = { niebieski: { nazwa: 'Spokojny niebieski', kolor: '#1f5fd6' }, zielony: { nazwa: 'Naturalny zielony', kolor: '#13875a' }, cieply: { nazwa: 'Ciepły pomarańcz', kolor: '#e8590c' }, grafit: { nazwa: 'Elegancki grafit', kolor: '#2f353a' } };
 
     var S = {
       lead: '', krok: 0, pakiet: 'individual', sms: false, zaliczki: false, operator: 'pomoc', w_podstrony: false, w_kalendarze: false, w_kampania: false,
       firma: '', nip: '', adres: '', osoba: '', email: '', telefon: '',
-      terapeuci: '1', miejsca: '1', adresyGab: '', kalendarz: 'wbudowany', domena: '', wizytowka: '',
-      nazwa: '', miasto: '', problemy: [], uslugi: '', styl: 'niebieski', nowaDomena: '', teksty: 'my', zdjecia: 'klient',
-      opis: '', zespol: '', godziny: '', kontaktPubl: '', social: '', uwagi: '', pliki: [], prawaMat: false,
+      nazwa: '', miasto: '', formToken: '',
       tryb: 'sms', kod: '', smsStan: { etap: 'start', maska: '', blad: '', kiedy: 0, probny: false },
       zgody: { a: false, b: false, c: false, d: false, e: false }, podpis: '', numer: '', bledy: {}, wynik: null
     };
@@ -77,13 +72,6 @@
       for (var i = 0; i < enc.length; i++) { h ^= enc[i]; h = Math.imul(h, 16777619); }
       return Promise.resolve('fnv-' + ('00000000' + (h >>> 0).toString(16)).slice(-8));
     }
-    function limity() {
-      var P = PAK[S.pakiet], t = Number(S.terapeuci), m = Number(S.miejsca), w = [];
-      if (S.pakiet === 'enterprise' && t > P.terapeuci) w.push('więcej niż ' + P.terapeuci + ' terapeutów');
-      if (m > P.miejsca) w.push('więcej niż ' + P.miejsca + ' miejsca przyjęć');
-      return w;
-    }
-
     /* ── Treść umowy ── */
     function zmienne(wynik) {
       var c = ceny(), W = KONF.wykonawca;
@@ -97,8 +85,8 @@
         CENA_DOD: dane(dodatkiLista().length ? dodatkiLista().join('; ') + ' (wliczone w kwoty z ust. 1)' : 'nie dotyczy'),
         DODATKI: dane(dodatkiLista().length ? dodatkiLista().join('; ') : 'brak'),
         OPERATOR: dane(OPERATORY_PLACE()),
-        KAL_OPIS: S.kalendarz === 'google' ? 'Kalendarza Google Zamawiającego' : 'wbudowanego kalendarza dostępności, w którym Zamawiający ustawia godziny przyjęć i przegląda rezerwacje',
-        KAL_DOST: S.kalendarz === 'google' ? ' oraz udostępni swój Kalendarz Google kontu usługi Wykonawcy (z prawem edycji wydarzeń)' : '',
+        KAL_OPIS: 'kalendarza dostępności: wbudowanego, w którym Zamawiający ustawia godziny przyjęć i przegląda rezerwacje, albo Kalendarza Google Zamawiającego, zgodnie z wyborem w formularzu startowym',
+        KAL_DOST: ' oraz, jeśli wybierze Kalendarz Google, udostępni go kontu usługi Wykonawcy (z prawem edycji wydarzeń)',
         SAD: luka(KONF.sad), HOSTING: luka(KONF.hosting), SMSD: luka(KONF.sms), POCZTA: luka(KONF.poczta), EOG: luka(KONF.eog), SRODKI: luka(KONF.srodki)
       };
     }
@@ -126,22 +114,8 @@
       v.OPIS_PAK = esc(opisPakietu());
       var wybor = [
         { cells: ['Pakiet', esc(P.nazwa)] },
-        { cells: ['Gabinet i miasto', esc(S.nazwa) + ', ' + esc(S.miasto)] },
-        { cells: ['Podstrony (problemy)', S.problemy.length ? esc(S.problemy.join(', ')) : 'do ustalenia'] },
-        { cells: ['Usługi w cenniku', esc(S.uslugi.trim()).replace(/\n/g, '<br />') || 'do ustalenia'] },
-        { cells: ['Styl strony', esc(STYLE[S.styl].nazwa)] },
-        { cells: ['Teksty', S.teksty === 'my' ? 'pisze Wykonawca' : 'dostarcza Zamawiający'] },
-        { cells: ['Zdjęcia', S.zdjecia === 'klient' ? 'dostarcza Zamawiający' : 'zdjęcia stockowe lub sesja wg ustaleń'] },
-        { cells: ['Nowa domena (propozycja)', S.nowaDomena ? esc(S.nowaDomena) : 'do ustalenia'] },
-        { cells: ['Terapeuci', esc(S.terapeuci)] },
-        { cells: [S.pakiet === 'individual' ? 'Miejsca przyjęć' : 'Lokalizacje', esc(S.miejsca)] },
-        { cells: ['Adresy gabinetów', esc(S.adresyGab).replace(/\n/g, '<br />')] },
-        { cells: ['Kalendarz dostępności', S.kalendarz === 'google' ? 'Kalendarz Google' : 'Kalendarz wbudowany'] },
-        { cells: ['Obecna domena', S.domena ? esc(S.domena) : 'brak'] },
-        { cells: ['Wizytówka Google', S.wizytowka ? esc(S.wizytowka) : 'brak'] },
-        { cells: ['Godziny przyjęć', S.godziny.trim() ? esc(S.godziny.trim()).replace(/\n/g, '<br />') : 'do ustalenia'] },
-        { cells: ['Materiały przekazane przez formularz', S.pliki.filter(function (p) { return p.status === 'ok'; }).length ? esc(S.pliki.filter(function (p) { return p.status === 'ok'; }).map(function (p) { return p.nazwa; }).join(', ')) : 'brak (dosłane później)'] },
         { cells: ['Dodatki w umowie', dodatkiLista().length ? esc(dodatkiLista().join('; ')) : 'brak'] },
+        { cells: ['Treści, zdjęcia i inne materiały strony', 'przekazywane w formularzu startowym, który jest częścią umowy'] },
         { cells: ['Wycena poza umową', wycena ? esc(wycena) : 'brak'] }
       ];
       var h = '';
@@ -162,7 +136,7 @@
       ], v);
 
       h += '<h2>§2. Wdrożenie</h2>' + ust([
-        'Strona powstaje orientacyjnie w **około 14 dni** od dnia, w którym Wykonawca ma komplet materiałów, dostępów i akceptacji od Zamawiającego. Komplet to elementy z tabeli „Wybrane przez Zamawiającego” oraz materiały przekazane przez formularz lub e-mail. Terminy nie są sztywne.',
+        'Strona powstaje orientacyjnie w **około 14 dni** od dnia, w którym Wykonawca ma komplet materiałów, dostępów i akceptacji od Zamawiającego. Komplet to treści, materiały i informacje przekazane przez Zamawiającego w formularzu startowym (stanowiącym część umowy) lub dosłane e-mailem. Po jego wysłaniu Wykonawca od razu przystępuje do projektu graficznego. Terminy nie są sztywne.',
         'Zamawiający dostarczy godziny przyjęć, usługi i cennik, dane zespołu, zdjęcia oraz dostęp do domeny i wizytówki Google{KAL_DOST}. Zajmie mu to ok. 2–3 godzin.',
         'Wykonawca pisze teksty na życzenie Zamawiającego albo korzysta z jego tekstów.',
         'W cenie są **dwie tury poprawek**. Brak uwag przez 7 dni od przedstawienia materiału oznacza akceptację. Opóźnienia po stronie Zamawiającego przesuwają terminy.',
@@ -270,12 +244,8 @@
     function zastosujToken() {
       var wybor = new URLSearchParams(location.search).get('p');
       if (!TOKEN && PAK[wybor]) {
-        /* Przycisk „Wybieram …” z oferty bez linku z CRM: ustawiamy pakiet i zaczynamy od treści. */
-        if (S.pakiet !== wybor) {
-          S.pakiet = wybor;
-          S.terapeuci = wybor === 'individual' ? '1' : (Number(S.terapeuci) > 1 ? S.terapeuci : '2'); S.miejsca = '1';
-          if (S.problemy.length > PAK[wybor].podstrony) S.problemy = S.problemy.slice(0, PAK[wybor].podstrony);
-        }
+        /* Przycisk „Wybieram …” z oferty bez linku z CRM: ustawiamy pakiet i zaczynamy od danych firmy. */
+        S.pakiet = wybor;
         S.krok = Math.max(S.krok, 1);
       }
       if (!TOKEN) return;
@@ -283,24 +253,19 @@
       if (inny) {
         /* Zapisany stan dotyczy kogoś innego (albo nikogo): zaczynamy czysto z danymi z linku. */
         S.firma = ''; S.nip = ''; S.adres = ''; S.osoba = ''; S.email = ''; S.telefon = '';
-        S.problemy = []; S.uslugi = ''; S.adresyGab = ''; S.nowaDomena = ''; S.domena = ''; S.wizytowka = '';
-        S.opis = ''; S.zespol = ''; S.godziny = ''; S.kontaktPubl = ''; S.social = ''; S.uwagi = ''; S.pliki = []; S.prawaMat = false;
         S.nazwa = TOKEN.g || ''; S.miasto = TOKEN.m || '';
-        S.terapeuci = '1'; S.miejsca = '1';
       }
       S.lead = TOKEN.l;
+      S.formToken = String(TOKEN.f || '').slice(0, 80);
       if (PAK[TOKEN.p]) S.pakiet = TOKEN.p;
-      if (TOKEN.p === 'enterprise' && Number(S.terapeuci) < 2) S.terapeuci = '2';
       S.sms = !!TOKEN.s; S.zaliczki = !!TOKEN.z;
       if (!S.firma && TOKEN.g) S.firma = TOKEN.g;
-      var start = TOKEN.k === 1 ? 1 : 2;
-      S.krok = inny ? start : Math.max(Math.min(S.krok, 2), start === 1 ? 1 : 2);
+      S.krok = inny ? 1 : Math.max(Math.min(S.krok, 1), 1);
     }
     /** Dane do odbiornika i do kodu: bez zgód, podpisu i błędów. */
     function paczka(typ) {
       var o = {}, c = ceny();
-      ['pakiet', 'sms', 'zaliczki', 'operator', 'w_podstrony', 'w_kalendarze', 'w_kampania', 'firma', 'nip', 'adres', 'osoba', 'email', 'telefon', 'terapeuci', 'miejsca', 'adresyGab', 'kalendarz', 'domena', 'wizytowka', 'nazwa', 'miasto', 'problemy', 'uslugi', 'styl', 'nowaDomena', 'teksty', 'zdjecia', 'opis', 'zespol', 'godziny', 'kontaktPubl', 'social', 'uwagi'].forEach(function (k) { o[k] = S[k]; });
-      o.pliki = S.pliki.filter(function (p) { return p.status === 'ok'; }).map(function (p) { return p.nazwa; });
+      ['pakiet', 'sms', 'zaliczki', 'operator', 'w_podstrony', 'w_kalendarze', 'w_kampania', 'firma', 'nip', 'adres', 'osoba', 'email', 'telefon', 'nazwa', 'miasto'].forEach(function (k) { o[k] = S[k]; });
       return {
         typ: typ, lead: S.lead, kiedy: new Date().toISOString(), konf: o, ceny: { wdr: c.wdr, utr: c.utr },
         umowa: S.wynik ? { numer: S.numer, czas: S.wynik.czas.toISOString(), hash: S.wynik.hash, wersja: KONF.wersja, osoba: S.osoba } : null
@@ -311,13 +276,11 @@
       return window.ODBIORNIK.wyslij(paczka(typ));
     }
 
-    /* ── Pomocnicze konfiguratora strony ── */
-    function ascii(s) {
-      var m = { 'ą': 'a', 'ć': 'c', 'ę': 'e', 'ł': 'l', 'ń': 'n', 'ó': 'o', 'ś': 's', 'ź': 'z', 'ż': 'z' };
-      return String(s).toLowerCase().replace(/[ąćęłńóśźż]/g, function (c) { return m[c]; });
+    /** Klient z ogólnej oferty (bez linku z CRM) dostaje własny identyfikator, żeby CRM mógł go rozpoznać. */
+    function ensureLead() {
+      if (!S.lead) { S.lead = 'web-' + Math.random().toString(36).slice(2, 10); zapiszStan(); }
+      return S.lead;
     }
-    function slug(s) { return ascii(s).replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); }
-    function liczLinie(t) { return String(t).split('\n').map(function (x) { return x.trim(); }).filter(Boolean).length; }
     function zapiszStan() {
       try {
         var kopia = JSON.parse(JSON.stringify(S));
@@ -330,8 +293,7 @@
         var z = JSON.parse(localStorage.getItem(KLUCZ));
         if (z && z.pakiet && PAK[z.pakiet]) {
           Object.keys(z).forEach(function (k) { if (k in S && k !== 'wynik') S[k] = z[k]; });
-          S.krok = Math.min(S.krok, 2);
-          S.pliki = (S.pliki || []).filter(function (p) { return p && p.nazwa; }).map(function (p) { return p.status === 'ok' ? p : { id: p.id, nazwa: p.nazwa, rozmiar: p.rozmiar, status: 'blad', blad: 'Przerwano. Dodaj plik ponownie.' }; });
+          S.krok = Math.min(S.krok, 1);
         }
       } catch (e) { /* pusty start */ }
     }
@@ -369,121 +331,6 @@
         '<label><input type="checkbox" data-k="w_kalendarze"' + (S.w_kalendarze ? ' checked' : '') + ' /> integracja z zewnętrznym kalendarzem innym niż Google</label>' +
         '<label><input type="checkbox" data-k="w_kampania"' + (S.w_kampania ? ' checked' : '') + ' /> struktura pod kampanię reklamową</label></div>' +
         '<div id="kf-podsum">' + podsumowanie() + '</div>';
-    }
-
-    /* Krok 2: konfigurator strony z podglądem na żywo */
-    function podgladStrony() {
-      var P = PAK[S.pakiet], st = STYLE[S.styl];
-      var nazwa = S.nazwa.trim() || 'Twój gabinet';
-      var miasto = S.miasto.trim() || 'Twoje miasto';
-      var dom = S.nowaDomena.trim() || (S.nazwa.trim() ? slug(S.nazwa) + '.pl' : 'twoj-gabinet.pl');
-      var pr = S.problemy;
-      var h1 = pr.length ? esc(pr[0]) + '?' : 'Co Cię boli?';
-      var nav = (pr.length ? pr.slice(0, 3) : ['Problem 1', 'Problem 2', 'Problem 3']).map(function (p) { return '<span>' + esc(p) + '</span>'; }).join('');
-      var chipy = pr.slice(0, 6).map(function (p) { return '<span class="kf-pr__chip">' + esc(p) + '</span>'; }).join('') + (pr.length > 6 ? '<span class="kf-pr__chip kf-pr__chip--wiecej">+' + (pr.length - 6) + '</span>' : '');
-      var uslugi = S.uslugi.split('\n').map(function (x) { return x.trim(); }).filter(Boolean).slice(0, 3);
-      var terap = S.pakiet === 'enterprise' ? 'Wybierz terapeutę lub pierwszy wolny termin' : 'Najbliższe wolne terminy';
-      return '<div class="kf-pr" style="--ak:' + st.kolor + '" role="img" aria-label="Podgląd strony: ' + esc(nazwa) + ', ' + esc(miasto) + '">' +
-        '<div class="kf-pr__bar"><i></i><i></i><i></i><span>' + esc(dom) + '</span></div>' +
-        '<div class="kf-pr__strona"><div class="kf-pr__nav"><b>' + esc(nazwa) + '</b><div class="kf-pr__menu">' + nav + '</div><em>Umów wizytę</em></div>' +
-        '<div class="kf-pr__hero"><p class="kf-pr__et">Fizjoterapia · ' + esc(miasto) + '</p><p class="kf-pr__h">' + h1 + '<span>Zacznijmy od znalezienia przyczyny.</span></p>' +
-        (chipy ? '<div class="kf-pr__chipy">' + chipy + '</div>' : '') + '</div>' +
-        '<div class="kf-pr__term"><p>' + terap + '</p><div><span>Jutro 9:00</span><span>Jutro 12:00</span><span>Pt 10:30</span></div></div>' +
-        (uslugi.length ? '<ul class="kf-pr__cennik">' + uslugi.map(function (u) { return '<li>' + esc(u) + '</li>'; }).join('') + '</ul>' : '') +
-        '</div></div>' +
-        '<ul class="kf-pr__licz"><li><b>' + pr.length + ' z ' + P.podstrony + '</b> podstron</li><li><b>' + liczLinie(S.uslugi) + ' z ' + (P.uslugi >= 99 ? '∞' : P.uslugi) + '</b> usług w cenniku</li><li><b>' + (S.pakiet === 'enterprise' ? S.terapeuci : 1) + ' z ' + (P.terapeuci >= 99 ? '∞' : P.terapeuci) + '</b> terapeutów</li></ul>';
-    }
-    function widokStrona() {
-      var ind = S.pakiet === 'individual', P = PAK[S.pakiet];
-      var pelne = S.problemy.length >= P.podstrony;
-      var chipy = PROBLEMY.map(function (p) {
-        var on = S.problemy.indexOf(p) >= 0;
-        return '<label class="kf-chip' + (on ? ' on' : '') + '"><input type="checkbox" data-p="' + esc(p) + '"' + (on ? ' checked' : '') + (!on && pelne ? ' disabled' : '') + ' /><span>' + esc(p) + '</span></label>';
-      }).join('');
-      var stylHtml = Object.keys(STYLE).map(function (k) {
-        return '<label class="kf-styl"><input type="radio" name="styl" data-k="styl" value="' + k + '"' + (S.styl === k ? ' checked' : '') + ' /><i style="background:' + STYLE[k].kolor + '"></i><span>' + STYLE[k].nazwa + '</span></label>';
-      }).join('');
-      var lewa = '<div class="kf-siatka kf-siatka--jedna">' +
-        pole('nazwa', 'Nazwa gabinetu', { pelne: true, ph: 'np. Linia Ruchu', ac: 'organization' }) +
-        pole('miasto', 'Miasto', { ph: 'np. Kraków' }) +
-        '<div class="kf-pole kf-pole--pelne"><label id="l-problemy">Na jakie problemy robić osobne podstrony? <em>(do ' + P.podstrony + ')</em></label><div class="kf-chipy" role="group" aria-labelledby="l-problemy">' + chipy + '</div>' +
-        '<p class="pod" id="kf-pod-problemy">' + (pelne ? 'Limit pakietu osiągnięty. Kolejne podstrony wyceniamy osobno.' : 'Każdy problem to osobna strona, która odpowiada na to, co ktoś wpisuje w Google.') + '</p>' + bl('problemy') + '</div>' +
-        pole('uslugi', 'Usługi i cennik <em>(po jednej w linii, do ' + P.uslugi + ')</em>', { pelne: true, tekst: true, wiersze: 4, ph: 'Konsultacja z terapią, 50 min, 200 zł\nTerapia manualna, 50 min, 180 zł', pod: 'Wystarczą nazwy. Ceny i czas dopiszemy razem na rozmowie startowej.' }) +
-        (ind ? '' : pole('terapeuci', 'Liczba terapeutów <em>(' + doLim(P.terapeuci) + ')</em>', { typ: 'number', inputmode: 'numeric' })) +
-        pole('miejsca', ind ? 'Miejsca przyjęć <em>(' + doLim(P.miejsca) + ')</em>' : 'Lokalizacje <em>(' + doLim(P.miejsca) + ')</em>', { typ: 'number', inputmode: 'numeric' }) +
-        pole('adresyGab', 'Adres gabinetu <em>(każdy w osobnej linii)</em>', { pelne: true, tekst: true }) +
-        '<div class="kf-pole kf-pole--pelne"><label id="l-styl">Styl strony</label><div class="kf-style" role="radiogroup" aria-labelledby="l-styl">' + stylHtml + '</div></div>' +
-        '<div class="kf-pole kf-pole--pelne"><label>Kalendarz dostępności</label><div class="kf-radia" role="radiogroup" aria-label="Kalendarz dostępności">' +
-        '<label><input type="radio" name="kalendarz" data-k="kalendarz" value="wbudowany"' + (S.kalendarz === 'wbudowany' ? ' checked' : '') + ' /> Wbudowany kalendarz (zalecany)</label>' +
-        '<label><input type="radio" name="kalendarz" data-k="kalendarz" value="google"' + (S.kalendarz === 'google' ? ' checked' : '') + ' /> Mój Kalendarz Google</label></div></div>' +
-        '<div class="kf-pole kf-pole--pelne"><label>Teksty na stronie</label><div class="kf-radia" role="radiogroup" aria-label="Teksty">' +
-        '<label><input type="radio" name="teksty" data-k="teksty" value="my"' + (S.teksty === 'my' ? ' checked' : '') + ' /> Piszecie je za mnie</label>' +
-        '<label><input type="radio" name="teksty" data-k="teksty" value="klient"' + (S.teksty === 'klient' ? ' checked' : '') + ' /> Mam własne teksty</label></div></div>' +
-        '<div class="kf-pole kf-pole--pelne"><label>Zdjęcia</label><div class="kf-radia" role="radiogroup" aria-label="Zdjęcia">' +
-        '<label><input type="radio" name="zdjecia" data-k="zdjecia" value="klient"' + (S.zdjecia === 'klient' ? ' checked' : '') + ' /> Dostarczę własne</label>' +
-        '<label><input type="radio" name="zdjecia" data-k="zdjecia" value="stock"' + (S.zdjecia === 'stock' ? ' checked' : '') + ' /> Potrzebuję zdjęć stockowych</label></div></div>' +
-        pole('nowaDomena', 'Domena <em>(jeśli masz propozycję)</em>', { ph: 'np. linia-ruchu.pl', pod: 'Kupujemy ją na Twoje dane, a koszt jest w cenie utrzymania.' }) +
-        pole('domena', 'Obecna domena <em>(jeśli jest)</em>', {}) +
-        pole('wizytowka', 'Wizytówka Google <em>(link, jeśli jest)</em>', {}) +
-        '<h5 class="kf-sekcja">Treści na stronę <em>(możesz uzupełnić później)</em></h5>' +
-        pole('opis', 'O gabinecie: kilka zdań o tym, czym się wyróżniacie', { pelne: true, tekst: true, wiersze: 3, ph: 'np. Pracujemy od 2012 roku, specjalizujemy się w bólu kręgosłupa, przyjmujemy też dzieci.' }) +
-        pole('zespol', 'Zespół: imię, tytuł i specjalizacja <em>(jedna osoba w linii)</em>', { pelne: true, tekst: true, wiersze: 3, ph: 'mgr Anna Nowak, fizjoterapeutka, terapia manualna' }) +
-        pole('godziny', 'Godziny przyjęć', { pelne: true, tekst: true, wiersze: 3, ph: 'pon–pt 8:00–18:00, sob 9:00–13:00', pod: 'Z tego ustawimy kalendarz dostępności.' }) +
-        pole('kontaktPubl', 'Telefon i e-mail, które mają być na stronie', { pelne: true, ph: 'np. 600 100 200, recepcja@gabinet.pl' }) +
-        pole('social', 'Facebook, Instagram, opinie i inne linki', { pelne: true, ph: 'adresy, każdy po przecinku' }) +
-        pole('uwagi', 'Coś jeszcze, co powinniśmy wiedzieć?', { pelne: true, tekst: true, wiersze: 3 }) +
-        '<h5 class="kf-sekcja">Materiały <em>(logo, zdjęcia, cennik, własne teksty)</em></h5>' + blokPlikow() +
-        '</div><div id="kf-limit"></div>';
-      return '<h4>Skonfiguruj swoją stronę</h4><div class="kf-strona"><div class="kf-strona__form">' + lewa + '</div><aside class="kf-strona__pod" aria-label="Podgląd na żywo"><p class="kf-pod-et">Podgląd na żywo</p><div id="kf-podglad-strony">' + podgladStrony() + '</div><div id="kf-podsum">' + podsumowanie() + '</div></aside></div>';
-    }
-    /* ── Pliki od klienta ── */
-    function rozmiarTekst(b) { return b >= 1048576 ? (b / 1048576).toFixed(1).replace('.', ',') + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB'; }
-    var OPIS_STATUSU = { wysyla: 'wysyłanie…', ok: 'wysłany', blad: 'nie udało się' };
-    function listaPlikow() {
-      return S.pliki.map(function (p) {
-        return '<li class="kf-plik kf-plik--' + p.status + '"><span class="kf-plik__n">' + esc(p.nazwa) + '</span><small>' + rozmiarTekst(p.rozmiar || 0) + ' · ' + (p.status === 'blad' && p.blad ? esc(p.blad) : OPIS_STATUSU[p.status]) + '</small></li>';
-      }).join('');
-    }
-    function blokPlikow() {
-      return '<div class="kf-pole kf-pole--pelne" id="kf-materialy">' +
-        '<label class="kf-drop" id="kf-drop" for="f-pliki"><b>Dodaj pliki</b><span>Przeciągnij tutaj albo wybierz z telefonu lub komputera: logo, zdjęcia gabinetu i zespołu, cennik, własne teksty (zdjęcia, PDF, Word, Excel; do 8 MB każdy, do ' + MAX_PLIKOW + ' plików).</span><input id="f-pliki" type="file" multiple accept="image/jpeg,image/png,image/webp,.pdf,.doc,.docx,.xls,.xlsx,.txt" data-pliki /></label>' +
-        '<ul class="kf-pliki" id="kf-lista-plikow" aria-live="polite">' + listaPlikow() + '</ul>' +
-        '<p class="pod">Nie masz teraz wszystkiego pod ręką? To nie szkodzi, resztę dosłać można później e-mailem. Pomyłkowo wysłany plik zgłoś w uwagach, usuniemy go.</p>' +
-        '<label class="kf-prawa"><input type="checkbox" data-k="prawaMat"' + (S.prawaMat ? ' checked' : '') + ' /><span>Mam prawa do tych materiałów i zgody osób widocznych na zdjęciach na publikację wizerunku.</span></label>' + bl('pliki') + bl('prawaMat') + '</div>';
-    }
-    function odswiezPliki() {
-      var u = document.getElementById('kf-lista-plikow');
-      if (u) u.innerHTML = listaPlikow();
-    }
-    function ensureLead() {
-      if (!S.lead) { S.lead = 'web-' + Math.random().toString(36).slice(2, 10); zapiszStan(); }
-      return S.lead;
-    }
-    var kolejkaPlikow = Promise.resolve();
-    var BLEDY_PLIKU = { typ: 'ten typ pliku nie jest obsługiwany', rozmiar: 'plik jest większy niż 8 MB', obraz: 'nie udało się odczytać zdjęcia', limit: 'osiągnięto limit plików', limit_dzienny: 'dziś nie możemy przyjąć więcej plików', siec: 'brak połączenia, spróbuj ponownie', dane: 'plik jest uszkodzony' };
-    function dodajPliki(lista) {
-      var pliki = Array.prototype.slice.call(lista || []);
-      pliki.forEach(function (plik) {
-        var w = { id: 'p' + Date.now() + Math.random().toString(36).slice(2, 6), nazwa: plik.name, rozmiar: plik.size, status: 'wysyla', blad: '' };
-        if (S.pliki.length >= MAX_PLIKOW) { w.status = 'blad'; w.blad = 'osiągnięto limit ' + MAX_PLIKOW + ' plików'; S.pliki.push(w); return; }
-        S.pliki.push(w);
-        kolejkaPlikow = kolejkaPlikow.then(function () {
-          return window.ODBIORNIK.przygotujPlik(plik).then(function (p) {
-            w.nazwa = p.nazwa; w.rozmiar = p.rozmiar;
-            return window.ODBIORNIK.zapytaj({ typ: 'plik', lead: ensureLead(), nazwa: S.nazwa || S.firma, kiedy: new Date().toISOString(), plik: { nazwa: p.nazwa, mime: p.mime, b64: p.b64 } });
-          }).then(function (r) {
-            if (r && r.ok) { w.status = 'ok'; } else { w.status = 'blad'; w.blad = BLEDY_PLIKU[r && r.blad] || 'spróbuj ponownie'; }
-          }, function (e) {
-            w.status = 'blad'; w.blad = BLEDY_PLIKU[e && e.kod] || 'spróbuj ponownie';
-          }).then(function () { zapiszStan(); odswiezPliki(); });
-        });
-      });
-      zapiszStan();
-      odswiezPliki();
-    }
-    function odswiezPodglad() {
-      var p = document.getElementById('kf-podglad-strony');
-      if (p) p.innerHTML = podgladStrony();
     }
 
     /* Krok 3: dane firmy */
@@ -539,8 +386,18 @@
     }
     function mailtoKonfiguracja() {
       var c = ceny(), P = PAK[S.pakiet];
-      var tresc = 'Dzień dobry,\n\nchcę porozmawiać o stronie z rezerwacją. Moja konfiguracja:\n\nPakiet: ' + P.nazwa + ' (wdrożenie ' + zl(c.wdr) + ', utrzymanie ' + zl(c.utr) + ' miesięcznie)\nDodatki: ' + (dodatkiLista().length ? dodatkiLista().join('; ') : 'brak') + '\nGabinet: ' + (S.nazwa || '-') + ', ' + (S.miasto || '-') + '\nPodstrony: ' + (S.problemy.join(', ') || '-') + '\nUsługi:\n' + (S.uslugi.trim() || '-') + '\nTerapeuci: ' + S.terapeuci + ', miejsca przyjęć: ' + S.miejsca + '\nAdres: ' + (S.adresyGab.trim() || '-') + '\nStyl: ' + STYLE[S.styl].nazwa + '\nKalendarz: ' + (S.kalendarz === 'google' ? 'Google' : 'wbudowany') + '\n\nKontakt: ' + (S.email || S.telefon || '-');
-      return 'mailto:' + KONF.email + '?subject=' + encodeURIComponent('Konfiguracja strony: ' + (S.nazwa || 'gabinet')) + '&body=' + encodeURIComponent(tresc);
+      var tresc = 'Dzień dobry,\n\nchcę porozmawiać o stronie z rezerwacją. Moja konfiguracja:\n\nPakiet: ' + P.nazwa + ' (wdrożenie ' + zl(c.wdr) + ', utrzymanie ' + zl(c.utr) + ' miesięcznie)\nDodatki: ' + (dodatkiLista().length ? dodatkiLista().join('; ') : 'brak') + '\nGabinet: ' + (S.firma || '-') + '\n\nKontakt: ' + (S.email || S.telefon || '-');
+      return 'mailto:' + KONF.email + '?subject=' + encodeURIComponent('Konfiguracja strony: ' + (S.firma || 'gabinet')) + '&body=' + encodeURIComponent(tresc);
+    }
+    /** Adres formularza startowego (token od serwera); na localhost przenosimy ?api= z bieżącego adresu. */
+    function adresFormularza(token) {
+      var api = new URLSearchParams(location.search).get('api');
+      return 'start.html?t=' + encodeURIComponent(token) + (api && /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? '&api=' + encodeURIComponent(api) : '');
+    }
+    function blokFormularza(w) {
+      return w.start
+        ? '<div class="kf-start"><h4>Rozmowa startowa: formularz</h4><p>Teraz uzupełnij formularz startowy: treści, zdjęcia, logo, zespół, usługi i inspiracje graficzne. Zapisuje się na bieżąco, a do niego możesz wrócić tym samym linkiem. <b>Od razu po jego wysłaniu przystępujemy do projektu graficznego.</b></p><a class="kf-btn" href="' + esc(adresFormularza(w.start)) + '" id="kf-start-link">Wypełnij formularz startowy</a></div>'
+        : '<div class="kf-start"><h4>Rozmowa startowa: formularz</h4><p>W ciągu doby roboczej wyślemy Ci link do formularza startowego (treści, zdjęcia, logo i inspiracje). <b>Od razu po jego wypełnieniu przystępujemy do projektu graficznego.</b></p></div>';
     }
     function widokWynik() {
       var w = S.wynik;
@@ -550,7 +407,8 @@
           '<dl class="kf-dl"><dt>Numer umowy</dt><dd>' + esc(S.numer) + '</dd><dt>Pakiet</dt><dd>' + esc(PAK[S.pakiet].nazwa) + ' · ' + zl(ceny().wdr) + ' wdrożenie · ' + zl(ceny().utr) + ' / mies.</dd><dt>Osoba podpisująca</dt><dd>' + esc(S.osoba) + '</dd><dt>Czas zawarcia</dt><dd>' + esc(czasPL(w.serwerCzas || w.czas)) + '</dd><dt>Skrót SHA-256</dt><dd>' + esc(w.hash) + '</dd></dl>' +
           '<div class="kf-pobierz" id="kf-pobierz"><button type="button" class="kf-btn" data-akcja="html">Pobierz kopię umowy</button><button type="button" class="kf-btn kf-btn--cichy" data-akcja="drukuj">Drukuj / zapisz jako PDF</button></div>' +
           '<div class="kf-info" id="kf-info" role="status"></div>' +
-          '<div class="kf-nast"><b>Co dalej</b><ol><li>W ciągu doby roboczej odezwiemy się z krótką listą rzeczy do dosłania i planem wdrożenia (strona powstaje w około 14 dni od kompletu materiałów).</li><li>Czego nie dodałeś w formularzu, możesz dosłać e-mailem na <b>' + esc(KONF.email) + '</b>.</li><li>Fakturę za wdrożenie wystawimy po Twojej akceptacji projektu, a stronę uruchomimy po wpłacie.</li></ol></div></div>';
+          blokFormularza(w) +
+          '<div class="kf-nast"><b>Co dalej</b><ol><li>Wypełniasz formularz startowy (teraz albo później, tym samym linkiem).</li><li><b>Od razu po wysłaniu formularza przystępujemy do projektu graficznego</b> i wracamy do Ciebie z pierwszą propozycją.</li><li>Fakturę za wdrożenie wystawimy po Twojej akceptacji projektu, a stronę uruchomimy po wpłacie.</li></ol></div></div>';
       }
       return '<div class="kf-wynik"><div class="ok"><div><h4>Umowa zaakceptowana</h4><p class="kf-lead" style="margin-top:2px">Teraz pobierz plik i wyślij go do nas. Dopiero nasze potwierdzenie zawiera umowę.</p></div></div>' +
         '<dl class="kf-dl"><dt>Numer umowy</dt><dd>' + esc(S.numer) + '</dd><dt>Pakiet</dt><dd>' + esc(PAK[S.pakiet].nazwa) + ' · ' + zl(ceny().wdr) + ' wdrożenie · ' + zl(ceny().utr) + ' / mies.</dd><dt>Osoba podpisująca</dt><dd>' + esc(S.osoba) + '</dd><dt>Czas akceptacji</dt><dd>' + esc(czasPL(w.czas)) + '</dd><dt>Skrót SHA-256</dt><dd>' + esc(w.hash) + '</dd></dl>' +
@@ -562,23 +420,8 @@
 
     /* ── Walidacja ── */
     function waliduj(k) {
-      var e = {}, P = PAK[S.pakiet];
+      var e = {};
       if (k === 1) {
-        if (S.nazwa.trim().length < 3) e.nazwa = 'Wpisz nazwę gabinetu.';
-        if (S.miasto.trim().length < 2) e.miasto = 'Wpisz miasto.';
-        if (!S.problemy.length) e.problemy = 'Wybierz przynajmniej jeden problem. Od niego zaczniemy podstrony.';
-        var ile = liczLinie(S.uslugi);
-        if (ile < 1) e.uslugi = 'Wpisz przynajmniej jedną usługę.';
-        else if (ile > P.uslugi) e.uslugi = 'W pakiecie ' + P.nazwa + ' jest do ' + P.uslugi + ' usług w cenniku. Skróć listę albo zaznacz dodatkowe usługi do wyceny.';
-        var t = Number(S.terapeuci), m = Number(S.miejsca);
-        if (S.pakiet === 'enterprise' && (!(t >= 1) || t !== Math.floor(t))) e.terapeuci = 'Wpisz liczbę terapeutów.';
-        if (!(m >= 1) || m !== Math.floor(m)) e.miejsca = 'Wpisz liczbę miejsc.';
-        if (!e.terapeuci && !e.miejsca && limity().length) e.limit = 'Ta konfiguracja przekracza pakiet: ' + limity().join(', ') + '. Napisz do nas, przygotujemy wycenę indywidualną.';
-        if (S.adresyGab.trim().length < 5) e.adresyGab = 'Wpisz adres gabinetu.';
-        if (S.pliki.some(function (p) { return p.status === 'wysyla'; })) e.pliki = 'Poczekaj chwilę, aż pliki się wyślą.';
-        if (S.pliki.some(function (p) { return p.status === 'ok'; }) && !S.prawaMat) e.prawaMat = 'Zaznacz oświadczenie o prawach do materiałów.';
-      }
-      if (k === 2) {
         if (S.firma.trim().length < 3) e.firma = 'Wpisz nazwę firmy albo imię i nazwisko.';
         if (!nipOk(S.nip)) e.nip = 'Sprawdź NIP: numer jest niepoprawny.';
         if (S.osoba.trim().split(/\s+/).length < 2) e.osoba = 'Wpisz imię i nazwisko.';
@@ -586,7 +429,7 @@
         if (!mailOk(S.email.trim())) e.email = 'Wpisz poprawny adres e-mail.';
         if (!telOk(S.telefon)) e.telefon = 'Wpisz numer telefonu (9 cyfr).';
       }
-      if (k === 3) {
+      if (k === 2) {
         if (!(S.zgody.a && S.zgody.b && S.zgody.c && S.zgody.d)) e.zgody = 'Zaznacz wszystkie oświadczenia, żeby kontynuować.';
         if (S.tryb === 'plik' && norm(S.podpis) !== norm(S.osoba)) e.podpis = 'Wpisz dokładnie: ' + S.osoba;
       }
@@ -599,10 +442,10 @@
         var kl = S.wynik ? ' class="zrobione"' : (i < S.krok ? ' class="zrobione"' : '');
         return '<li' + kl + (i === S.krok && !S.wynik ? ' aria-current="step"' : '') + '><span>' + n + '</span></li>';
       }).join('');
-      var cialo = S.wynik ? widokWynik() : [widokPakiet, widokStrona, widokDane, widokUmowa][S.krok]();
+      var cialo = S.wynik ? widokWynik() : [widokPakiet, widokDane, widokUmowa][S.krok]();
       var prz = '';
       if (!S.wynik) {
-        var glowny = S.krok < 3
+        var glowny = S.krok < 2
           ? '<button type="button" class="kf-btn" data-akcja="dalej">Dalej</button>'
           : S.tryb === 'plik'
             ? '<button type="button" class="kf-btn" data-akcja="podpisz">Akceptuję i zawieram umowę</button>'
@@ -613,17 +456,10 @@
       if (!KONF.zatwierdzona) baner = '<p class="kf-baner"><b>Wersja próbna.</b> Wzór umowy jest w przeglądzie prawnym, więc wygenerowany dokument ma znak PROJEKT i nie ma mocy prawnej.</p>';
       var miekki = (!S.wynik && S.krok >= 1) ? '<p class="kf-miekki">Nie jesteś jeszcze gotowy na umowę? <a href="' + mailtoKonfiguracja() + '">Wyślij nam samą konfigurację</a> albo <a href="tel:+48783480341" data-zadzwon>zadzwoń: 783 480 341</a>.</p>' : '';
       var naglowek = S.lead
-        ? '<h3>Wdrożenie dla: ' + esc(S.nazwa || S.firma || 'Twojego gabinetu') + '</h3><p class="kf-lead">Cztery krótkie kroki: treści i materiały do strony, dane firmy, a na końcu umowa potwierdzana kodem SMS. Wszystko, czego nie masz teraz pod ręką, możesz dosłać później. Do niczego Cię to nie zobowiązuje, dopóki nie wpiszesz kodu z SMS-a.</p>'
-        : '<h3>Rozpocznij wdrożenie</h3><p class="kf-lead">Najpierw układasz stronę swojego gabinetu i widzisz ją na żywo, dodajesz materiały, potem wpisujesz dane firmy, a na końcu potwierdzasz umowę kodem SMS. Do niczego Cię to nie zobowiązuje, dopóki nie wpiszesz kodu z SMS-a.</p>';
+        ? '<h3>Wdrożenie dla: ' + esc(S.nazwa || S.firma || 'Twojego gabinetu') + '</h3><p class="kf-lead">Trzy krótkie kroki: pakiet, dane firmy i umowa potwierdzona kodem SMS. Zaraz potem dostaniesz formularz startowy (treści, zdjęcia, inspiracje), a my <b>od razu przystępujemy do projektu graficznego</b>. Do niczego Cię to nie zobowiązuje, dopóki nie wpiszesz kodu z SMS-a.</p>'
+        : '<h3>Rozpocznij wdrożenie</h3><p class="kf-lead">Wybierasz pakiet, wpisujesz dane firmy i potwierdzasz umowę kodem SMS. Zaraz potem wypełniasz formularz startowy (treści, zdjęcia, inspiracje), a my <b>od razu przystępujemy do projektu graficznego</b>. Do niczego Cię to nie zobowiązuje, dopóki nie wpiszesz kodu z SMS-a.</p>';
       root.innerHTML = naglowek + baner +
         '<ol class="kf-kroki" aria-label="Kroki">' + st + '</ol><div class="kf-cialo">' + cialo + '</div>' + prz + miekki;
-      if (S.krok === 1 && !S.wynik) pokazLimit();
-    }
-    function pokazLimit() {
-      var box = document.getElementById('kf-limit');
-      if (!box) return;
-      var w = limity();
-      box.innerHTML = w.length ? '<p class="kf-limit">Ta konfiguracja przekracza pakiet: ' + esc(w.join(', ')) + '. Napisz do nas, przygotujemy wycenę indywidualną.</p>' : '';
     }
     function ustawKrok(n) { S.krok = n; S.bledy = {}; zapiszStan(); render(); var h = root.querySelector('.kf-kroki'); if (h && h.scrollIntoView) h.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
     function fokusBledu() {
@@ -637,35 +473,15 @@
       var k = e.target.getAttribute('data-k');
       if (!k || e.target.type === 'radio') return;
       S[k] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
-      if (k === 'terapeuci' || k === 'miejsca') pokazLimit();
-      if (S.krok === 1) odswiezPodglad();
       zapiszStan();
     });
     root.addEventListener('change', function (e) {
-      var t = e.target, k = t.getAttribute('data-k'), z = t.getAttribute('data-z'), p = t.getAttribute('data-p');
-      if (t.hasAttribute('data-pliki')) { dodajPliki(t.files); t.value = ''; return; }
+      var t = e.target, k = t.getAttribute('data-k'), z = t.getAttribute('data-z');
       if (z) { S.zgody[z] = t.checked; return; }
-      if (p !== null) {
-        var i = S.problemy.indexOf(p);
-        if (t.checked && i < 0) S.problemy.push(p);
-        if (!t.checked && i >= 0) S.problemy.splice(i, 1);
-        zapiszStan();
-        var y = window.scrollY;
-        render();
-        window.scrollTo(0, y);
-        var nowy = root.querySelector('[data-p="' + p.replace(/"/g, '\\"') + '"]');
-        if (nowy) nowy.focus({ preventScroll: true });
-        return;
-      }
       if (!k) return;
       if (t.type === 'radio') {
         S[k] = t.value;
-        if (k === 'pakiet') {
-          S.terapeuci = t.value === 'individual' ? '1' : (Number(S.terapeuci) > 1 ? S.terapeuci : '2'); S.miejsca = '1';
-          var lim = PAK[t.value].podstrony; if (S.problemy.length > lim) S.problemy = S.problemy.slice(0, lim);
-          document.getElementById('kf-podsum').innerHTML = podsumowanie();
-        }
-        if (S.krok === 1) odswiezPodglad();
+        if (k === 'pakiet') document.getElementById('kf-podsum').innerHTML = podsumowanie();
       } else if (t.tagName === 'SELECT') {
         S[k] = t.value;
       } else if (t.type === 'checkbox') {
@@ -674,14 +490,6 @@
         if (k === 'zaliczki') render();
       }
       zapiszStan();
-    });
-    root.addEventListener('dragover', function (e) { var d = e.target.closest('.kf-drop'); if (d) { e.preventDefault(); d.classList.add('kf-drop--nad'); } });
-    root.addEventListener('dragleave', function (e) { var d = e.target.closest('.kf-drop'); if (d) d.classList.remove('kf-drop--nad'); });
-    root.addEventListener('drop', function (e) {
-      var d = e.target.closest('.kf-drop');
-      if (!d) return;
-      e.preventDefault(); d.classList.remove('kf-drop--nad');
-      if (e.dataTransfer && e.dataTransfer.files) dodajPliki(e.dataTransfer.files);
     });
     function tekstBleduSms(kod, r) {
       var m = {
@@ -731,12 +539,12 @@
       if (a === 'dalej') {
         var er = waliduj(S.krok);
         if (Object.keys(er).length) { S.bledy = er; render(); return fokusBledu(); }
-        if (S.krok === 2) { ensureLead(); wyslij('dane'); }
+        if (S.krok === 1) { ensureLead(); wyslij('dane'); }
         return ustawKrok(S.krok + 1);
       }
       if (a === 'tryb-plik' || a === 'tryb-sms') { S.tryb = a === 'tryb-plik' ? 'plik' : 'sms'; S.bledy = {}; S.smsStan.blad = ''; return render(); }
       if (a === 'sms-wyslij') {
-        var ez = waliduj(3);
+        var ez = waliduj(2);
         delete ez.podpis;
         if (Object.keys(ez).length) { S.bledy = ez; render(); return fokusBledu(); }
         S.bledy = {};
@@ -752,7 +560,7 @@
         });
       }
       if (a === 'podpisz') {
-        var er2 = waliduj(3);
+        var er2 = waliduj(2);
         if (Object.keys(er2).length) { S.bledy = er2; render(); return fokusBledu(); }
         var czas = new Date();
         var tmp = document.createElement('div');
@@ -768,7 +576,7 @@
             var konf = paczka('umowa').konf;
             return window.ODBIORNIK.zapytaj({ typ: 'sms_potwierdz', lead: ensureLead(), telefon: S.telefon, kod: String(S.kod).replace(/\D/g, ''), dok: dok, konf: konf, ceny: ceny(), umowa: { numer: S.numer, hash: hash, wersja: KONF.wersja, osoba: S.osoba } }).then(function (r) {
               if (r && r.ok) {
-                S.wynik = { czas: czas, hash: hash, sms: true, serwerCzas: r.czas ? new Date(r.czas) : czas, maska: S.smsStan.maska, mail: !!r.mail, symulacja: !!r.symulacja };
+                S.wynik = { czas: czas, hash: hash, sms: true, serwerCzas: r.czas ? new Date(r.czas) : czas, maska: S.smsStan.maska, mail: !!r.mail, symulacja: !!r.symulacja, start: r.start || S.formToken || '' };
                 S.kod = ''; S.smsStan = { etap: 'start', maska: '', blad: '', kiedy: 0, probny: false };
                 render();
                 var h = root.querySelector('.kf-wynik'); if (h && h.scrollIntoView) h.scrollIntoView({ block: 'start', behavior: 'smooth' });
@@ -807,8 +615,7 @@
       if (!w) return;
       var id = w.getAttribute('data-wybierz-pakiet');
       if (!PAK[id]) return;
-      S.pakiet = id; S.wynik = null; S.krok = 0; S.terapeuci = id === 'individual' ? '1' : (Number(S.terapeuci) > 1 ? S.terapeuci : '2');
-      if (S.problemy.length > PAK[id].podstrony) S.problemy = S.problemy.slice(0, PAK[id].podstrony);
+      S.pakiet = id; S.wynik = null; S.krok = 0;
       zapiszStan(); render();
     });
 
