@@ -44,7 +44,7 @@
 
   /* Stan chwilowy, który nie trafia do localStorage. */
   const ui = {
-    mobIdx: null, szuflada: null, przenos: null, edycja: false, pedzel: 'otworz', szukaj: '', uslugaPacjenta: null,
+    mobIdx: null, szuflada: null, przenos: null, edycja: false, pedzel: 'otworz', lok: null, szukaj: '', uslugaPacjenta: null,
     drag: null, ostatniWskaznik: 0, odwolywanie: false, fokus: null,
   };
   const waski = matchMedia('(max-width: 700px)');
@@ -190,13 +190,19 @@
     p.hidden = !ui.edycja;
     if (!ui.edycja) return;
     const miejsce = stan.widok === 'tydzien' ? `dla ${esc(terapeuta(stan.terap).nazwa)}` : 'dla widocznych terapeutów';
+    const miejsca = D().miejsca;
+    if (!miejsca.some((m) => m.id === ui.lok)) ui.lok = miejsca[0].id;
+    const gdzie = miejsca.length > 1
+      ? `<div class="tryb__pedzel tryb__miejsce" role="radiogroup" aria-label="${ent() ? 'Lokalizacja' : 'Miejsce przyjęć'} otwieranych godzin"><span class="tryb__miejsce-et">${ent() ? 'Lokalizacja' : 'Gdzie przyjmujesz'}:</span>${miejsca.map((m) => `<button type="button" role="radio" aria-checked="${ui.lok === m.id}" data-pedzel-lok="${m.id}" class="pedzel pedzel--lok"><i class="pedzel__kropka" style="background:${K.kolor(m.kolor)}"></i>${esc(m.kr || m.nazwa)}</button>`).join('')}</div>`
+      : '';
     p.innerHTML = `
       <div class="tryb">
-        <p class="tryb__et"><b>Zmieniasz dostępność</b> ${miejsce}. Zaznacz prostokąt w kalendarzu, a godziny się otworzą albo zamkną. Kliknięcie zmienia całą godzinę. Zmiana dotyczy tylko wybranych dat.</p>
+        <p class="tryb__et"><b>Zmieniasz dostępność</b> ${miejsce}. Zaznacz prostokąt w kalendarzu, a godziny się otworzą albo zamkną. Kliknięcie zmienia całą godzinę. Zmiana dotyczy tylko wybranych dat.${miejsca.length > 1 ? ' Wybierz poniżej, w którym miejscu otwierasz godziny. Zaznaczenie godzin, które już są otwarte w innym miejscu, przenosi je do wybranego.' : ''}</p>
         <div class="tryb__pedzel" role="radiogroup" aria-label="Co robi zaznaczenie">
           <button type="button" role="radio" aria-checked="${ui.pedzel === 'otworz'}" data-pedzel="otworz" class="pedzel pedzel--otworz">Otwieram godziny</button>
           <button type="button" role="radio" aria-checked="${ui.pedzel === 'zamknij'}" data-pedzel="zamknij" class="pedzel pedzel--zamknij">Zamykam godziny</button>
         </div>
+        ${ui.pedzel === 'otworz' ? gdzie : ''}
         <div class="tryb__akcje">
           <button type="button" class="przycisk przycisk--cichy" data-akcja="grafik-z-tygodnia" ${stan.widok !== 'tydzien' ? 'disabled' : ''}>Ustaw ten tydzień jako stały grafik</button>
           <button type="button" class="przycisk przycisk--cichy" data-akcja="wyczysc-tydzien">Cofnij zmiany jednorazowe</button>
@@ -950,12 +956,13 @@
     let wizytyWZamknietych = 0;
     const snap = JSON.stringify(D());
     for (const k of kol) {
-      if (K.maluj(D(), k.terap, k.data, od, doo, otworz)) zmian += 1;
+      if (K.maluj(D(), k.terap, k.data, od, doo, otworz, otworz && D().miejsca.length > 1 ? ui.lok : null)) zmian += 1;
       if (!otworz) wizytyWZamknietych += K.wizytyWPrzedziale(D(), k.terap, k.data, od, doo).length;
     }
     if (!zmian) { stan.dane[stan.tryb] = JSON.parse(snap); toast(otworz ? 'Te godziny były już otwarte.' : 'Te godziny były już zamknięte.'); return; }
     zapisz(); zamknijSzuflade(false); render();
-    toast(`${otworz ? 'Otwarto' : 'Zamknięto'} godziny ${K.czas(od, doo - od)}${kol.length > 1 ? ` w ${kol.length} dniach` : ''}.${wizytyWZamknietych ? ` Zostało ${wizyt(wizytyWZamknietych)}.` : ''}`, snap);
+    const gdzieOpis = otworz && D().miejsca.length > 1 ? ` (${K.miejsce(D(), ui.lok).kr || K.miejsce(D(), ui.lok).nazwa})` : '';
+    toast(`${otworz ? 'Otwarto' : 'Zamknięto'} godziny ${K.czas(od, doo - od)}${gdzieOpis}${kol.length > 1 ? ` w ${kol.length} dniach` : ''}.${wizytyWZamknietych ? ` Zostało ${wizyt(wizytyWZamknietych)}.` : ''}`, snap);
   }
 
   /* ── Zaznaczanie myszą: zakres godzin i malowanie dostępności ───────── */
@@ -1158,6 +1165,7 @@
     if (b.dataset.status) { const [id, s] = b.dataset.status.split('|'); return ustawStatus(id, s); }
     if (b.dataset.widziane) { const r = D().rezerwacje.find((x) => x.id === b.dataset.widziane); if (r) { r.nowa = false; if (r.zmiana) r.zmiana.widziana = true; zapisz(); render(); } return; }
     if (b.dataset.pedzel) { ui.pedzel = b.dataset.pedzel; return renderTryb(); }
+    if (b.dataset.pedzelLok) { ui.lok = b.dataset.pedzelLok; return renderTryb(); }
     akcja(b);
   });
 

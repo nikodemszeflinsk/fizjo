@@ -453,3 +453,10 @@ body.ma-szuflade .toast { left: calc(50% - 220px); }
 .stat--odwolana, .stat--anulowana { background: #fbe3e1; color: var(--alert); }
 .dane__sel { padding: 4px 8px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--fg); max-width: 100%; }
 .zakres--decyzja { margin-top: 0; }
+
+/* ── Tryb dostępności: wybór miejsca przyjęć ────────────────────────── */
+.tryb__miejsce { align-items: center; flex-wrap: wrap; border-radius: 16px; }
+.tryb__miejsce-et { padding: 0 8px 0 12px; font-weight: 700; color: var(--muted); font-size: 0.92rem; }
+.pedzel--lok { display: inline-flex; align-items: center; gap: 7px; }
+.pedzel__kropka { width: 11px; height: 11px; border-radius: 50%; display: inline-block; flex: none; }
+.pedzel[aria-checked='true'].pedzel--lok { background: var(--text, #14171a); color: #fff; }
