@@ -178,6 +178,8 @@
 .kf-podglad .projekt { margin-bottom: 14px; padding: 10px 14px; background: #fdecea; color: #7a1c15; font-weight: 700; border-radius: 8px; text-align: center; }
 .kf-zgody { display: grid; gap: 10px; margin-top: 20px; }
 .kf-zgody label { display: flex; gap: 12px; align-items: flex-start; cursor: pointer; }
+.kf-wszystkie { padding-bottom: 10px; border-bottom: 1px solid var(--line, #d9dcd8); }
+.kf-wszystkie small { color: var(--muted, #5b646b); font-weight: 400; }
 .kf-zgody input { margin-top: 5px; width: 18px; height: 18px; accent-color: var(--accent); flex: none; }
 .kf-podpis { margin-top: 22px; max-width: 460px; }
 .kf-wynik { display: grid; gap: 14px; }

@@ -258,7 +258,11 @@
         S.pakiet = wybor;
         S.krok = Math.max(S.krok, 1);
       }
-      if (!TOKEN) return;
+      if (!TOKEN) {
+        /* Bez linku z CRM nie wolno używać zapamiętanego identyfikatora leada z CRM: serwer wymaga dla niego linku z terminem. */
+        if (S.lead && S.lead.indexOf('web-') !== 0) { S.lead = ''; S.formToken = ''; }
+        return;
+      }
       var inny = S.lead !== TOKEN.l;
       if (inny) {
         /* Zapisany stan dotyczy kogoś innego (albo nikogo): zaczynamy czysto z danymi z linku. */
@@ -364,6 +368,7 @@
       return '<h4>Przeczytaj i zaakceptuj umowę</h4>' +
         '<div class="kf-podglad" tabindex="0" role="region" aria-label="Treść umowy">' + umowaHtml(null) + '</div>' +
         '<div class="kf-zgody">' +
+        '<label class="kf-wszystkie"><input type="checkbox" data-z-wszystkie' + (z.a && z.b && z.c && z.d ? ' checked' : '') + ' /><span><b>Zaznacz wszystkie oświadczenia</b> <small>(bez opcjonalnego na dole)</small></span></label>' +
         cb('a', 'Przeczytałem umowę i akceptuję jej treść.') +
         cb('b', 'Rozumiem, że po zakończeniu umowy system rezerwacji przestaje działać, a Wykonawca nie wspiera jego samodzielnej konfiguracji (§6 ust. 4).') +
         cb('c', 'Jestem uprawniony do reprezentowania Zamawiającego (§9 ust. 3).') +
@@ -494,7 +499,18 @@
     });
     root.addEventListener('change', function (e) {
       var t = e.target, k = t.getAttribute('data-k'), z = t.getAttribute('data-z');
-      if (z) { S.zgody[z] = t.checked; return; }
+      if (t.hasAttribute('data-z-wszystkie')) {
+        ['a', 'b', 'c', 'd'].forEach(function (x) { S.zgody[x] = t.checked; });
+        Array.prototype.forEach.call(root.querySelectorAll('input[data-z]'), function (i) { if (['a', 'b', 'c', 'd'].indexOf(i.getAttribute('data-z')) >= 0) i.checked = t.checked; });
+        var bl = root.querySelector('.kf-zgody .blad'); if (bl) bl.remove();
+        return;
+      }
+      if (z) {
+        S.zgody[z] = t.checked;
+        var m = root.querySelector('input[data-z-wszystkie]');
+        if (m) { var ile = ['a', 'b', 'c', 'd'].filter(function (x) { return S.zgody[x]; }).length; m.checked = ile === 4; m.indeterminate = ile > 0 && ile < 4; }
+        return;
+      }
       if (!k) return;
       if (t.type === 'radio') {
         S[k] = t.value;
