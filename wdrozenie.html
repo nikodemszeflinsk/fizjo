@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wdrożenie Twojej strony · Studio Widok</title>
+  <meta name="description" content="Postęp wdrożenia: projekt graficzny do akceptacji, płatność z fakturą, budowa i rozmowa końcowa. Link przygotowany przez Studio Widok." />
+  <!-- Strona wysyłana linkiem z CRM (z tajnym tokenem). Nie ma jej w nawigacji ani w wyszukiwarce. -->
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#14171A" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/start.css?v=1" />
+  <link rel="stylesheet" href="assets/css/wdrozenie.css?v=1" />
+</head>
+<body>
+  <a class="skip" href="#wd-glowny">Przejdź do treści</a>
+
+  <header class="st-gora">
+    <span class="st-marka">
+      <svg viewBox="0 0 40 40" aria-hidden="true">
+        <path d="M8 6v20a8 8 0 0 1-3 6" style="stroke:#1F5FD6" />
+        <path d="M15 6v28" style="stroke:#E8590C" />
+        <path d="M22 6v28" style="stroke:#13875A" />
+        <path d="M29 6v28" style="stroke:#C2255C" />
+        <path d="M36 6v28" style="stroke:#F2B705" />
+      </svg>
+      Studio Widok
+    </span>
+    <p class="st-dla" id="wd-dla" hidden>Wdrożenie: <b></b></p>
+    <p class="st-zapis" id="wd-stan" role="status" aria-live="polite"></p>
+  </header>
+
+  <main class="wd" id="wd-glowny" tabindex="-1" hidden>
+    <ol class="wd-etapy" id="wd-etapy" aria-label="Etapy wdrożenia"></ol>
+    <div id="wd-tresc"></div>
+  </main>
+
+  <div class="st-komunikat" id="st-komunikat" hidden></div>
+  <noscript><p class="st-komunikat" style="display:block">Ta strona wymaga włączonego JavaScriptu. Napisz na kontakt@studio-widok.pl albo zadzwoń: 783 480 341.</p></noscript>
+
+  <script src="assets/js/chmura-config.js?v=1"></script>
+  <script src="assets/js/wdrozenie.js?v=1" defer></script>
+</body>
+</html>

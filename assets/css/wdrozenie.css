@@ -1,0 +1,66 @@
+/* Strona wdrożenia klienta: korzysta z tokenów i przycisków z start.css. */
+.wd { max-width: 920px; margin: 0 auto; padding: 22px clamp(14px, 3vw, 32px) 80px; }
+.wd:focus { outline: none; }
+
+/* Etapy */
+.wd-etapy { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; margin: 0 0 24px; padding: 0; list-style: none; counter-reset: e; }
+.wd-etap { position: relative; display: grid; justify-items: center; gap: 6px; padding-top: 4px; text-align: center; color: var(--muted); font-size: 0.88rem; font-weight: 700; line-height: 1.25; }
+.wd-etap::before { content: ''; position: absolute; top: 19px; left: -50%; width: 100%; height: 3px; background: var(--line); z-index: 0; }
+.wd-etap:first-child::before { display: none; }
+.wd-etap--zrobiony::before, .wd-etap--biezacy::before { background: var(--accent); }
+.wd-etap__nr { position: relative; z-index: 1; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--line); background: var(--paper); font-family: var(--f-display); font-weight: 900; }
+.wd-etap--zrobiony .wd-etap__nr { background: var(--accent); border-color: var(--accent); color: #fff; }
+.wd-etap--biezacy .wd-etap__nr { border-color: var(--accent); color: var(--accent-text); box-shadow: 0 0 0 4px var(--accent-soft); }
+.wd-etap--biezacy, .wd-etap--zrobiony { color: var(--ink); }
+@media (max-width: 560px) { .wd-etap__n { font-size: 0.74rem; } }
+
+/* Karty */
+.wd-karta { display: grid; gap: 14px; margin-bottom: 18px; padding: clamp(18px, 3vw, 28px); border: 1px solid var(--line); border-radius: 20px; background: #fff; box-shadow: 0 6px 22px rgba(20, 23, 26, 0.05); }
+.wd-karta h2 { margin: 0; font-family: var(--f-display); font-size: clamp(1.4rem, 3vw, 1.9rem); font-weight: 900; letter-spacing: -0.02em; }
+.wd-karta p { margin: 0; }
+.wd-info { margin-bottom: 18px; padding: 14px 18px; border-radius: 14px; background: var(--accent-soft); color: #173f8a; }
+.wd-info p { margin: 4px 0 0; }
+.wd-przyciski { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.wd-wczesniej { margin-bottom: 18px; padding: 12px 16px; border-radius: 14px; background: var(--floor); }
+.wd-wczesniej summary { cursor: pointer; font-weight: 700; }
+
+/* Projekty */
+.wd-projekt { display: grid; gap: 12px; padding: 16px; border: 1.5px solid var(--line); border-radius: 16px; }
+.wd-projekt header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 12px; }
+.wd-projekt h3 { margin: 0; font-family: var(--f-display); font-size: 1.15rem; }
+.wd-projekt h3 small { font-family: var(--f-body); font-weight: 400; color: var(--muted); font-size: 0.85rem; }
+.wd-projekt--do_akceptacji { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.wd-znak { padding: 3px 12px; border-radius: 999px; font-size: 0.8rem; font-weight: 800; background: var(--floor); }
+.wd-znak--czeka { background: #fff0c2; color: #5a3d00; }
+.wd-znak--ok { background: #dcf3e8; color: #0b5236; }
+.wd-znak--uwagi { background: #e7efff; color: #173f8a; }
+.wd-obrazy { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.wd-obraz img { display: block; width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); background: var(--floor); }
+.wd-odp { padding: 10px 14px; border-radius: 10px; background: var(--floor); font-size: 0.94rem; }
+.wd-decyzja { display: grid; gap: 12px; padding-top: 6px; border-top: 1px solid var(--line); }
+.wd-potw { margin: 0; align-items: flex-start; color: var(--ink); }
+.wd-uwagi { display: grid; gap: 8px; }
+.wd-uwagi textarea { width: 100%; padding: 12px 14px; border: 1.5px solid var(--line); border-radius: 12px; font: inherit; }
+
+/* Płatność */
+.wd-kwota { display: grid; gap: 2px; padding: 16px 20px; border-radius: 16px; background: var(--ink); color: #e9ecea; }
+.wd-kwota span { font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; color: #b9c0c5; }
+.wd-kwota b { font-family: var(--f-display); font-size: clamp(2rem, 6vw, 2.8rem); font-weight: 900; color: #fff; line-height: 1.1; }
+.wd-kwota small { color: #b9c0c5; }
+.wd-przelew { display: grid; gap: 0; margin: 0; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.wd-przelew > div { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 4px 14px; align-items: center; padding: 10px 16px; border-top: 1px solid var(--line); }
+.wd-przelew > div:first-child { border-top: 0; }
+.wd-przelew dt { color: var(--muted); font-size: 0.92rem; }
+.wd-przelew dd { margin: 0; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.wd-platnosc--tylko .wd-kwota { background: var(--floor); color: var(--ink); }
+.wd-platnosc--tylko .wd-kwota b, .wd-platnosc--tylko .wd-kwota span, .wd-platnosc--tylko .wd-kwota small { color: var(--ink); }
+@media (max-width: 560px) { .wd-przelew > div { grid-template-columns: minmax(0, 1fr); } }
+
+/* Budowa i rozmowa */
+.wd-postep { display: block; height: 8px; border-radius: 4px; background: var(--floor); overflow: hidden; }
+.wd-postep i { display: block; height: 100%; background: var(--ok); }
+.wd-lista { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.wd-lista li { display: flex; gap: 10px; align-items: baseline; padding: 10px 14px; border: 1px solid var(--line); border-radius: 12px; }
+.wd-lista li.ok { border-color: #9ccfb4; background: #eef8f2; }
+.wd-lista li.ok span:first-child { color: var(--ok); font-weight: 900; }
+.wd-termin { font-size: 1.2rem; }
