@@ -13,6 +13,10 @@
   var T = q.get('t') || '';
   var API = String(window.STUDIO_API || '').replace(/\/$/, '');
   if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) && q.get('api')) API = q.get('api').replace(/\/$/, '');
+  /* Podgląd (?podglad=1): pełny formularz bez serwera i bez tokenu. Odpowiedzi zostają tylko w tej przeglądarce, nic nie jest wysyłane. */
+  var PODGLAD = q.get('podglad') === '1';
+  var PODGLAD_DANE = {};
+  if (PODGLAD) { API = 'https://podglad.lokalnie'; T = 'podglad'; }
 
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
@@ -154,8 +158,8 @@
     }
   }
   function plikHtml(f) {
-    var obraz = /^image\/(jpeg|png|webp|gif|svg\+xml)$/.test(f.mime);
-    var adres = API + '/formularz/plik?t=' + encodeURIComponent(T) + '&id=' + f.id;
+    var obraz = /^image\/(jpeg|png|webp|gif|svg\+xml)$/.test(f.mime) && (!PODGLAD || !!PODGLAD_DANE[f.id]);
+    var adres = PODGLAD ? PODGLAD_DANE[f.id] || '' : API + '/formularz/plik?t=' + encodeURIComponent(T) + '&id=' + f.id;
     return '<li class="st-plik st-plik--ok">' + (obraz ? '<img src="' + adres + '" alt="" loading="lazy" />' : '<span class="st-plik__ik" aria-hidden="true">PDF</span>') + '<span class="st-plik__n">' + esc(f.nazwa) + '</span><small>' + rozmiarTekst(f.rozmiar) + '</small><button type="button" class="st-ikona" data-akcja="plik-usun" data-id="' + f.id + '" aria-label="Usuń plik ' + esc(f.nazwa) + '">×</button></li>';
   }
   function rozmiarTekst(b) { return b >= MB ? (b / MB).toFixed(1).replace('.', ',') + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB'; }
@@ -358,8 +362,50 @@
     window.addEventListener('beforeunload', function () { Object.keys(terminy).forEach(function (s) { clearTimeout(terminy[s]); }); });
   }
 
+
+  /* ── Podgląd: atrapa serwera w przeglądarce ── */
+  function instalujPodglad() {
+    var KL = 'start-podglad-v1';
+    var ps = { sekcje: {}, pliki: [], status: 'szkic', wyslano: null };
+    try { var z0 = JSON.parse(localStorage.getItem(KL) || 'null'); if (z0) ps = z0; } catch (e) { /* pusty start */ }
+    var zapisz = function () { try { localStorage.setItem(KL, JSON.stringify(ps)); } catch (e) { /* bez zapisu */ } };
+    var json = function (o, status) { return Promise.resolve(new Response(JSON.stringify(o), { status: status || 200, headers: { 'content-type': 'application/json' } })); };
+    var prawdziwy = window.fetch.bind(window);
+    window.fetch = function (url, o) {
+      url = String(url);
+      if (url.indexOf(API) !== 0) return prawdziwy(url, o);
+      var u = new URL(url);
+      var m = (o && o.method) || 'GET';
+      var sciezka = u.pathname;
+      if (sciezka === '/formularz' && m === 'GET') return json({ ok: true, dla: 'Przykładowy gabinet (podgląd)', sekcje: ps.sekcje, pliki: ps.pliki, status: ps.status, wyslano: ps.wyslano });
+      if (sciezka === '/formularz/sekcja' && m === 'PUT') {
+        var cialo = JSON.parse(o.body).dane || {};
+        cialo._zm = new Date().toISOString();
+        ps.sekcje[u.searchParams.get('s')] = cialo; zapisz();
+        return json({ ok: true, status: ps.status });
+      }
+      if (sciezka === '/formularz/plik' && m === 'POST') {
+        return o.body.arrayBuffer().then(function (bajty) {
+          var id = 'p' + losowe();
+          var meta = { id: id, pole: u.searchParams.get('pole'), nazwa: u.searchParams.get('nazwa') || 'plik', mime: o.body.type || 'application/octet-stream', rozmiar: bajty.byteLength, czas: new Date().toISOString() };
+          PODGLAD_DANE[id] = URL.createObjectURL(o.body);
+          ps.pliki.push(meta); zapisz();
+          return json({ ok: true, plik: meta });
+        });
+      }
+      if (sciezka === '/formularz/plik' && m === 'DELETE') { var id2 = u.searchParams.get('id'); ps.pliki = ps.pliki.filter(function (p) { return p.id !== id2; }); zapisz(); return json({ ok: true }); }
+      if (sciezka === '/formularz/wyslij' && m === 'POST') { ps.status = 'wyslany'; ps.wyslano = new Date().toISOString(); zapisz(); return json({ ok: true, wyslano: ps.wyslano }); }
+      return json({ ok: false }, 404);
+    };
+    var gora = $('.st-gora');
+    if (gora) gora.insertAdjacentHTML('afterend', '<p role="note" style="margin:0;padding:10px 16px;background:#fff4d6;color:#5a3d00;border-bottom:1px solid #f2d27a;font-size:0.95rem"><b>Podgląd formularza.</b> Tak go zobaczy klient. Nic nie jest wysyłane, a odpowiedzi zostają tylko w tej przeglądarce. <a href="#" id="st-podglad-czysc" style="color:inherit;font-weight:700">Wyczyść odpowiedzi</a></p>');
+    var c = $('#st-podglad-czysc');
+    if (c) c.addEventListener('click', function (e) { e.preventDefault(); try { localStorage.removeItem(KL); localStorage.removeItem(KLUCZ_SZKICU); localStorage.removeItem('start-wstep'); } catch (x) { /* bez zapisu */ } location.reload(); });
+  }
+
   /* ── Start ── */
   function start() {
+    if (PODGLAD) instalujPodglad();
     if (!SCH) return pokazKomunikat('Nie udało się wczytać formularza', 'Odśwież stronę. Jeśli to się powtarza, napisz do nas.');
     if (!API) return pokazKomunikat('Formularz nie jest jeszcze włączony', 'Skontaktuj się z nami, a przekażemy Ci działający link.');
     if (!T) return pokazKomunikat('Brakuje linku do formularza', 'Otwórz formularz z linku, który dostałeś od Studio Widok. Jeśli go nie masz, odezwij się.');
