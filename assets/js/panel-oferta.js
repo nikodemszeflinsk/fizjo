@@ -110,6 +110,7 @@
       <div class="p-sz-sekcja"><h3>Rezerwacje</h3>
         ${P.przelacznik({ etykieta: 'Przyjmuje rezerwacje online', pf: `rez:zespol.${i}.online`, wartosc: t.online !== false, pod: 'Wyłączony terapeuta nadal ma kalendarz, ale pacjent nie zarezerwuje u niego na stronie.' })}
         ${P.ent() ? P.przelacznik({ etykieta: 'Widoczny w kalendarzu gabinetu', pf: `rez:zespol.${i}.widoczny`, wartosc: t.widoczny !== false }) : ''}
+        ${P.ent() ? P.przelacznik({ etykieta: 'Sam ustawia swój grafik (konto terapeuty)', pf: `rez:zespol.${i}.grafikWlasny`, wartosc: t.grafikWlasny !== false, pod: 'Wyłączone: grafik tej osoby ustawiasz tylko Ty, a ona widzi swoje godziny bez możliwości zmiany. Działa, gdy w Ustawieniach terapeuci mogą ustawiać dostępność.' }) : ''}
       </div>
       ${P.ent() ? `<div class="p-sz-sekcja"><h3>Usługi</h3><div class="p-check-lista">${D.uslugi.map((u) => `<label><input type="checkbox" data-pzm="u-kto" data-usl="${u.id}" data-terap="${t.id}"${!t.uslugi || t.uslugi.includes(u.id) ? ' checked' : ''} /> ${esc(u.nazwa)} <small style="margin-left:auto;color:var(--muted)">${K.dlTekst(u.min)}</small></label>`).join('')}</div></div>` : ''}
       ${D.miejsca.length > 1 ? `<div class="p-sz-sekcja"><h3>Gdzie przyjmuje</h3><div class="p-check-lista">${D.miejsca.map((m) => `<label><input type="checkbox" data-pzm="t-lok" data-terap="${t.id}" data-lok="${m.id}"${(t.lokalizacje || []).includes(m.id) ? ' checked' : ''} /><span class="p-kropka" style="background:${K.kolor(m.kolor)}"></span> ${esc(m.nazwa)}<small style="margin-left:auto;color:var(--muted)">${K.godzTekst(sumaGodzin(D, t.id, m.id))} w grafiku</small></label>`).join('')}</div><p class="pod">Godziny w każdym miejscu ustawisz w <a href="#/dostepnosc">Dostępności</a>.</p></div>` : ''}
@@ -220,7 +221,8 @@
         <div class="pola2">${P.pole({ etykieta: 'Nazwa', pf: `rez:miejsca.${i}.nazwa`, wartosc: m.nazwa, atr: 'data-fokus' })}${P.pole({ etykieta: 'Krótka nazwa', pf: `rez:miejsca.${i}.kr`, wartosc: m.kr, pod: 'Na paskach w kalendarzu.' })}</div>
         <div class="pola2">${P.pole({ etykieta: 'Ulica i numer', pf: `rez:miejsca.${i}.ulica`, wartosc: m.ulica || '' })}${P.pole({ etykieta: 'Kod i miasto', pf: `rez:miejsca.${i}.miasto`, wartosc: m.miasto || '' })}</div>
         ${P.pole({ etykieta: 'Telefon', pf: `rez:miejsca.${i}.telefon`, wartosc: m.telefon || '', typ: 'tel' })}
-        <div class="p-sz-sekcja"><h3>Godziny otwarcia</h3><p class="p-podp">Pacjent widzi je przy rezerwacji. Godziny przyjęć terapeutów powinny się w nich mieścić.</p>
+        <div class="p-sz-sekcja"><h3>Godziny otwarcia</h3><p class="p-podp">Pacjent widzi je przy rezerwacji. Godziny przyjęć terapeutów muszą się w nich mieścić.</p>
+          <div class="p-filtry"><button type="button" class="p-btn p-btn--maly p-btn--cichy" data-pa="l-pn-pt" data-id="${id}">Pn–Pt jak w poniedziałek</button></div>
           ${K.DNI_PRACY.map((dz) => { const o = (m.otwarcie || {})[dz]; return `<div class="przedz"><label class="check" style="width:120px"><input type="checkbox" data-pzm="l-dzien" data-id="${id}" data-dz="${dz}"${o ? ' checked' : ''} /><span>${K.DNI[dz]}</span></label>${o ? `<input type="time" step="900" value="${K.godz2(o[0])}" data-pzm="l-godz" data-id="${id}" data-dz="${dz}" data-k="0" aria-label="Otwarcie, ${K.DNI[dz]}" /><span>–</span><input type="time" step="900" value="${K.godz2(o[1])}" data-pzm="l-godz" data-id="${id}" data-dz="${dz}" data-k="1" aria-label="Zamknięcie, ${K.DNI[dz]}" />` : '<span class="p-podp">zamknięte</span>'}</div>`; }).join('')}
           ${konf.length ? `<div class="p-ostrz">${P.ikona('uwaga')}<span>Poza godzinami otwarcia: ${konf.slice(0, 4).map((x) => `${esc(P.osobaNazwa(x.t).split(' ')[0])} ${DN[x.dz]} ${K.godz(x.r.od)}–${K.godz(x.r.do)}`).join(', ')}${konf.length > 4 ? '…' : ''}. <a href="#/dostepnosc" data-pa="zamknij">Popraw godziny przyjęć</a></span></div>` : '<div class="p-ostrz p-ostrz--ok">' + P.ikona('ok') + '<span>Godziny przyjęć wszystkich terapeutów mieszczą się w godzinach otwarcia.</span></div>'}
         </div>
@@ -236,6 +238,11 @@
   }, { szeroka: true });
   P.akcje['l-edytuj'] = (b) => P.otworzMiejsce(b.dataset.id);
   P.akcje['l-kolor'] = (b) => P.zmienRez('Zmieniono kolor miejsca', (D) => { D.miejsca.find((m) => m.id === b.dataset.id).kolor = Number(b.dataset.k); });
+  P.akcje['l-pn-pt'] = (b) => P.zmienRez('Godziny otwarcia: Pn–Pt jak w poniedziałek', (D) => {
+    const m = D.miejsca.find((x) => x.id === b.dataset.id);
+    if (!m.otwarcie) m.otwarcie = {};
+    [2, 3, 4, 5].forEach((dz) => { if (m.otwarcie[1]) m.otwarcie[dz] = [...m.otwarcie[1]]; else delete m.otwarcie[dz]; });
+  });
   P.akcje['l-dzien'] = (t) => P.zmienRez(`Godziny otwarcia: ${K.DNI[t.dataset.dz]} ${t.checked ? 'otwarte' : 'zamknięte'}`, (D) => { const m = D.miejsca.find((x) => x.id === t.dataset.id); if (!m.otwarcie) m.otwarcie = {}; if (t.checked) m.otwarcie[t.dataset.dz] = [K.zH('8:00'), K.zH('16:00')]; else delete m.otwarcie[t.dataset.dz]; });
   P.akcje['l-godz'] = (t) => { P.cichoRez((D) => { const m = D.miejsca.find((x) => x.id === t.dataset.id); m.otwarcie[t.dataset.dz][Number(t.dataset.k)] = K.zH(t.value || '0:00'); }); P.odswiez(); };
   P.akcje['l-dodaj'] = () => {

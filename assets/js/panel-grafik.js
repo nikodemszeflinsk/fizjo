@@ -25,6 +25,9 @@
   const osoba = () => {
     const D = P.D();
     if (!P.ent()) return D.zespol[0];
+    /* Terapeuta zalogowany na własne konto widzi i ustawia tylko siebie. */
+    const ja = P.rolaTerap && P.rolaTerap();
+    if (ja) return D.zespol.find((t) => t.id === ja) || D.zespol[0];
     return D.zespol.find((t) => t.id === GF.osoba) || D.zespol[0];
   };
   const przedzialy = (D, terap, dz) => (((D.reguly[terap] || {})[dz]) || []).slice().sort((a, b) => a.od - b.od);
@@ -99,8 +102,8 @@
     const t = osoba();
     const inni = D.zespol.filter((x) => x.id !== t.id);
     const szybko = `<label class="wybor wybor--maly"><span class="visually-hidden">Ustaw szybko</span><select data-pzm="gf-szybko" data-terap="${t.id}"><option value="">Ustaw szybko…</option><option value="8-16">Pn–Pt 8:00–16:00</option><option value="9-17">Pn–Pt 9:00–17:00</option><option value="2zm">Pn–Pt dwie zmiany: 8–12 i 15–19</option><option value="pusty">Wyczyść cały tydzień</option></select></label>`;
-    const kopiuj = P.ent() ? `<label class="wybor wybor--maly"><span class="visually-hidden">Skopiuj grafik od</span><select data-pzm="gf-kopiuj-od" data-terap="${t.id}"><option value="">Skopiuj grafik od…</option>${inni.map((x) => `<option value="${x.id}">${esc(P.osobaNazwa(x))}</option>`).join('')}</select></label>` : '';
-    const osoby = P.ent() ? `<div class="p-filtry" role="group" aria-label="Czyj grafik ustawiasz">${D.zespol.map((x) => `<button type="button" class="p-chip" data-pa="gf-osoba" data-id="${x.id}" aria-pressed="${x.id === t.id}"><span class="p-osoba__av" style="background:${K.kolor(x.kolor)}">${P.inicjaly(x.nazwa)}</span>${esc(P.osobaNazwa(x))}</button>`).join('')}</div>` : '';
+    const kopiuj = P.ent() && !(P.rolaTerap && P.rolaTerap()) ? `<label class="wybor wybor--maly"><span class="visually-hidden">Skopiuj grafik od</span><select data-pzm="gf-kopiuj-od" data-terap="${t.id}"><option value="">Skopiuj grafik od…</option>${inni.map((x) => `<option value="${x.id}">${esc(P.osobaNazwa(x))}</option>`).join('')}</select></label>` : '';
+    const osoby = P.ent() && !(P.rolaTerap && P.rolaTerap()) ? `<div class="p-filtry" role="group" aria-label="Czyj grafik ustawiasz">${D.zespol.map((x) => `<button type="button" class="p-chip" data-pa="gf-osoba" data-id="${x.id}" aria-pressed="${x.id === t.id}"><span class="p-osoba__av" style="background:${K.kolor(x.kolor)}">${P.inicjaly(x.nazwa)}</span>${esc(P.osobaNazwa(x))}</button>`).join('')}</div>` : '';
     return `<div class="dz-osoby">${osoby}<span class="dz-osoby__narz">${szybko}${kopiuj}</span></div>`;
   }
   function kartaTygodnia() {
@@ -109,8 +112,11 @@
     const naLok = {};
     DNI.forEach((dz) => przedzialy(D, t.id, dz).forEach((r) => { naLok[r.lok] = (naLok[r.lok] || 0) + (r.do - r.od); }));
     const razem = lacznie(D, t.id);
-    return P.karta(P.ent() ? `Godziny przyjęć: ${esc(P.osobaNazwa(t))}` : 'Godziny przyjęć w tygodniu',
-      `${pasekNarzedzi()}<div class="dz-tydzien">${DNI.map((dz) => wiersz(t, dz)).join('')}</div>
+    const zablok = P.zablokowany && P.zablokowany(t.id);
+    const ja = P.rolaTerap && P.rolaTerap();
+    const zasady = ja ? `<p class="p-ostrz">${P.ikona('uwaga')}<span>${zablok ? 'Grafik na razie ustawia właściciel. Jeśli chcesz coś zmienić, napisz do niego.' : 'Godziny muszą mieścić się w godzinach otwarcia miejsca. Właściciel widzi każdą Twoją zmianę.'}</span></p>` : '';
+    return P.karta(ja ? 'Moje godziny przyjęć' : P.ent() ? `Godziny przyjęć: ${esc(P.osobaNazwa(t))}` : 'Godziny przyjęć w tygodniu',
+      `${zasady}<fieldset class="dz-pola"${zablok ? ' disabled' : ''}>${pasekNarzedzi()}<div class="dz-tydzien">${DNI.map((dz) => wiersz(t, dz)).join('')}</div></fieldset>
       <p class="dz-razem">Razem: <b>${godzTekst(razem)}</b> w tygodniu${ileLok() > 1 ? ' · ' + Object.entries(naLok).map(([l, m]) => `<span class="dz-kropka" style="background:${kolorLok(l)}"></span> ${esc(K.miejsce(D, l).kr || K.miejsce(D, l).nazwa)} ${godzTekst(m)}`).join(' · ') : ''}</p>`,
       { pod: 'Włącz dni, w które przyjmujesz, i ustaw godziny. Pacjent zobaczy tylko te godziny, a zajęte znikną z listy.' });
   }
@@ -215,13 +221,14 @@
     const D = P.D();
     const dzis = K.dzisIso();
     const el = [];
-    D.blokady.filter((b) => b.do >= dzis).forEach((b) => {
+    const ja = P.rolaTerap && P.rolaTerap();
+    D.blokady.filter((b) => b.do >= dzis && (!ja || b.terap === ja || b.terap === '*')).forEach((b) => {
       let wiz = 0;
       for (let d = b.od < dzis ? dzis : b.od, n = 0; d <= b.do && n < 120; n++, d = K.iso(K.dodaj(K.zIso(d), 1))) wiz += K.wizytyWPrzedziale(D, b.terap, d, b.odMin == null ? K.START : b.odMin, b.doMin == null ? K.END : b.doMin).filter((r) => !K.minelo(r.data, r.od)).length;
       el.push({ data: b.od, typ: 'blokada', b, wiz });
     });
     const grupy = new Map();
-    D.wyjatki.filter((w) => w.data >= dzis).forEach((w) => {
+    D.wyjatki.filter((w) => w.data >= dzis && (!ja || w.terap === ja)).forEach((w) => {
       const k = `${w.terap}|${w.data}`;
       const g = grupy.get(k) || { data: w.data, typ: 'wyjatek', terap: w.terap, otw: [], zam: [] };
       (w.typ === 'open' ? g.otw : g.zam).push(w);
@@ -296,18 +303,21 @@
 
   /* ── Widok ─────────────────────────────────────────────────────────── */
   P.widoki.dostepnosc = {
-    tytul: 'Dostępność',
-    podtytul: () => (P.ent() ? 'Kiedy przyjmuje każdy terapeut. Pacjent widzi tylko wolne terminy.' : 'Kiedy przyjmujesz. Pacjent widzi tylko wolne terminy.'),
+    tytul: () => (P.rolaTerap && P.rolaTerap() ? 'Moja dostępność' : 'Dostępność'),
+    podtytul: () => (P.rolaTerap && P.rolaTerap() ? 'Kiedy przyjmujesz. Właściciel widzi Twój grafik i może go zmienić.' : P.ent() ? 'Godziny jednej osoby, urlopy, święta i zasady rezerwacji. Cały zespół ułożysz w „Grafiku zespołu”.' : 'Kiedy przyjmujesz. Pacjent widzi tylko wolne terminy.'),
     render() {
       if (!P.D().zespol.some((t) => t.id === GF.osoba)) GF.osoba = P.D().zespol[0].id;
+      const ja = P.rolaTerap && P.rolaTerap();
       return `<div class="dz">
-        <div class="dz__glowna p-stos">${kartaTygodnia()}${kartaWolne()}${kartaSwieta()}${kartaZasady()}
+        <div class="dz__glowna p-stos">${kartaTygodnia()}${kartaWolne()}${ja ? '' : kartaSwieta() + kartaZasady()}
           <p class="p-podp">Jedną godzinę albo jeden dzień zmienisz szybciej w <a href="#/kalendarz">Kalendarzu</a>: przycisk „Zmień dostępność”.</p></div>
         ${podglad()}
       </div>`;
     },
     naZmiane() { P.odswiez(); },
   };
+
+  P.GFX = { przedzialy, zmienGrafik, wiersz, pasekNarzedzi, kolizja, otwarcie, poza, domyslneMiejsce, kolorLok, ostrzezenia, kartaTygodnia, NAZWY };
 
   /* Zmiana grafiku zaplanowana na datę, która już minęła, staje się obecnym grafikiem (zostało z poprzednich wersji danych). */
   const stareUzupelnij = P.uzupelnij;

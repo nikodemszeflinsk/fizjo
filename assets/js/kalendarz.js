@@ -40,7 +40,10 @@
   const D = () => stan.dane[stan.tryb];
   const ent = () => stan.tryb === 'ent';
   const terapeuta = (id) => K.terap(D(), id);
-  const osoby = () => (ent() ? K.widoczni(D()) : [D().zespol[0]]);
+  /* Konto terapeuty w panelu: kalendarz pokazuje tylko jego kolumnę. */
+  let rolaOsoba = null;
+  const osoby = () => (ent() ? (rolaOsoba ? D().zespol.filter((t) => t.id === rolaOsoba) : K.widoczni(D())) : [D().zespol[0]]);
+  const edycjaZablokowana = () => !!(window.KAL_UI && window.KAL_UI.edycjaZablokowana && window.KAL_UI.edycjaZablokowana());
 
   /* Stan chwilowy, który nie trafia do localStorage. */
   const ui = {
@@ -146,7 +149,7 @@
   function renderPasek() {
     const w = WIDOKI.map(([k, n]) => `<button type="button" data-widok="${k}" aria-pressed="${stan.widok === k}">${k === 'dzien' && ent() ? '<span class="dl">Dzień zespołu</span><span class="kr">Zespół</span>' : n}</button>`).join('');
     const wybor = ent() && stan.widok === 'tydzien'
-      ? `<label class="wybor"><span>Terapeuta</span><select id="sel-terap">${D().zespol.map((t) => `<option value="${t.id}"${t.id === stan.terap ? ' selected' : ''}>${esc(t.nazwa)}</option>`).join('')}</select></label>`
+      ? `<label class="wybor"><span>Terapeuta</span><select id="sel-terap">${osoby().map((t) => `<option value="${t.id}"${t.id === stan.terap ? ' selected' : ''}>${esc(t.nazwa)}</option>`).join('')}</select></label>`
       : '';
     $('#pasek').innerHTML = `
       <div class="pasek__rzad">
@@ -164,9 +167,9 @@
       </div>
       <div class="pasek__rzad pasek__rzad--akcje">
         <button type="button" class="przycisk" data-akcja="nowa"><span aria-hidden="true">+</span> Rezerwacja</button>
-        <button type="button" class="przycisk przycisk--tryb" data-akcja="edycja" aria-pressed="${ui.edycja}">Zmień dostępność</button>
+        <button type="button" class="przycisk przycisk--tryb" data-akcja="edycja" aria-pressed="${ui.edycja}"${edycjaZablokowana() ? ' disabled title="Grafik ustawia właściciel"' : ''}>Zmień dostępność</button>
         ${document.body.dataset.app === 'panel' ? '<a class="przycisk przycisk--cichy" href="#/dostepnosc">Grafik</a>' : '<button type="button" class="przycisk przycisk--cichy" data-akcja="godziny">Godziny przyjęć</button>'}
-        <button type="button" class="przycisk przycisk--cichy" data-akcja="blokada">Blokada</button>
+        <button type="button" class="przycisk przycisk--cichy" data-akcja="blokada"${edycjaZablokowana() ? ' disabled title="Grafik ustawia właściciel"' : ''}>Blokada</button>
         ${document.body.dataset.app === 'panel' ? '' : '<button type="button" class="przycisk przycisk--cichy" data-akcja="ustawienia">Ustawienia</button>'}
         <div class="menu"><button type="button" class="przycisk przycisk--cichy" data-akcja="menu" aria-haspopup="true" aria-expanded="false" aria-label="Więcej">⋯</button>
           <ul class="menu__lista" id="menu-lista" hidden>
@@ -1369,6 +1372,13 @@
     nowa: (arg) => otworzSzuflade('nowa', arg || { terap: stan.terap, data: K.dzisIso(), od: Math.min(END - 60, Math.max(START, Math.ceil((K.terazMin() + 30) / 15) * 15)) }),
     blokada: (arg) => otworzSzuflade('blokada', arg || {}),
     idzDo: (terap, data, widok) => { if (widok) stan.widok = widok; idzDoRezerwacji(terap, data); },
+    ustawRole: (id) => {
+      rolaOsoba = id || null;
+      if (id) { stan.terap = id; if (stan.widok === 'miesiac' || stan.widok === 'agenda') stan.widok = 'dzien'; }
+      else if (!D().zespol.some((t) => t.id === stan.terap)) stan.terap = D().zespol[0].id;
+      ui.mobIdx = null; ui.edycja = false;
+      render();
+    },
     ustawTryb: (tryb) => {
       if (tryb === stan.tryb) return;
       stan.tryb = tryb; stan.widok = tryb === 'ent' ? 'dzien' : 'tydzien'; stan.terap = D().zespol[0].id; stan.data = K.dzisIso();

@@ -27,6 +27,7 @@
     rezerwacje: 'M5 4.5h10v11H5zM7.5 8h5M7.5 11h5M7.5 14h3',
     pacjenci: 'M8 9.5a2.8 2.8 0 1 0 0-5.6 2.8 2.8 0 0 0 0 5.6ZM3 16c.6-2.8 2.7-4.3 5-4.3s4.4 1.5 5 4.3M13.5 9.2a2.3 2.3 0 1 0-.8-4.4M14.5 11.9c1.4.4 2.3 1.6 2.6 3.6',
     dostepnosc: 'M10 16.5a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13ZM10 6.5V10l2.5 1.6',
+    grafik: 'M3.5 4.5h13v11h-13zM3.5 8h13M8 4.5v11M3.5 11.7h13',
     uslugi: 'M4 5h12M4 10h12M4 15h7M14.5 13.5l1.5 1.5 2.5-3',
     zespol: 'M7 9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM13.5 9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM2.5 16c.5-2.4 2.2-3.8 4.5-3.8s4 1.4 4.5 3.8M9.5 16c.5-2.4 1.8-3.8 4-3.8s3.6 1.4 4 3.8',
     lokalizacje: 'M10 17s5.5-5 5.5-9.2a5.5 5.5 0 0 0-11 0C4.5 12 10 17 10 17ZM10 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z',
@@ -73,13 +74,16 @@
     const wl = C.konto.wlasciciel;
     $('#p-kto').innerHTML = `${P.esc(wl)}<em>${P.ent() ? 'właściciel' : 'Twoje konto'}</em>`;
     $('#p-awatar').textContent = wl.split(' ').map((x) => x[0]).join('').slice(0, 2);
+    if (P.poMenu) P.poMenu();
   }
 
   /* ── Router ────────────────────────────────────────────────────────── */
   function trasa() {
     const h = location.hash.replace(/^#\/?/, '');
     const [id, ...reszta] = h.split('/');
-    return { id: P.widoki[id] || id === 'kalendarz' ? id : 'pulpit', arg: reszta.join('/') };
+    const znany = P.widoki[id] || id === 'kalendarz' ? id : 'pulpit';
+    /* Konto terapeuty nie ma dostępu do zakładek właściciela. */
+    return { id: P.dostep && !P.dostep(znany) ? 'pulpit' : znany, arg: reszta.join('/') };
   }
   P.idz = (sciezka) => { if (location.hash === `#/${sciezka}`) pokaz(); else location.hash = `#/${sciezka}`; };
   function pokaz() {
@@ -288,6 +292,8 @@
       const t = e.target.closest('[data-pakiet]').dataset.pakiet;
       window.KAL_UI.ustawTryb(t);
       P.uzupelnij(P.D(), t);
+      if (P.poPakiecie) P.poPakiecie();
+      if (P.dostep && !P.dostep(P.aktualny)) location.hash = '#/pulpit';
       window.KAL_UI.zapisz();
       P.odswiez();
       return;

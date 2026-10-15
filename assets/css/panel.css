@@ -358,3 +358,84 @@ button.p-wiersz__glowny:hover b { text-decoration: underline; }
   .p-masowo { border-radius: 16px; }
 }
 @media (prefers-reduced-motion: reduce) { .p-rail { transition: none; } }
+
+/* ── Konta terapeutów: przełącznik w menu ───────────────────────────── */
+.p-konto { display: grid; gap: 4px; padding: 0 6px; font-size: 0.78rem; color: #8f959b; }
+.p-konto:empty { display: none; }
+.p-konto__et em { font-style: normal; }
+.p-konto select { width: 100%; min-height: 38px; padding: 6px 10px; border: 1px solid rgba(255, 255, 255, 0.22); border-radius: 10px; background: rgba(255, 255, 255, 0.08); color: #fff; font: inherit; font-weight: 700; font-size: 0.84rem; }
+.p-konto select option { color: #14171a; background: #fff; }
+.dz-pola { margin: 0; padding: 0; border: 0; min-width: 0; }
+.dz-pola:disabled { opacity: 0.6; }
+.p-wiersz--zm { align-items: flex-start; }
+
+/* ── Grafik zespołu ─────────────────────────────────────────────────── */
+.gz { gap: 16px; }
+.gz-widok { align-items: center; }
+.gz-pedzel { display: grid; gap: 10px; margin-bottom: 14px; padding: 12px 14px; border-radius: 14px; background: var(--floor, #eceeeb); }
+.gz-pedzel__g { display: flex; align-items: center; gap: 12px; }
+.gz-pedzel__opcje { display: grid; gap: 10px; }
+.gz-pedzel__wlasne { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.gz-przew { overflow-x: auto; }
+.gz-tab { width: 100%; min-width: 760px; border-collapse: separate; border-spacing: 0 6px; table-layout: fixed; }
+.gz-tab th, .gz-tab td { padding: 0 4px; vertical-align: middle; }
+.gz-tab thead th { padding: 4px; text-align: center; font-size: 0.82rem; font-weight: 800; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; }
+.gz-tab thead th:first-child { text-align: left; width: 200px; }
+.gz-tab thead th:last-child, .gz-tab .gz-akc { width: 120px; }
+.gz-tab tbody th { display: flex; align-items: center; gap: 10px; padding: 6px 8px 6px 4px; text-align: left; font-weight: 400; }
+.gz-os-nazwa { display: grid; min-width: 0; }
+.gz-os-nazwa b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gz-os-nazwa small { color: var(--muted); font-variant-numeric: tabular-nums; }
+.gz-tab tfoot th, .gz-tab tfoot td { padding: 6px 4px; color: var(--muted); font-size: 0.86rem; font-weight: 700; text-align: center; border-top: 1px solid var(--hair); }
+.gz-tab tfoot th { text-align: left; }
+.gz-akc { text-align: right; }
+.gz-kom { display: grid; gap: 3px; align-content: center; width: 100%; min-height: 58px; padding: 5px; border: 1.5px dashed var(--hair-2); border-radius: 10px; background: #fff; font: inherit; color: var(--fg); text-align: left; }
+button.gz-kom { cursor: pointer; }
+button.gz-kom:hover { border-style: solid; border-color: var(--ink); }
+.gz-kom--ro { border-style: solid; border-color: var(--hair); }
+.gz-maluje button.gz-kom { cursor: crosshair; touch-action: none; user-select: none; }
+.gz-kom--wybrana { background: var(--akcent-jasny, #e7efff); border-style: solid; border-color: var(--akcent, #1f5fd6); }
+.gz-zm { display: block; padding: 3px 7px 3px 9px; border-radius: 6px; background: color-mix(in srgb, var(--k) 14%, white); box-shadow: inset 4px 0 0 var(--k); font-size: 0.8rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.25; }
+.gz-zm small { display: block; color: var(--muted); font-weight: 400; font-size: 0.72rem; }
+.gz-zm--zle { outline: 2px solid #b3261e; outline-offset: -1px; }
+.gz-ost { margin-left: 4px; font-style: normal; color: #b3261e; font-weight: 900; }
+.gz-wolne { color: var(--muted); text-align: center; }
+.gz-ja th { background: #eef3fd; border-radius: 10px 0 0 10px; }
+.gz-fokus th { outline: 2px solid var(--akcent, #1f5fd6); border-radius: 10px; }
+.gz-legenda { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 10px 0 0; padding: 0; list-style: none; color: var(--muted); font-size: 0.86rem; }
+.gz-legenda li { display: inline-flex; align-items: center; gap: 6px; }
+.gz-legenda i, .gz-kr { display: inline-block; width: 11px; height: 11px; border-radius: 50%; flex: none; }
+.gz-kr { margin-right: 8px; }
+.gz-edytor { padding: 0; }
+
+/* Lokalizacje: oś dnia z paskami terapeutów */
+.gz-lok-w { display: grid; grid-template-columns: 78px minmax(0, 1fr) 170px; gap: 6px 14px; align-items: center; padding: 6px 0; border-top: 1px solid var(--hair); }
+.gz-lok-w--osie { border-top: 0; padding: 0 0 2px; }
+.gz-lok-dzien { display: grid; line-height: 1.2; }
+.gz-lok-dzien small { color: var(--muted); font-variant-numeric: tabular-nums; }
+.gz-osie { position: relative; height: 16px; }
+.gz-osie span { position: absolute; transform: translateX(-50%); font-size: 0.72rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.gz-os { position: relative; border-radius: 8px; background: #eef0ed; overflow: hidden; }
+.gz-os__otw { position: absolute; top: 0; bottom: 0; background: #dff3e8; }
+.gz-os__dziura { position: absolute; top: 0; bottom: 0; background: repeating-linear-gradient(135deg, rgba(179, 38, 30, 0.22) 0 6px, rgba(179, 38, 30, 0.06) 6px 12px); border-inline: 2px solid rgba(179, 38, 30, 0.5); }
+.gz-pasek { position: absolute; height: 24px; display: block; overflow: hidden; padding: 0 6px 0 10px; border: 0; border-radius: 6px; background: color-mix(in srgb, var(--k) 20%, white); box-shadow: inset 4px 0 0 var(--k); color: var(--fg); font: inherit; font-size: 0.74rem; font-weight: 700; line-height: 24px; white-space: nowrap; text-overflow: ellipsis; text-align: left; font-variant-numeric: tabular-nums; }
+button.gz-pasek { cursor: pointer; }
+button.gz-pasek:hover { outline: 2px solid var(--ink); }
+.gz-pasek--zle { outline: 2px solid #b3261e; outline-offset: -2px; }
+.gz-t { font-size: 0.84rem; font-weight: 700; }
+.gz-t--ok { color: #0e6b45; }
+.gz-t--ost { color: #8a2118; }
+.gz-t--zamk { color: var(--muted); font-weight: 400; }
+@media (max-width: 700px) {
+  .gz-lok-w { grid-template-columns: 52px minmax(0, 1fr); }
+  .gz-lok-info { grid-column: 2; }
+  .gz-lok-w--osie > :last-child { display: none; }
+}
+.gz-dziury { margin-top: 12px; padding: 10px 14px; border-radius: 12px; background: var(--floor, #eceeeb); }
+.gz-dziury summary { cursor: pointer; font-weight: 700; }
+.gz-dziury ul { margin: 8px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.gz-dziury li { font-size: 0.92rem; line-height: 1.8; }
+/* Szeroka tabela grafiku przewija się w swoim polu, a nie rozpycha strony. */
+.gz, .gz > *, .gz .p-karta, .gz-przew { min-width: 0; max-width: 100%; }
+.gz .p-karta { overflow: hidden; }
+.gz-przew { position: relative; }
