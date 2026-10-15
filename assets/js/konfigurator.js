@@ -368,7 +368,7 @@
       return '<h4>Przeczytaj i zaakceptuj umowę</h4>' +
         '<div class="kf-podglad" tabindex="0" role="region" aria-label="Treść umowy">' + umowaHtml(null) + '</div>' +
         '<div class="kf-zgody">' +
-        '<label class="kf-wszystkie"><input type="checkbox" data-z-wszystkie' + (z.a && z.b && z.c && z.d ? ' checked' : '') + ' /><span><b>Zaznacz wszystkie oświadczenia</b> <small>(bez opcjonalnego na dole)</small></span></label>' +
+        '<label class="kf-wszystkie"><input type="checkbox" data-z-wszystkie' + (z.a && z.b && z.c && z.d && z.e ? ' checked' : '') + ' /><span><b>Zaznacz wszystkie</b></span></label>' +
         cb('a', 'Przeczytałem umowę i akceptuję jej treść.') +
         cb('b', 'Rozumiem, że po zakończeniu umowy system rezerwacji przestaje działać, a Wykonawca nie wspiera jego samodzielnej konfiguracji (§6 ust. 4).') +
         cb('c', 'Jestem uprawniony do reprezentowania Zamawiającego (§9 ust. 3).') +
@@ -500,15 +500,15 @@
     root.addEventListener('change', function (e) {
       var t = e.target, k = t.getAttribute('data-k'), z = t.getAttribute('data-z');
       if (t.hasAttribute('data-z-wszystkie')) {
-        ['a', 'b', 'c', 'd'].forEach(function (x) { S.zgody[x] = t.checked; });
-        Array.prototype.forEach.call(root.querySelectorAll('input[data-z]'), function (i) { if (['a', 'b', 'c', 'd'].indexOf(i.getAttribute('data-z')) >= 0) i.checked = t.checked; });
+        ['a', 'b', 'c', 'd', 'e'].forEach(function (x) { S.zgody[x] = t.checked; });
+        Array.prototype.forEach.call(root.querySelectorAll('input[data-z]'), function (i) { i.checked = t.checked; });
         var bl = root.querySelector('.kf-zgody .blad'); if (bl) bl.remove();
         return;
       }
       if (z) {
         S.zgody[z] = t.checked;
         var m = root.querySelector('input[data-z-wszystkie]');
-        if (m) { var ile = ['a', 'b', 'c', 'd'].filter(function (x) { return S.zgody[x]; }).length; m.checked = ile === 4; m.indeterminate = ile > 0 && ile < 4; }
+        if (m) { var ile = ['a', 'b', 'c', 'd', 'e'].filter(function (x) { return S.zgody[x]; }).length; m.checked = ile === 5; m.indeterminate = ile > 0 && ile < 5; }
         return;
       }
       if (!k) return;
