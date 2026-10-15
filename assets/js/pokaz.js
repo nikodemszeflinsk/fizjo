@@ -72,10 +72,21 @@
     zdarzenie('pokaz_chce', { ekran: teraz + 1 });
     b.textContent = 'Zapisane';
     var form = document.getElementById('pk-sms');
-    if (window.ODBIORNIK && window.ODBIORNIK.aktywny() && window.ODBIORNIK.zapytaj) {
-      form.hidden = false;
-      document.getElementById('pk-tel').focus();
-    } else document.getElementById('pk-dzieki').hidden = false;
+    function pokazFormularz() { form.hidden = false; document.getElementById('pk-tel').focus(); }
+    function podziekuj(r) {
+      var d = document.getElementById('pk-dzieki');
+      d.innerHTML = '<b>Wysłane!</b> SMS z pełną ofertą jest w drodze' + (r && r.maska ? ' na numer ' + r.maska : '') + '. Zadzwonię, żeby odpowiedzieć na pytania.';
+      d.hidden = false;
+    }
+    if (!(window.ODBIORNIK && window.ODBIORNIK.aktywny() && window.ODBIORNIK.zapytaj)) { document.getElementById('pk-dzieki').hidden = false; return; }
+    /* Gdy numer klienta jest już w CRM (link z CRM), wysyłamy od razu, bez pytania. Inaczej prosimy o numer. */
+    if (lead) {
+      window.ODBIORNIK.zapytaj({ typ: 'sms_oferta', lead: lead, dla: dla }).then(function (r) {
+        if (r && r.ok) podziekuj(r);
+        else if (r && (r.blad === 'limit' || r.blad === 'limit_dzienny')) { var d = document.getElementById('pk-dzieki'); d.innerHTML = '<b>Oferta już do Ciebie wysłana.</b> Sprawdź wiadomości w telefonie, a jeśli jej nie ma, powiedz mi o tym w rozmowie.'; d.hidden = false; }
+        else pokazFormularz();
+      });
+    } else pokazFormularz();
   });
   document.getElementById('pk-sms').addEventListener('submit', function (e) {
     e.preventDefault();

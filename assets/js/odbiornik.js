@@ -39,6 +39,7 @@
         ? { ok: true, symulacja: true, czas: new Date().toISOString(), numer: (p.umowa && p.umowa.numer) || '', mail: false }
         : { ok: false, blad: 'kod', zostalo: 4 };
     }
+    if (p.typ === 'sms_oferta' && !p.telefon) return { ok: false, blad: 'telefon' };
     if (p.typ === 'sms_oferta') return { ok: true, symulacja: true, maska: '*** *** ' + String(p.telefon || '').replace(/\D/g, '').slice(-3) };
     if (p.typ === 'plik') return { ok: true, symulacja: true };
     return { ok: true, symulacja: true };
