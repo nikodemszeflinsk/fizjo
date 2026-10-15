@@ -241,6 +241,12 @@
       } catch (e) { return null; }
     }
     var TOKEN = odczytajToken();
+    /* Termin podpisania: ważność linku sprawdza serwer, a „w” z linku służy tylko do pokazania daty. */
+    var LINK = { ut: '', do: '', stan: '' };
+    function dataGodz(iso) {
+      var d = new Date(iso);
+      return isNaN(d) ? '' : d.getDate() + '.' + ('0' + (d.getMonth() + 1)).slice(-2) + ', godz. ' + d.getHours() + ':' + ('0' + d.getMinutes()).slice(-2);
+    }
     function zastosujToken() {
       var wybor = new URLSearchParams(location.search).get('p');
       if (!TOKEN && PAK[wybor]) {
@@ -257,6 +263,7 @@
       }
       S.lead = TOKEN.l;
       S.formToken = String(TOKEN.f || '').slice(0, 80);
+      LINK.ut = String(TOKEN.u || '').slice(0, 80); LINK.do = String(TOKEN.w || '');
       if (PAK[TOKEN.p]) S.pakiet = TOKEN.p;
       S.sms = !!TOKEN.s; S.zaliczki = !!TOKEN.z;
       if (!S.firma && TOKEN.g) S.firma = TOKEN.g;
@@ -442,6 +449,11 @@
         var kl = S.wynik ? ' class="zrobione"' : (i < S.krok ? ' class="zrobione"' : '');
         return '<li' + kl + (i === S.krok && !S.wynik ? ' aria-current="step"' : '') + '><span>' + n + '</span></li>';
       }).join('');
+      if (LINK.stan === 'wygasl' && !S.wynik) {
+        root.innerHTML = '<h3>Ten link do umowy wygasł</h3><p class="kf-lead">Link do umowy ma termin, żeby warunki, które ustaliliśmy, nie wisiały bez końca. Napisz albo zadzwoń, a przedłużymy go od ręki, bez żadnych zmian w ofercie.</p>' +
+          '<div class="kf-przyciski"><a class="kf-btn" href="tel:+48783480341" data-zadzwon>Zadzwoń: 783 480 341</a><a class="kf-btn kf-btn--cichy" href="mailto:kontakt@studio-widok.pl?subject=' + encodeURIComponent('Przedłużenie linku do umowy') + '">Napisz e-mail</a></div>';
+        return;
+      }
       var cialo = S.wynik ? widokWynik() : [widokPakiet, widokDane, widokUmowa][S.krok]();
       var prz = '';
       if (!S.wynik) {
@@ -453,7 +465,8 @@
         prz = '<div class="kf-przyciski"><button type="button" class="kf-btn kf-btn--cichy" data-akcja="wstecz"' + (S.krok === 0 ? ' disabled' : '') + '>Wstecz</button>' + glowny + '</div>';
       }
       var baner = '';
-      if (!KONF.zatwierdzona) baner = '<p class="kf-baner"><b>Wersja próbna.</b> Wzór umowy jest w przeglądzie prawnym, więc wygenerowany dokument ma znak PROJEKT i nie ma mocy prawnej.</p>';
+      if (LINK.ut && LINK.do && !S.wynik) baner += '<p class="kf-baner kf-baner--termin"><b>Link do umowy jest ważny do ' + esc(dataGodz(LINK.do)) + '.</b> Po tym terminie poprosimy o nowy.</p>';
+      if (!KONF.zatwierdzona) baner += '<p class="kf-baner"><b>Wersja próbna.</b> Wzór umowy jest w przeglądzie prawnym, więc wygenerowany dokument ma znak PROJEKT i nie ma mocy prawnej.</p>';
       var miekki = (!S.wynik && S.krok >= 1) ? '<p class="kf-miekki">Nie jesteś jeszcze gotowy na umowę? <a href="' + mailtoKonfiguracja() + '">Wyślij nam samą konfigurację</a> albo <a href="tel:+48783480341" data-zadzwon>zadzwoń: 783 480 341</a>.</p>' : '';
       var naglowek = S.lead
         ? '<h3>Wdrożenie dla: ' + esc(S.nazwa || S.firma || 'Twojego gabinetu') + '</h3><p class="kf-lead">Trzy krótkie kroki: pakiet, dane firmy i umowa potwierdzona kodem SMS. Zaraz potem dostaniesz formularz startowy (treści, zdjęcia, inspiracje), a my <b>od razu przystępujemy do projektu graficznego</b>. Do niczego Cię to nie zobowiązuje, dopóki nie wpiszesz kodu z SMS-a.</p>'
@@ -551,8 +564,9 @@
         if (b.disabled) return;
         b.disabled = true;
         ensureLead();
-        return window.ODBIORNIK.zapytaj({ typ: 'sms_kod', lead: S.lead, telefon: S.telefon, numer: S.numer }).then(function (r) {
+        return window.ODBIORNIK.zapytaj({ typ: 'sms_kod', lead: S.lead, ut: LINK.ut || undefined, telefon: S.telefon, numer: S.numer }).then(function (r) {
           if (r && r.ok) { S.smsStan = { etap: 'wyslany', maska: r.maska || '', blad: '', kiedy: Date.now(), probny: !!r.symulacja }; S.kod = ''; }
+          else if (r && r.blad === 'link_wygasl') { LINK.stan = 'wygasl'; }
           else { S.smsStan.blad = tekstBleduSms(r && r.blad, r); if (r && r.blad === 'za_szybko' && S.smsStan.etap === 'wyslany') S.smsStan.blad = 'Kod został przed chwilą wysłany. Poczekaj kilkadziesiąt sekund i spróbuj ponownie.'; }
           render();
           var pole = document.getElementById('f-kod');
@@ -574,7 +588,7 @@
             var dok = dokument();
             S.wynik = null;
             var konf = paczka('umowa').konf;
-            return window.ODBIORNIK.zapytaj({ typ: 'sms_potwierdz', lead: ensureLead(), telefon: S.telefon, kod: String(S.kod).replace(/\D/g, ''), dok: dok, konf: konf, ceny: ceny(), umowa: { numer: S.numer, hash: hash, wersja: KONF.wersja, osoba: S.osoba } }).then(function (r) {
+            return window.ODBIORNIK.zapytaj({ typ: 'sms_potwierdz', lead: ensureLead(), ut: LINK.ut || undefined, telefon: S.telefon, kod: String(S.kod).replace(/\D/g, ''), dok: dok, konf: konf, ceny: ceny(), umowa: { numer: S.numer, hash: hash, wersja: KONF.wersja, osoba: S.osoba } }).then(function (r) {
               if (r && r.ok) {
                 S.wynik = { czas: czas, hash: hash, sms: true, serwerCzas: r.czas ? new Date(r.czas) : czas, maska: S.smsStan.maska, mail: !!r.mail, symulacja: !!r.symulacja, start: r.start || S.formToken || '' };
                 S.kod = ''; S.smsStan = { etap: 'start', maska: '', blad: '', kiedy: 0, probny: false };
@@ -583,6 +597,7 @@
               } else {
                 S.smsStan.blad = tekstBleduSms(r && r.blad, r);
                 S.kod = '';
+                if (r && r.blad === 'link_wygasl') { LINK.stan = 'wygasl'; render(); return; }
                 if (r && (r.blad === 'wygasl' || r.blad === 'proby')) S.smsStan.etap = 'start';
                 render();
                 fokusBledu();
@@ -622,6 +637,14 @@
     window.KONFIGURATOR = { stan: S, umowaHtml: umowaHtml, render: render };
     wczytajStan();
     zastosujToken();
+    if (LINK.ut && window.ODBIORNIK && window.ODBIORNIK.statusLinku) {
+      window.ODBIORNIK.statusLinku(LINK.ut).then(function (j) {
+        if (!j) return;
+        if (!j.wazna) LINK.stan = 'wygasl';
+        else if (j.wygasa) LINK.do = j.wygasa;
+        render();
+      });
+    }
     render();
     /* Raz na sesję dajemy znać, że klient otworzył umowę z linku. */
     try {

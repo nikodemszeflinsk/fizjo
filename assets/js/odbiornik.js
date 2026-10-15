@@ -89,6 +89,12 @@
       }
     },
     /** Wysyła paczkę i czyta odpowiedź skryptu (kod SMS, pliki). Zawsze rozwiązuje się obiektem; {ok:false, blad:'siec'} przy braku połączenia. */
+    /** Czy link do umowy jest ważny (tylko w chmurze). Zwraca {wazna, wygasa} albo null, gdy nie da się sprawdzić. */
+    statusLinku: function (ut) {
+      if (!ut || !adresApi() || lokalnie()) return Promise.resolve(null);
+      return fetch(adresApi() + '/umowa/status?ut=' + encodeURIComponent(ut)).then(function (r) { return r.json(); })
+        .then(function (j) { return j && j.ok ? j : null; }).catch(function () { return null; });
+    },
     zapytaj: function (paczka) {
       if (!CFG.url && !adresApi()) return Promise.resolve({ ok: false, blad: 'brak_odbiornika' });
       if (lokalnie()) return Promise.resolve(symuluj(paczka));
