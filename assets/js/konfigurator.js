@@ -9,11 +9,15 @@
     var KONF = {
       zatwierdzona: false, /* true dopiero po przeglądzie wzoru przez prawnika: wtedy znika znak PROJEKT */
       wersja: 'SW-2026-10-v3',
-      wykonawca: { nazwa: '', nip: '', adres: '' },
-      email: 'kontakt@studio-widok.pl',
+      wykonawca: { nazwa: 'Studio Widok (Nikodem Szefliński, osoba fizyczna prowadząca działalność nierejestrowaną)', nip: 'brak (działalność nierejestrowana)', adres: '' },
+      email: 'nikodemszefl@gmail.com',
       telefon: '783 480 341',
       sad: '',
-      hosting: '', sms: '', poczta: '', eog: '', srodki: ''
+      hosting: 'Cloudflare, Inc. (baza danych z preferowaną lokalizacją w Europie Zachodniej, pliki w rozproszonym magazynie Cloudflare)',
+      sms: 'SzybkiSMS.pl (bramka SMS: numer telefonu i treść kodu lub przypomnienia)',
+      poczta: 'Resend (wysyłka e-mail: potwierdzenia, kopie umów i przypomnienia)',
+      eog: 'Cloudflare i Resend mają siedzibę w USA; przekazanie danych odbywa się na podstawie standardowych klauzul umownych i certyfikacji w ramach EU-US Data Privacy Framework, w zakresie wynikającym z warunków przetwarzania danych tych dostawców',
+      srodki: 'szyfrowanie transmisji (HTTPS) i danych w spoczynku po stronie dostawców, logowanie do panelu Wykonawcy przez Cloudflare Access, dostęp klienta do jego danych tylko przez tajne linki, kopie zapasowe bazy danych oraz rejestr zdarzeń'
     };
 
     var PAK = {
@@ -145,11 +149,11 @@
 
       h += '<h2>§3. Cena i płatności</h2>' + ust([
         'Wdrożenie: {CENA_WDR}{WDR_OPIS}. Utrzymanie: {CENA_UTR} miesięcznie{UTR_OPIS}.',
-        'Wykonawca korzysta ze zwolnienia podmiotowego z VAT, więc podane ceny nie zawierają doliczonego podatku. Jeśli Wykonawca utraci prawo do zwolnienia, poinformuje o tym Zamawiającego co najmniej 30 dni wcześniej, a od dnia utraty zwolnienia podane ceny są cenami netto powiększanymi o VAT. Zamawiający może wtedy zrezygnować z umowy (§6).',
-        'Fakturę za wdrożenie Wykonawca wystawia **po akceptacji projektu**, z terminem płatności 7 dni. Strona zostaje uruchomiona na domenie Zamawiającego **po zapłacie**.',
-        'Utrzymanie płatne jest od miesiąca następującego po uruchomieniu Strony, na podstawie faktury wystawianej z góry na początku miesiąca, z terminem płatności 7 dni.',
+        'Wykonawca nie dolicza do cen podatku VAT, więc podane ceny są cenami końcowymi. Jeśli Wykonawca zarejestruje działalność gospodarczą albo z innego powodu będzie zobowiązany do doliczania VAT, poinformuje o tym Zamawiającego co najmniej 30 dni wcześniej, a od tego dnia podane ceny są cenami netto powiększanymi o VAT. Zamawiający może wtedy zrezygnować z umowy (§6).',
+        'Dokument sprzedaży (rachunek albo faktura) za wdrożenie Wykonawca wystawia **po akceptacji projektu**, z terminem płatności 7 dni. Strona zostaje uruchomiona na domenie Zamawiającego **po zapłacie**.',
+        'Utrzymanie płatne jest od miesiąca następującego po uruchomieniu Strony, na podstawie dokumentu sprzedaży (rachunku albo faktury) wystawianego z góry na początku miesiąca, z terminem płatności 7 dni.',
         'Zmiana ceny utrzymania wymaga zgody Zamawiającego. Bez zgody każda ze stron może zrezygnować z umowy (§6).',
-        'Faktury są wystawiane i doręczane w formie elektronicznej zgodnie z obowiązującymi przepisami (w tym przez KSeF, jeśli jest wymagany). Zamawiający wyraża zgodę na faktury elektroniczne wysyłane na adres {EMAIL}. Za opóźnienie w płatności należą odsetki ustawowe za opóźnienie w transakcjach handlowych.'
+        'Dokumenty sprzedaży są wystawiane i doręczane w formie elektronicznej zgodnie z obowiązującymi przepisami (w tym przez KSeF, jeśli po rejestracji działalności będzie wymagany). Zamawiający wyraża zgodę na ich przesyłanie na adres {EMAIL}. Za opóźnienie w płatności należą odsetki ustawowe za opóźnienie w transakcjach handlowych.'
       ], v);
 
       h += '<h2>§4. Prawa do Strony</h2>' + ust([
@@ -162,7 +166,7 @@
       h += '<h2>§5. Utrzymanie</h2>' + ust([
         'Utrzymanie obejmuje: hosting i certyfikat bezpieczeństwa, domenę, monitoring, naprawę błędów, aktualizacje Strony i systemu rezerwacji oraz drobne zmiany treści do **jednej godziny miesięcznie**.',
         'Wykonawca dokłada starań, żeby system działał bez przerw, ale nie gwarantuje stałej dostępności i nie odpowiada za awarie usług zewnętrznych (Google, hosting, poczta, SMS, operator płatności).',
-        '**Błędy.** Zamawiający zgłasza błędy e-mailem lub telefonicznie. Wykonawca usuwa błędy Strony i systemu rezerwacji bezpłatnie przez cały czas trwania umowy i dokłada starań, żeby błąd uniemożliwiający rezerwacje usunąć w ciągu 2 dni roboczych, a pozostałe w ciągu 10 dni roboczych od zgłoszenia. W zakresie, w jakim prawo na to pozwala, strony wyłączają rękojmię, a w jej miejsce stosuje się ten ustęp.'
+        '**Błędy.** Zamawiający zgłasza błędy e-mailem lub telefonicznie. Wykonawca usuwa błędy Strony i systemu rezerwacji bezpłatnie przez cały czas trwania umowy i dokłada starań, żeby błąd uniemożliwiający rezerwacje usunąć w ciągu 3 dni roboczych, a pozostałe w ciągu 14 dni roboczych od zgłoszenia. W zakresie, w jakim prawo na to pozwala, strony wyłączają rękojmię, a w jej miejsce stosuje się ten ustęp.'
       ], v);
 
       h += '<h2>§6. Czas trwania i rezygnacja</h2>' + ust([
@@ -170,7 +174,7 @@
         'Zamawiający może **zrezygnować w dowolnym momencie, ze skutkiem natychmiastowym**, e-mailem. **Opłacony z góry okres utrzymania nie jest zwracany**, ale system rezerwacji działa do jego końca, chyba że Zamawiający poprosi o wcześniejsze wyłączenie. Wykonawca może wypowiedzieć umowę z miesięcznym wyprzedzeniem, na koniec miesiąca kalendarzowego.',
         'W ciągu **7 dni** od zakończenia umowy Wykonawca przekazuje Zamawiającemu **pliki Strony** w formie umożliwiającej publikację na dowolnym hostingu, dostęp do domeny i wizytówki oraz eksport rezerwacji, jeśli go ma.',
         '**System rezerwacji działa na infrastrukturze Wykonawcy, więc po zakończeniu umowy przestaje działać**, dopóki Zamawiający nie skonfiguruje go sam albo nie zleci tego innej firmie. Wykonawca nie wspiera takiej konfiguracji i nie przekazuje swojej infrastruktury. Zamawiający został o tym poinformowany przed zawarciem umowy. Od zakończenia umowy hosting, aktualizacje, kopie zapasowe i opłaty za usługi zewnętrzne ponosi Zamawiający.',
-        '**Brak płatności.** Jeśli faktura za utrzymanie nie zostanie zapłacona w terminie, Wykonawca w dniu terminu i po trzech dniach wyśle przypomnienie e-mailem. Jeśli zaległość nie zostanie zapłacona w ciągu **14 dni od terminu**, Wykonawca może wypowiedzieć umowę ze skutkiem natychmiastowym e-mailem, a system rezerwacji zostanie wyłączony. Pliki Strony Wykonawca przekazuje po uregulowaniu zaległości.',
+        '**Brak płatności.** Jeśli należność za utrzymanie nie zostanie zapłacona w terminie, Wykonawca w dniu terminu i po trzech dniach wyśle przypomnienie e-mailem. W 7. dniu zaległości Wykonawca wyśle ostatnie przypomnienie i udostępni eksport rezerwacji. Jeśli zaległość nie zostanie zapłacona w ciągu **14 dni od terminu**, Wykonawca może wypowiedzieć umowę ze skutkiem natychmiastowym e-mailem, a system rezerwacji zostanie wyłączony. Pliki Strony Wykonawca przekazuje po uregulowaniu zaległości.',
         'Zamawiający może wypowiedzieć umowę ze skutkiem natychmiastowym, gdy system rezerwacji nie działa dłużej niż 14 dni z winy Wykonawcy.',
         'Wynagrodzenie za wdrożenie nie jest zwracane po uruchomieniu Strony. Przy rezygnacji przed uruchomieniem strony rozliczają się proporcjonalnie do wykonanych prac.'
       ], v);
@@ -188,7 +192,7 @@
       h += '<h2>§8. Odpowiedzialność i poufność</h2>' + ust([
         'Wykonawca nie gwarantuje liczby pacjentów, pozycji w wyszukiwarce ani terminu pierwszych efektów.',
         'Treści na Stronie powstają na podstawie informacji Zamawiającego, który je akceptuje i odpowiada za ich zgodność z przepisami o informacji i reklamie działalności leczniczej.',
-        'Odpowiedzialność Wykonawcy jest ograniczona do rzeczywistej szkody i do **kwoty zapłaconej w ostatnich 12 miesiącach**, bez utraconych korzyści (o ile prawo na to pozwala). Nie dotyczy to szkód wyrządzonych umyślnie ani w wyniku rażącego niedbalstwa.',
+        'Odpowiedzialność Wykonawcy jest ograniczona do rzeczywistej szkody i do **kwoty zapłaconej w ostatnich 12 miesiącach**, nie niższej jednak niż opłata za wdrożenie powiększona o dwanaście miesięcznych opłat za utrzymanie, bez utraconych korzyści (o ile prawo na to pozwala). Nie dotyczy to szkód wyrządzonych umyślnie ani w wyniku rażącego niedbalstwa.',
         'Strony zachowują poufność informacji uzyskanych w związku z umową, a Wykonawca także danych osobowych, również po zakończeniu umowy.'
       ], v);
 
@@ -318,7 +322,7 @@
     }
     function podsumowanie() {
       var c = ceny();
-      return '<div class="kf-podsum" aria-live="polite"><div><span>Wdrożenie</span> <b>' + zl(c.wdr) + '</b></div><div><span>Utrzymanie miesięcznie</span> <b>' + zl(c.utr) + '</b></div><small>Ceny końcowe: Wykonawca korzysta ze zwolnienia podmiotowego z VAT i nie dolicza go do ceny.</small></div>';
+      return '<div class="kf-podsum" aria-live="polite"><div><span>Wdrożenie</span> <b>' + zl(c.wdr) + '</b></div><div><span>Utrzymanie miesięcznie</span> <b>' + zl(c.utr) + '</b></div><small>Ceny końcowe: Wykonawca nie dolicza do nich VAT.</small></div>';
     }
 
     /* Krok 1: pakiet i dodatki */
