@@ -20,6 +20,8 @@ body[data-app='panel'] { background: var(--floor); }
 /* ── Pasek demo ───────────────────────────────────────────────────── */
 .p-demo { position: relative; display: flex; justify-content: center; padding: 9px 52px 9px 20px; background: var(--ink); color: #cfd3d6; font-size: 0.85rem; text-align: center; }
 .p-demo strong { color: #fff; }
+.p-demo__pc { display: none; color: #f2b705; font-weight: 700; }
+@media (max-width: 900px) { .p-demo__pc { display: inline; } }
 .p-demo__x { position: absolute; right: 10px; top: 50%; translate: 0 -50%; width: 30px; height: 30px; border: 0; border-radius: 50%; background: transparent; color: #cfd3d6; font-size: 1.2rem; cursor: pointer; }
 .p-demo__x:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
 

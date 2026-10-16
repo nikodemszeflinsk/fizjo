@@ -15,6 +15,12 @@
   if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) && q.get('api')) API = q.get('api').replace(/\/$/, '');
   /* Podgląd (?podglad=1): pełny formularz bez serwera i bez tokenu. Odpowiedzi zostają tylko w tej przeglądarce, nic nie jest wysyłane. */
   var PODGLAD = q.get('podglad') === '1';
+  /* Powrót do umowy: konfigurator (umowa.html) przekazuje swój adres w ?wroc=. Przyjmujemy tylko ten sam serwis i tylko umowa.html. */
+  var WROC = '';
+  try {
+    var wu = new URL(q.get('wroc') || '', location.href);
+    if (q.get('wroc') && wu.origin === location.origin && /\/umowa\.html$/.test(wu.pathname)) WROC = wu.pathname.replace(/^\//, '') + wu.search;
+  } catch (e) { WROC = ''; }
   var PODGLAD_DANE = {};
   if (PODGLAD) { API = 'https://podglad.lokalnie'; T = 'podglad'; }
 
@@ -216,7 +222,8 @@
       '<ul class="st-lista-sekcji">' + SCH.sekcje.map(function (s, i) { var x = p.sekcje[i]; return '<li class="st-stan--' + x.stan + '"><button type="button" class="st-link" data-akcja="idz" data-id="' + s.id + '"><span aria-hidden="true">' + ikonaStanu(x.stan) + '</span> ' + esc(s.tytul) + '</button><small>' + ({ puste: 'nie zaczęte', w_trakcie: x.brakuje.length + ' ' + (x.brakuje.length === 1 ? 'ważna rzecz do uzupełnienia' : 'ważnych rzeczy do uzupełnienia'), gotowe: 'gotowe', pominieta: 'wypełnisz później' }[x.stan]) + '</small></li>'; }).join('') + '</ul>' +
       (braki.length ? '<details class="st-braki"><summary>Czego jeszcze brakuje (' + braki.length + ')</summary><ul>' + braki.slice(0, 30).map(function (b) { return '<li><button type="button" class="st-link" data-akcja="idz" data-id="' + b.sekcja + '">' + esc(b.pole) + '</button></li>'; }).join('') + '</ul></details>' : '<p class="st-ok">Wszystkie ważne pytania mają odpowiedź.</p>') +
       (wyslany ? '<p class="st-ok st-ok--duze" role="status">Formularz został wysłany' + (st.wyslano ? ' (' + esc(new Date(st.wyslano).toLocaleString('pl-PL', { dateStyle: 'short', timeStyle: 'short' })) + ')' : '') + '. Dziękujemy! Zmiany, które wprowadzisz teraz, też do nas dotrą.</p>' : '') +
-      '<div class="st-wysylka"><button type="button" class="st-btn" data-akcja="wyslij" id="st-wyslij">' + (wyslany ? 'Wyślij ponownie po zmianach' : 'Wyślij do Studio Widok') + '</button><p class="st-pod">Po wysłaniu dostajemy powiadomienie i zaczynamy od projektu graficznego. Plików i odpowiedzi nie musisz podawać drugi raz.</p></div>' +
+      (WROC && wyslany ? '<p class="st-wroc"><a class="st-btn" id="st-wroc" href="' + esc(WROC) + '">Dalej: umowa i podpis →</a></p>' : '') +
+      '<div class="st-wysylka"><button type="button" class="st-btn" data-akcja="wyslij" id="st-wyslij">' + (wyslany ? 'Wyślij ponownie po zmianach' : 'Wyślij do Studio Widok') + '</button><p class="st-pod">' + (WROC ? 'Po wysłaniu wrócisz do ostatniego kroku: umowy. Projekt graficzny zaczynamy, gdy mamy też podpisaną umowę.' : 'Po wysłaniu dostajemy powiadomienie. Projekt graficzny zaczynamy, gdy mamy też podpisaną umowę.') + ' Plików i odpowiedzi nie musisz podawać drugi raz.</p></div>' +
       '<nav class="st-dol"><button type="button" class="st-btn st-btn--cichy" data-akcja="idz" data-id="' + SCH.sekcje[SCH.sekcje.length - 1].id + '">← ' + esc(SCH.sekcje[SCH.sekcje.length - 1].tytul) + '</button><span></span></nav></section>';
   }
   function render(zFokusem) {

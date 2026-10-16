@@ -92,6 +92,19 @@
     },
     /** Wysyła paczkę i czyta odpowiedź skryptu (kod SMS, pliki). Zawsze rozwiązuje się obiektem; {ok:false, blad:'siec'} przy braku połączenia. */
     /** Czy link do umowy jest ważny (tylko w chmurze). Zwraca {wazna, wygasa} albo null, gdy nie da się sprawdzić. */
+    /** Link do formularza startowego przed umową (kolejność: dane firmy → formularz → umowa). Zwraca {ok, token}; lokalnie symulacja bez tokenu. */
+    startToken: function (p) {
+      if (!adresApi()) return Promise.resolve({ ok: false, blad: 'brak_odbiornika' });
+      if (lokalnie()) return Promise.resolve({ ok: true, symulacja: true, token: '' });
+      return fetch(adresApi() + '/formularz/start', { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(p) })
+        .then(function (r) { return r.json(); }).then(function (j) { return j && typeof j === 'object' ? j : { ok: false, blad: 'odpowiedz' }; }).catch(function () { return { ok: false, blad: 'siec' }; });
+    },
+    /** Stan formularza startowego po tokenie: {status, zmieniono} albo null, gdy nie da się sprawdzić. */
+    formularzStatus: function (t) {
+      if (!t || !adresApi() || lokalnie()) return Promise.resolve(null);
+      return fetch(adresApi() + '/formularz?t=' + encodeURIComponent(t)).then(function (r) { return r.json(); })
+        .then(function (j) { return j && j.ok ? { status: j.status, zmieniono: j.zmieniono } : null; }).catch(function () { return null; });
+    },
     /** Zajęte i wolne miejsca w pilotażu pierwszych klientów (tylko w chmurze). Zwraca {miejsc, zajete} albo null. */
     pilotaz: function () {
       if (!adresApi() || lokalnie()) return Promise.resolve(null);

@@ -33,11 +33,11 @@
     function doLim(n) { return n >= 99 ? 'bez limitu' : 'do ' + n; }
     var OPERATORZY = { p24: 'Przelewy24', tpay: 'Tpay', stripe: 'Stripe', pomoc: 'wybranego wspólnie z Wykonawcą spośród Przelewy24, Tpay i Stripe' };
     var MIES = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'];
-    var KROKI = ['Pakiet i dodatki', 'Dane firmy', 'Umowa i podpis'];
+    var KROKI = ['Pakiet i dodatki', 'Dane firmy', 'Formularz startowy', 'Umowa i podpis'];
     var KLUCZ = 'konfigurator-strony-v1';
 
     var S = {
-      lead: '', krok: 0, pakiet: 'individual', pilot: false, sms: false, zaliczki: false, operator: 'pomoc', w_podstrony: false, w_kalendarze: false, w_kampania: false,
+      lead: '', krok: 0, pakiet: 'individual', pilot: false, formStatus: '', formBlad: false, sms: false, zaliczki: false, operator: 'pomoc', w_podstrony: false, w_kalendarze: false, w_kampania: false,
       firma: '', nip: '', adres: '', osoba: '', email: '', telefon: '',
       nazwa: '', miasto: '', formToken: '',
       tryb: 'sms', kod: '', smsStan: { etap: 'start', maska: '', blad: '', kiedy: 0, probny: false },
@@ -145,7 +145,7 @@
       ], v);
 
       h += '<h2>§2. Wdrożenie</h2>' + ust([
-        'Strona powstaje orientacyjnie w **około 14 dni** od dnia, w którym Wykonawca ma komplet materiałów, dostępów i akceptacji od Zamawiającego. Komplet to treści, materiały i informacje przekazane przez Zamawiającego w formularzu startowym (stanowiącym część umowy) lub dosłane e-mailem. Po jego wysłaniu Wykonawca od razu przystępuje do projektu graficznego. Terminy nie są sztywne.',
+        'Strona powstaje orientacyjnie w **około 14 dni** od dnia, w którym Wykonawca ma komplet materiałów, dostępów i akceptacji od Zamawiającego. Komplet to treści, materiały i informacje przekazane przez Zamawiającego w formularzu startowym (stanowiącym część umowy także wtedy, gdy został wypełniony przed jej zawarciem) lub dosłane e-mailem. Po zawarciu umowy i otrzymaniu formularza Wykonawca od razu przystępuje do projektu graficznego. Zamawiający może uzupełniać formularz do czasu akceptacji projektu. Terminy nie są sztywne.',
         'Zamawiający dostarczy godziny przyjęć, usługi i cennik, dane zespołu, zdjęcia oraz dostęp do domeny i wizytówki Google{KAL_DOST}. Zajmie mu to ok. 2–3 godzin.',
         'Wykonawca pisze teksty na życzenie Zamawiającego albo korzysta z jego tekstów.',
         'W cenie są **dwie tury poprawek**. Brak uwag przez 7 dni od przedstawienia materiału oznacza akceptację. Opóźnienia po stronie Zamawiającego przesuwają terminy.',
@@ -292,7 +292,7 @@
       S.sms = !!TOKEN.s; S.zaliczki = !!TOKEN.z;
       S.pilot = !!TOKEN.pil; PILOT.zLinku = !!TOKEN.pil;
       if (!S.firma && TOKEN.g) S.firma = TOKEN.g;
-      S.krok = inny ? 1 : Math.max(Math.min(S.krok, 1), 1);
+      S.krok = inny ? 1 : Math.max(Math.min(S.krok, 2), 1);
     }
     /** Dane do odbiornika i do kodu: bez zgód, podpisu i błędów. */
     function paczka(typ) {
@@ -325,7 +325,7 @@
         var z = JSON.parse(localStorage.getItem(KLUCZ));
         if (z && z.pakiet && PAK[z.pakiet]) {
           Object.keys(z).forEach(function (k) { if (k in S && k !== 'wynik') S[k] = z[k]; });
-          S.krok = Math.min(S.krok, 1);
+          S.krok = Math.min(S.krok, 2);
         }
       } catch (e) { /* pusty start */ }
     }
@@ -368,7 +368,44 @@
         '<div id="kf-podsum">' + podsumowanie() + '</div>';
     }
 
-    /* Krok 3: dane firmy */
+    /* Krok 3: formularz startowy (przed umową) */
+    function adresFormularzaZPowrotem() {
+      if (S.formToken) return adresFormularza(S.formToken) + '&wroc=' + encodeURIComponent(location.href.split('#')[0]);
+      if (window.ODBIORNIK && window.ODBIORNIK.lokalnie && window.ODBIORNIK.lokalnie()) return 'start.html?podglad=1';
+      return '';
+    }
+    function sprawdzFormularz() {
+      if (!S.formToken || !window.ODBIORNIK || !window.ODBIORNIK.formularzStatus) return;
+      window.ODBIORNIK.formularzStatus(S.formToken).then(function (j) {
+        if (!j) return;
+        var nowy = (j.status === 'wyslany' || j.status === 'zmieniony') ? 'wyslany' : (j.zmieniono ? 'szkic' : 'brak');
+        if (nowy !== S.formStatus) { S.formStatus = nowy; zapiszStan(); if (S.krok === 2 && !S.wynik) render(); }
+      });
+    }
+    function przygotujFormularz() {
+      if (S.formToken || !window.ODBIORNIK || !window.ODBIORNIK.startToken) return Promise.resolve();
+      return window.ODBIORNIK.startToken({ lead: S.lead, ut: LINK.ut || undefined, nazwa: S.firma }).then(function (r) {
+        if (r && r.ok && r.token) { S.formToken = r.token; S.formBlad = false; }
+        else if (r && r.blad === 'link_wygasl') LINK.stan = 'wygasl';
+        else if (!(r && r.ok)) S.formBlad = true;
+        zapiszStan();
+      });
+    }
+    function widokFormularz() {
+      var wyslany = S.formStatus === 'wyslany', adres = adresFormularzaZPowrotem();
+      var h = '<h4>Formularz startowy</h4><p class="kf-lead">Opowiedz nam o swoim gabinecie: treści, zdjęcia, logo, zespół, usługi i inspiracje graficzne. To ok. 15–20 minut. Zapisuje się na bieżąco, a do formularza możesz wrócić tym samym linkiem. <b>Umowa jest ostatnim krokiem</b>, więc do tej pory do niczego się nie zobowiązujesz.</p>';
+      if (wyslany) {
+        h += '<p class="kf-ok-form" role="status"><b>Formularz wysłany. Dziękujemy!</b> Możesz do niego wrócić i coś dopisać. Teraz ostatni krok: umowa.</p>' + (adres ? '<p><a class="kf-link" href="' + esc(adres) + '">Otwórz formularz ponownie</a></p>' : '');
+      } else if (adres) {
+        h += '<p><a class="kf-btn" href="' + esc(adres) + '" id="kf-form-link">' + (S.formStatus === 'szkic' ? 'Dokończ formularz startowy' : 'Wypełnij formularz startowy') + '</a></p>' +
+          (S.formStatus === 'szkic' ? '<p class="kf-pod" role="status">Zacząłeś go wypełniać. Dokończ i wyślij, a potem wróć tutaj, żeby zawrzeć umowę.</p>' : '<p class="kf-pod">Po wysłaniu formularza wrócisz tutaj. Jeśli wolisz zacząć od umowy, możesz ją podpisać teraz, a formularz uzupełnić po niej.</p>');
+      } else {
+        h += '<p class="blad" role="alert">Nie udało się przygotować formularza. Możesz przejść do umowy, a link do formularza dostaniesz od nas zaraz po jej podpisaniu.</p>';
+      }
+      return h;
+    }
+
+    /* Krok 2: dane firmy */
     function widokDane() {
       var pilotInfo = S.pilot ? '<div class="kf-pilot-info" role="status"><span><b>Pilotaż pierwszych klientów:</b> wdrożenie ' + zl(ceny().wdr) + ' zamiast ' + zl(PAK[S.pakiet].wdr + (S.zaliczki ? ZAL.wdr : 0)) + '. W zamian zgoda na wskazanie strony jako realizacji (§10 umowy).</span> <button type="button" class="kf-link" data-akcja="pilot-wylacz">Zrezygnuj z pilotażu</button></div>' : '';
       return pilotInfo + '<h4>Dane do umowy</h4><div class="kf-siatka">' +
@@ -434,6 +471,7 @@
       return 'start.html?t=' + encodeURIComponent(token) + (api && /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? '&api=' + encodeURIComponent(api) : '');
     }
     function blokFormularza(w) {
+      if (S.formStatus === 'wyslany') return '<div class="kf-start"><h4>Formularz startowy: wysłany</h4><p>Masz już wszystko, czego potrzebujemy na start. <b>Przystępujemy do projektu graficznego</b> i wracamy do Ciebie z pierwszą propozycją. Formularz możesz uzupełniać do akceptacji projektu' + (w.start ? ': <a class="kf-link" href="' + esc(adresFormularza(w.start)) + '">otwórz formularz</a>' : '') + '.</p></div>';
       return w.start
         ? '<div class="kf-start"><h4>Rozmowa startowa: formularz</h4><p>Teraz uzupełnij formularz startowy: treści, zdjęcia, logo, zespół, usługi i inspiracje graficzne. Zapisuje się na bieżąco, a do niego możesz wrócić tym samym linkiem. <b>Od razu po jego wysłaniu przystępujemy do projektu graficznego.</b></p><a class="kf-btn" href="' + esc(adresFormularza(w.start)) + '" id="kf-start-link">Wypełnij formularz startowy</a></div>'
         : '<div class="kf-start"><h4>Rozmowa startowa: formularz</h4><p>W ciągu doby roboczej wyślemy Ci link do formularza startowego (treści, zdjęcia, logo i inspiracje). <b>Od razu po jego wypełnieniu przystępujemy do projektu graficznego.</b></p></div>';
@@ -447,7 +485,7 @@
           '<div class="kf-pobierz" id="kf-pobierz"><button type="button" class="kf-btn" data-akcja="html">Pobierz kopię umowy</button><button type="button" class="kf-btn kf-btn--cichy" data-akcja="drukuj">Drukuj / zapisz jako PDF</button></div>' +
           '<div class="kf-info" id="kf-info" role="status"></div>' +
           blokFormularza(w) +
-          '<div class="kf-nast"><b>Co dalej</b><ol><li>Wypełniasz formularz startowy (teraz albo później, tym samym linkiem).</li><li><b>Od razu po wysłaniu formularza przystępujemy do projektu graficznego</b> i wracamy do Ciebie z pierwszą propozycją.</li><li>Fakturę za wdrożenie wystawimy po Twojej akceptacji projektu, a stronę uruchomimy po wpłacie.</li></ol></div></div>';
+          '<div class="kf-nast"><b>Co dalej</b><ol><li>' + (S.formStatus === 'wyslany' ? 'Formularz startowy już mamy.' : 'Wypełniasz formularz startowy (teraz albo później, tym samym linkiem).') + '</li><li><b>' + (S.formStatus === 'wyslany' ? 'Przystępujemy do projektu graficznego' : 'Po wysłaniu formularza przystępujemy do projektu graficznego') + '</b> i wracamy do Ciebie z pierwszą propozycją.</li><li>Fakturę za wdrożenie wystawimy po Twojej akceptacji projektu, a stronę uruchomimy po wpłacie.</li></ol></div></div>';
       }
       return '<div class="kf-wynik"><div class="ok"><div><h4>Umowa zaakceptowana</h4><p class="kf-lead" style="margin-top:2px">Teraz pobierz plik i wyślij go do nas. Dopiero nasze potwierdzenie zawiera umowę.</p></div></div>' +
         '<dl class="kf-dl"><dt>Numer umowy</dt><dd>' + esc(S.numer) + '</dd><dt>Pakiet</dt><dd>' + esc(PAK[S.pakiet].nazwa) + ' · ' + zl(ceny().wdr) + ' wdrożenie · ' + zl(ceny().utr) + ' / mies.</dd><dt>Osoba podpisująca</dt><dd>' + esc(S.osoba) + '</dd><dt>Czas akceptacji</dt><dd>' + esc(czasPL(w.czas)) + '</dd><dt>Skrót SHA-256</dt><dd>' + esc(w.hash) + '</dd></dl>' +
@@ -468,7 +506,7 @@
         if (!mailOk(S.email.trim())) e.email = 'Wpisz poprawny adres e-mail.';
         if (!telOk(S.telefon)) e.telefon = 'Wpisz numer telefonu (9 cyfr).';
       }
-      if (k === 2) {
+      if (k === 3) {
         if (!(S.zgody.a && S.zgody.b && S.zgody.c && S.zgody.d)) e.zgody = 'Zaznacz wszystkie oświadczenia, żeby kontynuować.';
         else if (S.pilot && !S.zgody.e) e.zgody = 'Cena pilotażowa wymaga akceptacji warunków pilotażu (§10). Zaznacz ją albo wróć do kroku „Pakiet i dodatki” i odznacz pilotaż.';
         if (S.tryb === 'plik' && norm(S.podpis) !== norm(S.osoba)) e.podpis = 'Wpisz dokładnie: ' + S.osoba;
@@ -487,10 +525,12 @@
           '<div class="kf-przyciski"><a class="kf-btn" href="tel:+48783480341" data-zadzwon>Zadzwoń: 783 480 341</a><a class="kf-btn kf-btn--cichy" href="mailto:kontakt@studio-widok.pl?subject=' + encodeURIComponent('Przedłużenie linku do umowy') + '">Napisz e-mail</a></div>';
         return;
       }
-      var cialo = S.wynik ? widokWynik() : [widokPakiet, widokDane, widokUmowa][S.krok]();
+      var cialo = S.wynik ? widokWynik() : [widokPakiet, widokDane, widokFormularz, widokUmowa][S.krok]();
       var prz = '';
       if (!S.wynik) {
-        var glowny = S.krok < 2
+        var glowny = S.krok === 2
+          ? '<button type="button" class="kf-btn' + (S.formStatus === 'wyslany' ? '' : ' kf-btn--cichy') + '" data-akcja="dalej">' + (S.formStatus === 'wyslany' ? 'Dalej: umowa i podpis' : 'Pomiń i przejdź do umowy') + '</button>'
+          : S.krok < 2
           ? '<button type="button" class="kf-btn" data-akcja="dalej">Dalej</button>'
           : S.tryb === 'plik'
             ? '<button type="button" class="kf-btn" data-akcja="podpisz">Akceptuję i zawieram umowę</button>'
@@ -502,11 +542,15 @@
       if (!KONF.zatwierdzona) baner += '<p class="kf-baner"><b>Wersja próbna.</b> Wzór umowy jest w przeglądzie prawnym, więc wygenerowany dokument ma znak PROJEKT i nie ma mocy prawnej.</p>';
       var miekki = (!S.wynik && S.krok >= 1) ? '<p class="kf-miekki">Nie jesteś jeszcze gotowy na umowę? <a href="' + mailtoKonfiguracja() + '">Wyślij nam samą konfigurację</a> albo <a href="tel:+48783480341" data-zadzwon>zadzwoń: 783 480 341</a>.</p>' : '';
       var naglowek = S.lead
-        ? '<h3>Wdrożenie dla: ' + esc(S.nazwa || S.firma || 'Twojego gabinetu') + '</h3><p class="kf-lead">Trzy krótkie kroki: pakiet, dane firmy i umowa potwierdzona kodem SMS. Zaraz potem dostaniesz formularz startowy (treści, zdjęcia, inspiracje), a my <b>od razu przystępujemy do projektu graficznego</b>. Do niczego Cię to nie zobowiązuje, dopóki nie wpiszesz kodu z SMS-a.</p>'
-        : '<h3>Rozpocznij wdrożenie</h3><p class="kf-lead">Wybierasz pakiet, wpisujesz dane firmy i potwierdzasz umowę kodem SMS. Zaraz potem wypełniasz formularz startowy (treści, zdjęcia, inspiracje), a my <b>od razu przystępujemy do projektu graficznego</b>. Do niczego Cię to nie zobowiązuje, dopóki nie wpiszesz kodu z SMS-a.</p>';
+        ? '<h3>Wdrożenie dla: ' + esc(S.nazwa || S.firma || 'Twojego gabinetu') + '</h3><p class="kf-lead">Cztery krótkie kroki: pakiet, dane firmy, formularz startowy (treści, zdjęcia, inspiracje) i na końcu umowa potwierdzona kodem SMS. Po jej podpisaniu <b>od razu przystępujemy do projektu graficznego</b>. Do niczego Cię to nie zobowiązuje, dopóki nie wpiszesz kodu z SMS-a.</p>'
+        : '<h3>Rozpocznij wdrożenie</h3><p class="kf-lead">Wybierasz pakiet, wpisujesz dane firmy i wypełniasz formularz startowy (treści, zdjęcia, inspiracje). Na końcu potwierdzasz umowę kodem SMS, a my <b>od razu przystępujemy do projektu graficznego</b>. Do niczego Cię to nie zobowiązuje, dopóki nie wpiszesz kodu z SMS-a.</p>';
       root.innerHTML = naglowek + baner +
         '<ol class="kf-kroki" aria-label="Kroki">' + st + '</ol><div class="kf-cialo">' + cialo + '</div>' + prz + miekki;
+      if (S.krok === 2 && !S.wynik) sprawdzFormularz();
     }
+    /* Po powrocie z formularza (też z historii przeglądarki) od razu sprawdzamy, czy został wysłany. */
+    document.addEventListener('visibilitychange', function () { if (!document.hidden && S.krok === 2 && !S.wynik) sprawdzFormularz(); });
+    window.addEventListener('pageshow', function (e) { if (e.persisted && S.krok === 2 && !S.wynik) sprawdzFormularz(); });
     function ustawKrok(n) { S.krok = n; S.bledy = {}; zapiszStan(); render(); var h = root.querySelector('.kf-kroki'); if (h && h.scrollIntoView) h.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
     function fokusBledu() {
       var el = root.querySelector('[aria-invalid="true"]') || root.querySelector('.blad');
@@ -598,13 +642,18 @@
       if (a === 'dalej') {
         var er = waliduj(S.krok);
         if (Object.keys(er).length) { S.bledy = er; render(); return fokusBledu(); }
-        if (S.krok === 1) { ensureLead(); wyslij('dane'); }
+        if (S.krok === 1) {
+          ensureLead(); wyslij('dane');
+          if (b.disabled) return;
+          b.disabled = true;
+          return przygotujFormularz().then(function () { if (LINK.stan === 'wygasl') return render(); ustawKrok(2); });
+        }
         return ustawKrok(S.krok + 1);
       }
       if (a === 'pilot-wylacz') { S.pilot = false; zapiszStan(); return render(); }
       if (a === 'tryb-plik' || a === 'tryb-sms') { S.tryb = a === 'tryb-plik' ? 'plik' : 'sms'; S.bledy = {}; S.smsStan.blad = ''; return render(); }
       if (a === 'sms-wyslij') {
-        var ez = waliduj(2);
+        var ez = waliduj(3);
         delete ez.podpis;
         if (Object.keys(ez).length) { S.bledy = ez; render(); return fokusBledu(); }
         S.bledy = {};
@@ -621,7 +670,7 @@
         });
       }
       if (a === 'podpisz') {
-        var er2 = waliduj(2);
+        var er2 = waliduj(3);
         if (Object.keys(er2).length) { S.bledy = er2; render(); return fokusBledu(); }
         var czas = new Date();
         var tmp = document.createElement('div');
