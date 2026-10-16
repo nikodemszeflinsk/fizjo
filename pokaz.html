@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/pokaz.css?v=4" />
+  <link rel="stylesheet" href="assets/css/pokaz.css?v=7" />
 </head>
 <body>
   <header class="pk-gora">
@@ -37,9 +37,9 @@
         <p class="pk-et">1 · Pacjent już Cię szuka</p>
         <h2 id="h1">Wpisuje w Google to, co go boli</h2>
         <ul>
-          <li>Wieczorem, z telefonu. Wpisuje to, co go boli, a nie nazwę gabinetu.</li>
+          <li>Wieczorem, z telefonu. Szuka bólu, a nie nazwy gabinetu.</li>
           <li>Na portalu jesteś jednym z kilkudziesięciu. <b>U siebie jesteś jedyny.</b></li>
-          <li>Dbamy, żeby pierwszym wynikiem była Twoja strona.</li>
+          <li>Dbamy, żeby pierwszą była Twoja strona.</li>
         </ul>
       </div>
       <figure class="pk-obraz" role="img" aria-label="Przykład wyników wyszukiwania frazy „ból krzyża fizjoterapeuta”: na górze strona gabinetu o fizjoterapii kręgosłupa i wizytówka w Mapach, niżej lista specjalistów z portalu.">
@@ -70,12 +70,18 @@
         <p class="pk-et">2 · Trafia na Twoją stronę</p>
         <h2 id="h2">Na stronę o swoim problemie</h2>
         <ul>
-          <li>Każda dolegliwość, którą leczysz, ma <b>własną stronę</b>: kręgosłup, kolano, bark, rehabilitacja po operacji.</li>
-          <li>Pisana językiem pacjenta i kończy się wolnym terminem, a nie formularzem „zapytaj o ofertę”.</li>
-          <li>Wizytówka w Mapach Google z aktualnymi godzinami, zdjęciami i usługami.</li>
+          <li>Każda dolegliwość ma <b>własną stronę</b>: kręgosłup, kolano, bark.</li>
+          <li>Pisana językiem pacjenta, kończy się wolnym terminem.</li>
+          <li>Do tego wizytówka w Mapach Google.</li>
         </ul>
       </div>
-      <figure class="pk-obraz pk-obraz--okno">
+      <div class="pk-m pk-m--strona" aria-hidden="true">
+        <p class="pk-m__adres">twoj-gabinet.pl/fizjoterapia-kregoslupa</p>
+        <p class="pk-m__tytul">Boli kręgosłup? Zacznijmy od znalezienia przyczyny.</p>
+        <p class="pk-m__termin">Najbliższy wolny termin: <b>jutro, 9:00</b></p>
+        <p class="pk-m__przyciski"><span class="pk-m__btn">Umów wizytę</span><span class="pk-m__btn pk-m__btn--linia">Zadzwoń</span></p>
+      </div>
+      <figure class="pk-obraz pk-obraz--okno pk-desk">
         <div class="pk-okno"><i></i><i></i><i></i><span>twoj-gabinet.pl/fizjoterapia-kregoslupa</span></div>
         <img src="assets/img/zrzuty/strona-podstrona-problemu.jpg" width="1400" height="972" alt="Podstrona gabinetu o fizjoterapii kręgosłupa: nagłówek, przyciski „Umów wizytę” i „Zadzwoń” oraz najbliższy wolny termin." decoding="async" />
       </figure>
@@ -86,12 +92,18 @@
         <p class="pk-et">3 · Umawia się sam</p>
         <h2 id="h3">Także o 22:00, a potem sam zmieni termin</h2>
         <ul>
-          <li>Wybiera dzień i godzinę z <b>Twojego</b> kalendarza, bez dzwonienia i czekania na oddzwonienie.</li>
-          <li>Dostaje potwierdzenie i przypomnienie. W e-mailu jest link, z którego sam przełoży albo odwoła wizytę.</li>
-          <li>Zwolniony termin wraca na stronę. Bez konta i bez danych medycznych.</li>
+          <li>Wybiera dzień i godzinę z <b>Twojego</b> kalendarza. Bez dzwonienia.</li>
+          <li>Dostaje potwierdzenie, a z linku w e-mailu sam przełoży wizytę.</li>
+          <li>Zwolniony termin wraca na stronę.</li>
         </ul>
       </div>
-      <figure class="pk-obraz pk-obraz--tel pk-obraz--dwa">
+      <div class="pk-m pk-m--rezerwacja" aria-hidden="true">
+        <p class="pk-m__pyt">Kiedy Ci pasuje?</p>
+        <p class="pk-m__chipy"><span class="pk-m__chip pk-m__chip--on">pon 19.10</span><span class="pk-m__chip">wt 20.10</span><span class="pk-m__chip">śr 21.10</span></p>
+        <p class="pk-m__chipy"><span class="pk-m__chip">9:00</span><span class="pk-m__chip pk-m__chip--on">15:30</span><span class="pk-m__chip">16:00</span></p>
+        <p class="pk-m__ok"><b>Potwierdzone</b>pon. 19.10, 15:30. Przypomnienie przyjdzie e-mailem.</p>
+      </div>
+      <figure class="pk-obraz pk-obraz--tel pk-obraz--dwa pk-desk">
         <img src="assets/img/zrzuty/strona-terminy-telefon.jpg" width="420" height="946" alt="Telefon: pacjent wybiera dzień i godzinę z wolnych terminów gabinetu." decoding="async" />
         <img src="assets/img/zrzuty/wizyta-telefon-1.jpg" width="780" height="1600" alt="Telefon: ekran wizyty z przyciskami zmiany terminu i odwołania." decoding="async" />
       </figure>
@@ -102,12 +114,19 @@
         <p class="pk-et">4 · Ty</p>
         <h2 id="h4">Wszystko widzisz w jednym kalendarzu</h2>
         <ul>
-          <li>Rezerwacje ze strony i te wpisane po telefonie są razem.</li>
-          <li>Godziny przyjęć ustawiasz kilkoma kliknięciami, a urlop jednym. Pacjent widzi tylko to, co otworzysz.</li>
-          <li>Jeden gabinet albo cały zespół z osobnymi grafikami i wieloma lokalizacjami.</li>
+          <li>Rezerwacje ze strony i po telefonie są razem.</li>
+          <li>Godziny ustawiasz kilkoma kliknięciami, urlop jednym.</li>
+          <li>Jeden gabinet albo cały zespół z osobnymi grafikami.</li>
         </ul>
       </div>
-      <figure class="pk-obraz pk-obraz--okno">
+      <div class="pk-m pk-m--dzien" aria-hidden="true">
+        <p class="pk-m__pyt pk-m__pyt--ukryj">Twój dzień w kalendarzu</p>
+        <p class="pk-m__wiz pk-m__wiz--a"><b>8:00</b>Maria W.<small>ze strony</small></p>
+        <p class="pk-m__wiz pk-m__wiz--b"><b>9:15</b>Jan K.<small>telefon</small></p>
+        <p class="pk-m__wiz pk-m__wiz--wolny"><b>10:30</b>Wolny termin<small>pacjent może się zapisać</small></p>
+        <p class="pk-m__wiz pk-m__wiz--zamk"><b>12:00</b>Przerwa<small>zablokowane</small></p>
+      </div>
+      <figure class="pk-obraz pk-obraz--okno pk-desk">
         <div class="pk-okno"><i></i><i></i><i></i></div>
         <img src="assets/img/zrzuty/kal2-tydzien.jpg" width="1908" height="1170" alt="Kalendarz tygodnia: rezerwacje i godziny dostępności w jednym widoku." decoding="async" />
       </figure>
@@ -119,17 +138,15 @@
         <h2 id="h5">Ty leczysz, my pozyskujemy pacjentów</h2>
         <ul>
           <li>Piszemy teksty o każdym problemie, który leczysz.</li>
-          <li>Stawiamy stronę, która działa na telefonie, wraz z domeną i hostingiem.</li>
-          <li>Zakładamy i porządkujemy wizytówkę w Mapach Google.</li>
-          <li>Ustawiamy rezerwację i kalendarz dostępności.</li>
-          <li>Utrzymujemy całość: poprawki, aktualizacje, bezpieczeństwo.</li>
-          <li><b>Opcjonalnie:</b> reklamy Google i Meta, gdy chcesz szybciej zapełnić grafik.</li>
+          <li>Stawiamy stronę z domeną, hostingiem i wizytówką w Mapach.</li>
+          <li>Ustawiamy rezerwację i kalendarz, potem wszystko utrzymujemy.</li>
+          <li><b>Opcjonalnie:</b> reklamy Google i Meta.</li>
         </ul>
       </div>
       <div class="pk-kafle" aria-label="W skrócie">
-        <p><b>Około 14 dni</b>od materiałów do działającej strony</p>
-        <p><b>2–3 godziny</b>Twojego czasu w całym wdrożeniu</p>
-        <p><b>Bez prowizji</b>pacjent jest Twój, a nie portalu</p>
+        <p><b>Około 14 dni</b>do działającej strony</p>
+        <p><b>2–3 godziny</b>Twojego czasu</p>
+        <p><b>Bez prowizji</b>pacjent jest Twój</p>
         <p><b>Bez umowy na lata</b>rezygnujesz, kiedy chcesz</p>
       </div>
     </section>
