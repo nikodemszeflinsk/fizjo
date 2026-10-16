@@ -493,3 +493,18 @@ button.gz-kom.pl-kom--jedn { border-style: solid; border-color: #9db8ea; }
   .pl-nav__data { margin-left: 0; }
   .pl-pacjent li { grid-template-columns: 1fr; }
 }
+
+/* ── Samouczek przy pierwszym otwarciu (assets/js/panel-tutorial.js) ──── */
+.p-demo__wskazowki { margin-left: 14px; padding: 2px 12px; border: 1.5px solid rgba(255, 255, 255, 0.5); border-radius: 999px; background: transparent; color: #fff; font: inherit; font-size: 0.85rem; font-weight: 700; cursor: pointer; }
+.p-demo__wskazowki:hover { background: rgba(255, 255, 255, 0.14); }
+.p-sam { position: fixed; inset: 0; z-index: 90; pointer-events: none; }
+.p-sam__pierscien { position: fixed; border-radius: 12px; box-shadow: 0 0 0 9999px rgba(20, 23, 26, 0.62), 0 0 0 3px #f2b705; transition: left 0.25s var(--ease), top 0.25s var(--ease), width 0.25s var(--ease), height 0.25s var(--ease); }
+.p-sam__pierscien[hidden] { display: none; }
+.p-sam__karta { position: fixed; width: min(340px, calc(100vw - 24px)); padding: 18px 20px 16px; border-radius: 16px; background: #fff; color: var(--ink); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45); pointer-events: auto; }
+.p-sam__karta--dol { left: 50%; top: auto; bottom: 16px; translate: -50% 0; }
+.p-sam__licznik { margin: 0 0 4px; color: #535a61; font-size: 0.9rem; font-weight: 700; }
+.p-sam__tytul { margin: 0 0 6px; font-family: 'Overpass', system-ui, sans-serif; font-size: 1.3rem; font-weight: 800; }
+.p-sam__tekst { margin: 0 0 14px; font-size: 1.02rem; line-height: 1.5; }
+.p-sam__akcje { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.p-sam__pomin { padding: 8px 4px; border: 0; background: none; color: #535a61; font: inherit; font-size: 0.95rem; text-decoration: underline; cursor: pointer; }
+@media (prefers-reduced-motion: reduce) { .p-sam__pierscien { transition: none; } }
