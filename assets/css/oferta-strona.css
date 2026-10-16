@@ -404,8 +404,3 @@
 .ofs-start__note { margin: 0; font-size: 0.9rem; color: #aab1b6; line-height: 1.5; }
 .ofs-start__karta--glowna .ofs-start__note { color: #535a61; }
 @media (max-width: 860px) { .ofs-start__karty { grid-template-columns: minmax(0, 1fr); } .ofs-start__karta .cta { align-self: stretch; text-align: center; justify-content: center; } }
-
-/* Kafel „Panel pacjenta”: dwa telefony z lewej, treść z prawej (na wąskich ekranach jeden pod drugim). */
-.ofr-kafel--pacjent .ofs-telefony { border-radius: 0; align-self: stretch; align-items: center; border-right: 1px solid var(--hair); }
-.ofr-kafel--pacjent .ofs-telefon img { border: 0; }
-@media (max-width: 860px) { .ofr-kafel--pacjent .ofs-telefony { border-right: 0; border-bottom: 1px solid var(--hair); } }

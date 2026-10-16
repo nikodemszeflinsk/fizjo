@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/karta.css?v=63" />
-  <link rel="stylesheet" href="assets/css/oferta-strona.css?v=12" />
+  <link rel="stylesheet" href="assets/css/oferta-strona.css?v=13" />
 </head>
 <body class="ofr-body">
   <a class="skip" href="#tresc">Przejdź do treści</a>
@@ -375,7 +375,7 @@
       <div class="ofr-blok__in">
         <p class="ofr-kicker">Demo</p>
         <h2 class="ofr-h2 ofr-h2--szeroki">Zobacz i poklikaj, zanim zdecydujesz — dowolnie, nic się nie zepsuje</h2>
-        <p class="ofr-lead">To demo na przykładowych danych fikcyjnej kliniki „Linia Ruchu”: możesz przejść całą rezerwację jako pacjent, poklikać w kalendarzu gabinetu i sprawdzić, jak pacjent sam zmienia wizytę. Zmiany zapisują się tylko w Twojej przeglądarce.</p>
+        <p class="ofr-lead">To demo na przykładowych danych fikcyjnej kliniki „Linia Ruchu”: możesz przejść całą rezerwację jako pacjent i poklikać w prototypie panelu gabinetu. Zmiany zapisują się tylko w Twojej przeglądarce.</p>
 
         <div class="ofr-zobacz">
           <article class="ofr-kafel ofr-kafel--duzy">
@@ -389,42 +389,19 @@
             </div>
           </article>
 
-          <article class="ofr-kafel">
-            <img src="assets/img/zrzuty/kal2-tydzien.jpg" alt="Kalendarz dostępności pakietu Individual: tydzień z dwoma miejscami przyjęć." width="1908" height="1170" loading="lazy" decoding="async" />
+          <article class="ofr-kafel ofr-kafel--duzy ofr-kafel--panel">
+            <img src="assets/img/zrzuty/panel-kalendarz-demo.jpg" alt="Prototyp panelu gabinetu: kalendarz tygodnia z wizytami i godzinami przyjęć, a z prawej nowe rezerwacje ze strony i wizyty do oznaczenia." width="2160" height="1200" loading="lazy" decoding="async" />
             <div class="ofr-kafel__tresc">
-              <h3>Kalendarz: Individual</h3>
-              <p>Jeden terapeuta, kilka miejsc przyjęć. Zaznacz godziny, żeby je otworzyć albo zamknąć, przeciągnij wizytę na inny termin i zobacz, co widzi pacjent.</p>
+              <h3>Prototyp panelu gabinetu</h3>
+              <p>Tak wygląda Twój kalendarz i rezerwacje na co dzień: wizyty w tygodniu i w dniu, nowe rezerwacje ze strony, dostępność, usługi i ceny. Przełącznik w lewym dolnym rogu pokazuje pakiet Individual albo Team (osobny grafik każdego terapeuty).</p>
               <div class="ofr-kafel__akcje">
-                <a class="cta cta--blue" href="kalendarz.html" target="_blank" rel="noopener">Otwórz kalendarz <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></a>
-              </div>
-            </div>
-          </article>
-
-          <article class="ofr-kafel">
-            <img src="assets/img/zrzuty/kal2-zespol.jpg" alt="Kalendarz dostępności pakietu Team: dzień zespołu z osobną kolumną dla każdego terapeuty." width="1908" height="1170" loading="lazy" decoding="async" />
-            <div class="ofr-kafel__tresc">
-              <h3>Kalendarz: Team</h3>
-              <p>Zespół i osobny grafik każdego terapeuty w jednym widoku dnia.</p>
-              <div class="ofr-kafel__akcje">
-                <a class="cta cta--blue" href="kalendarz.html?tryb=ent" target="_blank" rel="noopener">Otwórz kalendarz zespołu <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></a>
-              </div>
-            </div>
-          </article>
-
-          <article class="ofr-kafel ofr-kafel--duzy ofr-kafel--pacjent">
-            <div class="ofs-telefony ofs-telefony--kafel"><div class="ofs-telefon"><img src="assets/img/zrzuty/wizyta-telefon-1.jpg" alt="Strona wizyty pacjenta na telefonie: termin, miejsce, przyciski „Zmień termin” i „Odwołaj wizytę”." width="780" height="1600" loading="lazy" decoding="async" /></div><div class="ofs-telefon"><img src="assets/img/zrzuty/wizyta-telefon-2.jpg" alt="Wybór nowego terminu na telefonie: dni, godziny i podsumowanie zmiany." width="780" height="1600" loading="lazy" decoding="async" /></div></div>
-            <div class="ofr-kafel__tresc">
-              <h3>Strona pacjenta: zmiana wizyty</h3>
-              <p>Pacjent dostaje link w e-mailu, sam przekłada albo odwołuje wizytę i od razu widzi potwierdzenie. Zmiana pojawia się w kalendarzu gabinetu, bez telefonu do rejestracji.</p>
-              <div class="ofr-kafel__akcje">
-                <a class="cta cta--blue" href="wizyta.html" target="_blank" rel="noopener">Otwórz demo zmiany wizyty <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></a>
+                <a class="cta cta--blue" href="panel.html#/kalendarz" target="_blank" rel="noopener">Otwórz prototyp panelu <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></a>
               </div>
             </div>
           </article>
         </div>
-            </div>
-          </article>
-        </div>
+
+        <p class="ofr-fine ofs-demo-wiz">Chcesz zobaczyć, jak pacjent przekłada albo odwołuje wizytę? <a href="wizyta.html" target="_blank" rel="noopener">Otwórz demo zmiany wizyty</a>. Zmiana od razu pojawi się w kalendarzu panelu.</p>
       </div>
     </section>
 
@@ -801,7 +778,7 @@
       <div class="foot__col foot__col--cta">
         <p class="foot__h">Zobacz to w działaniu</p>
         <a class="cta cta--blue" href="demo.html" target="_blank" rel="noopener">Demo strony <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></a>
-        <a class="cta cta--line" href="kalendarz.html" target="_blank" rel="noopener">Demo kalendarza</a>
+        <a class="cta cta--line" href="panel.html#/kalendarz" target="_blank" rel="noopener">Demo panelu</a>
       </div>
     </div>
 
