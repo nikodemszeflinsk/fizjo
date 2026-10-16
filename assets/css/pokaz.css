@@ -26,7 +26,7 @@ body { margin: 0; display: flex; flex-direction: column; height: 100svh; backgro
 .pk-tor:focus { outline: none; }
 .pk-slajd { flex: 0 0 100%; min-width: 0; scroll-snap-align: start; scroll-snap-stop: always; overflow-y: auto; padding: 22px 20px 26px; display: grid; gap: 22px; align-content: start; }
 .pk-tekst { max-width: 560px; }
-.pk-et { margin: 0 0 8px; font-size: 0.88rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-jasny); }
+.pk-et { margin: 0 0 8px; font-size: 1.15rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: #a9c4f5; }
 .pk-slajd h2 { margin: 0 0 14px; font-family: var(--f-display); font-weight: 900; font-size: clamp(1.7rem, 7vw, 2.5rem); line-height: 1.08; letter-spacing: -0.02em; color: #fff; text-wrap: balance; }
 .pk-lead { margin: 0 0 16px; color: #c7ced3; }
 .pk-tekst ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
