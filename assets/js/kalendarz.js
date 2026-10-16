@@ -530,7 +530,7 @@
           </fieldset>
           ${pole('f-powod', 'Powód <em>(widzisz tylko Ty)</em>', '<select id="f-powod"><option>Bez podania powodu</option><option>Choroba</option><option>Brak czasu, przełoży później</option><option>Nie odbiera telefonu</option><option>Choroba terapeuty</option><option>Inny powód</option></select>')}
           <label class="check"><input type="checkbox" id="f-pozno"${godzinDo >= 0 && godzinDo < 24 ? ' checked' : ''} /><span>Odwołanie później niż 24 godziny przed wizytą</span></label>
-          ${r.zrodlo === 'strona' ? '<label class="check"><input type="checkbox" id="f-powiadom" checked /><span>Powiadom pacjenta e-mailem (w demie to symulacja)</span></label>' : ''}
+          ${r.zrodlo === 'strona' ? '<label class="check"><input type="checkbox" id="f-powiadom" checked /><span>Powiadom pacjenta SMS-em (w demie to symulacja)</span></label>' : ''}
           ${r.zal && D().ustawienia.zaliczki ? `<p class="okno__nota">Pacjent wpłacił zaliczkę ${r.zal.kwota} zł (${esc(r.zal.metoda)}). Zwrot robisz u operatora płatności, zgodnie ze swoim regulaminem.</p>` : ''}
           <p class="okno__nota">Termin od razu wraca na stronę jako wolny, a wizyta zostaje w historii jako odwołana. Możesz to cofnąć albo przywrócić wizytę później.</p>
         </div>
@@ -1212,7 +1212,7 @@
         const powod = $('#f-powod') ? $('#f-powod').value : '';
         const pozno = !!($('#f-pozno') && $('#f-pozno').checked);
         ui.odwolywanie = false;
-        return zmien(`${kto === 'anulowana' ? 'Anulowano' : 'Odwołano'}: ${r.imie}. Termin znów jest wolny${pow ? ', e-mail do pacjenta wysłany (symulacja)' : ''}.`, () => { Object.assign(r, { status: kto, powod, pozno, nowa: false, odwolano: new Date().toISOString() }); });
+        return zmien(`${kto === 'anulowana' ? 'Anulowano' : 'Odwołano'}: ${r.imie}. Termin znów jest wolny${pow ? ', SMS do pacjenta wysłany (symulacja)' : ''}.`, () => { Object.assign(r, { status: kto, powod, pozno, nowa: false, odwolano: new Date().toISOString() }); });
       }
       case 'przywroc': {
         const r = D().rezerwacje.find((x) => x.id === b.dataset.id);

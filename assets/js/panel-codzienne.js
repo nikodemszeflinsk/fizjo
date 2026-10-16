@@ -372,6 +372,7 @@
       return `${P.naglowek(esc(p.imie), `${esc(p.tel)} · pozyskany: ${esc(K.ZRODLA[p.zrodlo] || p.zrodlo)}, ${P.dataKrotka(p.pierwsza)}`)}
         <div class="sz__glowne">
           <a class="przycisk przycisk--cichy" href="tel:${k}">Zadzwoń</a>
+          <button type="button" class="przycisk przycisk--cichy" data-pa="sms-nowy" data-tel="${esc(p.tel)}">Wyślij SMS</button>
           <button type="button" class="przycisk" data-pa="umow" data-imie="${esc(p.imie)}" data-tel="${esc(p.tel)}" data-terap="${p.terap}">Umów wizytę</button>
         </div>
         <dl class="dane">
@@ -380,7 +381,7 @@
           <div><dt>Następna wizyta</dt><dd>${p.nastepna ? `${esc(K.dlugaData(K.zIso(p.nastepna.data)))}, ${K.godz(p.nastepna.od)}` : 'brak'}</dd></div>
         </dl>
         ${P.pole({ etykieta: 'Notatka o pacjencie <em>(nie medyczna, widzi ją tylko gabinet)</em>', wartosc: n.notatka || '', wiersze: 2, atr: `data-pac-notatka="${k}"`, placeholder: 'np. woli terminy rano, dzwonić po 16' })}
-        ${P.przelacznik({ etykieta: 'Zgoda na przypomnienia SMS', wartosc: n.sms !== false, pod: 'Bez zgody pacjent dostaje tylko e-maile.', atr: `data-pac-sms="${k}"` })}
+        ${P.przelacznik({ etykieta: 'Zgoda na SMS-y o wizytach', wartosc: n.sms !== false, pod: 'Bez zgody pacjent nie dostaje SMS-ów z systemu. Zadzwoń do niego.', atr: `data-pac-sms="${k}"` })}
         <div class="p-sz-sekcja"><h3>Historia wizyt</h3>
           <ul class="p-lista">${wizyty.map((r) => `<li class="p-wiersz"><button type="button" class="p-wiersz__glowny" data-pa="rez" data-id="${r.id}"><b>${esc(K.dlugaData(K.zIso(r.data)))}, ${K.godz(r.od)} ${statusTag(r)}</b><small>${esc(K.usluga(D, r.usluga).nazwa)} · ${P.zl(K.cena(D, r))} · ${esc(K.ZRODLA_KR[r.zrodlo] || r.zrodlo)}${P.ent() ? ` · ${esc(P.osobaNazwa(osoba(r.terap)))}` : ''}</small></button></li>`).join('')}</ul>
         </div>

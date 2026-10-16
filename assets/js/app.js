@@ -647,7 +647,7 @@
         <dt>Kiedy</dt><dd>${dayLong(fromIso(B.date))}, ${B.time}</dd>
         <dt>Gdzie</dt><dd>${esc(GABINET.adres)}, ${esc(GABINET.kod)}</dd>
         <dt>Potwierdzenie</dt><dd>${
-          B.data.sms || !B.data.email.trim() ? 'SMS na ' + esc(B.data.phone) : 'e-mail na ' + esc(B.data.email)
+          'SMS na ' + esc(B.data.phone)
         }</dd>
         ${
           B.data.note
@@ -661,11 +661,11 @@
         <button class="back" type="button" data-restart>Umów kolejną wizytę</button>
       </div>
       <ul class="done__dalej">
-        <li>Dzień przed wizytą dostaniesz SMS z przypomnieniem.</li>
-        <li>W SMS-ie jest link do Twojej karty: terminy, ćwiczenia i przycisk „nie mogę, przełóż”.</li>
+        <li>Za chwilę dostaniesz SMS z potwierdzeniem, a dzień przed wizytą przypomnienie.</li>
+        <li>W SMS-ie jest link do strony Twojej wizyty, z przyciskiem „zmień termin” albo „odwołaj”.</li>
         <li>Termin możesz zmienić sam, bez dzwonienia.</li>
       </ul>
-      <p class="demo-note">Tryb demo: w prawdziwym wdrożeniu rezerwacja trafia do kalendarza gabinetu, a pacjent dostaje przypomnienie o wizycie e-mailem (pakiet Widoczność), w pakiecie Prowadzenie także SMS-em.</p>
+      <p class="demo-note">Tryb demo: w prawdziwym wdrożeniu rezerwacja trafia do kalendarza gabinetu, a pacjent dostaje SMS z potwierdzeniem i przypomnieniem o wizycie.</p>
     </div>`;
   }
 

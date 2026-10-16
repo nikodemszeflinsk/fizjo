@@ -12,7 +12,7 @@
   var lead = (q.get('l') || '').slice(0, 40);
   var dla = (q.get('dla') || '').slice(0, 90);
   var pakiet = q.get('p');
-  var PAK = { individual: { nazwa: 'Individual', wdr: 2900, utr: 99 }, enterprise: { nazwa: 'Team', wdr: 4499, utr: 149 } };
+  var PAK = { individual: { nazwa: 'Individual', wdr: 2900, utr: 149 }, enterprise: { nazwa: 'Team', wdr: 4499, utr: 199 } };
   var sms = q.get('s') === '1', zal = q.get('z') === '1', pil = q.get('pil') === '1';
   var PILOT_WDR = { individual: 1900, enterprise: 2999 };
   function zl(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' zł'; }
@@ -42,7 +42,7 @@
     var P = PAK[pakiet];
     var wiersz = document.getElementById('ofs-start-pakiet');
     if (wiersz) {
-      wiersz.innerHTML = 'Przygotowaliśmy dla Ciebie pakiet <b>' + P.nazwa + '</b>' + (pil ? ' w pilotażu pierwszych klientów' : '') + ': ' + zl((pil ? PILOT_WDR[pakiet] : P.wdr) + (zal ? 299 : 0)) + ' wdrożenie i ' + zl(P.utr + (sms ? 49 : 0) + (zal ? 29 : 0)) + ' miesięcznie (ceny końcowe).';
+      wiersz.innerHTML = 'Przygotowaliśmy dla Ciebie pakiet <b>' + P.nazwa + '</b>' + (pil ? ' w pilotażu pierwszych klientów' : '') + ': ' + zl((pil ? PILOT_WDR[pakiet] : P.wdr) + (zal ? 299 : 0)) + ' wdrożenie i ' + zl(P.utr + (sms ? 50 : 0) + (zal ? 29 : 0)) + ' miesięcznie (ceny końcowe).';
       wiersz.hidden = false;
     }
   }

@@ -510,3 +510,19 @@ button.gz-kom.pl-kom--jedn { border-style: solid; border-color: #9db8ea; }
 .p-sam__akcje { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .p-sam__pomin { padding: 8px 4px; border: 0; background: none; color: #535a61; font: inherit; font-size: 0.95rem; text-decoration: underline; cursor: pointer; }
 @media (prefers-reduced-motion: reduce) { .p-sam__pierscien { transition: none; } }
+
+/* ── SMS: licznik w nagłówku, okno własnego SMS-a, karta w Ustawieniach ── */
+.p-sms-chip { gap: 6px; }
+.p-sms-chip b { font-variant-numeric: tabular-nums; }
+.p-sms-chip[data-poziom='malo'] { border-color: #e8590c; color: #9a3a05; }
+.p-sms-chip[data-poziom='wyczerpany'] { border-color: #c2255c; background: #fdecea; color: #8a1237; }
+@media (max-width: 760px) { .p-sms-chip__t { font-size: 0.9rem; } }
+.p-sms-stan { margin: 0 0 14px; padding: 10px 14px; border-radius: 12px; background: #eef7f1; color: #14633f; }
+.p-sms-stan--malo { background: #fff1e6; color: #8a3a05; }
+.p-sms-stan--wyczerpany { background: #fdecea; color: #8a1237; }
+.p-sms-ostrz { margin: 0; padding: 8px 12px; border-radius: 10px; background: #fdecea; color: #8a1237; font-weight: 700; }
+.p-sms-licznik__duzy { margin: 0 0 8px; font-size: 1rem; }
+.p-sms-licznik__duzy b { font-family: var(--f-display); font-size: 2.4rem; font-weight: 900; line-height: 1; }
+.p-sms-licznik--malo .p-limit__tor i { background: #e8590c; }
+.p-sms-licznik--wyczerpany .p-limit__tor i { background: #c2255c; }
+.p-sms-licznik .p-limit__tor { display: block; width: 100%; }

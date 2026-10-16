@@ -63,7 +63,9 @@
     return {
       nazwa: 'Linia Ruchu',
       /* Wiadomości do pacjentów: włączasz i wyłączasz, treść ustawiamy przy wdrożeniu. */
-      powiadomienia: { potwierdzenie: true, przypomnienie: true, przypomnienieGodz: 24, odwolanie: true, zmiana: true, sms: false, doGabinetu: true },
+      powiadomienia: { potwierdzenie: true, przypomnienie: true, przypomnienieGodz: 24, odwolanie: true, zmiana: true, doGabinetu: true, doTerapeutow: true },
+      /* SMS: 200 wiadomości miesięcznie w utrzymaniu, kolejne pakiety po 200 za 50 zł miesięcznie; własne SMS-y wysłane z panelu. */
+      sms: { pakiety: ent ? 1 : 0, wlasne: [] }, /* zespół wysyła więcej wiadomości, więc w demie Team ma jeden dokupiony pakiet */
       pacjenci: {},
       konto: {
         nazwa: ent ? 'Linia Ruchu sp. z o.o.' : 'Linia Ruchu Jan Kowalski',
@@ -71,7 +73,7 @@
         telefon: ent ? '12 345 67 89' : '600 700 800',
         adres: 'ul. Przykładowa 1, 30-001 Kraków',
         wlasciciel: 'Jan Kowalski',
-        dodatki: { sms: false, zaliczki: true },
+        dodatki: { zaliczki: true },
       },
     };
   };

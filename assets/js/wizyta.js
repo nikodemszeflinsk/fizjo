@@ -1,5 +1,5 @@
 /*
- * Zmiana wizyty przez pacjenta: link z e-maila → termin, przełożenie, odwołanie.
+ * Zmiana wizyty przez pacjenta: link z SMS-a → termin, przełożenie, odwołanie.
  *
  * Bez konta, bez logowania i bez pytań o zdrowie: pacjent widzi tylko własną wizytę, wybiera nowy termin
  * albo odwołuje (powód z listy, bez wolnego tekstu). Zasady (do ilu godzin przed wizytą) ustawia gabinet.
@@ -194,7 +194,7 @@
     }
     return `<div class="sukces"><span class="sukces__ikona">${IK.ok}</span><h1>Termin zmieniony</h1></div>
       <section class="karta" aria-label="Nowy termin">${termin(r)}${szczegoly(r, g)}</section>
-      <p class="wstep">Wysłaliśmy potwierdzenie e-mailem, a gabinet już o tym wie.</p>
+      <p class="wstep">Wysłaliśmy potwierdzenie SMS-em, a gabinet już o tym wie.</p>
       <div class="dwa"><button type="button" class="btn btn--cichy" data-a="ics">${IK.kal}Do kalendarza</button><a class="btn btn--cichy" href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(g.adres)}" target="_blank" rel="noopener">${IK.trasa}Trasa</a></div>
       <div class="akcje"><button type="button" class="btn btn--cichy" data-a="wstecz">Wróć do wizyty</button></div>`;
   }
