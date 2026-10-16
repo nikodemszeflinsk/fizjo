@@ -13,23 +13,36 @@
   var dla = (q.get('dla') || '').slice(0, 90);
   var pakiet = q.get('p');
   var PAK = { individual: { nazwa: 'Individual', wdr: 2900, utr: 99 }, enterprise: { nazwa: 'Team', wdr: 4499, utr: 149 } };
-  var sms = q.get('s') === '1', zal = q.get('z') === '1';
+  var sms = q.get('s') === '1', zal = q.get('z') === '1', pil = q.get('pil') === '1';
+  var PILOT_WDR = { individual: 1900, enterprise: 2999 };
   function zl(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' zł'; }
   function b64u(t) { return btoa(unescape(encodeURIComponent(t))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
 
   /* Adres konfiguratora: z leadem przez token (jak link do umowy z CRM), bez leada przez ?p=. */
-  function adresStartu(p) {
+  function adresStartu(p, pilotaz) {
     var wybrany = PAK[p] ? p : (PAK[pakiet] ? pakiet : '');
-    if (lead && wybrany) return 'umowa.html?d=' + b64u(JSON.stringify({ l: lead, g: dla, m: '', p: wybrany, s: sms ? 1 : 0, z: zal ? 1 : 0, k: 1 }));
-    return 'umowa.html' + (wybrany ? '?p=' + wybrany : '');
+    var wPilotazu = pilotaz || pil;
+    if (lead && wybrany) return 'umowa.html?d=' + b64u(JSON.stringify({ l: lead, g: dla, m: '', p: wybrany, s: sms ? 1 : 0, z: zal ? 1 : 0, k: 1, pil: wPilotazu ? 1 : 0 }));
+    return 'umowa.html' + (wybrany ? '?p=' + wybrany + (wPilotazu ? '&pil=1' : '') : (wPilotazu ? '?pil=1' : ''));
   }
   document.querySelectorAll('[data-start]').forEach(function (a) { a.setAttribute('href', adresStartu(a.getAttribute('data-start'))); });
+  document.querySelectorAll('[data-start-pilot]').forEach(function (a) { a.setAttribute('href', adresStartu(a.getAttribute('data-start-pilot'), true)); });
+
+  /* Licznik miejsc w pilotażu: prawdziwy, z serwera. Gdy pilotaż jest pełny, ukrywamy go w ofercie (nie udajemy dostępności). */
+  if (window.ODBIORNIK && window.ODBIORNIK.pilotaz) {
+    window.ODBIORNIK.pilotaz().then(function (j) {
+      if (!j) return;
+      var wolne = Math.max(0, j.miejsc - j.zajete);
+      if (!wolne && !pil) { document.querySelectorAll('[data-pilot-blok]').forEach(function (e) { e.hidden = true; }); return; }
+      document.querySelectorAll('[data-pilot-wolne]').forEach(function (e) { e.textContent = 'wolne miejsca: ' + wolne + ' z ' + j.miejsc; });
+    });
+  }
 
   if (PAK[pakiet]) {
     var P = PAK[pakiet];
     var wiersz = document.getElementById('ofs-start-pakiet');
     if (wiersz) {
-      wiersz.innerHTML = 'Przygotowaliśmy dla Ciebie pakiet <b>' + P.nazwa + '</b>: ' + zl(P.wdr + (zal ? 299 : 0)) + ' wdrożenie i ' + zl(P.utr + (sms ? 49 : 0) + (zal ? 29 : 0)) + ' miesięcznie (ceny końcowe).';
+      wiersz.innerHTML = 'Przygotowaliśmy dla Ciebie pakiet <b>' + P.nazwa + '</b>' + (pil ? ' w pilotażu pierwszych klientów' : '') + ': ' + zl((pil ? PILOT_WDR[pakiet] : P.wdr) + (zal ? 299 : 0)) + ' wdrożenie i ' + zl(P.utr + (sms ? 49 : 0) + (zal ? 29 : 0)) + ' miesięcznie (ceny końcowe).';
       wiersz.hidden = false;
     }
   }

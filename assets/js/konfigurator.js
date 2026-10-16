@@ -8,7 +8,7 @@
     /* KONFIGURACJA. Uzupełnij przed pierwszym użyciem. Puste pola pokazują się w umowie jako żółte „do uzupełnienia”. */
     var KONF = {
       zatwierdzona: false, /* true dopiero po przeglądzie wzoru przez prawnika: wtedy znika znak PROJEKT */
-      wersja: 'SW-2026-10-v3',
+      wersja: 'SW-2026-10-v4',
       wykonawca: { nazwa: 'Studio Widok (Nikodem Szefliński, osoba fizyczna prowadząca działalność nierejestrowaną)', nip: 'brak (działalność nierejestrowana)', adres: '' },
       email: 'kontakt@studio-widok.pl',
       telefon: '783 480 341',
@@ -24,6 +24,9 @@
       individual: { nazwa: 'Individual', wdr: 2900, utr: 99, terapeuci: 1, miejsca: 3, uslugi: 7, podstrony: 5 },
       enterprise: { nazwa: 'Team', wdr: 4499, utr: 149, terapeuci: 99, miejsca: 99, uslugi: 99, podstrony: 10 }
     };
+    /* Pilotaż pierwszych klientów: obniżona cena wdrożenia w zamian za zgodę na referencję (§10 umowy). Limit miejsc pilnuje serwer. */
+    var PILOT = { miejsc: 3, wdr: { individual: 1900, enterprise: 2999 }, zajete: null, zLinku: false };
+    function pilotWolne() { return PILOT.zajete === null ? PILOT.miejsc : Math.max(0, PILOT.miejsc - PILOT.zajete); }
     var SMS = { cena: 49, limit: 200 };
     var ZAL = { wdr: 299, utr: 29 };
     /* 99 = bez limitu w pakiecie. */
@@ -34,7 +37,7 @@
     var KLUCZ = 'konfigurator-strony-v1';
 
     var S = {
-      lead: '', krok: 0, pakiet: 'individual', sms: false, zaliczki: false, operator: 'pomoc', w_podstrony: false, w_kalendarze: false, w_kampania: false,
+      lead: '', krok: 0, pakiet: 'individual', pilot: false, sms: false, zaliczki: false, operator: 'pomoc', w_podstrony: false, w_kalendarze: false, w_kampania: false,
       firma: '', nip: '', adres: '', osoba: '', email: '', telefon: '',
       nazwa: '', miasto: '', formToken: '',
       tryb: 'sms', kod: '', smsStan: { etap: 'start', maska: '', blad: '', kiedy: 0, probny: false },
@@ -54,7 +57,7 @@
     function ust(lista, v) {
       return lista.filter(Boolean).map(function (t, i) { return '<p class="ust"><span class="n">' + (i + 1) + '.</span><span>' + md(t, v) + '</span></p>'; }).join('');
     }
-    function ceny() { var P = PAK[S.pakiet]; return { wdr: P.wdr + (S.zaliczki ? ZAL.wdr : 0), baza: P.utr, utr: P.utr + (S.sms ? SMS.cena : 0) + (S.zaliczki ? ZAL.utr : 0) }; }
+    function ceny() { var P = PAK[S.pakiet]; return { wdr: (S.pilot ? PILOT.wdr[S.pakiet] : P.wdr) + (S.zaliczki ? ZAL.wdr : 0), baza: P.utr, utr: P.utr + (S.sms ? SMS.cena : 0) + (S.zaliczki ? ZAL.utr : 0) }; }
     function nipOk(n) {
       var c = String(n).replace(/[\s-]/g, '');
       if (!/^\d{10}$/.test(c)) return false;
@@ -83,7 +86,8 @@
         NUMER: dane(S.numer || '—'), DATA: dane(dataPL(wynik ? wynik.czas : new Date())),
         FIRMA: dane(S.firma), NIP: dane(S.nip), ADRES: dane(S.adres), OSOBA: dane(S.osoba), EMAIL: dane(S.email), TELEFON: dane(S.telefon),
         WYK_NAZWA: luka(W.nazwa), WYK_NIP: luka(W.nip), WYK_ADRES: luka(W.adres), WYK_EMAIL: dane(KONF.email), WYK_TEL: dane(KONF.telefon),
-        PAKIET: dane(PAK[S.pakiet].nazwa), CENA_WDR: dane(zl(c.wdr)), CENA_UTR: dane(zl(c.utr)),
+        PAKIET: dane(PAK[S.pakiet].nazwa), CENA_WDR: dane(zl(c.wdr)), CENA_UTR: dane(zl(c.utr)), CENA_STD: dane(zl(PAK[S.pakiet].wdr + (S.zaliczki ? ZAL.wdr : 0))),
+        PILOT_OPIS: S.pilot ? ' (cena pilotażowa, zob. §10)' : '',
         WDR_OPIS: S.zaliczki ? ', w tym zaliczki online: ' + zl(ZAL.wdr) : '',
         UTR_OPIS: (S.sms || S.zaliczki) ? ', w tym ' + [S.sms && 'przypomnienia SMS (' + zl(SMS.cena) + ', do ' + SMS.limit + ' wiadomości miesięcznie)', S.zaliczki && 'zaliczki online (' + zl(ZAL.utr) + ')'].filter(Boolean).join(' oraz ') : '',
         CENA_DOD: dane(dodatkiLista().length ? dodatkiLista().join('; ') + ' (wliczone w kwoty z ust. 1)' : 'nie dotyczy'),
@@ -118,10 +122,11 @@
       v.OPIS_PAK = esc(opisPakietu());
       var wybor = [
         { cells: ['Pakiet', esc(P.nazwa)] },
+        S.pilot ? { cells: ['Pilotaż pierwszych klientów', 'tak: wdrożenie ' + esc(zl(ceny().wdr)) + ' zamiast ' + esc(zl(P.wdr + (S.zaliczki ? ZAL.wdr : 0)))] } : null,
         { cells: ['Dodatki w umowie', dodatkiLista().length ? esc(dodatkiLista().join('; ')) : 'brak'] },
         { cells: ['Treści, zdjęcia i inne materiały strony', 'przekazywane w formularzu startowym, który jest częścią umowy'] },
         { cells: ['Wycena poza umową', wycena ? esc(wycena) : 'brak'] }
-      ];
+      ].filter(Boolean);
       var h = '';
       if (!KONF.zatwierdzona) h += '<p class="projekt">PROJEKT. Wzór umowy jest w przeglądzie prawnym i nie ma mocy prawnej.</p>';
       h += '<h1>UMOWA O STRONĘ INTERNETOWĄ Z SYSTEMEM REZERWACJI</h1>';
@@ -148,7 +153,7 @@
       ], v);
 
       h += '<h2>§3. Cena i płatności</h2>' + ust([
-        'Wdrożenie: {CENA_WDR}{WDR_OPIS}. Utrzymanie: {CENA_UTR} miesięcznie{UTR_OPIS}.',
+        'Wdrożenie: {CENA_WDR}{PILOT_OPIS}{WDR_OPIS}. Utrzymanie: {CENA_UTR} miesięcznie{UTR_OPIS}.',
         'Wykonawca nie dolicza do cen podatku VAT, więc podane ceny są cenami końcowymi. Jeśli Wykonawca zarejestruje działalność gospodarczą albo z innego powodu będzie zobowiązany do doliczania VAT, poinformuje o tym Zamawiającego co najmniej 30 dni wcześniej, a od tego dnia podane ceny są cenami netto powiększanymi o VAT. Zamawiający może wtedy zrezygnować z umowy (§6).',
         'Dokument sprzedaży (rachunek albo faktura) za wdrożenie Wykonawca wystawia **po akceptacji projektu**, z terminem płatności 7 dni. Strona zostaje uruchomiona na domenie Zamawiającego **po zapłacie**.',
         'Utrzymanie płatne jest od miesiąca następującego po uruchomieniu Strony, na podstawie dokumentu sprzedaży (rachunku albo faktury) wystawianego z góry na początku miesiąca, z terminem płatności 7 dni.',
@@ -209,15 +214,25 @@
           : 'Osoba akceptująca jest uprawniona do reprezentowania Zamawiającego i dysponuje adresem {EMAIL}.'
       ], v);
 
+      if (S.pilot) {
+        h += '<h2>§10. Pilotaż pierwszych klientów</h2>' + ust([
+          'Zamawiający uczestniczy w **pilotażu pierwszych klientów**: Wykonawca wdraża Strony pierwszym trzem klientom po obniżonej cenie wdrożenia. Cena wdrożenia w tej umowie wynosi {CENA_WDR} zamiast ceny standardowej {CENA_STD}. Cena utrzymania nie jest obniżona.',
+          'W zamian Zamawiający: (a) zgadza się, aby Wykonawca wskazał Zamawiającego i Stronę (nazwę gabinetu, adres Strony i krótki opis współpracy) jako swoją realizację w materiałach o swojej działalności, w tym na swojej stronie internetowej i w ofertach; (b) po uruchomieniu Strony, w ciągu około 30 dni, odbędzie z Wykonawcą krótką rozmowę (do 30 minut) o działaniu Strony i systemu rezerwacji; (c) udostępni Wykonawcy zbiorcze, zanonimizowane liczby dotyczące rezerwacji dokonanych przez Stronę (na przykład liczbę rezerwacji w miesiącu), wyłącznie w celu opisania efektów w realizacji.',
+          'Wykonawca nie publikuje opinii Zamawiającego bez uzgodnienia jej treści z Zamawiającym, nie używa danych pacjentów ani żadnych informacji pozwalających zidentyfikować pacjenta i nie przypisuje Zamawiającemu wyników, których ten nie potwierdził.',
+          'Zamawiający może w każdej chwili cofnąć zgodę z ust. 2 lit. a e-mailem. Wykonawca usunie wtedy wskazanie realizacji ze swoich materiałów w ciągu 14 dni. Cofnięcie zgody nie obliguje Zamawiającego do dopłaty do ceny wdrożenia ani nie wpływa na pozostałe postanowienia umowy.',
+          'Pilotaż obejmuje trzech pierwszych klientów, którzy zawrą umowę. Jeśli limit zostanie wyczerpany przed zawarciem tej umowy, umowa jest zawierana po cenie standardowej.',
+          'Cena utrzymania z tej umowy nie wzrośnie przez 12 miesięcy od jej zawarcia, z zastrzeżeniem §3 ust. 2 (VAT).'
+        ], v);
+      }
       var koncowe = [
         'Zmiany umowy wymagają formy dokumentowej (e-mail z potwierdzeniem). Komunikacja odbywa się na adresy e-mail z umowy, a zmianę adresu strona zgłasza drugiej niezwłocznie.',
         'Żadna ze stron nie może przenieść praw i obowiązków z umowy na inną osobę bez zgody drugiej. Wykonawca może korzystać z podwykonawców i odpowiada za nich jak za siebie.',
         'Żadna ze stron nie odpowiada za niewykonanie lub nienależyte wykonanie umowy z powodu siły wyższej (np. awarii sieci lub dostawców, działań władz), jeśli niezwłocznie poinformuje o tym drugą stronę.',
         'Jeśli któryś zapis umowy okaże się nieważny, pozostałe obowiązują.',
-        S.zgody.e ? 'Zamawiający zgadza się, aby Wykonawca wskazał Stronę (nazwę gabinetu i adres Strony) jako swoją realizację. Zgodę można w każdej chwili cofnąć e-mailem.' : null,
+        S.zgody.e && !S.pilot ? 'Zamawiający zgadza się, aby Wykonawca wskazał Stronę (nazwę gabinetu i adres Strony) jako swoją realizację. Zgodę można w każdej chwili cofnąć e-mailem.' : null,
         'Stosuje się prawo polskie. Strony najpierw próbują rozwiązać spór polubownie, a jeśli to się nie uda, rozstrzyga go sąd właściwy według przepisów ogólnych.'
       ];
-      h += '<h2>§10. Postanowienia końcowe</h2>' + ust(koncowe, v);
+      h += '<h2>§' + (S.pilot ? 11 : 10) + '. Postanowienia końcowe</h2>' + ust(koncowe, v);
 
       h += '<h2>Wybrane przez Zamawiającego</h2>' + tabela(wybor);
       return h;
@@ -253,6 +268,7 @@
     }
     function zastosujToken() {
       var wybor = new URLSearchParams(location.search).get('p');
+      if (!TOKEN && new URLSearchParams(location.search).get('pil') === '1') S.pilot = true;
       if (!TOKEN && PAK[wybor]) {
         /* Przycisk „Wybieram …” z oferty bez linku z CRM: ustawiamy pakiet i zaczynamy od danych firmy. */
         S.pakiet = wybor;
@@ -274,13 +290,14 @@
       LINK.ut = String(TOKEN.u || '').slice(0, 80); LINK.do = String(TOKEN.w || '');
       if (PAK[TOKEN.p]) S.pakiet = TOKEN.p;
       S.sms = !!TOKEN.s; S.zaliczki = !!TOKEN.z;
+      S.pilot = !!TOKEN.pil; PILOT.zLinku = !!TOKEN.pil;
       if (!S.firma && TOKEN.g) S.firma = TOKEN.g;
       S.krok = inny ? 1 : Math.max(Math.min(S.krok, 1), 1);
     }
     /** Dane do odbiornika i do kodu: bez zgód, podpisu i błędów. */
     function paczka(typ) {
       var o = {}, c = ceny();
-      ['pakiet', 'sms', 'zaliczki', 'operator', 'w_podstrony', 'w_kalendarze', 'w_kampania', 'firma', 'nip', 'adres', 'osoba', 'email', 'telefon', 'nazwa', 'miasto'].forEach(function (k) { o[k] = S[k]; });
+      ['pakiet', 'pilot', 'sms', 'zaliczki', 'operator', 'w_podstrony', 'w_kalendarze', 'w_kampania', 'firma', 'nip', 'adres', 'osoba', 'email', 'telefon', 'nazwa', 'miasto'].forEach(function (k) { o[k] = S[k]; });
       return {
         typ: typ, lead: S.lead, kiedy: new Date().toISOString(), konf: o, ceny: { wdr: c.wdr, utr: c.utr },
         umowa: S.wynik ? { numer: S.numer, czas: S.wynik.czas.toISOString(), hash: S.wynik.hash, wersja: KONF.wersja, osoba: S.osoba } : null
@@ -326,7 +343,7 @@
     }
     function podsumowanie() {
       var c = ceny();
-      return '<div class="kf-podsum" aria-live="polite"><div><span>Wdrożenie</span> <b>' + zl(c.wdr) + '</b></div><div><span>Utrzymanie miesięcznie</span> <b>' + zl(c.utr) + '</b></div><small>Ceny końcowe: Wykonawca nie dolicza do nich VAT.</small></div>';
+      return '<div class="kf-podsum" aria-live="polite"><div><span>Wdrożenie</span> <b>' + zl(c.wdr) + '</b></div><div><span>Utrzymanie miesięcznie</span> <b>' + zl(c.utr) + '</b></div><small>' + (S.pilot ? 'Cena pilotażowa (standardowo ' + zl(PAK[S.pakiet].wdr + (S.zaliczki ? ZAL.wdr : 0)) + '). ' : '') + 'Ceny końcowe: Wykonawca nie dolicza do nich VAT.</small></div>';
     }
 
     /* Krok 1: pakiet i dodatki */
@@ -334,9 +351,12 @@
       var kart = Object.keys(PAK).map(function (id) {
         var P = PAK[id];
         var opis = id === 'individual' ? 'Jeden terapeuta, do 3 miejsc przyjęć, do 5 podstron' : 'Zespół i kilka lokalizacji: terapeuci i lokalizacje bez limitu, każdy z własnym grafikiem, do 10 podstron';
-        return '<label class="kf-pakiet"><input type="radio" name="pakiet" data-k="pakiet" value="' + id + '"' + (S.pakiet === id ? ' checked' : '') + ' /><b>' + P.nazwa + '</b><span>' + opis + '</span><em>' + zl(P.wdr) + ' wdrożenie · ' + zl(P.utr) + ' / mies.</em></label>';
+        return '<label class="kf-pakiet"><input type="radio" name="pakiet" data-k="pakiet" value="' + id + '"' + (S.pakiet === id ? ' checked' : '') + ' /><b>' + P.nazwa + '</b><span>' + opis + '</span><em>' + (S.pilot ? '<s>' + zl(P.wdr) + '</s> ' + zl(PILOT.wdr[id]) : zl(P.wdr)) + ' wdrożenie · ' + zl(P.utr) + ' / mies.</em></label>';
       }).join('');
-      return '<h4>Wybierz pakiet</h4><div class="kf-pakiety" role="radiogroup" aria-label="Pakiet">' + kart + '</div>' +
+      var pilotBlok = (S.pilot || PILOT.zLinku || pilotWolne() > 0)
+        ? '<label class="kf-pilot"><input type="checkbox" data-k="pilot"' + (S.pilot ? ' checked' : '') + ' /><span><b>Pilotaż pierwszych klientów</b> · wdrożenie ' + zl(PILOT.wdr[S.pakiet]) + ' zamiast ' + zl(PAK[S.pakiet].wdr) + '<small>' + (PILOT.zajete === null ? PILOT.miejsc + ' miejsca w pilotażu' : 'Wolne miejsca: ' + pilotWolne() + ' z ' + PILOT.miejsc) + '. W zamian zgoda na wskazanie Twojej strony jako realizacji, krótka rozmowa po 30 dniach i zbiorcze liczby rezerwacji (§10 umowy). Utrzymanie bez zmian.</small></span></label>'
+        : '<p class="kf-pilot kf-pilot--pelny">Pilotaż pierwszych klientów jest już pełny. Wdrożenie w cenie standardowej.</p>';
+      return pilotBlok + '<h4>Wybierz pakiet</h4><div class="kf-pakiety" role="radiogroup" aria-label="Pakiet">' + kart + '</div>' +
         '<h4 class="kf-h-dod">Dodatki <em>(opcjonalnie)</em></h4>' +
         '<label class="kf-dodatek"><input type="checkbox" data-k="sms"' + (S.sms ? ' checked' : '') + ' /><span><b>Przypomnienia SMS</b> · +' + zl(SMS.cena) + ' / mies.<small>' + SMS.limit + ' wiadomości miesięcznie, oprócz przypomnienia e-mailem.</small></span></label>' +
         '<label class="kf-dodatek"><input type="checkbox" data-k="zaliczki"' + (S.zaliczki ? ' checked' : '') + ' /><span><b>Zaliczki płatne online</b> · +' + zl(ZAL.wdr) + ' wdrożenie, +' + zl(ZAL.utr) + ' / mies.<small>BLIK, karta lub przelew przy rezerwacji. Pieniądze trafiają na Twoje konto u operatora płatności, a prowizję pobiera operator.</small></span></label>' +
@@ -350,7 +370,8 @@
 
     /* Krok 3: dane firmy */
     function widokDane() {
-      return '<h4>Dane do umowy</h4><div class="kf-siatka">' +
+      var pilotInfo = S.pilot ? '<div class="kf-pilot-info" role="status"><span><b>Pilotaż pierwszych klientów:</b> wdrożenie ' + zl(ceny().wdr) + ' zamiast ' + zl(PAK[S.pakiet].wdr + (S.zaliczki ? ZAL.wdr : 0)) + '. W zamian zgoda na wskazanie strony jako realizacji (§10 umowy).</span> <button type="button" class="kf-link" data-akcja="pilot-wylacz">Zrezygnuj z pilotażu</button></div>' : '';
+      return pilotInfo + '<h4>Dane do umowy</h4><div class="kf-siatka">' +
         pole('firma', 'Nazwa firmy lub imię i nazwisko prowadzącego', { pelne: true, ac: 'organization' }) +
         pole('nip', 'NIP', { inputmode: 'numeric', pod: 'Sprawdzimy poprawność numeru.' }) +
         pole('osoba', 'Osoba podpisująca (imię i nazwisko)', { ac: 'name' }) +
@@ -374,7 +395,9 @@
         cb('c', 'Jestem uprawniony do reprezentowania Zamawiającego (§9 ust. 3).') +
         cb('d', 'Akceptuję powierzenie przetwarzania danych osobowych (§7).') +
         (S.bledy.zgody ? '<p class="blad">' + esc(S.bledy.zgody) + '</p>' : '') +
-        '<label class="kf-opc"><input type="checkbox" data-z="e"' + (z.e ? ' checked' : '') + ' /><span><em>Opcjonalnie:</em> zgadzam się, żeby Studio Widok wskazało moją stronę jako swoją realizację (§10).</span></label></div>' +
+        (S.pilot
+          ? '<label><input type="checkbox" data-z="e"' + (z.e ? ' checked' : '') + ' /><span>Akceptuję warunki pilotażu pierwszych klientów (§10), w tym wskazanie mojej strony jako realizacji. Zgodę mogę cofnąć e-mailem.</span></label></div>'
+          : '<label class="kf-opc"><input type="checkbox" data-z="e"' + (z.e ? ' checked' : '') + ' /><span><em>Opcjonalnie:</em> zgadzam się, żeby Studio Widok wskazało moją stronę jako swoją realizację (§10).</span></label></div>') +
         blokPodpisu();
     }
     function blokPodpisu() {
@@ -447,6 +470,7 @@
       }
       if (k === 2) {
         if (!(S.zgody.a && S.zgody.b && S.zgody.c && S.zgody.d)) e.zgody = 'Zaznacz wszystkie oświadczenia, żeby kontynuować.';
+        else if (S.pilot && !S.zgody.e) e.zgody = 'Cena pilotażowa wymaga akceptacji warunków pilotażu (§10). Zaznacz ją albo wróć do kroku „Pakiet i dodatki” i odznacz pilotaż.';
         if (S.tryb === 'plik' && norm(S.podpis) !== norm(S.osoba)) e.podpis = 'Wpisz dokładnie: ' + S.osoba;
       }
       return e;
@@ -514,18 +538,20 @@
       if (!k) return;
       if (t.type === 'radio') {
         S[k] = t.value;
-        if (k === 'pakiet') document.getElementById('kf-podsum').innerHTML = podsumowanie();
+        if (k === 'pakiet' && S.pilot) { render(); var rr = root.querySelector('input[name="pakiet"][value="' + t.value + '"]'); if (rr) rr.focus(); }
+        else if (k === 'pakiet') document.getElementById('kf-podsum').innerHTML = podsumowanie();
       } else if (t.tagName === 'SELECT') {
         S[k] = t.value;
       } else if (t.type === 'checkbox') {
         S[k] = t.checked;
         if (k === 'sms') document.getElementById('kf-podsum').innerHTML = podsumowanie();
-        if (k === 'zaliczki') render();
+        if (k === 'zaliczki' || k === 'pilot') { render(); var cb2 = root.querySelector('input[data-k="' + k + '"]'); if (cb2) cb2.focus(); }
       }
       zapiszStan();
     });
     function tekstBleduSms(kod, r) {
       var m = {
+        pilot_pelny: 'Pilotaż pierwszych klientów jest już pełny. Wróć do kroku „Pakiet i dodatki”, odznacz pilotaż i podpisz umowę w cenie standardowej.',
         telefon: 'Ten numer nie wygląda na numer komórkowy. Wróć do kroku „Dane firmy” i popraw telefon.',
         za_szybko: 'Kod został przed chwilą wysłany. Poczekaj kilkadziesiąt sekund i spróbuj ponownie.',
         limit: 'Wysłaliśmy już kilka kodów na ten numer. Spróbuj za kilka godzin albo podpisz plikiem.',
@@ -575,6 +601,7 @@
         if (S.krok === 1) { ensureLead(); wyslij('dane'); }
         return ustawKrok(S.krok + 1);
       }
+      if (a === 'pilot-wylacz') { S.pilot = false; zapiszStan(); return render(); }
       if (a === 'tryb-plik' || a === 'tryb-sms') { S.tryb = a === 'tryb-plik' ? 'plik' : 'sms'; S.bledy = {}; S.smsStan.blad = ''; return render(); }
       if (a === 'sms-wyslij') {
         var ez = waliduj(2);
@@ -663,6 +690,14 @@
         if (!j.wazna) LINK.stan = 'wygasl';
         else if (j.wygasa) LINK.do = j.wygasa;
         render();
+      });
+    }
+    if (window.ODBIORNIK && window.ODBIORNIK.pilotaz) {
+      window.ODBIORNIK.pilotaz().then(function (j) {
+        if (!j) return;
+        PILOT.miejsc = j.miejsc; PILOT.zajete = j.zajete;
+        if (pilotWolne() === 0 && !PILOT.zLinku) S.pilot = false;
+        if (!S.wynik && S.krok === 0) render();
       });
     }
     render();

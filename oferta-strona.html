@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/karta.css?v=63" />
-  <link rel="stylesheet" href="assets/css/oferta-strona.css?v=13" />
+  <link rel="stylesheet" href="assets/css/oferta-strona.css?v=15" />
 </head>
 <body class="ofr-body">
   <a class="skip" href="#tresc">Przejdź do treści</a>
@@ -81,6 +81,7 @@
             <a class="cta cta--blue" href="#cena">Zobacz pakiety <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></a>
             <a class="cta cta--line" href="#demo">Zobacz demo</a>
             <p class="ofs-cta__cena">od <b>2&nbsp;900&nbsp;zł</b> wdrożenia i <b>99&nbsp;zł</b> miesięcznie. Ceny końcowe.</p>
+            <p class="ofs-cta__pilot" data-pilot-blok>Pilotaż pierwszych klientów: wdrożenie od <b>1&nbsp;900&nbsp;zł</b>. <a href="#pilotaz">Zobacz warunki</a></p>
           </div>
 
           <div class="ofr-obietnice">
@@ -466,6 +467,39 @@
             <p class="ofr-cena__stopka">Przy zespole koszt na terapeutę spada: 149 zł dzieli się na wszystkich.</p>
             <div class="ofs-wybierz"><a class="cta cta--blue" href="umowa.html?p=enterprise" data-start="enterprise">Wybieram Team <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></a></div>
           </article>
+        </div>
+
+        <div class="ofs-pilot" id="pilotaz" data-pilot-blok>
+          <p class="ofs-pilot__znak">Pilotaż pierwszych klientów · <span data-pilot-wolne>3 miejsca</span></p>
+          <h3>Pierwsze trzy wdrożenia w niższej cenie</h3>
+          <p class="ofs-pilot__opis">Dopiero zaczynamy, więc nie mamy jeszcze realizacji do pokazania. Trzem pierwszym gabinetom obniżamy cenę wdrożenia. W zamian prosimy o zgodę na wskazanie Twojej strony jako realizacji. Pierwsze strony chcemy zrobić naprawdę dobrze, więc w pilotażu masz bezpośredni numer telefonu do osoby, która je buduje.</p>
+          <div class="ofs-pilot__ceny">
+            <div><span>Individual, wdrożenie</span><b>1&nbsp;900&nbsp;zł</b><s>zamiast 2&nbsp;900&nbsp;zł</s></div>
+            <div><span>Team, wdrożenie</span><b>2&nbsp;999&nbsp;zł</b><s>zamiast 4&nbsp;499&nbsp;zł</s></div>
+          </div>
+          <div class="ofs-pilot__kolumny">
+            <div>
+              <h4>Co dostajesz</h4>
+              <ul>
+                <li>Pełny pakiet, taki sam jak w ofercie, bez okrojonych funkcji</li>
+                <li>Utrzymanie w zwykłej cenie (99 zł albo 149 zł) i bez podwyżki przez 12 miesięcy</li>
+                <li>Bezpośredni kontakt z osobą, która buduje Twoją stronę</li>
+              </ul>
+            </div>
+            <div>
+              <h4>Co dajesz w zamian</h4>
+              <ul>
+                <li>Zgodę na wskazanie strony jako realizacji: nazwa gabinetu i adres strony</li>
+                <li>Krótką rozmowę (do 30 minut) miesiąc po uruchomieniu</li>
+                <li>Zbiorcze liczby rezerwacji ze strony, bez żadnych danych pacjentów</li>
+              </ul>
+            </div>
+          </div>
+          <p class="ofs-pilot__fine">Opinii nie publikujemy bez Twojej akceptacji. Zgodę możesz cofnąć e-mailem w każdej chwili i nie wymaga to dopłaty. Warunki są w umowie (§10), którą czytasz przed podpisaniem.</p>
+          <div class="ofs-pilot__cta">
+            <a class="cta cta--blue" href="umowa.html?p=individual&amp;pil=1" data-start-pilot="individual">Wchodzę do pilotażu: Individual <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></a>
+            <a class="cta cta--blue" href="umowa.html?p=enterprise&amp;pil=1" data-start-pilot="enterprise">Wchodzę do pilotażu: Team <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></a>
+          </div>
         </div>
 
         <p class="ofs-gwiazdka" id="gwiazdka">
@@ -866,8 +900,8 @@
     })();
   </script>
   <script src="assets/js/chmura-config.js?v=2"></script>
-  <script src="assets/js/odbiornik.js?v=8"></script>
-  <script src="assets/js/oferta-lead.js?v=2" defer></script>
+  <script src="assets/js/odbiornik.js?v=9"></script>
+  <script src="assets/js/oferta-lead.js?v=3" defer></script>
   <script src="assets/js/droga-strona.js?v=2" defer></script>
 </body>
 </html>

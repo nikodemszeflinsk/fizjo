@@ -92,6 +92,12 @@
     },
     /** Wysyła paczkę i czyta odpowiedź skryptu (kod SMS, pliki). Zawsze rozwiązuje się obiektem; {ok:false, blad:'siec'} przy braku połączenia. */
     /** Czy link do umowy jest ważny (tylko w chmurze). Zwraca {wazna, wygasa} albo null, gdy nie da się sprawdzić. */
+    /** Zajęte i wolne miejsca w pilotażu pierwszych klientów (tylko w chmurze). Zwraca {miejsc, zajete} albo null. */
+    pilotaz: function () {
+      if (!adresApi() || lokalnie()) return Promise.resolve(null);
+      return fetch(adresApi() + '/pilotaz').then(function (r) { return r.json(); })
+        .then(function (j) { return j && j.ok && typeof j.miejsc === 'number' ? j : null; }).catch(function () { return null; });
+    },
     statusLinku: function (ut) {
       if (!ut || !adresApi() || lokalnie()) return Promise.resolve(null);
       return fetch(adresApi() + '/umowa/status?ut=' + encodeURIComponent(ut)).then(function (r) { return r.json(); })

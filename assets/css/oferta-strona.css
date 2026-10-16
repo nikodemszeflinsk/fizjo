@@ -404,3 +404,32 @@
 .ofs-start__note { margin: 0; font-size: 0.9rem; color: #aab1b6; line-height: 1.5; }
 .ofs-start__karta--glowna .ofs-start__note { color: #535a61; }
 @media (max-width: 860px) { .ofs-start__karty { grid-template-columns: minmax(0, 1fr); } .ofs-start__karta .cta { align-self: stretch; text-align: center; justify-content: center; } }
+
+/* ── Pilotaż pierwszych klientów ────────────────────────────────────── */
+.ofs-cta__pilot { flex-basis: 100%; margin: 0; color: var(--ink-2); font-size: 0.98rem; }
+.ofs-cta__pilot b { font-family: var(--f-display); font-weight: 800; color: var(--ink); }
+.ofs-cta__pilot a { font-weight: 700; }
+.ofs-pilot { margin-top: 34px; padding: clamp(20px, 3vw, 32px); border: 2px solid #f2b705; border-radius: var(--r-sign); background: rgba(242, 183, 5, 0.07); }
+.ofs-pilot[hidden], [data-pilot-blok][hidden] { display: none; }
+.ofs-pilot__znak { margin: 0 0 8px; color: #f2b705; font-size: 1rem; font-weight: 800; letter-spacing: 0.03em; text-transform: uppercase; }
+.ofs-pilot h3 { margin: 0 0 10px; font-family: var(--f-display); font-size: clamp(1.4rem, 3vw, 1.9rem); font-weight: 800; letter-spacing: -0.02em; color: #fff; }
+.ofs-pilot__opis { margin: 0 0 18px; max-width: 760px; color: #d5dade; font-size: 1.02rem; line-height: 1.6; }
+.ofs-pilot__ceny { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 20px; }
+.ofs-pilot__ceny > div { display: grid; gap: 2px; padding: 14px 18px; border-radius: 12px; background: rgba(255, 255, 255, 0.08); }
+.ofs-pilot__ceny span { color: #c7ced3; font-size: 0.95rem; }
+.ofs-pilot__ceny b { font-family: var(--f-display); font-size: 1.9rem; font-weight: 900; color: #fff; }
+.ofs-pilot__ceny s { color: #aab1b6; font-size: 0.95rem; }
+.ofs-pilot__kolumny { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 28px; margin-bottom: 14px; }
+.ofs-pilot h4 { margin: 0 0 8px; font-family: var(--f-display); font-size: 1.05rem; font-weight: 800; color: #fff; }
+.ofs-pilot ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.ofs-pilot li { position: relative; padding-left: 22px; color: #d5dade; font-size: 0.98rem; line-height: 1.5; }
+.ofs-pilot li::before { content: ''; position: absolute; left: 2px; top: 0.5em; width: 11px; height: 6px; border-left: 3px solid #f2b705; border-bottom: 3px solid #f2b705; transform: rotate(-45deg); }
+.ofs-pilot__fine { margin: 0 0 18px; color: #aab1b6; font-size: 0.95rem; line-height: 1.5; }
+.ofs-pilot__cta { display: flex; flex-wrap: wrap; gap: 12px; }
+@media (max-width: 760px) { .ofs-pilot__ceny, .ofs-pilot__kolumny { grid-template-columns: minmax(0, 1fr); } }
+.kf-pilot { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 18px; padding: 14px 18px; border: 2px solid #f2b705; border-radius: 14px; background: rgba(242, 183, 5, 0.1); cursor: pointer; }
+.kf-pilot input { margin-top: 5px; width: 18px; height: 18px; accent-color: var(--accent); flex: none; }
+.kf-pilot small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.92rem; font-weight: 400; }
+.kf-pilot-info { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; margin-bottom: 16px; padding: 12px 16px; border: 2px solid #f2b705; border-radius: 12px; background: rgba(242, 183, 5, 0.1); font-size: 0.97rem; }
+.kf-pilot--pelny { cursor: default; border-color: var(--line); background: var(--surface-2); color: var(--muted); }
+.kf-pakiet em s { color: var(--muted); font-weight: 400; }
