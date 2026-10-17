@@ -175,3 +175,7 @@ body { margin: 0; display: flex; flex-direction: column; height: 100svh; backgro
   .pk-slajd--lista .pk-kafle p { padding: 8px 10px; font-size: 0.95rem; }
   .pk-slajd--lista .pk-kafle b { font-size: 1.05rem; }
 }
+
+/* Podpis „przykładowy projekt” pod zrzutem i w makiecie telefonu */
+.pk-przyklad { padding: 10px 14px; background: #e6e8e5; color: #4d5156; font-size: 0.95rem; }
+.pk-m__przyklad { color: #4d5156; font-size: 0.9rem; }

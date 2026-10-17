@@ -166,11 +166,11 @@
         'Prawa autorskie do projektu, kodu i treści stworzonych przez Wykonawcę **zostają przy Wykonawcy**. Od dnia zapłaty za wdrożenie Zamawiający dostaje **niewyłączną, bezterminową licencję** na korzystanie ze Strony na całym świecie, na polach eksploatacji: utrwalanie i zwielokrotnianie, publikowanie w internecie (publiczne udostępnianie w taki sposób, aby każdy miał dostęp w miejscu i czasie przez siebie wybranym), zmiany treści i przeniesienie na inny hosting oraz wprowadzanie zmian i opracowań na własny użytek. Wynagrodzenie za licencję jest zawarte w cenie wdrożenia.',
         'Licencja nie obejmuje odsprzedaży Strony ani kodu, udzielania dalszych licencji (poza firmą od hostingu lub obsługi technicznej Zamawiającego) ani używania kodu rezerwacji poza Stroną Zamawiającego. Wykonawca może używać własnych szablonów i narzędzi dla innych klientów.',
         '**Materiały Zamawiającego** (teksty, zdjęcia, logo) pozostają jego własnością. Zamawiający udziela Wykonawcy niewyłącznej, nieodpłatnej licencji na ich użycie w zakresie potrzebnym do wykonania umowy (zwielokrotnianie, kadrowanie i obróbka, publikacja na Stronie) na czas trwania umowy. Cudze licencje (zdjęcia stockowe, czcionki) obowiązują na swoich warunkach.',
-        '**Domenę** kupuje Wykonawca na dane Zamawiającego i jest ona jego własnością. Pierwszy rok rejestracji jest w cenie wdrożenia. **Roczne odnowienie domeny jest poza cenami z umowy**: Wykonawca odnawia domenę na prośbę Zamawiającego, a Zamawiający zwraca dokładnie tyle, ile pobiera rejestrator, bez marży Wykonawcy. Wykonawca informuje o kwocie co najmniej 30 dni przed terminem odnowienia. Nieodnowiona domena może zostać utracona. Wizytówka Google jest na koncie Zamawiającego.'
+        '**Domenę** kupuje Wykonawca na dane Zamawiającego. Jest ona własnością Zamawiającego, a jej koszt, także coroczne odnowienie u rejestratora, jest w cenie utrzymania. Wizytówka Google jest na koncie Zamawiającego.'
       ], v);
 
       h += '<h2>§5. Utrzymanie</h2>' + ust([
-        'Utrzymanie obejmuje: hosting i certyfikat bezpieczeństwa, obsługę techniczną domeny (bez opłaty rejestratora za odnowienie, zob. §4 ust. 4), monitoring, naprawę błędów, aktualizacje Strony i systemu rezerwacji, drobne zmiany treści do **jednej godziny miesięcznie** oraz wiadomości SMS do pacjentów w limicie z ust. 2.',
+        'Utrzymanie obejmuje: hosting i certyfikat bezpieczeństwa, domenę wraz z jej rocznym odnowieniem, monitoring, naprawę błędów, aktualizacje Strony i systemu rezerwacji, drobne zmiany treści do **jednej godziny miesięcznie** oraz wiadomości SMS do pacjentów w limicie z ust. 2.',
         '**Wiadomości SMS.** Do pacjentów Zamawiającego wysyłane są SMS-y: potwierdzenie rezerwacji, przypomnienie przed wizytą i informacja o zmianie lub odwołaniu terminu, a także własne wiadomości wysyłane przez Zamawiającego z panelu. W cenie utrzymania jest **200 wiadomości miesięcznie**. Kolejne 200 wiadomości miesięcznie można dokupić za **50 zł miesięcznie** (każdy pakiet osobno, bez okresu minimalnego). Wykonawca ostrzega Zamawiającego, gdy limit zbliża się do końca. Po jego wyczerpaniu wiadomości do pacjentów nie są wysyłane do końca miesiąca albo do dokupienia kolejnego pakietu, a system rezerwacji działa dalej. SMS-y dostają tylko pacjenci, którzy zgodzili się na nie przy rezerwacji. E-maile system wysyła wyłącznie do Zamawiającego i jego terapeutów (powiadomienia o rezerwacjach i zmianach).',
         'Wykonawca dokłada starań, żeby system działał bez przerw, ale nie gwarantuje stałej dostępności i nie odpowiada za awarie usług zewnętrznych (Google, hosting, poczta, SMS, operator płatności).',
         '**Błędy.** Zamawiający zgłasza błędy e-mailem lub telefonicznie. Wykonawca usuwa błędy Strony i systemu rezerwacji bezpłatnie przez cały czas trwania umowy i dokłada starań, żeby błąd uniemożliwiający rezerwacje usunąć w ciągu 3 dni roboczych, a pozostałe w ciągu 14 dni roboczych od zgłoszenia. W zakresie, w jakim prawo na to pozwala, strony wyłączają rękojmię, a w jej miejsce stosuje się ten ustęp.'
@@ -263,7 +263,7 @@
     }
     var TOKEN = odczytajToken();
     /* Termin podpisania: ważność linku sprawdza serwer, a „w” z linku służy tylko do pokazania daty. */
-    var LINK = { ut: '', do: '', stan: '' };
+    var LINK = { ut: '', do: '', stan: '', ot: '' };
     function dataGodz(iso) {
       var d = new Date(iso);
       return isNaN(d) ? '' : d.getDate() + '.' + ('0' + (d.getMonth() + 1)).slice(-2) + ', godz. ' + d.getHours() + ':' + ('0' + d.getMinutes()).slice(-2);
@@ -289,7 +289,7 @@
       }
       S.lead = TOKEN.l;
       S.formToken = String(TOKEN.f || '').slice(0, 80);
-      LINK.ut = String(TOKEN.u || '').slice(0, 80); LINK.do = String(TOKEN.w || '');
+      LINK.ut = String(TOKEN.u || '').slice(0, 80); LINK.do = String(TOKEN.w || ''); LINK.ot = String(TOKEN.o || '').slice(0, 80);
       if (PAK[TOKEN.p]) S.pakiet = TOKEN.p;
       S.sms = !!TOKEN.s; S.zaliczki = !!TOKEN.z;
       S.pilot = !!TOKEN.pil; PILOT.zLinku = !!TOKEN.pil;
@@ -382,6 +382,14 @@
         if (!j) return;
         var nowy = (j.status === 'wyslany' || j.status === 'zmieniony') ? 'wyslany' : (j.zmieniono ? 'szkic' : 'brak');
         if (nowy !== S.formStatus) { S.formStatus = nowy; zapiszStan(); if (S.krok === 2 && !S.wynik) render(); }
+      });
+    }
+    /* Klient z oferty z CRM (link bez umowy): z tokenu oferty dostaje link do umowy z terminem, bez niego serwer nie przyjmie podpisu. */
+    function zdobadzUt() {
+      if (LINK.ut || !LINK.ot || !S.lead || S.lead.indexOf('web-') === 0 || !window.ODBIORNIK || !window.ODBIORNIK.umowaStart) return Promise.resolve();
+      return window.ODBIORNIK.umowaStart({ lead: S.lead, ot: LINK.ot }).then(function (r) {
+        if (r && r.ok && r.ut) { LINK.ut = r.ut; LINK.do = r.wygasa || ''; }
+        else if (r && r.blad === 'link_wygasl') LINK.stan = 'wygasl';
       });
     }
     function przygotujFormularz() {
@@ -648,7 +656,7 @@
           ensureLead(); wyslij('dane');
           if (b.disabled) return;
           b.disabled = true;
-          return przygotujFormularz().then(function () { if (LINK.stan === 'wygasl') return render(); ustawKrok(2); });
+          return zdobadzUt().then(przygotujFormularz).then(function () { if (LINK.stan === 'wygasl') return render(); ustawKrok(2); });
         }
         return ustawKrok(S.krok + 1);
       }
@@ -735,6 +743,15 @@
     window.KONFIGURATOR = { stan: S, umowaHtml: umowaHtml, render: render };
     wczytajStan();
     zastosujToken();
+    if (!LINK.ut && LINK.ot) {
+      zdobadzUt().then(function () {
+        if (!LINK.ut || !window.ODBIORNIK.statusLinku) return render();
+        window.ODBIORNIK.statusLinku(LINK.ut).then(function (j) {
+          if (j && !j.wazna) LINK.stan = 'wygasl'; else if (j && j.wygasa) LINK.do = j.wygasa;
+          render();
+        });
+      });
+    }
     if (LINK.ut && window.ODBIORNIK && window.ODBIORNIK.statusLinku) {
       window.ODBIORNIK.statusLinku(LINK.ut).then(function (j) {
         if (!j) return;

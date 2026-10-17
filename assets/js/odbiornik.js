@@ -92,6 +92,13 @@
     },
     /** Wysyła paczkę i czyta odpowiedź skryptu (kod SMS, pliki). Zawsze rozwiązuje się obiektem; {ok:false, blad:'siec'} przy braku połączenia. */
     /** Czy link do umowy jest ważny (tylko w chmurze). Zwraca {wazna, wygasa} albo null, gdy nie da się sprawdzić. */
+    /** Klient z oferty z CRM: z tokenu oferty dostaje link do umowy (z terminem). Zwraca {ok, ut, wygasa}; lokalnie symulacja. */
+    umowaStart: function (p) {
+      if (!adresApi()) return Promise.resolve({ ok: false, blad: 'brak_odbiornika' });
+      if (lokalnie()) return Promise.resolve({ ok: true, symulacja: true, ut: '' });
+      return fetch(adresApi() + '/umowa/start', { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(p) })
+        .then(function (r) { return r.json(); }).then(function (j) { return j && typeof j === 'object' ? j : { ok: false, blad: 'odpowiedz' }; }).catch(function () { return { ok: false, blad: 'siec' }; });
+    },
     /** Link do formularza startowego przed umową (kolejność: dane firmy → formularz → umowa). Zwraca {ok, token}; lokalnie symulacja bez tokenu. */
     startToken: function (p) {
       if (!adresApi()) return Promise.resolve({ ok: false, blad: 'brak_odbiornika' });

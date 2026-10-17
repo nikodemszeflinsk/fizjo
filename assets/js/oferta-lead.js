@@ -12,6 +12,7 @@
   var lead = (q.get('l') || '').slice(0, 40);
   var dla = (q.get('dla') || '').slice(0, 90);
   var pakiet = q.get('p');
+  var ot = (q.get('o') || '').slice(0, 80); /* token oferty z CRM: pozwala dostać link do umowy po kliknięciu „Rozpocznij wdrożenie” */
   var PAK = { individual: { nazwa: 'Individual', wdr: 2900, utr: 149 }, enterprise: { nazwa: 'Team', wdr: 4499, utr: 199 } };
   var sms = q.get('s') === '1', zal = q.get('z') === '1', pil = q.get('pil') === '1';
   var PILOT_WDR = { individual: 1900, enterprise: 2999 };
@@ -22,7 +23,7 @@
   function adresStartu(p, pilotaz) {
     var wybrany = PAK[p] ? p : (PAK[pakiet] ? pakiet : '');
     var wPilotazu = pilotaz || pil;
-    if (lead && wybrany) return 'umowa.html?d=' + b64u(JSON.stringify({ l: lead, g: dla, m: '', p: wybrany, s: sms ? 1 : 0, z: zal ? 1 : 0, k: 1, pil: wPilotazu ? 1 : 0 }));
+    if (lead && wybrany) return 'umowa.html?d=' + b64u(JSON.stringify({ l: lead, g: dla, m: '', p: wybrany, s: sms ? 1 : 0, z: zal ? 1 : 0, k: 1, pil: wPilotazu ? 1 : 0, o: ot || undefined }));
     return 'umowa.html' + (wybrany ? '?p=' + wybrany + (wPilotazu ? '&pil=1' : '') : (wPilotazu ? '?pil=1' : ''));
   }
   document.querySelectorAll('[data-start]').forEach(function (a) { a.setAttribute('href', adresStartu(a.getAttribute('data-start'))); });
