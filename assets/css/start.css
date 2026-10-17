@@ -151,3 +151,8 @@ body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(
   .st-dol .st-btn { flex: 1; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .st-postep i { transition: none; } }
+
+/* Przypomnienie o wysłaniu formularza (pod nagłówkiem) i informacja po wysłaniu */
+.st-przyp { margin: 0; padding: 10px clamp(16px, 4vw, 40px); background: #fff4d6; color: #5a3d00; border-bottom: 1px solid #f2d27a; font-size: 1rem; line-height: 1.45; }
+.st-przyp[hidden] { display: none; }
+.st-ok--umowa { background: #eef3fd; color: #14171a; }

@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/karta.css?v=63" />
-  <link rel="stylesheet" href="assets/css/oferta-strona.css?v=17" />
+  <link rel="stylesheet" href="assets/css/oferta-strona.css?v=19" />
 </head>
 <body class="ofr-body">
   <a class="skip" href="#tresc">Przejdź do treści</a>
@@ -337,7 +337,7 @@
           <article class="grupa">
             <h3 class="grupa__h">Utrzymanie, które robimy za Ciebie</h3>
             <ul class="grupa__lista">
-              <li><b>Domena</b> kupiona na Twoje dane i odnawiana w ramach utrzymania, hosting i certyfikat bezpieczeństwa.</li>
+              <li><b>Domena</b> kupiona na Twoje dane i odnawiana w ramach utrzymania, hosting i certyfikat SSL.</li>
               <li><b>Monitoring, naprawa błędów i aktualizacje</b> strony oraz systemu rezerwacji.</li>
               <li><b>Do godziny drobnych zmian treści</b> miesięcznie, np. nowy cennik albo godziny.</li>
               <li><b>Polityka prywatności, cookies i regulamin rezerwacji</b> wdrożone w uzgodnionym brzmieniu.</li>
@@ -439,7 +439,7 @@
               <li>Potwierdzenie i przypomnienie SMS-em (do 200 wiadomości miesięcznie), z linkiem do zmiany wizyty przez pacjenta</li>
               <li>E-mail do Ciebie o każdej nowej rezerwacji i zmianie</li>
               <li>Polityka prywatności, cookies i regulamin rezerwacji</li>
-              <li>Domena, hosting i dwie tury poprawek w cenie</li>
+              <li>Domena, hosting, dwie tury poprawek i pierwszy miesiąc utrzymania w cenie</li>
             </ul>
             <p class="ofr-cena__stopka">Utrzymanie i SMS-y dla pacjentów w jednej cenie.</p>
             <div class="ofs-wybierz"><a class="cta cta--blue" href="umowa.html?p=individual" data-start="individual">Wybieram Individual <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></a></div>
@@ -460,7 +460,7 @@
               <div><dt>Podstrony</dt><dd>do 10</dd></div>
             </dl>
             <ul class="ofr-cena__lista">
-              <li>Wszystko z pakietu Individual</li>
+              <li>Wszystko z pakietu Individual, w tym pierwszy miesiąc utrzymania w cenie wdrożenia</li>
               <li>Osobny kalendarz dostępności na każdego terapeutę</li>
               <li>Wybór terapeuty albo „pierwszy wolny termin”</li>
               <li>Widok „dzień zespołu” w kalendarzu</li>
@@ -472,42 +472,50 @@
           </article>
         </div>
 
-        <div class="ofs-pilot" id="pilotaz" data-pilot-blok>
-          <p class="ofs-pilot__znak">Pilotaż pierwszych klientów · <span data-pilot-wolne>3 miejsca</span></p>
-          <h3>Pierwsze trzy wdrożenia w niższej cenie</h3>
-          <p class="ofs-pilot__opis">Dopiero zaczynamy, więc nie mamy jeszcze realizacji do pokazania. Trzem pierwszym gabinetom obniżamy cenę wdrożenia. W zamian prosimy o zgodę na wskazanie Twojej strony jako realizacji. Pierwsze strony chcemy zrobić naprawdę dobrze, więc w pilotażu masz bezpośredni numer telefonu do osoby, która je buduje.</p>
-          <div class="ofs-pilot__ceny">
-            <div><span>Individual, wdrożenie</span><b>1&nbsp;900&nbsp;zł</b><s>zamiast 2&nbsp;900&nbsp;zł</s></div>
-            <div><span>Team, wdrożenie</span><b>2&nbsp;999&nbsp;zł</b><s>zamiast 4&nbsp;499&nbsp;zł</s></div>
+        <div class="ofs-pilot-wrap" id="pilotaz" data-pilot-blok>
+          <div class="ofs-pilot__pasek" data-pilot-licznik hidden>
+            <span class="ofs-pilot__pasek-et">Oferta ważna jeszcze</span>
+            <span class="ofs-pilot__zegar" role="timer"><span><b data-zegar="dni">–</b> dni</span><span><b data-zegar="godz">–</b> godz.</span><span><b data-zegar="min">–</b> min</span></span>
+            <span class="ofs-pilot__pasek-do">do <b data-zegar-do>–</b>, albo do wyczerpania miejsc</span>
           </div>
-          <div class="ofs-pilot__kolumny">
-            <div>
-              <h4>Co dostajesz</h4>
-              <ul>
-                <li>Pełny pakiet, taki sam jak w ofercie, bez okrojonych funkcji</li>
-                <li>Utrzymanie w zwykłej cenie (149 zł albo 199 zł) i bez podwyżki przez 12 miesięcy</li>
-                <li>Bezpośredni kontakt z osobą, która buduje Twoją stronę</li>
-              </ul>
+          <div class="ofs-pilot">
+            <p class="ofs-pilot__znak">Pilotaż pierwszych klientów · <span data-pilot-wolne>3 miejsca</span></p>
+            <h3>Pierwsze trzy wdrożenia w niższej cenie</h3>
+            <div class="ofs-pilot__ceny">
+              <div><span>Individual, wdrożenie</span><b>1&nbsp;900&nbsp;zł</b><s>zamiast 2&nbsp;900&nbsp;zł</s></div>
+              <div><span>Team, wdrożenie</span><b>2&nbsp;999&nbsp;zł</b><s>zamiast 4&nbsp;499&nbsp;zł</s></div>
             </div>
-            <div>
-              <h4>Co dajesz w zamian</h4>
-              <ul>
-                <li>Zgodę na wskazanie strony jako realizacji: nazwa gabinetu i adres strony</li>
-                <li>Krótką rozmowę (do 30 minut) miesiąc po uruchomieniu</li>
-                <li>Zbiorcze liczby rezerwacji ze strony, bez żadnych danych pacjentów</li>
-              </ul>
+            <div class="ofs-pilot__kolumny">
+              <div>
+                <h4>Co dostajesz</h4>
+                <ul>
+                  <li>Pełny pakiet, taki sam jak w ofercie, bez okrojonych funkcji</li>
+                  <li>Trzecią turę poprawek projektu graficznego w cenie (w standardzie są dwie)</li>
+                  <li>Priorytet zgłoszeń i bezpośredni numer do osoby, która buduje Twoją stronę, przez pierwsze trzy miesiące</li>
+                </ul>
+              </div>
+              <div>
+                <h4>Co dajesz w zamian</h4>
+                <ul>
+                  <li>Krótką rozmowę raz na dwa tygodnie (do 15 minut) przez pierwsze trzy miesiące</li>
+                  <li>Opinię o naszej pracy i o działaniu strony</li>
+                  <li>Zgodę na wskazanie strony jako realizacji: nazwa gabinetu i adres strony</li>
+                  <li>Zbiorcze liczby rezerwacji ze strony, bez żadnych danych pacjentów</li>
+                </ul>
+              </div>
             </div>
-          </div>
-          <p class="ofs-pilot__fine">Opinii nie publikujemy bez Twojej akceptacji. Zgodę możesz cofnąć e-mailem w każdej chwili i nie wymaga to dopłaty. Warunki są w umowie (§10), którą czytasz przed podpisaniem.</p>
-          <div class="ofs-pilot__cta">
-            <a class="cta cta--blue" href="umowa.html?p=individual&amp;pil=1" data-start-pilot="individual">Wchodzę do pilotażu: Individual <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></a>
-            <a class="cta cta--blue" href="umowa.html?p=enterprise&amp;pil=1" data-start-pilot="enterprise">Wchodzę do pilotażu: Team <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></a>
+            <p class="ofs-pilot__fine">To wymiana: obniżamy cenę wdrożenia, a w zamian dostajemy to, co pozwoli pokazać kolejnym gabinetom, że to działa. <span data-pilot-waznosc>Oferta ważna do wyczerpania miejsc.</span> Warunki są w umowie (§10), którą czytasz przed podpisaniem.</p>
+            <div class="ofs-pilot__cta">
+              <a class="cta cta--blue" href="umowa.html?p=individual&amp;pil=1" data-start-pilot="individual">Wchodzę do pilotażu: Individual <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></a>
+              <a class="cta cta--blue" href="umowa.html?p=enterprise&amp;pil=1" data-start-pilot="enterprise">Wchodzę do pilotażu: Team <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></a>
+            </div>
+            <p class="ofs-pilot__po" data-pilot-po hidden>Termin pilotażu w tej ofercie minął. Wdrożenie w cenie standardowej jest nadal dostępne, a jeśli chcesz wrócić do pilotażu, <a href="tel:+48783480341" data-zadzwon>zadzwoń: 783 480 341</a>.</p>
           </div>
         </div>
 
         <p class="ofs-gwiazdka" id="gwiazdka">
-          <b>* Utrzymanie</b> to hosting, domena (także jej coroczne odnowienie), certyfikat, aktualizacje, naprawa błędów i do godziny drobnych zmian
-          treści miesięcznie oraz do 200 SMS-ów do pacjentów, fakturowane z góry na początku miesiąca. Rezygnujesz w każdej chwili, e-mailem, ze skutkiem
+          <b>* Utrzymanie</b> to hosting, domena (także jej coroczne odnowienie), certyfikat SSL, aktualizacje, naprawa błędów i do godziny drobnych zmian
+          treści miesięcznie oraz do 200 SMS-ów do pacjentów, fakturowane z góry na początku miesiąca (pierwszy miesiąc jest w cenie wdrożenia). Rezygnujesz w każdej chwili, e-mailem, ze skutkiem
           natychmiastowym. W ciągu 7 dni dostajesz pliki strony oraz dostęp do domeny i wizytówki Google. System rezerwacji
           działa na naszej infrastrukturze, więc po rezygnacji przestaje działać, dopóki nie skonfigurujesz własnego.
           Szczegóły niżej i w umowie.
@@ -540,7 +548,7 @@
           <div>
             <h3>Co jest w utrzymaniu</h3>
             <ul>
-              <li>Domena (z rocznym odnowieniem), hosting i certyfikat bezpieczeństwa</li>
+              <li>Domena (z rocznym odnowieniem), hosting i certyfikat SSL</li>
               <li>Monitoring, naprawa błędów i aktualizacje</li>
               <li>Do 200 SMS-ów miesięcznie do pacjentów (potwierdzenia i przypomnienia)</li>
               <li>Do godziny drobnych zmian treści miesięcznie</li>
@@ -553,7 +561,7 @@
               <li>Czas nieokreślony, bez okresu minimalnego</li>
               <li>Rezygnujesz w każdej chwili, e-mailem, ze skutkiem natychmiastowym</li>
               <li>Faktura za wdrożenie po akceptacji projektu, termin płatności 7 dni, uruchomienie po wpłacie</li>
-              <li>Utrzymanie fakturujemy z góry, na początku miesiąca. Opłacony miesiąc nie jest zwracany, ale system działa do jego końca</li>
+              <li>Pierwszy miesiąc utrzymania jest w cenie wdrożenia, kolejne fakturujemy z góry, na początku miesiąca. Opłacony miesiąc nie jest zwracany, ale system działa do jego końca</li>
               <li>Licencja na korzystanie ze strony: niewyłączna i bezterminowa</li>
             </ul>
           </div>
@@ -768,7 +776,13 @@
             </ol>
             <p class="ofs-start__pakiet" id="ofs-start-pakiet" hidden></p>
             <a class="cta cta--blue" href="umowa.html" data-start>Rozpocznij wdrożenie <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></a>
-            <p class="ofs-start__note">Fakturę za wdrożenie wystawiamy dopiero po akceptacji projektu. Czego nie masz pod ręką, dosyłasz później, tym samym linkiem.</p>
+            <p class="ofs-start__note">Czego nie masz pod ręką, dosyłasz później, tym samym linkiem.</p>
+            <ul class="ofs-start__ryzyko" aria-label="Bez ryzyka">
+              <li><b>Płacisz dopiero po akceptacji projektu.</b> Najpierw widzisz swoją stronę w projekcie graficznym, rachunek dostajesz potem.</li>
+              <li><b>Poprawki w cenie.</b> Dwie tury poprawek projektu (w pilotażu trzy).</li>
+              <li><b>Rezygnujesz, kiedy chcesz.</b> Bez umowy na lata i bez okresu wypowiedzenia.</li>
+              <li><b>Strona i dane są Twoje.</b> Pliki strony i dostęp do domeny dostajesz w 7 dni po rezygnacji.</li>
+            </ul>
           </article>
 
           <article class="ofs-start__karta">
@@ -906,8 +920,8 @@
     })();
   </script>
   <script src="assets/js/chmura-config.js?v=2"></script>
-  <script src="assets/js/odbiornik.js?v=11"></script>
-  <script src="assets/js/oferta-lead.js?v=5" defer></script>
+  <script src="assets/js/odbiornik.js?v=12"></script>
+  <script src="assets/js/oferta-lead.js?v=6" defer></script>
   <script src="assets/js/droga-strona.js?v=2" defer></script>
 </body>
 </html>

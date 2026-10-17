@@ -38,7 +38,7 @@
     var KLUCZ = 'konfigurator-strony-v1';
 
     var S = {
-      lead: '', krok: 0, pakiet: 'individual', pilot: false, formStatus: '', formBlad: false, sms: false, zaliczki: false, operator: 'pomoc', w_podstrony: false, w_kalendarze: false, w_kampania: false,
+      lead: '', krok: 0, pakiet: 'individual', pilot: false, pilotMinal: false, formStatus: '', formBlad: false, sms: false, zaliczki: false, operator: 'pomoc', w_podstrony: false, w_kalendarze: false, w_kampania: false,
       firma: '', nip: '', adres: '', osoba: '', email: '', telefon: '',
       nazwa: '', miasto: '', formToken: '',
       tryb: 'sms', kod: '', smsStan: { etap: 'start', maska: '', blad: '', kiedy: 0, probny: false },
@@ -157,7 +157,7 @@
         'Wdrożenie: {CENA_WDR}{PILOT_OPIS}{WDR_OPIS}. Utrzymanie: {CENA_UTR} miesięcznie{UTR_OPIS}.',
         'Wykonawca nie dolicza do cen podatku VAT, więc podane ceny są cenami końcowymi. Jeśli Wykonawca zarejestruje działalność gospodarczą albo z innego powodu będzie zobowiązany do doliczania VAT, poinformuje o tym Zamawiającego co najmniej 30 dni wcześniej, a od tego dnia podane ceny są cenami netto powiększanymi o VAT. Zamawiający może wtedy zrezygnować z umowy (§6).',
         'Dokument sprzedaży (rachunek albo faktura) za wdrożenie Wykonawca wystawia **po akceptacji projektu**, z terminem płatności 7 dni. Strona zostaje uruchomiona na domenie Zamawiającego **po zapłacie**.',
-        'Utrzymanie płatne jest od miesiąca następującego po uruchomieniu Strony, na podstawie dokumentu sprzedaży (rachunku albo faktury) wystawianego z góry na początku miesiąca, z terminem płatności 7 dni.',
+        '**Pierwszy miesiąc utrzymania**, liczony od dnia uruchomienia Strony, jest wliczony w cenę wdrożenia. Kolejne miesiące utrzymania są płatne z góry, na podstawie dokumentu sprzedaży (rachunku albo faktury) wystawianego na początku okresu, z terminem płatności 7 dni.',
         'Zmiana ceny utrzymania wymaga zgody Zamawiającego. Bez zgody każda ze stron może zrezygnować z umowy (§6).',
         'Dokumenty sprzedaży są wystawiane i doręczane w formie elektronicznej zgodnie z obowiązującymi przepisami (w tym przez KSeF, jeśli po rejestracji działalności będzie wymagany). Zamawiający wyraża zgodę na ich przesyłanie na adres {EMAIL}. Za opóźnienie w płatności należą odsetki ustawowe za opóźnienie w transakcjach handlowych.'
       ], v);
@@ -170,7 +170,7 @@
       ], v);
 
       h += '<h2>§5. Utrzymanie</h2>' + ust([
-        'Utrzymanie obejmuje: hosting i certyfikat bezpieczeństwa, domenę wraz z jej rocznym odnowieniem, monitoring, naprawę błędów, aktualizacje Strony i systemu rezerwacji, drobne zmiany treści do **jednej godziny miesięcznie** oraz wiadomości SMS do pacjentów w limicie z ust. 2.',
+        'Utrzymanie obejmuje: hosting i certyfikat SSL, domenę wraz z jej rocznym odnowieniem, monitoring, naprawę błędów, aktualizacje Strony i systemu rezerwacji, drobne zmiany treści do **jednej godziny miesięcznie** oraz wiadomości SMS do pacjentów w limicie z ust. 2.',
         '**Wiadomości SMS.** Do pacjentów Zamawiającego wysyłane są SMS-y: potwierdzenie rezerwacji, przypomnienie przed wizytą i informacja o zmianie lub odwołaniu terminu, a także własne wiadomości wysyłane przez Zamawiającego z panelu. W cenie utrzymania jest **200 wiadomości miesięcznie**. Kolejne 200 wiadomości miesięcznie można dokupić za **50 zł miesięcznie** (każdy pakiet osobno, bez okresu minimalnego). Wykonawca ostrzega Zamawiającego, gdy limit zbliża się do końca. Po jego wyczerpaniu wiadomości do pacjentów nie są wysyłane do końca miesiąca albo do dokupienia kolejnego pakietu, a system rezerwacji działa dalej. SMS-y dostają tylko pacjenci, którzy zgodzili się na nie przy rezerwacji. E-maile system wysyła wyłącznie do Zamawiającego i jego terapeutów (powiadomienia o rezerwacjach i zmianach).',
         'Wykonawca dokłada starań, żeby system działał bez przerw, ale nie gwarantuje stałej dostępności i nie odpowiada za awarie usług zewnętrznych (Google, hosting, poczta, SMS, operator płatności).',
         '**Błędy.** Zamawiający zgłasza błędy e-mailem lub telefonicznie. Wykonawca usuwa błędy Strony i systemu rezerwacji bezpłatnie przez cały czas trwania umowy i dokłada starań, żeby błąd uniemożliwiający rezerwacje usunąć w ciągu 3 dni roboczych, a pozostałe w ciągu 14 dni roboczych od zgłoszenia. W zakresie, w jakim prawo na to pozwala, strony wyłączają rękojmię, a w jej miejsce stosuje się ten ustęp.'
@@ -219,11 +219,11 @@
       if (S.pilot) {
         h += '<h2>§10. Pilotaż pierwszych klientów</h2>' + ust([
           'Zamawiający uczestniczy w **pilotażu pierwszych klientów**: Wykonawca wdraża Strony pierwszym trzem klientom po obniżonej cenie wdrożenia. Cena wdrożenia w tej umowie wynosi {CENA_WDR} zamiast ceny standardowej {CENA_STD}. Cena utrzymania nie jest obniżona.',
-          'W zamian Zamawiający: (a) zgadza się, aby Wykonawca wskazał Zamawiającego i Stronę (nazwę gabinetu, adres Strony i krótki opis współpracy) jako swoją realizację w materiałach o swojej działalności, w tym na swojej stronie internetowej i w ofertach; (b) po uruchomieniu Strony, w ciągu około 30 dni, odbędzie z Wykonawcą krótką rozmowę (do 30 minut) o działaniu Strony i systemu rezerwacji; (c) udostępni Wykonawcy zbiorcze, zanonimizowane liczby dotyczące rezerwacji dokonanych przez Stronę (na przykład liczbę rezerwacji w miesiącu), wyłącznie w celu opisania efektów w realizacji.',
+          'W ramach pilotażu, ponad zakres pakietu, Wykonawca zapewnia: (a) **trzy tury poprawek** projektu graficznego zamiast dwóch; (b) przez pierwsze trzy miesiące od uruchomienia Strony priorytet w obsłudze zgłoszeń Zamawiającego i bezpośredni numer telefonu do osoby, która zbudowała Stronę (Wykonawca dokłada starań, żeby odpowiedzieć w ciągu jednego dnia roboczego).',
+          'W zamian Zamawiający: (a) przez pierwsze trzy miesiące od uruchomienia Strony odbywa z Wykonawcą krótką rozmowę (do 15 minut) raz na dwa tygodnie o działaniu Strony i systemu rezerwacji; (b) przekazuje Wykonawcy opinię o współpracy i o działaniu Strony; (c) zgadza się, aby Wykonawca wskazał Zamawiającego i Stronę (nazwę gabinetu i adres Strony) jako swoją realizację w materiałach o swojej działalności, w tym na swojej stronie internetowej i w ofertach; (d) udostępnia Wykonawcy zbiorcze liczby dotyczące rezerwacji dokonanych przez Stronę (na przykład liczbę rezerwacji w miesiącu), wyłącznie w celu opisania efektów w realizacji, bez żadnych danych pacjentów.',
           'Wykonawca nie publikuje opinii Zamawiającego bez uzgodnienia jej treści z Zamawiającym, nie używa danych pacjentów ani żadnych informacji pozwalających zidentyfikować pacjenta i nie przypisuje Zamawiającemu wyników, których ten nie potwierdził.',
-          'Zamawiający może w każdej chwili cofnąć zgodę z ust. 2 lit. a e-mailem. Wykonawca usunie wtedy wskazanie realizacji ze swoich materiałów w ciągu 14 dni. Cofnięcie zgody nie obliguje Zamawiającego do dopłaty do ceny wdrożenia ani nie wpływa na pozostałe postanowienia umowy.',
-          'Pilotaż obejmuje trzech pierwszych klientów, którzy zawrą umowę. Jeśli limit zostanie wyczerpany przed zawarciem tej umowy, umowa jest zawierana po cenie standardowej.',
-          'Cena utrzymania z tej umowy nie wzrośnie przez 12 miesięcy od jej zawarcia, z zastrzeżeniem §3 ust. 2 (VAT).'
+          'Zamawiający może w każdej chwili cofnąć zgodę z ust. 3 lit. c e-mailem. Wykonawca usunie wtedy wskazanie realizacji ze swoich materiałów w ciągu 14 dni. Cofnięcie zgody nie obliguje Zamawiającego do dopłaty do ceny wdrożenia ani nie wpływa na pozostałe postanowienia umowy.',
+          'Pilotaż obejmuje trzech pierwszych klientów, którzy zawrą umowę, i jest dostępny do upływu terminu podanego w ofercie. Jeśli limit zostanie wyczerpany albo termin upłynie przed zawarciem tej umowy, umowa jest zawierana po cenie standardowej.'
         ], v);
       }
       var koncowe = [
@@ -355,8 +355,8 @@
         var opis = id === 'individual' ? 'Jeden terapeuta, do 3 miejsc przyjęć, do 5 podstron' : 'Zespół i kilka lokalizacji: terapeuci i lokalizacje bez limitu, każdy z własnym grafikiem, do 10 podstron';
         return '<label class="kf-pakiet"><input type="radio" name="pakiet" data-k="pakiet" value="' + id + '"' + (S.pakiet === id ? ' checked' : '') + ' /><b>' + P.nazwa + '</b><span>' + opis + '</span><em>' + (S.pilot ? '<s>' + zl(P.wdr) + '</s> ' + zl(PILOT.wdr[id]) : zl(P.wdr)) + ' wdrożenie · ' + zl(P.utr) + ' / mies.</em></label>';
       }).join('');
-      var pilotBlok = (S.pilot || PILOT.zLinku || pilotWolne() > 0)
-        ? '<label class="kf-pilot"><input type="checkbox" data-k="pilot"' + (S.pilot ? ' checked' : '') + ' /><span><b>Pilotaż pierwszych klientów</b> · wdrożenie ' + zl(PILOT.wdr[S.pakiet]) + ' zamiast ' + zl(PAK[S.pakiet].wdr) + '<small>' + (PILOT.zajete === null ? PILOT.miejsc + ' miejsca w pilotażu' : 'Wolne miejsca: ' + pilotWolne() + ' z ' + PILOT.miejsc) + '. W zamian zgoda na wskazanie Twojej strony jako realizacji, krótka rozmowa po 30 dniach i zbiorcze liczby rezerwacji (§10 umowy). Utrzymanie bez zmian.</small></span></label>'
+      var pilotBlok = S.pilotMinal ? '<p class="kf-pilot kf-pilot--pelny">Termin pilotażu w tej ofercie minął. Wdrożenie w cenie standardowej. Jeśli chcesz wrócić do pilotażu, zadzwoń: 783 480 341.</p>' : (S.pilot || PILOT.zLinku || pilotWolne() > 0)
+        ? '<label class="kf-pilot"><input type="checkbox" data-k="pilot"' + (S.pilot ? ' checked' : '') + ' /><span><b>Pilotaż pierwszych klientów</b> · wdrożenie ' + zl(PILOT.wdr[S.pakiet]) + ' zamiast ' + zl(PAK[S.pakiet].wdr) + '<small>' + (PILOT.zajete === null ? PILOT.miejsc + ' miejsca w pilotażu' : 'Wolne miejsca: ' + pilotWolne() + ' z ' + PILOT.miejsc) + '. W zamian: krótka rozmowa raz na dwa tygodnie przez trzy miesiące, opinia o usłudze, zgoda na wskazanie strony jako realizacji i zbiorcze liczby rezerwacji (§10 umowy). Dla Ciebie trzecia tura poprawek projektu i priorytet zgłoszeń.</small></span></label>'
         : '<p class="kf-pilot kf-pilot--pelny">Pilotaż pierwszych klientów jest już pełny. Wdrożenie w cenie standardowej.</p>';
       return pilotBlok + '<h4>Wybierz pakiet</h4><div class="kf-pakiety" role="radiogroup" aria-label="Pakiet">' + kart + '</div>' +
         '<h4 class="kf-h-dod">Dodatki <em>(opcjonalnie)</em></h4>' +
@@ -417,7 +417,7 @@
 
     /* Krok 2: dane firmy */
     function widokDane() {
-      var pilotInfo = S.pilot ? '<div class="kf-pilot-info" role="status"><span><b>Pilotaż pierwszych klientów:</b> wdrożenie ' + zl(ceny().wdr) + ' zamiast ' + zl(PAK[S.pakiet].wdr + (S.zaliczki ? ZAL.wdr : 0)) + '. W zamian zgoda na wskazanie strony jako realizacji (§10 umowy).</span> <button type="button" class="kf-link" data-akcja="pilot-wylacz">Zrezygnuj z pilotażu</button></div>' : '';
+      var pilotInfo = S.pilot ? '<div class="kf-pilot-info" role="status"><span><b>Pilotaż pierwszych klientów:</b> wdrożenie ' + zl(ceny().wdr) + ' zamiast ' + zl(PAK[S.pakiet].wdr + (S.zaliczki ? ZAL.wdr : 0)) + '. W zamian opinia, rozmowy co dwa tygodnie, zgoda na wskazanie strony jako realizacji i zbiorcze liczby rezerwacji (§10 umowy).</span> <button type="button" class="kf-link" data-akcja="pilot-wylacz">Zrezygnuj z pilotażu</button></div>' : '';
       return pilotInfo + '<h4>Dane do umowy</h4><div class="kf-siatka">' +
         pole('firma', 'Nazwa firmy lub imię i nazwisko prowadzącego', { pelne: true, ac: 'organization' }) +
         pole('nip', 'NIP', { inputmode: 'numeric', pod: 'Sprawdzimy poprawność numeru.' }) +
@@ -605,6 +605,7 @@
     });
     function tekstBleduSms(kod, r) {
       var m = {
+        pilot_wygasl: 'Termin pilotażu w tej ofercie minął. Wróć do kroku „Pakiet i dodatki”, odznacz pilotaż i podpisz umowę w cenie standardowej albo zadzwoń: 783 480 341.',
         pilot_pelny: 'Pilotaż pierwszych klientów jest już pełny. Wróć do kroku „Pakiet i dodatki”, odznacz pilotaż i podpisz umowę w cenie standardowej.',
         telefon: 'Ten numer nie wygląda na numer komórkowy. Wróć do kroku „Dane firmy” i popraw telefon.',
         za_szybko: 'Kod został przed chwilą wysłany. Poczekaj kilkadziesiąt sekund i spróbuj ponownie.',
@@ -743,6 +744,11 @@
     window.KONFIGURATOR = { stan: S, umowaHtml: umowaHtml, render: render };
     wczytajStan();
     zastosujToken();
+    if (LINK.ot && S.pilot && window.ODBIORNIK && window.ODBIORNIK.ofertaStatus) {
+      window.ODBIORNIK.ofertaStatus(LINK.ot).then(function (j) {
+        if (j && j.znany && j.pilot_do && Date.parse(j.pilot_do) < Date.parse(j.teraz)) { S.pilot = false; S.pilotMinal = true; zapiszStan(); render(); }
+      });
+    }
     if (!LINK.ut && LINK.ot) {
       zdobadzUt().then(function () {
         if (!LINK.ut || !window.ODBIORNIK.statusLinku) return render();

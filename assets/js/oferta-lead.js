@@ -19,15 +19,48 @@
   function zl(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' zł'; }
   function b64u(t) { return btoa(unescape(encodeURIComponent(t))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
 
+  var pilotWazny = true; /* po terminie pilotażu z oferty (licznik) nie niesiemy pilotażu do umowy */
+
   /* Adres konfiguratora: z leadem przez token (jak link do umowy z CRM), bez leada przez ?p=. */
   function adresStartu(p, pilotaz) {
     var wybrany = PAK[p] ? p : (PAK[pakiet] ? pakiet : '');
-    var wPilotazu = pilotaz || pil;
+    var wPilotazu = pilotWazny && (pilotaz || pil);
     if (lead && wybrany) return 'umowa.html?d=' + b64u(JSON.stringify({ l: lead, g: dla, m: '', p: wybrany, s: sms ? 1 : 0, z: zal ? 1 : 0, k: 1, pil: wPilotazu ? 1 : 0, o: ot || undefined }));
     return 'umowa.html' + (wybrany ? '?p=' + wybrany + (wPilotazu ? '&pil=1' : '') : (wPilotazu ? '?pil=1' : ''));
   }
   document.querySelectorAll('[data-start]').forEach(function (a) { a.setAttribute('href', adresStartu(a.getAttribute('data-start'))); });
   document.querySelectorAll('[data-start-pilot]').forEach(function (a) { a.setAttribute('href', adresStartu(a.getAttribute('data-start-pilot'), true)); });
+
+  /* Licznik terminu pilotażu: tylko dla oferty z CRM (termin: dwa tygodnie od wygenerowania oferty, liczy go serwer). */
+  if (ot && window.ODBIORNIK && window.ODBIORNIK.ofertaStatus) {
+    window.ODBIORNIK.ofertaStatus(ot).then(function (j) {
+      if (!j || !j.znany || !j.pilot_do) return;
+      var koniec = Date.parse(j.pilot_do), przesuniecie = Date.parse(j.teraz) - Date.now();
+      var pasek = document.querySelector('[data-pilot-licznik]');
+      if (!pasek || isNaN(koniec)) return;
+      var d = new Date(koniec);
+      pasek.querySelector('[data-zegar-do]').textContent = d.toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' });
+      var wazn = document.querySelector('[data-pilot-waznosc]'); if (wazn) wazn.textContent = 'Oferta ważna do upływu terminu albo do wcześniejszego wyczerpania miejsc.';
+      var czas;
+      function minal() {
+        clearInterval(czas);
+        pilotWazny = false;
+        pasek.hidden = true;
+        document.querySelectorAll('.ofs-pilot__cta, .ofs-cta__pilot').forEach(function (e) { e.hidden = true; });
+        var po = document.querySelector('[data-pilot-po]'); if (po) po.hidden = false;
+        document.querySelectorAll('[data-start]').forEach(function (a) { a.setAttribute('href', adresStartu(a.getAttribute('data-start'))); });
+      }
+      function tik() {
+        var ms = koniec - (Date.now() + przesuniecie);
+        if (ms <= 0) return minal();
+        var q2 = function (k, v) { var e = pasek.querySelector('[data-zegar="' + k + '"]'); if (e) e.textContent = v; };
+        q2('dni', Math.floor(ms / 86400000)); q2('godz', Math.floor(ms % 86400000 / 3600000)); q2('min', Math.floor(ms % 3600000 / 60000));
+      }
+      pasek.hidden = false;
+      tik();
+      czas = setInterval(tik, 30000);
+    });
+  }
 
   /* Licznik miejsc w pilotażu: prawdziwy, z serwera. Gdy pilotaż jest pełny, ukrywamy go w ofercie (nie udajemy dostępności). */
   if (window.ODBIORNIK && window.ODBIORNIK.pilotaz) {

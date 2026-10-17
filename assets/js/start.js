@@ -208,7 +208,7 @@
     var pola = s.pola.map(function (p) { return poleHtml(s, p, s.id + '|' + p.id); }).join('');
     return '<section class="st-sekcja" aria-labelledby="st-h">' +
       '<p class="st-krok">Krok ' + (i + 1) + ' z ' + SCH.sekcje.length + ' · około ' + esc(s.czas) + '</p><h1 id="st-h" tabindex="-1">' + esc(s.tytul) + '</h1><p class="st-po-co">' + esc(s.po_co) + '</p>' +
-      (i === 0 && !st.sekcje._wstep ? '<aside class="st-wstep"><b>Jak to działa</b><p>Wszystko zapisuje się na bieżąco, a do formularza możesz wrócić tym samym linkiem w każdej chwili. Czego nie masz pod ręką, pomiń: nic się nie stanie. Pola oznaczone „ważne” są potrzebne do rozpoczęcia projektu graficznego, ale nawet bez nich możesz wysłać formularz i dosłać resztę później.</p><button type="button" class="st-btn st-btn--maly st-btn--cichy" data-akcja="wstep-ukryj">Rozumiem</button></aside>' : '') +
+      (i === 0 && !st.sekcje._wstep ? '<aside class="st-wstep"><b>Jak to działa</b><p>Wszystko zapisuje się na bieżąco, a do formularza możesz wrócić tym samym linkiem w każdej chwili. Dla nas odpowiedzi są gotowe do pracy dopiero po kliknięciu „Wyślij do Studio Widok” w podsumowaniu na końcu. Czego nie masz pod ręką, pomiń: nic się nie stanie. Pola oznaczone „ważne” są potrzebne do rozpoczęcia projektu graficznego, ale nawet bez nich możesz wysłać formularz i dosłać resztę później.</p><button type="button" class="st-btn st-btn--maly st-btn--cichy" data-akcja="wstep-ukryj">Rozumiem</button></aside>' : '') +
       '<label class="st-pomin"><input type="checkbox" data-akcja-zmiana="pomin" data-s="' + s.id + '"' + (dane._pomin ? ' checked' : '') + ' /> Wypełnię tę część później</label>' +
       '<div class="st-pola' + (dane._pomin ? ' st-pola--wyciszone' : '') + '">' + pola + '</div>' +
       '<nav class="st-dol" aria-label="Poprzednia i następna część">' + (prev ? '<button type="button" class="st-btn st-btn--cichy" data-akcja="idz" data-id="' + prev.id + '">← ' + esc(prev.tytul) + '</button>' : '<span></span>') + '<button type="button" class="st-btn" data-akcja="idz" data-id="' + (next ? next.id : 'podsumowanie') + '">' + (next ? esc(next.tytul) + ' →' : 'Podsumowanie →') + '</button></nav></section>';
@@ -221,9 +221,9 @@
       '<div class="st-wynik"><b id="st-licznik">' + p.procent + '% ważnych pytań</b><span>Brief jest tym pełniejszy, im więcej wiemy. Możesz go wysłać już teraz i uzupełniać dalej.</span></div>' +
       '<ul class="st-lista-sekcji">' + SCH.sekcje.map(function (s, i) { var x = p.sekcje[i]; return '<li class="st-stan--' + x.stan + '"><button type="button" class="st-link" data-akcja="idz" data-id="' + s.id + '"><span aria-hidden="true">' + ikonaStanu(x.stan) + '</span> ' + esc(s.tytul) + '</button><small>' + ({ puste: 'nie zaczęte', w_trakcie: x.brakuje.length + ' ' + (x.brakuje.length === 1 ? 'ważna rzecz do uzupełnienia' : 'ważnych rzeczy do uzupełnienia'), gotowe: 'gotowe', pominieta: 'wypełnisz później' }[x.stan]) + '</small></li>'; }).join('') + '</ul>' +
       (braki.length ? '<details class="st-braki"><summary>Czego jeszcze brakuje (' + braki.length + ')</summary><ul>' + braki.slice(0, 30).map(function (b) { return '<li><button type="button" class="st-link" data-akcja="idz" data-id="' + b.sekcja + '">' + esc(b.pole) + '</button></li>'; }).join('') + '</ul></details>' : '<p class="st-ok">Wszystkie ważne pytania mają odpowiedź.</p>') +
-      (wyslany ? '<p class="st-ok st-ok--duze" role="status">Formularz został wysłany' + (st.wyslano ? ' (' + esc(new Date(st.wyslano).toLocaleString('pl-PL', { dateStyle: 'short', timeStyle: 'short' })) + ')' : '') + '. Dziękujemy! Zmiany, które wprowadzisz teraz, też do nas dotrą.</p>' : '') +
+      (wyslany ? '<p class="st-ok st-ok--duze" role="status">Formularz został wysłany' + (st.wyslano ? ' (' + esc(new Date(st.wyslano).toLocaleString('pl-PL', { dateStyle: 'short', timeStyle: 'short' })) + ')' : '') + '. Dziękujemy! Zmiany, które wprowadzisz teraz, też do nas dotrą.</p><p class="st-ok st-ok--umowa" role="status">' + (st.umowa ? 'Mamy już Twoją umowę, więc przystępujemy do projektu graficznego.' : 'Do projektu graficznego przystąpimy dopiero po akceptacji umowy.' + (WROC ? ' To ostatni krok: wróć do umowy i ją potwierdź.' : '')) + '</p>' : '') +
       (WROC && wyslany ? '<p class="st-wroc"><a class="st-btn" id="st-wroc" href="' + esc(WROC) + '">Dalej: umowa i podpis →</a></p>' : '') +
-      '<div class="st-wysylka"><button type="button" class="st-btn" data-akcja="wyslij" id="st-wyslij">' + (wyslany ? 'Wyślij ponownie po zmianach' : 'Wyślij do Studio Widok') + '</button><p class="st-pod">' + (WROC ? 'Po wysłaniu wrócisz do ostatniego kroku: umowy. Projekt graficzny zaczynamy, gdy mamy też podpisaną umowę.' : 'Po wysłaniu dostajemy powiadomienie. Projekt graficzny zaczynamy, gdy mamy też podpisaną umowę.') + ' Plików i odpowiedzi nie musisz podawać drugi raz.</p></div>' +
+      '<div class="st-wysylka"><button type="button" class="st-btn" data-akcja="wyslij" id="st-wyslij">' + (wyslany ? 'Wyślij ponownie po zmianach' : 'Wyślij do Studio Widok') + '</button><p class="st-pod">' + (WROC ? 'Po wysłaniu wrócisz do ostatniego kroku: umowy. Projekt graficzny zaczynamy dopiero po akceptacji umowy.' : 'Po wysłaniu dostajemy powiadomienie. Projekt graficzny zaczynamy dopiero po akceptacji umowy.') + ' Plików i odpowiedzi nie musisz podawać drugi raz.</p></div>' +
       '<nav class="st-dol"><button type="button" class="st-btn st-btn--cichy" data-akcja="idz" data-id="' + SCH.sekcje[SCH.sekcje.length - 1].id + '">← ' + esc(SCH.sekcje[SCH.sekcje.length - 1].tytul) + '</button><span></span></nav></section>';
   }
   function render(zFokusem) {
@@ -420,7 +420,7 @@
       if (x.r.status === 404) return pokazKomunikat('Ten link jest nieaktywny', 'Mógł wygasnąć albo zostać zastąpiony nowym. Odezwij się do nas, a przekażemy aktualny.');
       if (!x.r.ok || !x.j.ok) throw new Error('start');
       var j = x.j;
-      st.dla = j.dla || ''; st.sekcje = j.sekcje || {}; st.pliki = j.pliki || []; st.status = j.status; st.wyslano = j.wyslano;
+      st.umowa = !!j.umowa; st.dla = j.dla || ''; st.sekcje = j.sekcje || {}; st.pliki = j.pliki || []; st.status = j.status; st.wyslano = j.wyslano;
       try { if (localStorage.getItem('start-wstep')) st.sekcje._wstep = true; } catch (e) { /* bez zapisu */ }
       /* Szkic z przeglądarki, który nie dotarł na serwer (np. zamknięta karta bez sieci). */
       try {
@@ -428,6 +428,7 @@
         if (szkic) Object.keys(szkic).forEach(function (s) { var zm = st.sekcje[s] && st.sekcje[s]._zm ? Date.parse(st.sekcje[s]._zm) : 0; if (szkic[s].czas > zm) { st.sekcje[s] = szkic[s].dane; oznaczZmiane(s); } });
       } catch (e) { /* uszkodzony szkic pomijamy */ }
       $('#st-uklad').hidden = false;
+      var przyp = $('#st-przyp'); if (przyp) przyp.hidden = false;
       if (st.dla) { var d = $('#st-dla'); d.querySelector('b').textContent = st.dla; d.hidden = false; }
       var h = (location.hash || '').replace('#', '');
       if (h === 'podsumowanie' || SCH.sekcje.some(function (s) { return s.id === h; })) st.aktywna = h;
