@@ -380,7 +380,7 @@
           <div><dt>Przychód</dt><dd>${P.zl(p.przychod)}</dd></div>
           <div><dt>Następna wizyta</dt><dd>${p.nastepna ? `${esc(K.dlugaData(K.zIso(p.nastepna.data)))}, ${K.godz(p.nastepna.od)}` : 'brak'}</dd></div>
         </dl>
-        ${P.pole({ etykieta: 'Notatka o pacjencie <em>(nie medyczna, widzi ją tylko gabinet)</em>', wartosc: n.notatka || '', wiersze: 2, atr: `data-pac-notatka="${k}"`, placeholder: 'np. woli terminy rano, dzwonić po 16' })}
+        ${P.pole({ etykieta: 'Notatka o pacjencie <em>(nie medyczna, widzi ją tylko gabinet)</em>', wartosc: n.notatka || '', wiersze: 2, atr: `data-pac-notatka="${k}"`, placeholder: 'np. woli terminy rano, dzwonić po 16', pod: 'Nie wpisuj diagnoz ani innych danych medycznych.' })}
         ${P.przelacznik({ etykieta: 'Zgoda na SMS-y o wizytach', wartosc: n.sms !== false, pod: 'Bez zgody pacjent nie dostaje SMS-ów z systemu. Zadzwoń do niego.', atr: `data-pac-sms="${k}"` })}
         <div class="p-sz-sekcja"><h3>Historia wizyt</h3>
           <ul class="p-lista">${wizyty.map((r) => `<li class="p-wiersz"><button type="button" class="p-wiersz__glowny" data-pa="rez" data-id="${r.id}"><b>${esc(K.dlugaData(K.zIso(r.data)))}, ${K.godz(r.od)} ${statusTag(r)}</b><small>${esc(K.usluga(D, r.usluga).nazwa)} · ${P.zl(K.cena(D, r))} · ${esc(K.ZRODLA_KR[r.zrodlo] || r.zrodlo)}${P.ent() ? ` · ${esc(P.osobaNazwa(osoba(r.terap)))}` : ''}</small></button></li>`).join('')}</ul>

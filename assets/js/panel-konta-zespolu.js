@@ -19,7 +19,7 @@
   const esc = P.esc;
   const KLUCZ = 'panel-rola-v1';
   const DOZWOLONE_TERAPEUTA = ['pulpit', 'kalendarz', 'rezerwacje', 'dostepnosc', 'grafik'];
-  const DOZWOLONE_REJESTRACJA = ['pulpit', 'kalendarz', 'rezerwacje', 'dostepnosc', 'grafik'];
+  const DOZWOLONE_REJESTRACJA = ['pulpit', 'kalendarz', 'rezerwacje', 'pacjenci', 'dostepnosc', 'grafik'];
 
   let rola = 'wl';
   try { rola = localStorage.getItem(KLUCZ) || 'wl'; } catch (e) { /* bez zapisu zaczynamy jako właściciel */ }
@@ -197,13 +197,13 @@
     if (P.rolaTerap()) {
       return [
         { grupa: null, poz: [['pulpit', 'Dziś'], ['kalendarz', 'Kalendarz'], ['rezerwacje', 'Rezerwacje']] },
-        { grupa: 'Mój grafik', poz: [['dostepnosc', 'Moja dostępność'], ['grafik', 'Grafik zespołu']] },
+        { grupa: 'Mój grafik', poz: [['dostepnosc', 'Mój stały grafik'], ['grafik', 'Grafik zespołu']] },
       ];
     }
     if (P.rejestracja()) {
       return [
-        { grupa: null, poz: [['pulpit', 'Dziś'], ['kalendarz', 'Kalendarz'], ['rezerwacje', 'Rezerwacje']] },
-        { grupa: 'Grafiki', poz: [['grafik', 'Grafik zespołu'], ['dostepnosc', 'Dostępność']] },
+        { grupa: null, poz: [['pulpit', 'Dziś'], ['kalendarz', 'Kalendarz'], ['rezerwacje', 'Rezerwacje'], ['pacjenci', 'Pacjenci']] },
+        { grupa: 'Grafiki', poz: [['grafik', 'Grafik zespołu'], ['dostepnosc', 'Stały grafik']] },
       ];
     }
     m[1].poz.unshift(['grafik', 'Grafik zespołu']);

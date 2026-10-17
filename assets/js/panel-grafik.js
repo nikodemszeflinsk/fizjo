@@ -303,7 +303,7 @@
 
   /* ── Widok ─────────────────────────────────────────────────────────── */
   P.widoki.dostepnosc = {
-    tytul: () => (P.rolaTerap && P.rolaTerap() ? 'Moja dostępność' : 'Dostępność'),
+    tytul: () => (P.rolaTerap && P.rolaTerap() ? 'Mój stały grafik' : 'Stały grafik'),
     podtytul: () => (P.rolaTerap && P.rolaTerap() ? 'Kiedy przyjmujesz. Właściciel widzi Twój grafik i może go zmienić.' : P.ent() ? 'Godziny jednej osoby, urlopy, święta i zasady rezerwacji. Cały zespół ułożysz w „Grafiku zespołu”.' : 'Kiedy przyjmujesz. Pacjent widzi tylko wolne terminy.'),
     render() {
       if (!P.D().zespol.some((t) => t.id === GF.osoba)) GF.osoba = P.D().zespol[0].id;

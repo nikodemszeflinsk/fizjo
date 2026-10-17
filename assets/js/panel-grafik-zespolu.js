@@ -210,7 +210,7 @@
         <button type="button" class="p-chip p-chip--bez" data-pa="gz-widok" data-id="plan" aria-pressed="${w === 'plan'}">Plan tygodni</button>
         <button type="button" class="p-chip p-chip--bez" data-pa="gz-widok" data-id="osoby" aria-pressed="${w === 'osoby'}">Wzorzec tygodnia</button>
         <button type="button" class="p-chip p-chip--bez" data-pa="gz-widok" data-id="lokalizacje" aria-pressed="${w === 'lokalizacje'}">Lokalizacje</button>
-        ${P.rolaTerap() ? `<a class="p-btn p-btn--maly p-btn--cichy" href="#/dostepnosc">Moja dostępność</a>` : ''}</div>`;
+        ${P.rolaTerap() ? `<a class="p-btn p-btn--maly p-btn--cichy" href="#/dostepnosc">Mój stały grafik</a>` : ''}</div>`;
       const glowna = w === 'plan'
         ? P.PL.karta(widoczni(), { tytul: 'Plan tygodni' })
         : w === 'osoby'

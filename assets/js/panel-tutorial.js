@@ -10,7 +10,8 @@
   var KROKI = [
     { cel: '#p-menu a[href="#/pulpit"]', tytul: 'Dziś', tekst: 'Wizyty na dziś i nowe rezerwacje ze strony. Zacznij od potwierdzenia nowych.' },
     { cel: '#p-menu a[href="#/kalendarz"]', tytul: 'Kalendarz', tekst: 'Kliknij wizytę, żeby ją zmienić. Przeciągnij ją, żeby przenieść na inny termin.' },
-    { cel: '#p-menu a[href="#/dostepnosc"], #p-menu a[href="#/grafik"]', tytul: 'Dostępność', tekst: 'Tu ustawiasz godziny przyjęć. Pacjent widzi tylko to, co otworzysz.' },
+    { cel: '#p-menu a[href="#/pacjenci"]', tytul: 'Pacjenci', tekst: 'Lista pacjentów z telefonem i historią wizyt. Bez danych medycznych.' },
+    { cel: '#p-menu a[href="#/dostepnosc"], #p-menu a[href="#/grafik"]', tytul: 'Stały grafik', tekst: 'Godziny przyjęć ustawiasz tu albo w Kalendarzu (przycisk „Zmień dostępność”). Pacjent widzi tylko to, co otworzysz.' },
     { cel: '.p-pakiet', tytul: 'Dwa pakiety', tekst: 'To demo pokazuje oba. Przełącz na Team, żeby zobaczyć grafik zespołu.' }
   ];
   var i = 0, nakladka = null, karta = null, ring = null;

@@ -54,8 +54,8 @@
 
   /* ── Menu ──────────────────────────────────────────────────────────── */
   P.MENU = () => [
-    { grupa: null, poz: [['pulpit', 'Dziś'], ['kalendarz', 'Kalendarz'], ['rezerwacje', 'Rezerwacje']] },
-    { grupa: 'Gabinet', poz: [['dostepnosc', 'Dostępność'], ['uslugi', 'Usługi i ceny'], ['zespol', P.ent() ? 'Zespół' : 'Mój profil'], ['lokalizacje', P.ent() ? 'Lokalizacje' : 'Miejsca przyjęć'], ['ustawienia', 'Ustawienia']] },
+    { grupa: null, poz: [['pulpit', 'Dziś'], ['kalendarz', 'Kalendarz'], ['rezerwacje', 'Rezerwacje'], ['pacjenci', 'Pacjenci']] },
+    { grupa: 'Gabinet', poz: [['dostepnosc', 'Stały grafik'], ['uslugi', 'Usługi i ceny'], ['zespol', P.ent() ? 'Zespół' : 'Mój profil'], ['lokalizacje', P.ent() ? 'Lokalizacje' : 'Miejsca przyjęć'], ['ustawienia', 'Ustawienia']] },
   ];
   function liczbaUwagi() {
     const D = P.D();
@@ -308,7 +308,8 @@
 
   /* ── Wyszukiwarka całego panelu ────────────────────────────────────── */
   const SEKCJE = [
-    ['dostepnosc', 'Dostępność: godziny przyjęć, urlopy, święta', 'godziny grafik urlop święta przerwa zasady rezerwacji'],
+    ['dostepnosc', 'Stały grafik: godziny przyjęć, urlopy, święta', 'godziny grafik stały grafik dostępność urlop święta przerwa zasady rezerwacji'],
+    ['pacjenci', 'Pacjenci: lista, kontakt, historia wizyt', 'pacjent pacjenci klient telefon lista sms'],
     ['uslugi', 'Usługi i ceny', 'cena cennik usługa czas zaliczka'],
     ['zespol', 'Zespół i profile', 'terapeuta zespół profil'],
     ['lokalizacje', 'Miejsca przyjęć i godziny otwarcia', 'adres dojazd parking godziny otwarcia'],
