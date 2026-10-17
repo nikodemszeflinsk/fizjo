@@ -32,15 +32,14 @@
   document.querySelectorAll('[data-start-pilot]').forEach(function (a) { a.setAttribute('href', adresStartu(a.getAttribute('data-start-pilot'), true)); });
 
   /* Licznik terminu pilotażu: tylko dla oferty z CRM (termin: dwa tygodnie od wygenerowania oferty, liczy go serwer). */
-  if (ot && window.ODBIORNIK && window.ODBIORNIK.ofertaStatus) {
-    window.ODBIORNIK.ofertaStatus(ot).then(function (j) {
+  if ((ot || lead) && window.ODBIORNIK && window.ODBIORNIK.ofertaStatus) {
+    window.ODBIORNIK.ofertaStatus(ot, lead).then(function (j) {
       if (!j || !j.znany || !j.pilot_do) return;
       var koniec = Date.parse(j.pilot_do), przesuniecie = Date.parse(j.teraz) - Date.now();
       var pasek = document.querySelector('[data-pilot-licznik]');
       if (!pasek || isNaN(koniec)) return;
       var d = new Date(koniec);
       pasek.querySelector('[data-zegar-do]').textContent = d.toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' });
-      var wazn = document.querySelector('[data-pilot-waznosc]'); if (wazn) wazn.textContent = 'Oferta ważna do upływu terminu albo do wcześniejszego wyczerpania miejsc.';
       var czas;
       function minal() {
         clearInterval(czas);

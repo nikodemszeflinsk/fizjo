@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/karta.css?v=63" />
-  <link rel="stylesheet" href="assets/css/oferta-strona.css?v=19" />
+  <link rel="stylesheet" href="assets/css/oferta-strona.css?v=22" />
 </head>
 <body class="ofr-body">
   <a class="skip" href="#tresc">Przejdź do treści</a>
@@ -474,9 +474,12 @@
 
         <div class="ofs-pilot-wrap" id="pilotaz" data-pilot-blok>
           <div class="ofs-pilot__pasek" data-pilot-licznik hidden>
-            <span class="ofs-pilot__pasek-et">Oferta ważna jeszcze</span>
-            <span class="ofs-pilot__zegar" role="timer"><span><b data-zegar="dni">–</b> dni</span><span><b data-zegar="godz">–</b> godz.</span><span><b data-zegar="min">–</b> min</span></span>
-            <span class="ofs-pilot__pasek-do">do <b data-zegar-do>–</b>, albo do wyczerpania miejsc</span>
+            <div class="ofs-pilot__pasek-wiersz">
+              <span class="ofs-pilot__pasek-et">Oferta ważna jeszcze</span>
+              <span class="ofs-pilot__zegar" role="timer"><span><b data-zegar="dni">–</b> dni</span><span><b data-zegar="godz">–</b> godz.</span><span><b data-zegar="min">–</b> min</span></span>
+              <span class="ofs-pilot__pasek-do">do <b data-zegar-do>–</b></span>
+            </div>
+            <p class="ofs-pilot__pasek-waz">Oferta ważna do upływu terminu lub wcześniejszego wyczerpania miejsc.</p>
           </div>
           <div class="ofs-pilot">
             <p class="ofs-pilot__znak">Pilotaż pierwszych klientów · <span data-pilot-wolne>3 miejsca</span></p>
@@ -504,7 +507,7 @@
                 </ul>
               </div>
             </div>
-            <p class="ofs-pilot__fine">To wymiana: obniżamy cenę wdrożenia, a w zamian dostajemy to, co pozwoli pokazać kolejnym gabinetom, że to działa. <span data-pilot-waznosc>Oferta ważna do wyczerpania miejsc.</span> Warunki są w umowie (§10), którą czytasz przed podpisaniem.</p>
+            <p class="ofs-pilot__fine">To wymiana: obniżamy cenę wdrożenia, a w zamian dostajemy to, co pozwoli pokazać kolejnym gabinetom, że to działa. Warunki są w umowie (§10), którą czytasz przed podpisaniem.</p>
             <div class="ofs-pilot__cta">
               <a class="cta cta--blue" href="umowa.html?p=individual&amp;pil=1" data-start-pilot="individual">Wchodzę do pilotażu: Individual <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></a>
               <a class="cta cta--blue" href="umowa.html?p=enterprise&amp;pil=1" data-start-pilot="enterprise">Wchodzę do pilotażu: Team <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></a>
@@ -526,7 +529,7 @@
           <p>Wybierasz tylko to, czego potrzebujesz. Dodatki możesz włączyć przy umowie albo dołożyć później.</p>
           <ul>
             <li>
-              <div><h4>Dodatkowe SMS-y</h4><p>Do 200 SMS-ów miesięcznie jest w utrzymaniu: potwierdzenie rezerwacji, przypomnienie dzień przed wizytą i informacja o zmianie terminu. Gdy masz więcej wizyt (zespół, kilka lokalizacji), dokupujesz kolejne 200 wiadomości, każdy pakiet za 50 zł miesięcznie. Ostrzegamy Cię, zanim limit się skończy. W panelu widzisz, ile wiadomości zostało, i możesz wysłać pacjentowi własny SMS. Pacjent zgadza się na SMS-y przy rezerwacji.</p></div>
+              <div><h4>Dodatkowe SMS-y</h4><p>Do 200 SMS-ów miesięcznie jest w utrzymaniu: potwierdzenie rezerwacji, przypomnienie dzień przed wizytą i informacja o zmianie terminu. Gdy masz więcej wizyt (zespół, kilka lokalizacji), dokupujesz kolejne 200 wiadomości, każdy pakiet za 50 zł miesięcznie. Niewykorzystane wiadomości, także dokupione, nie przepadają z końcem miesiąca i przechodzą na kolejne. Ostrzegamy Cię, zanim pula się skończy. W panelu widzisz, ile wiadomości zostało, i możesz wysłać pacjentowi własny SMS. Pacjent zgadza się na SMS-y przy rezerwacji.</p></div>
               <p class="ofs-dodatki__cena">50 zł<small>za kolejne 200 miesięcznie</small></p>
             </li>
             <li>
@@ -550,7 +553,7 @@
             <ul>
               <li>Domena (z rocznym odnowieniem), hosting i certyfikat SSL</li>
               <li>Monitoring, naprawa błędów i aktualizacje</li>
-              <li>Do 200 SMS-ów miesięcznie do pacjentów (potwierdzenia i przypomnienia)</li>
+              <li>Do 200 SMS-ów miesięcznie do pacjentów (potwierdzenia i przypomnienia), niewykorzystane nie przepadają</li>
               <li>Do godziny drobnych zmian treści miesięcznie</li>
               <li>Kontakt telefoniczny i mailowy z osobą, która to zrobiła</li>
             </ul>
@@ -567,6 +570,7 @@
           </div>
           <div>
             <h3>Jeśli zrezygnujesz z utrzymania</h3>
+            <p class="ofs-przenies">Masz prawo przenieść stronę i system na własne utrzymanie i samodzielnie ogarnąć to technicznie. Udostępniamy wtedy pliki strony do skonfigurowania na Twojej własnej infrastrukturze.</p>
             <ul>
               <li>W ciągu 7 dni dostajesz pliki strony i dostęp do domeny oraz wizytówki, możesz opublikować je gdzie chcesz</li>
               <li>System rezerwacji działa na naszej infrastrukturze, więc po zakończeniu umowy przestaje działać, dopóki nie skonfigurujesz własnego</li>
@@ -738,7 +742,7 @@
           </details>
           <details>
             <summary>Czy mogę wysyłać pacjentom SMS-y? Czy potrzebuję zgód?<span class="faq__icon" aria-hidden="true"></span></summary>
-            <p>Tak, SMS-y są w standardzie: do 200 wiadomości miesięcznie w cenie utrzymania (potwierdzenie rezerwacji, przypomnienie dzień przed wizytą, informacja o zmianie lub odwołaniu). Gdy limit zbliża się do końca, ostrzegamy Cię, a kolejne 200 wiadomości dokupujesz za 50 zł miesięcznie. W panelu widzisz, ile wiadomości zostało, i możesz wysłać pacjentowi własny SMS. E-maile wysyłamy tylko Tobie i Twoim terapeutom, żeby nikt nie przegapił nowej rezerwacji. Pacjenci zaznaczają zgodę na SMS-y przy rezerwacji, a treść zgody i klauzul informacyjnych ustalamy razem (odpowiadasz za nie jako administrator danych).</p>
+            <p>Tak, SMS-y są w standardzie: do 200 wiadomości miesięcznie w cenie utrzymania (potwierdzenie rezerwacji, przypomnienie dzień przed wizytą, informacja o zmianie lub odwołaniu). Niewykorzystane wiadomości, także dokupione, nie przepadają z końcem miesiąca. Gdy pula zbliża się do końca, ostrzegamy Cię, a kolejne 200 wiadomości dokupujesz za 50 zł miesięcznie. W panelu widzisz, ile wiadomości zostało, i możesz wysłać pacjentowi własny SMS. E-maile wysyłamy tylko Tobie i Twoim terapeutom, żeby nikt nie przegapił nowej rezerwacji. Pacjenci zaznaczają zgodę na SMS-y przy rezerwacji, a treść zgody i klauzul informacyjnych ustalamy razem (odpowiadasz za nie jako administrator danych).</p>
           </details>
           <details>
             <summary>Ile mojego czasu to zajmie i co, gdy coś przestanie działać?<span class="faq__icon" aria-hidden="true"></span></summary>
@@ -777,27 +781,34 @@
             <p class="ofs-start__pakiet" id="ofs-start-pakiet" hidden></p>
             <a class="cta cta--blue" href="umowa.html" data-start>Rozpocznij wdrożenie <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></a>
             <p class="ofs-start__note">Czego nie masz pod ręką, dosyłasz później, tym samym linkiem.</p>
-            <ul class="ofs-start__ryzyko" aria-label="Bez ryzyka">
-              <li><b>Płacisz dopiero po akceptacji projektu.</b> Najpierw widzisz swoją stronę w projekcie graficznym, rachunek dostajesz potem.</li>
-              <li><b>Poprawki w cenie.</b> Dwie tury poprawek projektu (w pilotażu trzy).</li>
-              <li><b>Rezygnujesz, kiedy chcesz.</b> Bez umowy na lata i bez okresu wypowiedzenia.</li>
-              <li><b>Strona i dane są Twoje.</b> Pliki strony i dostęp do domeny dostajesz w 7 dni po rezygnacji.</li>
-            </ul>
           </article>
 
           <article class="ofs-start__karta">
             <p class="ofs-start__et">Wolisz porozmawiać</p>
-            <h3>Zadzwoń</h3>
-            <p class="ofs-start__opis">Masz wątpliwości, pytania albo obiekcje? Zadzwoń. Odpowiem od razu i bez nacisku.</p>
+            <h3>Zadzwoń albo napisz</h3>
+            <p class="ofs-start__opis">Masz wątpliwości, pytania albo obiekcje? Zadzwoń albo napisz. Odpowiem od razu i bez nacisku.</p>
             <ul class="ofs-start__pytania">
               <li>Czy to się opłaci w moim gabinecie?</li>
               <li>Mam już stronę albo program do umawiania.</li>
               <li>Co z danymi pacjentów i RODO?</li>
               <li>Ile to potrwa i ile mojego czasu zajmie?</li>
             </ul>
-            <a class="cta cta--line" href="tel:+48783480341" data-zadzwon>Zadzwoń: 783 480 341</a>
+            <div class="ofs-start__kontakt">
+              <a class="cta cta--line" href="tel:+48783480341" data-zadzwon>Zadzwoń: 783 480 341</a>
+              <a class="cta cta--line" href="mailto:kontakt@studio-widok.pl?subject=Pytanie%20o%20stron%C4%99%20z%20rezerwacj%C4%85">Napisz: kontakt@studio-widok.pl</a>
+            </div>
             <p class="ofs-start__note">Nikodem Szefliński, osoba, która zrobi Twoją stronę.</p>
           </article>
+        </div>
+
+        <div class="ofs-start__bez-ryzyka">
+          <h3>Bez ryzyka</h3>
+          <ul class="ofs-start__ryzyko" aria-label="Bez ryzyka">
+            <li><b>Płacisz dopiero po akceptacji projektu.</b> Najpierw widzisz swoją stronę w projekcie graficznym, rachunek dostajesz potem.</li>
+            <li><b>Poprawki w cenie.</b> Dwie tury poprawek projektu (w pilotażu trzy).</li>
+            <li><b>Rezygnujesz, kiedy chcesz.</b> Bez umowy na lata i bez okresu wypowiedzenia.</li>
+            <li><b>Strona i dane są Twoje.</b> Pliki strony i dostęp do domeny dostajesz w 7 dni po rezygnacji.</li>
+          </ul>
         </div>
       </div>
     </section>
@@ -920,8 +931,8 @@
     })();
   </script>
   <script src="assets/js/chmura-config.js?v=2"></script>
-  <script src="assets/js/odbiornik.js?v=12"></script>
-  <script src="assets/js/oferta-lead.js?v=6" defer></script>
+  <script src="assets/js/odbiornik.js?v=13"></script>
+  <script src="assets/js/oferta-lead.js?v=7" defer></script>
   <script src="assets/js/droga-strona.js?v=2" defer></script>
 </body>
 </html>

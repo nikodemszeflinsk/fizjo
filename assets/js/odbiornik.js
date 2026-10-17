@@ -93,9 +93,9 @@
     /** Wysyła paczkę i czyta odpowiedź skryptu (kod SMS, pliki). Zawsze rozwiązuje się obiektem; {ok:false, blad:'siec'} przy braku połączenia. */
     /** Czy link do umowy jest ważny (tylko w chmurze). Zwraca {wazna, wygasa} albo null, gdy nie da się sprawdzić. */
     /** Termin pilotażu w ofercie z CRM: {znany, pilot_do, teraz} albo null (lokalnie albo bez chmury). */
-    ofertaStatus: function (o) {
-      if (!o || !adresApi() || lokalnie()) return Promise.resolve(null);
-      return fetch(adresApi() + '/oferta/status?o=' + encodeURIComponent(o)).then(function (r) { return r.json(); })
+    ofertaStatus: function (o, lead) {
+      if ((!o && !lead) || !adresApi() || lokalnie()) return Promise.resolve(null);
+      return fetch(adresApi() + '/oferta/status?' + (o ? 'o=' + encodeURIComponent(o) : 'l=' + encodeURIComponent(lead))).then(function (r) { return r.json(); })
         .then(function (j) { return j && j.ok ? j : null; }).catch(function () { return null; });
     },
     /** Klient z oferty z CRM: z tokenu oferty dostaje link do umowy (z terminem). Zwraca {ok, ut, wygasa}; lokalnie symulacja. */

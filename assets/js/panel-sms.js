@@ -25,21 +25,39 @@
     if (!n) return 0;
     return /[^\x00-\x7F]/.test(t) ? (n <= 70 ? 1 : Math.ceil(n / 67)) : (n <= 160 ? 1 : Math.ceil(n / 153));
   };
-  /** Wiadomości automatyczne w tym miesiącu: potwierdzenie i przypomnienie do każdej wizyty, której termin już był albo jest dziś. */
-  const automatyczne = () => {
-    const D = P.D(), m = miesiac(), dzis = K.dzisIso();
+  /** Wiadomości automatyczne w danym miesiącu: potwierdzenie i przypomnienie do każdej wizyty, której termin już był albo jest dziś. */
+  const automatyczne = (m = miesiac()) => {
+    const D = P.D(), dzis = K.dzisIso();
     return D.rezerwacje.filter((r) => String(r.data).slice(0, 7) === m && r.data <= dzis && r.status !== 'anulowana' && r.status !== 'odwolana').length * 2;
   };
   const wlasneMiesiac = () => dane().wlasne.filter((w) => w.m === miesiac());
+  const wlasneW = (m = miesiac()) => dane().wlasne.filter((w) => w.m === m).reduce((s, w) => s + w.czesci, 0);
+  const nastepny = (m) => { const [r, mm] = m.split('-').map(Number); return mm === 12 ? `${r + 1}-01` : `${r}-${String(mm + 1).padStart(2, '0')}`; };
+  const poprzedni = () => { const d = K.zIso(K.dzisIso()); d.setDate(1); d.setMonth(d.getMonth() - 1); return K.iso(d).slice(0, 7); };
+  /**
+   * Niewykorzystane SMS-y nie przepadają z końcem miesiąca (dotyczy też dokupionych): z każdego miesiąca przechodzi reszta puli.
+   * W demie gabinet korzysta od zeszłego miesiąca, więc przenosimy resztę od niego.
+   */
+  const przeniesione = () => {
+    const S = dane();
+    if (!S.od) S.od = poprzedni();
+    const limit = LIMIT * (1 + S.pakiety);
+    let reszta = 0;
+    for (let m = S.od; m < miesiac(); m = nastepny(m)) reszta = Math.max(0, reszta + limit - automatyczne(m) - wlasneW(m));
+    return reszta;
+  };
   const stan = () => {
     const limit = LIMIT * (1 + dane().pakiety);
-    const wlasne = wlasneMiesiac().reduce((s, w) => s + w.czesci, 0);
-    const uzyte = automatyczne() + wlasne;
-    return { limit, uzyte, auto: automatyczne(), wlasne, pozostalo: Math.max(0, limit - uzyte), pakiety: dane().pakiety };
+    const przenies = przeniesione();
+    const pula = limit + przenies;
+    const wlasne = wlasneW();
+    const auto = automatyczne();
+    const uzyte = auto + wlasne;
+    return { limit, przeniesione: przenies, pula, uzyte, auto, wlasne, pozostalo: Math.max(0, pula - uzyte), pakiety: dane().pakiety };
   };
   P.sms = { stan, czesci };
 
-  const poziom = (s) => (s.pozostalo === 0 ? 'wyczerpany' : s.pozostalo <= s.limit * 0.2 ? 'malo' : 'ok');
+  const poziom = (s) => (s.pozostalo === 0 ? 'wyczerpany' : s.pozostalo <= s.pula * 0.2 ? 'malo' : 'ok');
 
   /* ── Licznik w nagłówku ─────────────────────────────────────────────── */
   function chip() {
@@ -60,9 +78,9 @@
     let s;
     try { s = stan(); } catch (e) { return; }
     b.dataset.poziom = poziom(s);
-    b.title = `Pozostało ${s.pozostalo} z ${s.limit} wiadomości SMS w tym miesiącu. Kliknij, żeby wysłać własny SMS.`;
-    b.innerHTML = `${P.ikona('powiadomienia')}<span class="p-sms-chip__t">SMS: <b>${s.pozostalo}</b> z ${s.limit}</span>`;
-    b.setAttribute('aria-label', `Wyślij SMS. Pozostało ${s.pozostalo} z ${s.limit} wiadomości w tym miesiącu`);
+    b.title = `Pozostało ${s.pozostalo} z ${s.pula} wiadomości SMS (${s.limit} w tym miesiącu i ${s.przeniesione} przeniesionych). Kliknij, żeby wysłać własny SMS.`;
+    b.innerHTML = `${P.ikona('powiadomienia')}<span class="p-sms-chip__t">SMS: <b>${s.pozostalo}</b> z ${s.pula}</span>`;
+    b.setAttribute('aria-label', `Wyślij SMS. Pozostało ${s.pozostalo} z ${s.pula} wiadomości`);
   }
   const odswiezPierwotne = P.odswiez;
   P.odswiez = () => { odswiezPierwotne(); odswiezChip(); };
@@ -92,7 +110,7 @@
     const numerOk = TMP.kto === 'inny' ? cyfry(TMP.numer).length === 9 : !!wybrany;
     const ostatnie = wlasneMiesiac().slice(-4).reverse();
     return `${P.naglowek('Własny SMS', 'Do pacjenta: zmiana godziny, wolny termin, prośba o telefon. Bez danych o zdrowiu.')}
-      <div class="p-sms-stan p-sms-stan--${poziom(s)}"><b>Pozostało ${s.pozostalo} z ${s.limit}</b> wiadomości w tym miesiącu${s.pozostalo === 0 ? '. Limit wyczerpany: dokup kolejne 200 w Ustawieniach.' : ''}</div>
+      <div class="p-sms-stan p-sms-stan--${poziom(s)}"><b>Pozostało ${s.pozostalo} z ${s.pula}</b> wiadomości (${s.limit} w tym miesiącu${s.przeniesione ? ` i ${s.przeniesione} przeniesionych` : ''})${s.pozostalo === 0 ? '. Pula wyczerpana: dokup kolejne 200 w Ustawieniach.' : ''}</div>
       <div class="p-formularz">
         ${P.wybor({ etykieta: 'Do kogo', id: 'sms-kto', wartosc: TMP.kto, opcje: [['', 'Wybierz pacjenta…'], ...lista.map(([k, p]) => [k, `${p.imie}, ${p.tel}`]), ['inny', 'Inny numer…']] })}
         ${TMP.kto === 'inny' ? P.pole({ etykieta: 'Numer telefonu', id: 'sms-numer', typ: 'tel', wartosc: TMP.numer, placeholder: '600 700 800' }) : ''}
@@ -141,7 +159,7 @@
     const imie = wybrany ? wybrany[1].imie : '';
     const tekst = TMP.tresc;
     P.zamknij(false);
-    P.zmienCms(`SMS wysłany do ${imie || numer} (symulacja). Pozostało ${Math.max(0, s.pozostalo - c)} z ${s.limit}.`, (C) => {
+    P.zmienCms(`SMS wysłany do ${imie || numer} (symulacja). Pozostało ${Math.max(0, s.pozostalo - c)} z ${s.pula}.`, (C) => {
       if (!C.sms) C.sms = { pakiety: 0, wlasne: [] };
       C.sms.wlasne.push({ k: new Date().toISOString(), m: miesiac(), do: numer, imie, tekst, czesci: c });
     });
@@ -151,15 +169,15 @@
   /* ── Karta w Ustawieniach ───────────────────────────────────────────── */
   P.smsKarta = () => {
     const s = stan();
-    const proc = Math.min(100, Math.round((s.uzyte / s.limit) * 100));
+    const proc = Math.min(100, Math.round((s.uzyte / s.pula) * 100));
     return P.karta('Wiadomości SMS', `<div class="p-formularz">
       <div class="p-sms-licznik p-sms-licznik--${poziom(s)}">
-        <p class="p-sms-licznik__duzy"><b>${s.pozostalo}</b> <span>z ${s.limit} wiadomości zostało w tym miesiącu</span></p>
+        <p class="p-sms-licznik__duzy"><b>${s.pozostalo}</b> <span>z ${s.pula} wiadomości w puli: ${s.limit} w tym miesiącu${s.przeniesione ? ` i ${s.przeniesione} przeniesionych z poprzednich` : ''}</span></p>
         <span class="p-limit__tor"><i style="width:${proc}%"></i></span>
-        <p class="p-podp">Wysłano ${s.uzyte}: ${s.auto} automatycznych (potwierdzenie i przypomnienie do wizyt) i ${s.wlasne} własnych.${s.pozostalo === 0 ? ' Limit wyczerpany: wiadomości do pacjentów nie są wysyłane do końca miesiąca albo do dokupienia pakietu.' : s.pozostalo <= s.limit * 0.2 ? ' Zbliża się koniec limitu: możesz dokupić kolejne 200.' : ''}</p>
+        <p class="p-podp">Wysłano ${s.uzyte}: ${s.auto} automatycznych (potwierdzenie i przypomnienie do wizyt) i ${s.wlasne} własnych.${s.pozostalo === 0 ? ' Pula wyczerpana: wiadomości do pacjentów nie są wysyłane, dopóki w nowym miesiącu nie przybędzie kolejne 200 albo nie dokupisz pakietu.' : s.pozostalo <= s.pula * 0.2 ? ' Zbliża się koniec puli: możesz dokupić kolejne 200.' : ''}</p>
       </div>
       <div class="p-filtry"><button type="button" class="p-btn p-btn--akcent" data-pa="sms-nowy">Wyślij własny SMS</button></div>
-      <ul class="p-lista"><li class="p-wiersz"><div class="p-wiersz__glowny" style="cursor:default"><b>Dodatkowe SMS-y: ${s.pakiety ? `${s.pakiety} × 200 dokupione` : 'bez dokupienia'}</b><small>200 SMS-ów miesięcznie jest w utrzymaniu. Każde kolejne 200 to ${CENA_PAKIETU} zł miesięcznie, bez okresu minimalnego.${s.pakiety ? ` Teraz dopłacasz ${s.pakiety * CENA_PAKIETU} zł miesięcznie.` : ''}</small></div><span class="p-wiersz__akcje">${s.pakiety ? '<button type="button" class="p-btn p-btn--maly p-btn--cichy" data-pa="sms-pakiet" data-d="-1">Odejmij 200</button>' : ''}<button type="button" class="p-btn p-btn--maly p-btn--akcent" data-pa="sms-pakiet" data-d="1">Dokup 200 (+${CENA_PAKIETU} zł/mies.)</button></span></li></ul>
+      <ul class="p-lista"><li class="p-wiersz"><div class="p-wiersz__glowny" style="cursor:default"><b>Dodatkowe SMS-y: ${s.pakiety ? `${s.pakiety} × 200 dokupione` : 'bez dokupienia'}</b><small>200 SMS-ów miesięcznie jest w utrzymaniu, a niewykorzystane (także dokupione) nie przepadają z końcem miesiąca. Każde kolejne 200 to ${CENA_PAKIETU} zł miesięcznie, bez okresu minimalnego.${s.pakiety ? ` Teraz dopłacasz ${s.pakiety * CENA_PAKIETU} zł miesięcznie.` : ''}</small></div><span class="p-wiersz__akcje">${s.pakiety ? '<button type="button" class="p-btn p-btn--maly p-btn--cichy" data-pa="sms-pakiet" data-d="-1">Odejmij 200</button>' : ''}<button type="button" class="p-btn p-btn--maly p-btn--akcent" data-pa="sms-pakiet" data-d="1">Dokup 200 (+${CENA_PAKIETU} zł/mies.)</button></span></li></ul>
       <p class="p-podp">W prawdziwym panelu dokupienie wysyła nam prośbę, a my zmieniamy umowę. W demie działa od razu. Pacjent dostaje SMS-y tylko wtedy, gdy zgodził się na nie przy rezerwacji.</p>
     </div>`);
   };
