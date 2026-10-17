@@ -64,3 +64,7 @@
 .wd-lista li.ok { border-color: #9ccfb4; background: #eef8f2; }
 .wd-lista li.ok span:first-child { color: var(--ok); font-weight: 900; }
 .wd-termin { font-size: 1.2rem; }
+
+/* Opłacona płatność: spokojna karta zamiast ciemnej „Do zapłaty” */
+.wd-kwota--ok { background: #eaf7ef; color: #14633f; }
+.wd-kwota--ok span, .wd-kwota--ok b, .wd-kwota--ok small { color: #14633f; }

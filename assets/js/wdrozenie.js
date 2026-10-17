@@ -77,11 +77,12 @@
     if (P.status === 'brak') return '<section class="wd-karta"><h2>Płatność</h2><p>Po akceptacji projektu przygotujemy fakturę za wdrożenie i pokażemy ją tutaj razem z danymi do przelewu.</p></section>';
     var dokument = P.dokument ? '<a class="st-btn st-btn--cichy" href="' + adres('/wdrozenie/dokument') + '" target="_blank" rel="noopener">Zobacz rachunek' + (P.faktura_nr ? ' ' + esc(P.faktura_nr) : '') + '</a>' : '';
     var faktura = P.dokument ? '' : P.faktura ? '<a class="st-btn st-btn--cichy" href="' + plikUrl(P.faktura.id, true) + '">Pobierz fakturę' + (P.faktura_nr ? ' ' + esc(P.faktura_nr) : '') + ' (PDF)</a>' : (P.faktura_nr ? '<p class="st-pod">Numer faktury: ' + esc(P.faktura_nr) + '</p>' : '<p class="st-pod">Fakturę dodamy tutaj w ciągu dnia roboczego.</p>');
-    var stan = { oczekuje: '', zgloszona: '<p class="st-ok">Dziękujemy! Zgłosiłeś wpłatę. Sprawdzamy ją i od razu przechodzimy do budowy strony.</p>', oplacona: '<p class="st-ok st-ok--duze">Zapłacone' + (P.zaplacono ? ' ' + esc(dataPL(P.zaplacono)) : '') + '. Dziękujemy! Przechodzimy do budowy strony.</p>' }[P.status] || '';
+    var stan = { oczekuje: '', zgloszona: '<p class="st-ok">Dziękujemy! Zgłosiłeś wpłatę. Sprawdzamy ją i od razu przechodzimy do budowy strony.</p>', oplacona: '<p class="st-ok st-ok--duze">Zapłacone' + (P.zaplacono ? ' ' + esc(dataPL(P.zaplacono)) : '') + '. Dziękujemy!' + (d.etap === 'platnosc' || d.etap === 'budowa' ? ' Przechodzimy do budowy strony.' : '') + '</p>' }[P.status] || '';
     var dane = P.status === 'oczekuje' || P.status === 'zgloszona'
       ? '<dl class="wd-przelew"><div><dt>Odbiorca</dt><dd>' + esc(P.odbiorca) + '</dd></div><div><dt>Numer rachunku</dt><dd><span id="wd-rachunek">' + esc(P.rachunek) + '</span> ' + kopiujPrzycisk(P.rachunek, 'numer rachunku') + '</dd></div><div><dt>Tytuł przelewu</dt><dd>' + esc(P.tytul) + ' ' + kopiujPrzycisk(P.tytul, 'tytuł przelewu') + '</dd></div><div><dt>Kwota</dt><dd><b>' + zl(P.kwota) + '</b> ' + kopiujPrzycisk(String(P.kwota).replace('.', ','), 'kwota') + '</dd></div></dl>'
       : '';
-    return '<section class="wd-karta wd-platnosc"><h2>Płatność</h2><div class="wd-kwota"><span>Do zapłaty</span><b>' + zl(P.kwota) + '</b>' + (P.termin ? '<small>Termin: ' + esc(dataPL(P.termin)) + '</small>' : '') + '</div>' +
+    var oplacona = P.status === 'oplacona';
+    return '<section class="wd-karta wd-platnosc"><h2>Płatność</h2><div class="wd-kwota' + (oplacona ? ' wd-kwota--ok' : '') + '"><span>' + (oplacona ? 'Zapłacono' : 'Do zapłaty') + '</span><b>' + zl(P.kwota) + '</b>' + (oplacona ? (P.zaplacono ? '<small>' + esc(dataPL(P.zaplacono)) + '</small>' : '') : P.termin ? '<small>Termin: ' + esc(dataPL(P.termin)) + '</small>' : '') + '</div>' +
       '<p>' + esc(P.opis) + '</p><p class="st-pod">Ceny końcowe, bez doliczania VAT.</p>' + stan + dane +
       '<div class="wd-przyciski">' + dokument + faktura + (P.link_online && P.status === 'oczekuje' ? '<a class="st-btn" href="' + esc(P.link_online) + '" target="_blank" rel="noopener">Zapłać online</a>' : '') + (P.status === 'oczekuje' ? '<button type="button" class="st-btn' + (P.link_online ? ' st-btn--cichy' : '') + '" data-akcja="zaplacono">Zapłaciłem przelewem</button>' : '') + '</div>' +
       (P.status === 'oczekuje' ? '<p class="st-pod">Po wpłacie kliknij „Zapłaciłem przelewem”, żebyśmy wiedzieli, że mamy szukać wpłaty. Ruszamy z budową zaraz po zaksięgowaniu.</p>' : '') + '</section>';
@@ -92,10 +93,13 @@
   }
   function sekcjaRozmowa(d) {
     var r = d.rozmowa || {};
-    return '<section class="wd-karta"><h2>Rozmowa końcowa</h2><p>Na końcu spotykamy się, żeby przekazać Ci stronę i pokazać, jak z niej korzystać: kalendarz, rezerwacje, godziny przyjęć i konta dla zespołu.</p>' +
+    var linkOk = /^https?:\/\//i.test(r.link || '');
+    return '<section class="wd-karta"><h2>Rozmowa końcowa: przekazanie i szkolenie</h2><p>Na końcu spotykamy się, żeby przekazać Ci stronę i pokazać, jak z niej korzystać: kalendarz, rezerwacje, godziny przyjęć i konta dla zespołu.</p>' +
       (r.termin ? '<p class="wd-termin"><b>' + esc(dataGodz(r.termin)) + '</b></p>' : '<p>Termin ustalimy z Tobą, gdy strona będzie gotowa.</p>') +
-      (r.link ? '<a class="st-btn" href="' + esc(r.link) + '" target="_blank" rel="noopener">Dołącz do rozmowy</a>' : '') + (r.notatka ? '<p class="st-pod">' + esc(r.notatka) + '</p>' : '') + '</section>';
+      (linkOk ? '<a class="st-btn" href="' + esc(r.link) + '" target="_blank" rel="noopener">Dołącz do rozmowy</a>' : (r.link ? '<p class="st-pod">Link do rozmowy: ' + esc(r.link) + '</p>' : '')) + (r.notatka ? '<p class="st-pod">' + esc(r.notatka) + '</p>' : '') + '</section>';
   }
+  /** Rozmowa końcowa przed (budowa) i po zakończeniu wdrożenia: pokazujemy ją, gdy właściciel ustawił termin albo link. */
+  function rozmowaGdyJest(d) { var r = d.rozmowa || {}; return r.termin || r.link ? sekcjaRozmowa(d) : ''; }
   function sekcjaGotowe() { return '<section class="wd-karta"><h2>Wdrożenie zakończone</h2><p class="st-ok st-ok--duze">Strona działa, a rezerwacje trafiają do Twojego kalendarza. Dziękujemy za zaufanie!</p><p>W razie pytań dzwoń albo pisz: <a href="tel:+48783480341">783 480 341</a>, <a href="mailto:kontakt@studio-widok.pl">kontakt@studio-widok.pl</a>.</p></section>'; }
 
   function renderuj() {
@@ -103,8 +107,8 @@
     $('#wd-etapy').innerHTML = etapyHtml(d);
     var i = indeksEtapu(d.etap);
     var tresc = komunikatHtml(d);
-    if (d.etap === 'gotowe') tresc += sekcjaGotowe() + sekcjaPlatnosc(d).replace('<section class="wd-karta wd-platnosc">', '<section class="wd-karta wd-platnosc wd-platnosc--tylko">');
-    else tresc += [sekcjaFormularz, sekcjaProjekt, sekcjaPlatnosc, sekcjaBudowa, sekcjaRozmowa][i](d);
+    if (d.etap === 'gotowe') tresc += sekcjaGotowe() + rozmowaGdyJest(d) + sekcjaPlatnosc(d).replace('<section class="wd-karta wd-platnosc">', '<section class="wd-karta wd-platnosc wd-platnosc--tylko">');
+    else tresc += [sekcjaFormularz, sekcjaProjekt, sekcjaPlatnosc, sekcjaBudowa, sekcjaRozmowa][i](d) + (i === 3 ? rozmowaGdyJest(d) : '');
     /* Wcześniejsze etapy: krótkie przypomnienie (np. projekt zaakceptowany), żeby nic nie znikało. */
     if (i >= 2 && d.projekty.length && d.etap !== 'gotowe') tresc += '<details class="wd-wczesniej"><summary>Zaakceptowany projekt graficzny</summary>' + d.projekty.slice().reverse().filter(function (p) { return p.status === 'zaakceptowany'; }).map(function (p) { return projektHtml(p, d); }).join('') + '</details>';
     $('#wd-tresc').innerHTML = tresc;
