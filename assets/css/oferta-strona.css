@@ -425,7 +425,7 @@
 .ofs-pilot h4 { margin: 0 0 8px; font-family: var(--f-display); font-size: 1.05rem; font-weight: 800; color: #fff; }
 .ofs-pilot ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
 .ofs-pilot li { position: relative; padding-left: 22px; color: #d5dade; font-size: 0.98rem; line-height: 1.5; }
-.ofs-pilot li::before { content: '¹3'; position: absolute; left: 0; top: 0; color: #f2b705; font-weight: 800; }
+.ofs-pilot li::before { content: '\2713'; position: absolute; left: 0; top: 0; color: #f2b705; font-weight: 800; }
 .ofs-pilot__fine { margin: 0 0 18px; color: #aab1b6; font-size: 0.95rem; line-height: 1.5; }
 .ofs-pilot__cta { display: flex; flex-wrap: wrap; gap: 12px; }
 @media (max-width: 760px) { .ofs-pilot__ceny, .ofs-pilot__kolumny { grid-template-columns: minmax(0, 1fr); } }
@@ -459,7 +459,7 @@
 /* Odwrócenie ryzyka pod „Rozpocznij wdrożenie” */
 .ofs-start__ryzyko { margin: 16px 0 0; padding: 14px 16px; list-style: none; display: grid; gap: 8px; border-radius: 12px; background: #eef3fd; color: #14171a; }
 .ofs-start__ryzyko li { position: relative; padding-left: 24px; line-height: 1.45; font-size: 0.97rem; }
-.ofs-start__ryzyko li::before { content: '¹3'; position: absolute; left: 0; top: 0; color: #1f5fd6; font-weight: 800; }
+.ofs-start__ryzyko li::before { content: '\2713'; position: absolute; left: 0; top: 0; color: #1f5fd6; font-weight: 800; }
 
 .ofs-pilot__pasek-wiersz { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; }
 .ofs-pilot__pasek-waz { margin: 0; font-size: 0.95rem; font-weight: 600; }
