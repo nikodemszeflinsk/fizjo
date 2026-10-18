@@ -22,7 +22,7 @@
 
     var PAK = {
       individual: { nazwa: 'Individual', wdr: 2900, utr: 149, terapeuci: 1, miejsca: 3, uslugi: 7, podstrony: 7, sms: 200 },
-      enterprise: { nazwa: 'Team', wdr: 4499, utr: 299, terapeuci: 99, miejsca: 99, uslugi: 99, podstrony: 15, sms: 678 }
+      enterprise: { nazwa: 'Team', wdr: 4499, utr: 299, terapeuci: 99, miejsca: 99, uslugi: 99, podstrony: 15, sms: 650 }
     };
     /* Pilotaż pierwszych klientów: obniżona cena wdrożenia w zamian za zgodę na referencję (§10 umowy). Limit miejsc pilnuje serwer. */
     var PILOT = { miejsc: 3, wdr: { individual: 1900, enterprise: 2999 }, zajete: null, zLinku: false };
@@ -157,8 +157,8 @@
       h += '<h2>§3. Cena i płatności</h2>' + ust([
         'Wdrożenie: {CENA_WDR}{PILOT_OPIS}{WDR_OPIS}. Utrzymanie: {CENA_UTR} miesięcznie{UTR_OPIS}.',
         'Wykonawca nie dolicza do cen podatku VAT, więc podane ceny są cenami końcowymi. Jeśli Wykonawca zarejestruje działalność gospodarczą albo z innego powodu będzie zobowiązany do doliczania VAT, poinformuje o tym Zamawiającego co najmniej 30 dni wcześniej, a od tego dnia podane ceny są cenami netto powiększanymi o VAT. Zamawiający może wtedy zrezygnować z umowy (§6).',
-        'Dokument sprzedaży (rachunek albo faktura) za wdrożenie Wykonawca wystawia **po akceptacji projektu**, z terminem płatności 7 dni. Strona zostaje uruchomiona na domenie Zamawiającego **po zapłacie**.',
-        '**Pierwszy miesiąc utrzymania**, liczony od dnia uruchomienia Strony, jest wliczony w cenę wdrożenia. Kolejne miesiące utrzymania są płatne z góry, na podstawie dokumentu sprzedaży (rachunku albo faktury) wystawianego na początku okresu, z terminem płatności 7 dni.',
+        'Dokument sprzedaży (rachunek) za wdrożenie Wykonawca wystawia **po akceptacji projektu**, z terminem płatności 7 dni. Strona zostaje uruchomiona na domenie Zamawiającego **po zapłacie**.',
+        '**Pierwszy miesiąc utrzymania**, liczony od dnia uruchomienia Strony, jest wliczony w cenę wdrożenia. Kolejne miesiące utrzymania są płatne z góry, na podstawie dokumentu sprzedaży (rachunku) wystawianego na początku okresu, z terminem płatności 7 dni.',
         'Zmiana ceny utrzymania wymaga zgody Zamawiającego. Bez zgody każda ze stron może zrezygnować z umowy (§6).',
         'Dokumenty sprzedaży są wystawiane i doręczane w formie elektronicznej zgodnie z obowiązującymi przepisami (w tym przez KSeF, jeśli po rejestracji działalności będzie wymagany). Zamawiający wyraża zgodę na ich przesyłanie na adres {EMAIL}. Za opóźnienie w płatności należą odsetki ustawowe za opóźnienie w transakcjach handlowych.'
       ], v);
@@ -180,7 +180,7 @@
       h += '<h2>§6. Czas trwania i rezygnacja</h2>' + ust([
         'Umowa jest zawarta na **czas nieokreślony**, bez okresu minimalnego.',
         'Zamawiający może **zrezygnować w dowolnym momencie, ze skutkiem natychmiastowym**, e-mailem. **Opłacony z góry okres utrzymania nie jest zwracany**, ale system rezerwacji działa do jego końca, chyba że Zamawiający poprosi o wcześniejsze wyłączenie. Wykonawca może wypowiedzieć umowę z miesięcznym wyprzedzeniem, na koniec miesiąca kalendarzowego.',
-        'W ciągu **7 dni** od zakończenia umowy Wykonawca przekazuje Zamawiającemu **pliki Strony i systemu rezerwacji** w formie umożliwiającej ich uruchomienie na dowolnej infrastrukturze, dostęp do domeny i wizytówki oraz eksport rezerwacji, jeśli go ma. Zamawiający ma prawo przenieść Stronę i system rezerwacji na własne utrzymanie i samodzielnie ogarnąć to technicznie, **na własny rachunek**.',
+        'W ciągu **7 dni** od zakończenia umowy Wykonawca przekazuje Zamawiającemu **pliki Strony i systemu rezerwacji** w formie umożliwiającej ich uruchomienie na dowolnej infrastrukturze, dostęp do domeny i wizytówki oraz eksport rezerwacji, jeśli system rezerwacji taki eksport udostępnia. Zamawiający ma prawo przenieść Stronę i system rezerwacji na własne utrzymanie i samodzielnie wykonać potrzebne czynności techniczne, **na własny rachunek**.',
         '**System rezerwacji działa na infrastrukturze Wykonawcy, więc po zakończeniu umowy (po końcu opłaconego okresu) przestaje u Wykonawcy działać.** Zamawiający uruchamia go na własnej infrastrukturze na własny koszt. Wykonawca nie przekazuje swojej infrastruktury i nie pomaga w konfiguracji, chyba że strony uzgodnią to jako osobne, płatne zlecenie. Zamawiający został o tym poinformowany przed zawarciem umowy. Od zakończenia umowy hosting, aktualizacje, kopie zapasowe i opłaty za usługi zewnętrzne ponosi Zamawiający.',
         '**Brak płatności.** Jeśli należność za utrzymanie nie zostanie zapłacona w terminie, Wykonawca w dniu terminu i po trzech dniach wyśle przypomnienie e-mailem. W 7. dniu zaległości Wykonawca wyśle ostatnie przypomnienie i udostępni eksport rezerwacji. Jeśli zaległość nie zostanie zapłacona w ciągu **14 dni od terminu**, Wykonawca może wypowiedzieć umowę ze skutkiem natychmiastowym e-mailem, a system rezerwacji zostanie wyłączony. Pliki Strony Wykonawca przekazuje po uregulowaniu zaległości.',
         'Zamawiający może wypowiedzieć umowę ze skutkiem natychmiastowym, gdy system rezerwacji nie działa dłużej niż 14 dni z winy Wykonawcy.',
@@ -425,7 +425,7 @@
         pole('adres', 'Adres siedziby', { pelne: true, ac: 'street-address' }) +
         pole('email', 'E-mail', { typ: 'email', ac: 'email', pod: 'Z tego adresu wyślesz podpisaną umowę.' }) +
         pole('telefon', 'Telefon (komórkowy)', { typ: 'tel', ac: 'tel', inputmode: 'tel', pod: 'Na ten numer wyślemy kod SMS do podpisu umowy.' }) + '</div>' +
-        '<details class="kf-rodo"><summary>Jak przetwarzamy Twoje dane</summary><p><b>Administrator:</b> Wykonawca (dane w umowie). <b>Cel:</b> zawarcie i wykonanie umowy, kontakt z Tobą oraz wykazanie, że umowa została zawarta (art. 6 ust. 1 lit. b i f RODO). <b>Odbiorcy:</b> dostawcy, z których korzystamy: Google (arkusz, Dysk i poczta, na których zapisujemy dane i pliki) oraz operator SMS (wysyłka kodu). <b>Czas:</b> na czas umowy i do czasu przedawnienia roszczeń i obowiązków podatkowych. <b>Twoje prawa:</b> dostęp, sprostowanie, usunięcie, ograniczenie, sprzeciw i skarga do Prezesa UODO. Kontakt: kontakt@studio-widok.pl.</p></details>';
+        '<details class="kf-rodo"><summary>Jak przetwarzamy Twoje dane</summary><p><b>Administrator:</b> Wykonawca (dane w umowie). <b>Cel:</b> zawarcie i wykonanie umowy, kontakt z Tobą oraz wykazanie, że umowa została zawarta (art. 6 ust. 1 lit. b i f RODO). <b>Odbiorcy:</b> dostawcy, z których korzystamy: Cloudflare (hosting, baza danych i pliki), SzybkiSMS.pl (wysyłka kodu SMS) i Resend (wysyłka e-mail). Cloudflare i Resend mają siedzibę w USA, więc dane mogą być tam przekazywane na podstawie standardowych klauzul umownych lub certyfikacji EU-US Data Privacy Framework. <b>Czas:</b> na czas umowy i do czasu przedawnienia roszczeń i obowiązków podatkowych. <b>Twoje prawa:</b> dostęp, sprostowanie, usunięcie, ograniczenie, sprzeciw i skarga do Prezesa UODO. Kontakt: kontakt@studio-widok.pl.</p></details>';
     }
 
     /* Krok 4: umowa */

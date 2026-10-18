@@ -68,3 +68,7 @@
 /* Opłacona płatność: spokojna karta zamiast ciemnej „Do zapłaty” */
 .wd-kwota--ok { background: #eaf7ef; color: #14633f; }
 .wd-kwota--ok span, .wd-kwota--ok b, .wd-kwota--ok small { color: #14633f; }
+
+.wd-dlaczego { border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; background: #fafaf8; font-size: 0.95rem; }
+.wd-dlaczego summary { cursor: pointer; font-weight: 700; }
+.wd-dlaczego p { margin: 8px 0 0; color: var(--ink-2, #2b3035); }

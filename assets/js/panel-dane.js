@@ -64,7 +64,7 @@
       nazwa: 'Linia Ruchu',
       /* Wiadomości do pacjentów: włączasz i wyłączasz, treść ustawiamy przy wdrożeniu. */
       powiadomienia: { potwierdzenie: true, przypomnienie: true, przypomnienieGodz: 24, odwolanie: true, zmiana: true, doGabinetu: true, doTerapeutow: true },
-      /* SMS: 200 wiadomości miesięcznie w utrzymaniu Individual, 678 w Team; własne SMS-y wysłane z panelu. */
+      /* SMS: 200 wiadomości miesięcznie w utrzymaniu Individual, 650 w Team; własne SMS-y wysłane z panelu. */
       sms: { wlasne: [] },
       pacjenci: {},
       konto: {

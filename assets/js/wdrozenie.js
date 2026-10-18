@@ -1,5 +1,5 @@
 /*
- * Strona wdrożenia klienta: etapy, projekt graficzny do akceptacji, okno płatności z fakturą, budowa, rozmowa końcowa.
+ * Strona wdrożenia klienta: etapy, projekt graficzny do akceptacji, okno płatności z rachunkiem, budowa, rozmowa końcowa.
  * Dane z API po tajnym tokenie z linku (?t=). Klient może zaakceptować projekt, zgłosić uwagi i zgłosić wpłatę.
  */
 (function () {
@@ -60,7 +60,7 @@
     var akcje = '';
     if (p.status === 'do_akceptacji') {
       akcje = '<div class="wd-decyzja" data-projekt="' + esc(p.id) + '">' +
-        '<label class="st-pomin wd-potw"><input type="checkbox" data-potw /> Potwierdzam, że akceptuję projekt graficzny w tej wersji. Po akceptacji wystawiamy fakturę za wdrożenie.</label>' +
+        '<label class="st-pomin wd-potw"><input type="checkbox" data-potw /> Potwierdzam, że akceptuję projekt graficzny w tej wersji. Po akceptacji wystawiamy rachunek za wdrożenie.</label>' +
         '<div class="wd-przyciski"><button type="button" class="st-btn" data-akcja="akceptuj" data-id="' + esc(p.id) + '" disabled>Akceptuję projekt</button><button type="button" class="st-btn st-btn--cichy" data-akcja="uwagi-otworz" data-id="' + esc(p.id) + '">Mam uwagi</button></div>' +
         '<div class="wd-uwagi" hidden><label class="st-et" for="uw-' + esc(p.id) + '">Co zmienić?</label><p class="st-pod">Opisz własnymi słowami: co się nie podoba i jak ma być. W cenie są ' + d.tury.wCenie + ' tury poprawek (wykorzystano: ' + d.tury.uzyte + ').</p><textarea id="uw-' + esc(p.id) + '" rows="5"></textarea><button type="button" class="st-btn" data-akcja="uwagi-wyslij" data-id="' + esc(p.id) + '">Wyślij uwagi</button></div></div>';
     }
@@ -72,18 +72,22 @@
     return '<section class="wd-karta"><h2>Projekt graficzny</h2>' + (lista.length ? lista.map(function (p) { return projektHtml(p, d); }).join('') : '<p>Pracujemy nad pierwszą propozycją na podstawie Twojego formularza. Gdy będzie gotowa, pojawi się tutaj i damy Ci znać.</p>') + '</section>';
   }
   function kopiujPrzycisk(wartosc, etykieta) { return '<button type="button" class="st-btn st-btn--maly st-btn--cichy" data-akcja="kopiuj" data-w="' + esc(wartosc) + '" aria-label="Kopiuj: ' + esc(etykieta) + '">Kopiuj</button>'; }
+  /** Krótkie wyjaśnienie, dlaczego klient dostaje rachunek, a nie fakturę (działalność nierejestrowana). */
+  function dlaczegoRachunek() {
+    return '<details class="wd-dlaczego"><summary>Dlaczego rachunek, a nie faktura?</summary><p>Studio Widok prowadzi działalność nierejestrowaną, dlatego zamiast faktury VAT wystawiamy rachunek. Nie jesteśmy płatnikiem VAT, więc cena jest końcowa i nie doliczamy do niej podatku. Rachunek jest pełnoprawnym dokumentem sprzedaży: ma numer, dane stron, opis usługi i kwotę.</p></details>';
+  }
   function sekcjaPlatnosc(d) {
     var P = d.platnosc;
-    if (P.status === 'brak') return '<section class="wd-karta"><h2>Płatność</h2><p>Po akceptacji projektu przygotujemy fakturę za wdrożenie i pokażemy ją tutaj razem z danymi do przelewu.</p></section>';
+    if (P.status === 'brak') return '<section class="wd-karta"><h2>Płatność</h2><p>Po akceptacji projektu przygotujemy rachunek za wdrożenie i pokażemy go tutaj razem z danymi do przelewu.</p></section>';
     var dokument = P.dokument ? '<a class="st-btn st-btn--cichy" href="' + adres('/wdrozenie/dokument') + '" target="_blank" rel="noopener">Zobacz rachunek' + (P.faktura_nr ? ' ' + esc(P.faktura_nr) : '') + '</a>' : '';
-    var faktura = P.dokument ? '' : P.faktura ? '<a class="st-btn st-btn--cichy" href="' + plikUrl(P.faktura.id, true) + '">Pobierz fakturę' + (P.faktura_nr ? ' ' + esc(P.faktura_nr) : '') + ' (PDF)</a>' : (P.faktura_nr ? '<p class="st-pod">Numer faktury: ' + esc(P.faktura_nr) + '</p>' : '<p class="st-pod">Fakturę dodamy tutaj w ciągu dnia roboczego.</p>');
+    var faktura = P.dokument ? '' : P.faktura ? '<a class="st-btn st-btn--cichy" href="' + plikUrl(P.faktura.id, true) + '">Pobierz dokument' + (P.faktura_nr ? ' ' + esc(P.faktura_nr) : '') + ' (PDF)</a>' : (P.faktura_nr ? '<p class="st-pod">Numer rachunku: ' + esc(P.faktura_nr) + '</p>' : '<p class="st-pod">Rachunek dodamy tutaj w ciągu dnia roboczego.</p>');
     var stan = { oczekuje: '', zgloszona: '<p class="st-ok">Dziękujemy! Zgłosiłeś wpłatę. Sprawdzamy ją i od razu przechodzimy do budowy strony.</p>', oplacona: '<p class="st-ok st-ok--duze">Zapłacone' + (P.zaplacono ? ' ' + esc(dataPL(P.zaplacono)) : '') + '. Dziękujemy!' + (d.etap === 'platnosc' || d.etap === 'budowa' ? ' Przechodzimy do budowy strony.' : '') + '</p>' }[P.status] || '';
     var dane = P.status === 'oczekuje' || P.status === 'zgloszona'
       ? '<dl class="wd-przelew"><div><dt>Odbiorca</dt><dd>' + esc(P.odbiorca) + '</dd></div><div><dt>Numer rachunku</dt><dd><span id="wd-rachunek">' + esc(P.rachunek) + '</span> ' + kopiujPrzycisk(P.rachunek, 'numer rachunku') + '</dd></div><div><dt>Tytuł przelewu</dt><dd>' + esc(P.tytul) + ' ' + kopiujPrzycisk(P.tytul, 'tytuł przelewu') + '</dd></div><div><dt>Kwota</dt><dd><b>' + zl(P.kwota) + '</b> ' + kopiujPrzycisk(String(P.kwota).replace('.', ','), 'kwota') + '</dd></div></dl>'
       : '';
     var oplacona = P.status === 'oplacona';
     return '<section class="wd-karta wd-platnosc"><h2>Płatność</h2><div class="wd-kwota' + (oplacona ? ' wd-kwota--ok' : '') + '"><span>' + (oplacona ? 'Zapłacono' : 'Do zapłaty') + '</span><b>' + zl(P.kwota) + '</b>' + (oplacona ? (P.zaplacono ? '<small>' + esc(dataPL(P.zaplacono)) + '</small>' : '') : P.termin ? '<small>Termin: ' + esc(dataPL(P.termin)) + '</small>' : '') + '</div>' +
-      '<p>' + esc(P.opis) + '</p><p class="st-pod">Ceny końcowe, bez doliczania VAT.</p>' + stan + dane +
+      '<p>' + esc(P.opis) + '</p><p class="st-pod">Ceny końcowe, bez doliczania VAT.</p>' + dlaczegoRachunek() + stan + dane +
       '<div class="wd-przyciski">' + dokument + faktura + (P.link_online && P.status === 'oczekuje' ? '<a class="st-btn" href="' + esc(P.link_online) + '" target="_blank" rel="noopener">Zapłać online</a>' : '') + (P.status === 'oczekuje' ? '<button type="button" class="st-btn' + (P.link_online ? ' st-btn--cichy' : '') + '" data-akcja="zaplacono">Zapłaciłem przelewem</button>' : '') + '</div>' +
       (P.status === 'oczekuje' ? '<p class="st-pod">Po wpłacie kliknij „Zapłaciłem przelewem”, żebyśmy wiedzieli, że mamy szukać wpłaty. Ruszamy z budową zaraz po zaksięgowaniu.</p>' : '') + '</section>';
   }

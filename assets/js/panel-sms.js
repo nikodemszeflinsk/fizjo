@@ -1,6 +1,6 @@
 /*
  * Panel: wiadomości SMS do pacjentów.
- *  - licznik w nagłówku: ile wiadomości zostało w puli (200 w utrzymaniu Individual, 678 w Team; każda kolejna wiadomość 0,17 zł netto),
+ *  - licznik w nagłówku: ile wiadomości zostało w puli (200 w utrzymaniu Individual, 650 w Team; wiadomości ponad limit w sztukach),
  *  - własny SMS do pacjenta (szablony, liczba części, zgoda pacjenta), też z karty pacjenta,
  *  - karta „Wiadomości SMS” w Ustawieniach: stan limitu, wiadomości ponad limit, ostatnio wysłane.
  * To prototyp: nic nie jest wysyłane, a liczniki liczą się z danych demo (potwierdzenie i przypomnienie do każdej wizyty) i z własnych SMS-ów.
@@ -11,10 +11,9 @@
   const K = window.KAL;
   const P = window.PANEL;
   const esc = P.esc;
-  const LIMIT_IND = 200, LIMIT_TEAM = 678;
+  const LIMIT_IND = 200, LIMIT_TEAM = 650;
   const limitPakietu = () => (P.ent() ? LIMIT_TEAM : LIMIT_IND);
-  const CENA_NADWYZKI = 0.17; /* zł netto za każdy SMS ponad limit, wg taryfy operatora */
-  const zlNetto = (n) => `${n.toFixed(2).replace('.', ',')} zł netto`;
+  /* Wiadomości ponad limit pokazujemy w sztukach; rozlicza je faktura/rachunek wg taryfy operatora. */
 
   /** Dane SMS w ustawieniach panelu: własne wiadomości. */
   const dane = () => { const C = P.C(); if (!C.sms) C.sms = { wlasne: [] }; return C.sms; };
@@ -56,7 +55,7 @@
     const auto = automatyczne();
     const uzyte = auto + wlasne;
     const nadwyzka = Math.max(0, uzyte - pula);
-    return { limit, przeniesione: przenies, pula, uzyte, auto, wlasne, pozostalo: Math.max(0, pula - uzyte), nadwyzka, koszt: nadwyzka * CENA_NADWYZKI };
+    return { limit, przeniesione: przenies, pula, uzyte, auto, wlasne, pozostalo: Math.max(0, pula - uzyte), nadwyzka };
   };
   P.sms = { stan, czesci };
 
@@ -113,7 +112,7 @@
     const numerOk = TMP.kto === 'inny' ? cyfry(TMP.numer).length === 9 : !!wybrany;
     const ostatnie = wlasneMiesiac().slice(-4).reverse();
     return `${P.naglowek('Własny SMS', 'Do pacjenta: zmiana godziny, wolny termin, prośba o telefon. Bez danych o zdrowiu.')}
-      <div class="p-sms-stan p-sms-stan--${poziom(s)}"><b>Pozostało ${s.pozostalo} z ${s.pula}</b> wiadomości (${s.limit} w tym miesiącu${s.przeniesione ? ` i ${s.przeniesione} przeniesionych` : ''})${s.pozostalo === 0 ? `. Pula wyczerpana: kolejne wiadomości są wysyłane, a każda kosztuje ${zlNetto(CENA_NADWYZKI)}.` : ''}</div>
+      <div class="p-sms-stan p-sms-stan--${poziom(s)}"><b>Pozostało ${s.pozostalo} z ${s.pula}</b> wiadomości (${s.limit} w tym miesiącu${s.przeniesione ? ` i ${s.przeniesione} przeniesionych` : ''})${s.pozostalo === 0 ? `. Limit wyczerpany: kolejne wiadomości są wysyłane i liczą się jako wiadomości ponad limit.` : ''}</div>
       <div class="p-formularz">
         ${P.wybor({ etykieta: 'Do kogo', id: 'sms-kto', wartosc: TMP.kto, opcje: [['', 'Wybierz pacjenta…'], ...lista.map(([k, p]) => [k, `${p.imie}, ${p.tel}`]), ['inny', 'Inny numer…']] })}
         ${TMP.kto === 'inny' ? P.pole({ etykieta: 'Numer telefonu', id: 'sms-numer', typ: 'tel', wartosc: TMP.numer, placeholder: '600 700 800' }) : ''}
@@ -121,7 +120,7 @@
         <div class="pole"><label>Szablon</label><div class="p-filtry" role="group" aria-label="Szablony SMS">${SZABLONY.map(([n], i) => `<button type="button" class="p-btn p-btn--maly p-btn--cichy" data-pa="sms-szablon" data-i="${i}">${esc(n)}</button>`).join('')}</div></div>
         ${P.pole({ etykieta: 'Treść SMS-a', id: 'sms-tresc', wiersze: 5, wartosc: TMP.tresc, placeholder: 'Wpisz treść albo wybierz szablon' })}
         <p class="p-podp" id="sms-licznik" aria-live="polite">${TMP.tresc.length} znaków, ${c} ${c === 1 ? 'wiadomość' : (c >= 2 && c <= 4 ? 'wiadomości' : 'wiadomości')} z limitu${/[^\x00-\x7F]/.test(TMP.tresc) ? ' (polskie znaki skracają część do 70 znaków)' : ''}.</p>
-        ${ponadLimit && c ? `<p class="p-sms-ostrz" role="status">Ta treść wykracza poza limit o ${ponadLimit} ${ponadLimit === 1 ? 'wiadomość' : 'wiadomości'}. Rozliczymy je według taryfy operatora: ${zlNetto(ponadLimit * CENA_NADWYZKI)}.</p>` : ''}
+        ${ponadLimit && c ? `<p class="p-sms-ostrz" role="status">Ta treść wykracza poza limit o ${ponadLimit} ${ponadLimit === 1 ? 'wiadomość' : 'wiadomości'}. Będą liczone jako wiadomości ponad limit.</p>` : ''}
         <div class="sz__glowne"><button type="button" class="przycisk" data-pa="sms-wyslij" ${(!c || !numerOk || bezZgody) ? 'disabled' : ''}>Wyślij SMS (symulacja)</button></div>
       </div>
       ${ostatnie.length ? `<div class="p-sz-sekcja"><h3>Ostatnio wysłane</h3><ul class="p-lista">${ostatnie.map((w) => `<li class="p-wiersz"><div class="p-wiersz__glowny" style="cursor:default"><b>${esc(w.imie || w.do)}</b><small>${esc(w.tekst.length > 90 ? w.tekst.slice(0, 90) + '…' : w.tekst)}</small></div></li>`).join('')}</ul></div>` : ''}`;
@@ -177,10 +176,10 @@
       <div class="p-sms-licznik p-sms-licznik--${poziom(s)}">
         <p class="p-sms-licznik__duzy"><b>${s.pozostalo}</b> <span>z ${s.pula} wiadomości w puli: ${s.limit} w tym miesiącu${s.przeniesione ? ` i ${s.przeniesione} przeniesionych z poprzednich` : ''}</span></p>
         <span class="p-limit__tor"><i style="width:${proc}%"></i></span>
-        <p class="p-podp">Wysłano ${s.uzyte}: ${s.auto} automatycznych (potwierdzenie i przypomnienie do wizyt) i ${s.wlasne} własnych.${s.nadwyzka ? ` Ponad limit: ${s.nadwyzka} (${zlNetto(s.koszt)}, rozliczymy na kolejnej fakturze).` : s.pozostalo <= s.pula * 0.2 ? ' Zbliża się koniec limitu. Wiadomości będą wychodzić dalej, a każda ponad limit kosztuje ' + zlNetto(CENA_NADWYZKI) + '.' : ''}</p>
+        <p class="p-podp">Wysłano ${s.uzyte}: ${s.auto} automatycznych (potwierdzenie i przypomnienie do wizyt) i ${s.wlasne} własnych.${s.nadwyzka ? ` Wiadomości ponad limit: ${s.nadwyzka}.` : s.pozostalo <= s.pula * 0.2 ? ' Zbliża się koniec limitu. Wiadomości będą wychodzić dalej jako wiadomości ponad limit.' : ''}</p>
       </div>
       <div class="p-filtry"><button type="button" class="p-btn p-btn--akcent" data-pa="sms-nowy">Wyślij własny SMS</button></div>
-      <ul class="p-lista"><li class="p-wiersz"><div class="p-wiersz__glowny" style="cursor:default"><b>Limit: ${s.limit} SMS-ów miesięcznie w utrzymaniu</b><small>Niewykorzystane wiadomości nie przepadają z końcem miesiąca. Każdy SMS ponad limit rozliczamy według taryfy operatora: ${zlNetto(CENA_NADWYZKI)} za wiadomość.</small></div></li></ul>
+      <ul class="p-lista"><li class="p-wiersz"><div class="p-wiersz__glowny" style="cursor:default"><b>Limit: ${s.limit} SMS-ów miesięcznie w utrzymaniu</b><small>Niewykorzystane wiadomości nie przepadają z końcem miesiąca. Wiadomości ponad limit ${s.nadwyzka ? `(teraz: ${s.nadwyzka}) ` : ''}rozliczamy według taryfy operatora.</small></div></li></ul>
       <p class="p-podp">Pacjent dostaje SMS-y tylko wtedy, gdy zgodził się na nie przy rezerwacji.</p>
     </div>`);
   };
