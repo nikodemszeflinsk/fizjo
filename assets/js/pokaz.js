@@ -1,6 +1,7 @@
 /*
  * Pokaz w minutę: nawigacja po ekranach i zdarzenia dla CRM.
- * Link z CRM: pokaz.html?l=<id leada>&dla=<nazwa gabinetu>
+ * Link z CRM: pokaz.html?l=<id leada>&dla=<nazwa gabinetu>&m=<miasto>&sp=<specjalizacja>
+ *  - miasto i specjalizacja personalizują przykładowy wynik wyszukiwania na pierwszym ekranie (bez cen).
  *  - „pokaz_otwarty” raz na sesję, „pokaz_chce” po kliknięciu „Tak, wyślij mi pełną ofertę”
  *    (zdarzenia lecą tylko z id leada i skonfigurowanym odbiornikiem).
  */
@@ -21,6 +22,31 @@
     var el = document.getElementById('pk-dla');
     el.querySelector('b').textContent = dla;
     el.hidden = false;
+  }
+
+  /* Personalizacja pierwszego ekranu: miasto gabinetu i jego główna specjalizacja. */
+  var miasto = (q.get('m') || '').replace(/[<>]/g, '').trim().slice(0, 40);
+  var spec = (q.get('sp') || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\u0142/g, 'l');
+  var SPEC = [
+    ['sport', { q: 'kontuzja sportowa fizjoterapeuta', url: 'fizjoterapia-sportowa', t: 'Fizjoterapia sportowa', o: 'Powrót do sportu po kontuzji, ból kolana i barku. Najbliższy wolny termin: jutro.' }],
+    ['neuro', { q: 'rehabilitacja neurologiczna', url: 'rehabilitacja-neurologiczna', t: 'Rehabilitacja neurologiczna', o: 'Rehabilitacja po udarze i urazach układu nerwowego. Najbliższy wolny termin: jutro.' }],
+    ['dzieci', { q: 'fizjoterapia dziecięca', url: 'fizjoterapia-dzieci', t: 'Fizjoterapia dziecięca', o: 'Wady postawy, rehabilitacja niemowląt i dzieci. Najbliższy wolny termin: jutro.' }],
+    ['pediatr', { q: 'fizjoterapia dziecięca', url: 'fizjoterapia-dzieci', t: 'Fizjoterapia dziecięca', o: 'Wady postawy, rehabilitacja niemowląt i dzieci. Najbliższy wolny termin: jutro.' }],
+    ['uroginek', { q: 'fizjoterapia uroginekologiczna', url: 'fizjoterapia-uroginekologiczna', t: 'Fizjoterapia uroginekologiczna', o: 'Mięśnie dna miednicy, ciąża i połóg. Najbliższy wolny termin: jutro.' }],
+    ['manual', { q: 'terapia manualna fizjoterapeuta', url: 'terapia-manualna', t: 'Terapia manualna', o: 'Ból kręgosłupa, karku i stawów. Najbliższy wolny termin: jutro.' }],
+    ['rehabilit', { q: 'rehabilitacja po operacji fizjoterapeuta', url: 'rehabilitacja', t: 'Rehabilitacja po urazach i operacjach', o: 'Powrót do sprawności po operacji i urazie. Najbliższy wolny termin: jutro.' }],
+  ];
+  var dop = null;
+  SPEC.forEach(function (s) { if (!dop && spec.indexOf(s[0]) !== -1) dop = s[1]; });
+  if (miasto || dop) {
+    var ust = function (id, tekst) { var e = document.getElementById(id); if (e) e.textContent = tekst; };
+    var nazwaMiasta = miasto || '';
+    var fraza = dop ? dop.q : 'ból krzyża fizjoterapeuta';
+    ust('pk-q', (fraza + ' ' + nazwaMiasta).trim());
+    ust('pk-tytul', ((dop ? dop.t : 'Fizjoterapia kręgosłupa') + ' ' + nazwaMiasta).trim());
+    if (dop) { ust('pk-url', 'twoj-gabinet.pl › ' + dop.url); ust('pk-opis', dop.o); }
+    var fig = document.getElementById('pk-serp-fig');
+    if (fig) fig.setAttribute('aria-label', 'Przykład wyników wyszukiwania frazy „' + (fraza + ' ' + nazwaMiasta).trim() + '”: na górze strona gabinetu i wizytówka w Mapach, niżej lista specjalistów z portalu.');
   }
   function zdarzenie(typ, dane) {
     if (!lead || !window.ODBIORNIK || !window.ODBIORNIK.aktywny()) return;

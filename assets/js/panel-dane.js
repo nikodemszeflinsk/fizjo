@@ -64,8 +64,8 @@
       nazwa: 'Linia Ruchu',
       /* Wiadomości do pacjentów: włączasz i wyłączasz, treść ustawiamy przy wdrożeniu. */
       powiadomienia: { potwierdzenie: true, przypomnienie: true, przypomnienieGodz: 24, odwolanie: true, zmiana: true, doGabinetu: true, doTerapeutow: true },
-      /* SMS: 200 wiadomości miesięcznie w utrzymaniu, kolejne pakiety po 200 za 50 zł miesięcznie; własne SMS-y wysłane z panelu. */
-      sms: { pakiety: ent ? 1 : 0, wlasne: [] }, /* zespół wysyła więcej wiadomości, więc w demie Team ma jeden dokupiony pakiet */
+      /* SMS: 200 wiadomości miesięcznie w utrzymaniu Individual, 678 w Team; własne SMS-y wysłane z panelu. */
+      sms: { wlasne: [] },
       pacjenci: {},
       konto: {
         nazwa: ent ? 'Linia Ruchu sp. z o.o.' : 'Linia Ruchu Jan Kowalski',

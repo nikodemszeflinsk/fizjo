@@ -472,3 +472,6 @@
 .ofs-start__bez-ryzyka .ofs-start__ryzyko { margin: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 28px; padding: 16px 20px; }
 @media (max-width: 720px) { .ofs-start__bez-ryzyka .ofs-start__ryzyko { grid-template-columns: minmax(0, 1fr); } }
 .ofs-start__kontakt { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* O mnie */
+.ofs-omnie__tekst { margin: 0; max-width: 760px; font-size: 1.12rem; line-height: 1.65; color: var(--ink-2); }

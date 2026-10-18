@@ -21,14 +21,14 @@
     };
 
     var PAK = {
-      individual: { nazwa: 'Individual', wdr: 2900, utr: 149, terapeuci: 1, miejsca: 3, uslugi: 7, podstrony: 5 },
-      enterprise: { nazwa: 'Team', wdr: 4499, utr: 199, terapeuci: 99, miejsca: 99, uslugi: 99, podstrony: 10 }
+      individual: { nazwa: 'Individual', wdr: 2900, utr: 149, terapeuci: 1, miejsca: 3, uslugi: 7, podstrony: 7, sms: 200 },
+      enterprise: { nazwa: 'Team', wdr: 4499, utr: 299, terapeuci: 99, miejsca: 99, uslugi: 99, podstrony: 15, sms: 678 }
     };
     /* Pilotaż pierwszych klientów: obniżona cena wdrożenia w zamian za zgodę na referencję (§10 umowy). Limit miejsc pilnuje serwer. */
     var PILOT = { miejsc: 3, wdr: { individual: 1900, enterprise: 2999 }, zajete: null, zLinku: false };
     function pilotWolne() { return PILOT.zajete === null ? PILOT.miejsc : Math.max(0, PILOT.miejsc - PILOT.zajete); }
-    /* SMS do pacjentów są w standardzie (limit w utrzymaniu); dodatek to kolejny pakiet wiadomości. */
-    var SMS = { cena: 50, limit: 200 };
+    /* SMS do pacjentów są w standardzie (limit w utrzymaniu zależy od pakietu), a każdy SMS ponad limit kosztuje według taryfy operatora. */
+    var SMS = { nadwyzka: '0,17 zł netto' };
     var ZAL = { wdr: 299, utr: 29 };
     /* 99 = bez limitu w pakiecie. */
     function doLim(n) { return n >= 99 ? 'bez limitu' : 'do ' + n; }
@@ -58,7 +58,7 @@
     function ust(lista, v) {
       return lista.filter(Boolean).map(function (t, i) { return '<p class="ust"><span class="n">' + (i + 1) + '.</span><span>' + md(t, v) + '</span></p>'; }).join('');
     }
-    function ceny() { var P = PAK[S.pakiet]; return { wdr: (S.pilot ? PILOT.wdr[S.pakiet] : P.wdr) + (S.zaliczki ? ZAL.wdr : 0), baza: P.utr, utr: P.utr + (S.sms ? SMS.cena : 0) + (S.zaliczki ? ZAL.utr : 0) }; }
+    function ceny() { var P = PAK[S.pakiet]; return { wdr: (S.pilot ? PILOT.wdr[S.pakiet] : P.wdr) + (S.zaliczki ? ZAL.wdr : 0), baza: P.utr, utr: P.utr + (S.zaliczki ? ZAL.utr : 0) }; }
     function nipOk(n) {
       var c = String(n).replace(/[\s-]/g, '');
       if (!/^\d{10}$/.test(c)) return false;
@@ -90,7 +90,9 @@
         PAKIET: dane(PAK[S.pakiet].nazwa), CENA_WDR: dane(zl(c.wdr)), CENA_UTR: dane(zl(c.utr)), CENA_STD: dane(zl(PAK[S.pakiet].wdr + (S.zaliczki ? ZAL.wdr : 0))),
         PILOT_OPIS: S.pilot ? ' (cena pilotażowa, zob. §10)' : '',
         WDR_OPIS: S.zaliczki ? ', w tym zaliczki online: ' + zl(ZAL.wdr) : '',
-        UTR_OPIS: (S.sms || S.zaliczki) ? ', w tym ' + [S.sms && 'dodatkowy pakiet SMS (' + zl(SMS.cena) + ', kolejne ' + SMS.limit + ' wiadomości miesięcznie)', S.zaliczki && 'zaliczki online (' + zl(ZAL.utr) + ')'].filter(Boolean).join(' oraz ') : '',
+        UTR_OPIS: S.zaliczki ? ', w tym zaliczki online (' + zl(ZAL.utr) + ')' : '',
+        SMS_LIMIT: dane(String(PAK[S.pakiet].sms)),
+        SMS_NADWYZKA: dane(SMS.nadwyzka),
         CENA_DOD: dane(dodatkiLista().length ? dodatkiLista().join('; ') + ' (wliczone w kwoty z ust. 1)' : 'nie dotyczy'),
         DODATKI: dane(dodatkiLista().length ? dodatkiLista().join('; ') : 'brak'),
         OPERATOR: dane(OPERATORY_PLACE()),
@@ -101,16 +103,15 @@
     }
     function dodatkiLista() {
       var d = [];
-      if (S.sms) d.push('dodatkowy pakiet SMS (' + zl(SMS.cena) + ' miesięcznie, kolejne ' + SMS.limit + ' wiadomości miesięcznie ponad limit z utrzymania)');
       if (S.zaliczki) d.push('zaliczki płatne online (' + zl(ZAL.wdr) + ' wdrożenie, ' + zl(ZAL.utr) + ' miesięcznie)');
       return d;
     }
     function OPERATORY_PLACE() { return OPERATORZY[S.operator] || OPERATORZY.pomoc; }
     function opisPakietu() {
-      var wspolne = 'potwierdzenia i przypomnienia o wizytach SMS-em do pacjentów (do 200 wiadomości miesięcznie) z linkiem do zmiany lub odwołania wizyty przez pacjenta (bez konta i bez danych zdrowotnych), powiadomienia e-mail o rezerwacjach dla Zamawiającego i jego terapeutów, wizytówka Google, podstawowe SEO, polityka prywatności, cookies i regulamin rezerwacji, domena i hosting';
+      var wspolne = 'potwierdzenia i przypomnienia o wizytach SMS-em do pacjentów (' + PAK[S.pakiet].sms + ' wiadomości miesięcznie, każda kolejna po taryfie operatora) z linkiem do zmiany lub odwołania wizyty przez pacjenta (bez konta i bez danych zdrowotnych), powiadomienia e-mail o rezerwacjach dla Zamawiającego i jego terapeutów, wizytówka Google, podstawowe SEO, polityka prywatności, cookies i regulamin rezerwacji, domena i hosting';
       return S.pakiet === 'individual'
-        ? '1 terapeuta, do 3 miejsc przyjęć, do 7 usług, do 5 podstron, ' + wspolne
-        : 'terapeuci z osobnymi grafikami bez limitu, wybór terapeuty albo pierwszy wolny termin, lokalizacje bez limitu, usługi bez limitu, do 10 podstron, ' + wspolne;
+        ? '1 terapeuta, do 3 miejsc przyjęć, do 7 usług, do 7 podstron, ' + wspolne
+        : 'terapeuci z osobnymi grafikami bez limitu, wybór terapeuty albo pierwszy wolny termin, lokalizacje bez limitu, usługi bez limitu, do 15 podstron, ' + wspolne;
     }
     function tabela(wiersze) {
       return '<table>' + wiersze.map(function (r) {
@@ -171,7 +172,7 @@
 
       h += '<h2>§5. Utrzymanie</h2>' + ust([
         'Utrzymanie obejmuje: hosting i certyfikat SSL, domenę wraz z jej rocznym odnowieniem, monitoring, naprawę błędów, aktualizacje Strony i systemu rezerwacji, drobne zmiany treści do **jednej godziny miesięcznie** oraz wiadomości SMS do pacjentów w limicie z ust. 2.',
-        '**Wiadomości SMS.** Do pacjentów Zamawiającego wysyłane są SMS-y: potwierdzenie rezerwacji, przypomnienie przed wizytą i informacja o zmianie lub odwołaniu terminu, a także własne wiadomości wysyłane przez Zamawiającego z panelu. W cenie utrzymania jest **200 wiadomości miesięcznie**. Kolejne 200 wiadomości miesięcznie można dokupić za **50 zł miesięcznie** (każdy pakiet osobno, bez okresu minimalnego). **Niewykorzystane wiadomości, także dokupione, nie wygasają z końcem miesiąca i przechodzą na kolejne miesiące, dopóki trwa umowa.** Wykonawca ostrzega Zamawiającego, gdy pula wiadomości zbliża się do końca. Po jej wyczerpaniu wiadomości do pacjentów nie są wysyłane do chwili, gdy w kolejnym miesiącu przybędzie nowe 200 wiadomości, albo do dokupienia kolejnego pakietu, a system rezerwacji działa dalej. SMS-y dostają tylko pacjenci, którzy zgodzili się na nie przy rezerwacji. E-maile system wysyła wyłącznie do Zamawiającego i jego terapeutów (powiadomienia o rezerwacjach i zmianach).',
+        '**Wiadomości SMS.** Do pacjentów Zamawiającego wysyłane są SMS-y: potwierdzenie rezerwacji, przypomnienie przed wizytą i informacja o zmianie lub odwołaniu terminu, a także własne wiadomości wysyłane przez Zamawiającego z panelu. W cenie utrzymania jest **{SMS_LIMIT} wiadomości miesięcznie**. **Każda wiadomość ponad limit jest rozliczana według taryfy operatora bramki SMS, obecnie {SMS_NADWYZKA} za wiadomość**, na dokumencie sprzedaży za kolejny okres. **Niewykorzystane wiadomości nie wygasają z końcem miesiąca i przechodzą na kolejne miesiące, dopóki trwa umowa.** Wykonawca ostrzega Zamawiającego, gdy limit zbliża się do końca. Wiadomości są wysyłane także po jego przekroczeniu. SMS-y dostają tylko pacjenci, którzy zgodzili się na nie przy rezerwacji. E-maile system wysyła wyłącznie do Zamawiającego i jego terapeutów (powiadomienia o rezerwacjach i zmianach).',
         'Wykonawca dokłada starań, żeby system działał bez przerw, ale nie gwarantuje stałej dostępności i nie odpowiada za awarie usług zewnętrznych (Google, hosting, poczta, SMS, operator płatności).',
         '**Błędy.** Zamawiający zgłasza błędy e-mailem lub telefonicznie. Wykonawca usuwa błędy Strony i systemu rezerwacji bezpłatnie przez cały czas trwania umowy i dokłada starań, żeby błąd uniemożliwiający rezerwacje usunąć w ciągu 3 dni roboczych, a pozostałe w ciągu 14 dni roboczych od zgłoszenia. W zakresie, w jakim prawo na to pozwala, strony wyłączają rękojmię, a w jej miejsce stosuje się ten ustęp.'
       ], v);
@@ -179,11 +180,11 @@
       h += '<h2>§6. Czas trwania i rezygnacja</h2>' + ust([
         'Umowa jest zawarta na **czas nieokreślony**, bez okresu minimalnego.',
         'Zamawiający może **zrezygnować w dowolnym momencie, ze skutkiem natychmiastowym**, e-mailem. **Opłacony z góry okres utrzymania nie jest zwracany**, ale system rezerwacji działa do jego końca, chyba że Zamawiający poprosi o wcześniejsze wyłączenie. Wykonawca może wypowiedzieć umowę z miesięcznym wyprzedzeniem, na koniec miesiąca kalendarzowego.',
-        'W ciągu **7 dni** od zakończenia umowy Wykonawca przekazuje Zamawiającemu **pliki Strony** w formie umożliwiającej publikację na dowolnym hostingu, dostęp do domeny i wizytówki oraz eksport rezerwacji, jeśli go ma. Zamawiający ma prawo przenieść Stronę i system rezerwacji na własne utrzymanie i samodzielnie ogarnąć to technicznie, a Wykonawca udostępnia w tym celu pliki Strony do skonfigurowania na infrastrukturze Zamawiającego.',
-        '**System rezerwacji działa na infrastrukturze Wykonawcy, więc po zakończeniu umowy przestaje działać**, dopóki Zamawiający nie skonfiguruje go sam albo nie zleci tego innej firmie. Wykonawca nie wspiera takiej konfiguracji i nie przekazuje swojej infrastruktury. Zamawiający został o tym poinformowany przed zawarciem umowy. Od zakończenia umowy hosting, aktualizacje, kopie zapasowe i opłaty za usługi zewnętrzne ponosi Zamawiający.',
+        'W ciągu **7 dni** od zakończenia umowy Wykonawca przekazuje Zamawiającemu **pliki Strony i systemu rezerwacji** w formie umożliwiającej ich uruchomienie na dowolnej infrastrukturze, dostęp do domeny i wizytówki oraz eksport rezerwacji, jeśli go ma. Zamawiający ma prawo przenieść Stronę i system rezerwacji na własne utrzymanie i samodzielnie ogarnąć to technicznie, **na własny rachunek**.',
+        '**System rezerwacji działa na infrastrukturze Wykonawcy, więc po zakończeniu umowy (po końcu opłaconego okresu) przestaje u Wykonawcy działać.** Zamawiający uruchamia go na własnej infrastrukturze na własny koszt. Wykonawca nie przekazuje swojej infrastruktury i nie pomaga w konfiguracji, chyba że strony uzgodnią to jako osobne, płatne zlecenie. Zamawiający został o tym poinformowany przed zawarciem umowy. Od zakończenia umowy hosting, aktualizacje, kopie zapasowe i opłaty za usługi zewnętrzne ponosi Zamawiający.',
         '**Brak płatności.** Jeśli należność za utrzymanie nie zostanie zapłacona w terminie, Wykonawca w dniu terminu i po trzech dniach wyśle przypomnienie e-mailem. W 7. dniu zaległości Wykonawca wyśle ostatnie przypomnienie i udostępni eksport rezerwacji. Jeśli zaległość nie zostanie zapłacona w ciągu **14 dni od terminu**, Wykonawca może wypowiedzieć umowę ze skutkiem natychmiastowym e-mailem, a system rezerwacji zostanie wyłączony. Pliki Strony Wykonawca przekazuje po uregulowaniu zaległości.',
         'Zamawiający może wypowiedzieć umowę ze skutkiem natychmiastowym, gdy system rezerwacji nie działa dłużej niż 14 dni z winy Wykonawcy.',
-        'Wynagrodzenie za wdrożenie nie jest zwracane po uruchomieniu Strony. Przy rezygnacji przed uruchomieniem strony rozliczają się proporcjonalnie do wykonanych prac.'
+        'Wynagrodzenie za wdrożenie jest należne dopiero po akceptacji projektu graficznego Strony. Jeśli Zamawiający zrezygnuje przed akceptacją projektu, nic nie płaci za wdrożenie. Po akceptacji projektu wynagrodzenie jest należne w całości, także gdy Zamawiający zrezygnuje przed uruchomieniem Strony, i nie jest zwracane po jej uruchomieniu.'
       ], v);
 
       h += '<h2>§7. Dane osobowe</h2>' + ust([
@@ -291,7 +292,7 @@
       S.formToken = String(TOKEN.f || '').slice(0, 80);
       LINK.ut = String(TOKEN.u || '').slice(0, 80); LINK.do = String(TOKEN.w || ''); LINK.ot = String(TOKEN.o || '').slice(0, 80);
       if (PAK[TOKEN.p]) S.pakiet = TOKEN.p;
-      S.sms = !!TOKEN.s; S.zaliczki = !!TOKEN.z;
+      S.sms = false; S.zaliczki = !!TOKEN.z;
       S.pilot = !!TOKEN.pil; PILOT.zLinku = !!TOKEN.pil;
       if (!S.firma && TOKEN.g) S.firma = TOKEN.g;
       S.krok = inny ? 1 : Math.max(Math.min(S.krok, 2), 1);
@@ -352,7 +353,7 @@
     function widokPakiet() {
       var kart = Object.keys(PAK).map(function (id) {
         var P = PAK[id];
-        var opis = id === 'individual' ? 'Jeden terapeuta, do 3 miejsc przyjęć, do 5 podstron' : 'Zespół i kilka lokalizacji: terapeuci i lokalizacje bez limitu, każdy z własnym grafikiem, do 10 podstron';
+        var opis = id === 'individual' ? 'Jeden terapeuta, do 3 miejsc przyjęć, do 7 podstron' : 'Zespół i kilka lokalizacji: terapeuci i lokalizacje bez limitu, każdy z własnym grafikiem, do 15 podstron';
         return '<label class="kf-pakiet"><input type="radio" name="pakiet" data-k="pakiet" value="' + id + '"' + (S.pakiet === id ? ' checked' : '') + ' /><b>' + P.nazwa + '</b><span>' + opis + '</span><em>' + (S.pilot ? '<s>' + zl(P.wdr) + '</s> ' + zl(PILOT.wdr[id]) : zl(P.wdr)) + ' wdrożenie · ' + zl(P.utr) + ' / mies.</em></label>';
       }).join('');
       var pilotBlok = S.pilotMinal ? '<p class="kf-pilot kf-pilot--pelny">Termin pilotażu w tej ofercie minął. Zadzwoń (783 480 341) albo napisz, a przygotujemy aktualną ofertę.</p>' : (S.pilot || PILOT.zLinku || pilotWolne() > 0)
@@ -360,7 +361,6 @@
         : '<p class="kf-pilot kf-pilot--pelny">Pilotaż pierwszych klientów jest już pełny. Wdrożenie w cenie standardowej.</p>';
       return pilotBlok + '<h4>Wybierz pakiet</h4><div class="kf-pakiety" role="radiogroup" aria-label="Pakiet">' + kart + '</div>' +
         '<h4 class="kf-h-dod">Dodatki <em>(opcjonalnie)</em></h4>' +
-        '<label class="kf-dodatek"><input type="checkbox" data-k="sms"' + (S.sms ? ' checked' : '') + ' /><span><b>Dodatkowe SMS-y</b> · +' + zl(SMS.cena) + ' / mies.<small>Kolejne ' + SMS.limit + ' wiadomości miesięcznie ponad ' + SMS.limit + ' w cenie utrzymania (potwierdzenia i przypomnienia dla pacjentów).</small></span></label>' +
         '<label class="kf-dodatek"><input type="checkbox" data-k="zaliczki"' + (S.zaliczki ? ' checked' : '') + ' /><span><b>Zaliczki płatne online</b> · +' + zl(ZAL.wdr) + ' wdrożenie, +' + zl(ZAL.utr) + ' / mies.<small>BLIK, karta lub przelew przy rezerwacji. Pieniądze trafiają na Twoje konto u operatora płatności, a prowizję pobiera operator.</small></span></label>' +
         (S.zaliczki ? '<div class="kf-pole" style="margin-top:12px;max-width:420px"><label for="f-operator">Operator płatności</label><select id="f-operator" data-k="operator">' + Object.keys(OPERATORZY).map(function (k) { return '<option value="' + k + '"' + (S.operator === k ? ' selected' : '') + '>' + (k === 'pomoc' ? 'Jeszcze nie wiem, doradzicie' : OPERATORZY[k]) + '</option>'; }).join('') + '</select></div>' : '') +
         '<div class="kf-wycena"><b>Chcesz wycenę czegoś jeszcze?</b> Te rzeczy wyceniamy osobno i nie wchodzą do tej umowy.<br />' +
@@ -642,7 +642,7 @@
       komunikat('W oknie drukowania wybierz „Zapisz jako PDF”.');
     }
     function kopiuj() {
-      var c = ceny(), tekst = 'Umowa ' + S.numer + ' (' + KONF.wersja + ')\nPakiet: ' + PAK[S.pakiet].nazwa + (S.sms ? ' + dodatkowe SMS-y' : '') + (S.zaliczki ? ' + zaliczki online' : '') + '\nWdrożenie: ' + zl(c.wdr) + ', utrzymanie: ' + zl(c.utr) + ' miesięcznie\nGabinet: ' + S.nazwa + ', ' + S.miasto + '\nFirma: ' + S.firma + ', NIP ' + S.nip + '\nOsoba podpisująca: ' + S.osoba + '\nE-mail: ' + S.email + ', telefon: ' + S.telefon + '\nZaakceptowano: ' + czasPL(S.wynik.czas) + '\nSHA-256: ' + S.wynik.hash;
+      var c = ceny(), tekst = 'Umowa ' + S.numer + ' (' + KONF.wersja + ')\nPakiet: ' + PAK[S.pakiet].nazwa + '' + (S.zaliczki ? ' + zaliczki online' : '') + '\nWdrożenie: ' + zl(c.wdr) + ', utrzymanie: ' + zl(c.utr) + ' miesięcznie\nGabinet: ' + S.nazwa + ', ' + S.miasto + '\nFirma: ' + S.firma + ', NIP ' + S.nip + '\nOsoba podpisująca: ' + S.osoba + '\nE-mail: ' + S.email + ', telefon: ' + S.telefon + '\nZaakceptowano: ' + czasPL(S.wynik.czas) + '\nSHA-256: ' + S.wynik.hash;
       try { navigator.clipboard.writeText(tekst).then(function () { komunikat('Skopiowano. Wklej to do e-maila razem z plikiem umowy.'); }, function () { komunikat(tekst); }); } catch (x) { komunikat(tekst); }
     }
     root.addEventListener('click', function (e) {

@@ -42,13 +42,13 @@
           <li>Dbamy, żeby pierwszą była Twoja strona.</li>
         </ul>
       </div>
-      <figure class="pk-obraz" role="img" aria-label="Przykład wyników wyszukiwania frazy „ból krzyża fizjoterapeuta”: na górze strona gabinetu o fizjoterapii kręgosłupa i wizytówka w Mapach, niżej lista specjalistów z portalu.">
+      <figure class="pk-obraz" id="pk-serp-fig" role="img" aria-label="Przykład wyników wyszukiwania frazy „ból krzyża fizjoterapeuta”: na górze strona gabinetu o fizjoterapii kręgosłupa i wizytówka w Mapach, niżej lista specjalistów z portalu.">
         <div class="pk-serp">
-          <div class="pk-serp__pasek"><span class="pk-serp__lupa" aria-hidden="true"></span>ból krzyża fizjoterapeuta [miasto]</div>
+          <div class="pk-serp__pasek"><span class="pk-serp__lupa" aria-hidden="true"></span><span id="pk-q">ból krzyża fizjoterapeuta [miasto]</span></div>
           <div class="pk-serp__wynik pk-serp__wynik--nasz">
-            <p class="pk-serp__url">twoj-gabinet.pl › fizjoterapia-kregoslupa</p>
-            <p class="pk-serp__tytul">Fizjoterapia kręgosłupa [Twoje miasto]</p>
-            <p class="pk-serp__opis">Ból pleców, rwa kulszowa, dyskopatia. Najbliższy wolny termin: jutro.</p>
+            <p class="pk-serp__url" id="pk-url">twoj-gabinet.pl › fizjoterapia-kregoslupa</p>
+            <p class="pk-serp__tytul" id="pk-tytul">Fizjoterapia kręgosłupa [Twoje miasto]</p>
+            <p class="pk-serp__opis" id="pk-opis">Ból pleców, rwa kulszowa, dyskopatia. Najbliższy wolny termin: jutro.</p>
             <span class="pk-serp__znak">Twoja strona</span>
           </div>
           <div class="pk-serp__mapa">
@@ -190,6 +190,6 @@
 
   <script src="assets/js/chmura-config.js?v=2"></script>
   <script src="assets/js/odbiornik.js?v=8"></script>
-  <script src="assets/js/pokaz.js?v=4" defer></script>
+  <script src="assets/js/pokaz.js?v=5" defer></script>
 </body>
 </html>
