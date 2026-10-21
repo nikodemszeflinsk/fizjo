@@ -778,6 +778,12 @@
         if (!S.wynik && S.krok === 0) render();
       });
     }
+    /* Adres Wykonawcy pochodzi z Ustawień CRM (gdy nie wpisano go na stałe w KONF). */
+    if (!KONF.wykonawca.adres && window.ODBIORNIK && window.ODBIORNIK.wykonawca) {
+      window.ODBIORNIK.wykonawca().then(function (j) {
+        if (j && j.adres && !KONF.wykonawca.adres) { KONF.wykonawca.adres = j.adres; if (!S.wynik) render(); }
+      });
+    }
     render();
     /* Raz na sesję dajemy znać, że klient otworzył umowę z linku. */
     try {

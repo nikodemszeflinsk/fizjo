@@ -504,3 +504,7 @@
 .ofs-niedost .cta:hover { background: rgba(255, 255, 255, 0.12); }
 .ofs-pilot__dla-fine { margin-top: 12px !important; }
 .ofs-start__karta--glowna .ofs-start__et { align-self: flex-start; width: fit-content; max-width: 100%; }
+
+/* Cena wdrożenia standardowych pakietów jest przekreślona, dopóki pakiety są niedostępne (pilotaż) */
+.ofs-przekr { text-decoration: none; }
+.ofs-ceny--niedostepne .ofs-przekr { text-decoration: line-through; text-decoration-thickness: 3px; text-decoration-color: #e9c46a; }

@@ -124,6 +124,12 @@
       return fetch(adresApi() + '/pilotaz').then(function (r) { return r.json(); })
         .then(function (j) { return j && j.ok && typeof j.miejsc === 'number' ? j : null; }).catch(function () { return null; });
     },
+    /** Adres Wykonawcy z Ustawień CRM ({adres}) albo null. */
+    wykonawca: function () {
+      if (!adresApi() || lokalnie()) return Promise.resolve(null);
+      return fetch(adresApi() + '/wykonawca').then(function (r) { return r.json(); })
+        .then(function (j) { return j && j.ok && j.adres ? j : null; }).catch(function () { return null; });
+    },
     statusLinku: function (ut) {
       if (!ut || !adresApi() || lokalnie()) return Promise.resolve(null);
       return fetch(adresApi() + '/umowa/status?ut=' + encodeURIComponent(ut)).then(function (r) { return r.json(); })
