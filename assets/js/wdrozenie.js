@@ -56,6 +56,9 @@
   }
   function projektHtml(p, d) {
     var obrazy = p.pliki.map(function (f) { return /^image\//.test(f.mime) ? '<a href="' + plikUrl(f.id) + '" target="_blank" rel="noopener" class="wd-obraz"><img src="' + plikUrl(f.id) + '" alt="' + esc(p.nazwa + ', ' + f.nazwa) + '" loading="lazy" /></a>' : '<a class="st-btn st-btn--maly st-btn--cichy" href="' + plikUrl(f.id, true) + '">' + esc(f.nazwa) + '</a>'; }).join('');
+    var link = p.link && /^https:\/\//i.test(p.link)
+      ? '<div class="wd-link-projektu"><a class="st-btn" href="' + esc(p.link) + '" target="_blank" rel="noopener noreferrer">Otwórz projekt graficzny</a><p class="st-pod">Projekt otwiera się w nowej karcie. Obejrzyj go, a potem wróć tutaj, żeby go zaakceptować albo wysłać uwagi.</p></div>'
+      : '';
     var status = { do_akceptacji: ['Czeka na Twoją decyzję', 'czeka'], zaakceptowany: ['Zaakceptowany', 'ok'], uwagi: ['Uwagi wysłane, poprawiamy', 'uwagi'] }[p.status] || ['', ''];
     var akcje = '';
     if (p.status === 'do_akceptacji') {
@@ -65,7 +68,7 @@
         '<div class="wd-uwagi" hidden><label class="st-et" for="uw-' + esc(p.id) + '">Co zmienić?</label><p class="st-pod">Opisz własnymi słowami: co się nie podoba i jak ma być. W cenie są ' + d.tury.wCenie + ' tury poprawek (wykorzystano: ' + d.tury.uzyte + ').</p><textarea id="uw-' + esc(p.id) + '" rows="5"></textarea><button type="button" class="st-btn" data-akcja="uwagi-wyslij" data-id="' + esc(p.id) + '">Wyślij uwagi</button></div></div>';
     }
     var odp = p.odpowiedz ? '<p class="wd-odp"><b>' + (p.odpowiedz.typ === 'akceptacja' ? 'Zaakceptowano' : 'Twoje uwagi') + '</b> ' + esc(dataGodz(p.odpowiedz.czas)) + (p.odpowiedz.tekst ? '<br>' + esc(p.odpowiedz.tekst).replace(/\n/g, '<br>') : '') + '</p>' : '';
-    return '<article class="wd-projekt wd-projekt--' + p.status + '"><header><h3>' + esc(p.nazwa) + ' <small>wersja ' + esc(p.wersja) + '</small></h3><span class="wd-znak wd-znak--' + status[1] + '">' + status[0] + '</span></header>' + (p.opis ? '<p>' + esc(p.opis) + '</p>' : '') + '<div class="wd-obrazy">' + obrazy + '</div>' + odp + akcje + '</article>';
+    return '<article class="wd-projekt wd-projekt--' + p.status + '"><header><h3>' + esc(p.nazwa) + ' <small>wersja ' + esc(p.wersja) + '</small></h3><span class="wd-znak wd-znak--' + status[1] + '">' + status[0] + '</span></header>' + (p.opis ? '<p>' + esc(p.opis) + '</p>' : '') + link + (obrazy ? '<div class="wd-obrazy">' + obrazy + '</div>' : '') + odp + akcje + '</article>';
   }
   function sekcjaProjekt(d) {
     var lista = d.projekty.slice().reverse();
@@ -79,7 +82,7 @@
   function sekcjaPlatnosc(d) {
     var P = d.platnosc;
     if (P.status === 'brak') return '<section class="wd-karta"><h2>Płatność</h2><p>Po akceptacji projektu przygotujemy rachunek za wdrożenie i pokażemy go tutaj razem z danymi do przelewu.</p></section>';
-    var dokument = P.dokument ? '<a class="st-btn st-btn--cichy" href="' + adres('/wdrozenie/dokument') + '" target="_blank" rel="noopener">Zobacz rachunek' + (P.faktura_nr ? ' ' + esc(P.faktura_nr) : '') + '</a>' : '';
+    var dokument = P.dokument || P.pdf ? '<a class="st-btn st-btn--cichy" href="' + adres(P.pdf ? '/wdrozenie/rachunek.pdf' : '/wdrozenie/dokument') + '" target="_blank" rel="noopener">Zobacz rachunek' + (P.faktura_nr ? ' ' + esc(P.faktura_nr) : '') + (P.pdf ? ' (PDF)' : '') + '</a>' : '';
     var faktura = P.dokument ? '' : P.faktura ? '<a class="st-btn st-btn--cichy" href="' + plikUrl(P.faktura.id, true) + '">Pobierz dokument' + (P.faktura_nr ? ' ' + esc(P.faktura_nr) : '') + ' (PDF)</a>' : (P.faktura_nr ? '<p class="st-pod">Numer rachunku: ' + esc(P.faktura_nr) + '</p>' : '<p class="st-pod">Rachunek dodamy tutaj w ciągu dnia roboczego.</p>');
     var stan = { oczekuje: '', zgloszona: '<p class="st-ok">Dziękujemy! Zgłosiłeś wpłatę. Sprawdzamy ją i od razu przechodzimy do budowy strony.</p>', oplacona: '<p class="st-ok st-ok--duze">Zapłacone' + (P.zaplacono ? ' ' + esc(dataPL(P.zaplacono)) : '') + '. Dziękujemy!' + (d.etap === 'platnosc' || d.etap === 'budowa' ? ' Przechodzimy do budowy strony.' : '') + '</p>' }[P.status] || '';
     var dane = P.status === 'oczekuje' || P.status === 'zgloszona'

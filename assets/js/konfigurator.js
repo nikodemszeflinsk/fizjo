@@ -7,8 +7,8 @@
 
     /* KONFIGURACJA. Uzupełnij przed pierwszym użyciem. Puste pola pokazują się w umowie jako żółte „do uzupełnienia”. */
     var KONF = {
-      zatwierdzona: false, /* true dopiero po przeglądzie wzoru przez prawnika: wtedy znika znak PROJEKT */
-      wersja: 'SW-2026-10-v4',
+      zatwierdzona: true, /* wzór przejrzany 21.10.2026 (przegląd własny, bez prawnika); znak PROJEKT znika dopiero, gdy uzupełnisz adres Wykonawcy poniżej */
+      wersja: 'SW-2026-10-v5',
       wykonawca: { nazwa: 'Studio Widok (Nikodem Szefliński, osoba fizyczna prowadząca działalność nierejestrowaną)', nip: 'brak (działalność nierejestrowana)', adres: '' },
       email: 'kontakt@studio-widok.pl',
       telefon: '783 480 341',
@@ -36,6 +36,9 @@
     var MIES = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'];
     var KROKI = ['Pakiet i dodatki', 'Dane firmy', 'Formularz startowy', 'Umowa i podpis'];
     var KLUCZ = 'konfigurator-strony-v1';
+    /* Wzór jest „próbny”, dopóki nie jest zatwierdzony i kompletny (adres Wykonawcy musi być uzupełniony). */
+    function probna() { return !KONF.zatwierdzona || !KONF.wykonawca.adres; }
+    function opisProbna() { return KONF.zatwierdzona ? 'Brakuje adresu Wykonawcy w konfiguracji, więc wzór jest niekompletny i nie ma mocy prawnej.' : 'Wzór umowy jest w przeglądzie prawnym i nie ma mocy prawnej.'; }
 
     var S = {
       lead: '', krok: 0, pakiet: 'individual', pilot: false, pilotMinal: false, formStatus: '', formBlad: false, sms: false, zaliczki: false, operator: 'pomoc', w_podstrony: false, w_kalendarze: false, w_kampania: false,
@@ -130,7 +133,7 @@
         { cells: ['Wycena poza umową', wycena ? esc(wycena) : 'brak'] }
       ].filter(Boolean);
       var h = '';
-      if (!KONF.zatwierdzona) h += '<p class="projekt">PROJEKT. Wzór umowy jest w przeglądzie prawnym i nie ma mocy prawnej.</p>';
+      if (probna()) h += '<p class="projekt">PROJEKT. ' + opisProbna() + '</p>';
       h += '<h1>UMOWA O STRONĘ INTERNETOWĄ Z SYSTEMEM REZERWACJI</h1>';
       h += '<p>' + md('Umowa nr {NUMER} z dnia {DATA}.', v) + '</p>';
       h += '<p>' + md('**Wykonawca:** {WYK_NAZWA}, marka Studio Widok, NIP {WYK_NIP}, adres {WYK_ADRES}, e-mail {WYK_EMAIL}, tel. {WYK_TEL}.', v) + '</p>';
@@ -160,11 +163,11 @@
         'Dokument sprzedaży (rachunek) za wdrożenie Wykonawca wystawia **po akceptacji projektu**, z terminem płatności 7 dni. Strona zostaje uruchomiona na domenie Zamawiającego **po zapłacie**.',
         '**Pierwszy miesiąc utrzymania**, liczony od dnia uruchomienia Strony, jest wliczony w cenę wdrożenia. Kolejne miesiące utrzymania są płatne z góry, na podstawie dokumentu sprzedaży (rachunku) wystawianego na początku okresu, z terminem płatności 7 dni.',
         'Zmiana ceny utrzymania wymaga zgody Zamawiającego. Bez zgody każda ze stron może zrezygnować z umowy (§6).',
-        'Dokumenty sprzedaży są wystawiane i doręczane w formie elektronicznej zgodnie z obowiązującymi przepisami (w tym przez KSeF, jeśli po rejestracji działalności będzie wymagany). Zamawiający wyraża zgodę na ich przesyłanie na adres {EMAIL}. Za opóźnienie w płatności należą odsetki ustawowe za opóźnienie w transakcjach handlowych.'
+        'Dokumenty sprzedaży są wystawiane i doręczane w formie elektronicznej zgodnie z obowiązującymi przepisami (w tym przez Krajowy System e-Faktur, jeśli przepisy będą tego wymagać). Zamawiający wyraża zgodę na ich przesyłanie na adres {EMAIL}. Za opóźnienie w płatności należą odsetki ustawowe za opóźnienie w wysokości wynikającej z przepisów.'
       ], v);
 
       h += '<h2>§4. Prawa do Strony</h2>' + ust([
-        'Prawa autorskie do projektu, kodu i treści stworzonych przez Wykonawcę **zostają przy Wykonawcy**. Od dnia zapłaty za wdrożenie Zamawiający dostaje **niewyłączną, bezterminową licencję** na korzystanie ze Strony na całym świecie, na polach eksploatacji: utrwalanie i zwielokrotnianie, publikowanie w internecie (publiczne udostępnianie w taki sposób, aby każdy miał dostęp w miejscu i czasie przez siebie wybranym), zmiany treści i przeniesienie na inny hosting oraz wprowadzanie zmian i opracowań na własny użytek. Wynagrodzenie za licencję jest zawarte w cenie wdrożenia.',
+        'Prawa autorskie do projektu, kodu i treści stworzonych przez Wykonawcę **zostają przy Wykonawcy**. Od dnia zapłaty za wdrożenie Zamawiający dostaje **niewyłączną licencję na czas nieoznaczony** na korzystanie ze Strony na całym świecie, na polach eksploatacji: utrwalanie i zwielokrotnianie, publikowanie w internecie (publiczne udostępnianie w taki sposób, aby każdy miał dostęp w miejscu i czasie przez siebie wybranym), zmiany treści i przeniesienie na inny hosting oraz wprowadzanie zmian i opracowań na własny użytek. Wynagrodzenie za licencję jest zawarte w cenie wdrożenia. Zamawiający może zrezygnować z licencji w każdej chwili. Wykonawca może ją wypowiedzieć wyłącznie z ważnego powodu, którym jest rażące naruszenie ust. 2 trwające mimo wezwania do zaprzestania, z terminem wypowiedzenia 30 dni. Zakończenie umowy o utrzymanie nie powoduje wygaśnięcia licencji.',
         'Licencja nie obejmuje odsprzedaży Strony ani kodu, udzielania dalszych licencji (poza firmą od hostingu lub obsługi technicznej Zamawiającego) ani używania kodu rezerwacji poza Stroną Zamawiającego. Wykonawca może używać własnych szablonów i narzędzi dla innych klientów.',
         '**Materiały Zamawiającego** (teksty, zdjęcia, logo) pozostają jego własnością. Zamawiający udziela Wykonawcy niewyłącznej, nieodpłatnej licencji na ich użycie w zakresie potrzebnym do wykonania umowy (zwielokrotnianie, kadrowanie i obróbka, publikacja na Stronie) na czas trwania umowy. Cudze licencje (zdjęcia stockowe, czcionki) obowiązują na swoich warunkach.',
         '**Domenę** kupuje Wykonawca na dane Zamawiającego. Jest ona własnością Zamawiającego, a jej koszt, także coroczne odnowienie u rejestratora, jest w cenie utrzymania. Wizytówka Google jest na koncie Zamawiającego.'
@@ -174,13 +177,13 @@
         'Utrzymanie obejmuje: hosting i certyfikat SSL, domenę wraz z jej rocznym odnowieniem, monitoring, naprawę błędów, aktualizacje Strony i systemu rezerwacji, drobne zmiany treści do **jednej godziny miesięcznie** oraz wiadomości SMS do pacjentów w limicie z ust. 2.',
         '**Wiadomości SMS.** Do pacjentów Zamawiającego wysyłane są SMS-y: potwierdzenie rezerwacji, przypomnienie przed wizytą i informacja o zmianie lub odwołaniu terminu, a także własne wiadomości wysyłane przez Zamawiającego z panelu. W cenie utrzymania jest **{SMS_LIMIT} wiadomości miesięcznie**. **Każda wiadomość ponad limit jest rozliczana według taryfy operatora bramki SMS, obecnie {SMS_NADWYZKA} za wiadomość**, na dokumencie sprzedaży za kolejny okres. **Niewykorzystane wiadomości nie wygasają z końcem miesiąca i przechodzą na kolejne miesiące, dopóki trwa umowa.** Wykonawca ostrzega Zamawiającego, gdy limit zbliża się do końca. Wiadomości są wysyłane także po jego przekroczeniu. SMS-y dostają tylko pacjenci, którzy zgodzili się na nie przy rezerwacji. E-maile system wysyła wyłącznie do Zamawiającego i jego terapeutów (powiadomienia o rezerwacjach i zmianach).',
         'Wykonawca dokłada starań, żeby system działał bez przerw, ale nie gwarantuje stałej dostępności i nie odpowiada za awarie usług zewnętrznych (Google, hosting, poczta, SMS, operator płatności).',
-        '**Błędy.** Zamawiający zgłasza błędy e-mailem lub telefonicznie. Wykonawca usuwa błędy Strony i systemu rezerwacji bezpłatnie przez cały czas trwania umowy i dokłada starań, żeby błąd uniemożliwiający rezerwacje usunąć w ciągu 3 dni roboczych, a pozostałe w ciągu 14 dni roboczych od zgłoszenia. W zakresie, w jakim prawo na to pozwala, strony wyłączają rękojmię, a w jej miejsce stosuje się ten ustęp.'
+        '**Błędy.** Zamawiający zgłasza błędy e-mailem lub telefonicznie. Wykonawca usuwa błędy Strony i systemu rezerwacji bezpłatnie przez cały czas trwania umowy i dokłada starań, żeby błąd uniemożliwiający rezerwacje usunąć w ciągu 3 dni roboczych, a pozostałe w ciągu 14 dni roboczych od zgłoszenia. W zakresie, w jakim prawo na to pozwala, strony wyłączają rękojmię, a w jej miejsce stosuje się ten ustęp. Wyłączenie nie obejmuje wad, które Wykonawca podstępnie zataił.'
       ], v);
 
       h += '<h2>§6. Czas trwania i rezygnacja</h2>' + ust([
         'Umowa jest zawarta na **czas nieokreślony**, bez okresu minimalnego.',
-        'Zamawiający może **zrezygnować w dowolnym momencie, ze skutkiem natychmiastowym**, e-mailem. **Opłacony z góry okres utrzymania nie jest zwracany**, ale system rezerwacji działa do jego końca, chyba że Zamawiający poprosi o wcześniejsze wyłączenie. Wykonawca może wypowiedzieć umowę z miesięcznym wyprzedzeniem, na koniec miesiąca kalendarzowego.',
-        'W ciągu **7 dni** od zakończenia umowy Wykonawca przekazuje Zamawiającemu **pliki Strony i systemu rezerwacji** w formie umożliwiającej ich uruchomienie na dowolnej infrastrukturze, dostęp do domeny i wizytówki oraz eksport rezerwacji, jeśli system rezerwacji taki eksport udostępnia. Zamawiający ma prawo przenieść Stronę i system rezerwacji na własne utrzymanie i samodzielnie wykonać potrzebne czynności techniczne, **na własny rachunek**.',
+        'Zamawiający może **zrezygnować w dowolnym momencie, ze skutkiem natychmiastowym**, e-mailem. **Opłacony z góry okres utrzymania nie jest zwracany**, ale system rezerwacji działa do jego końca, chyba że Zamawiający poprosi o wcześniejsze wyłączenie. Wykonawca może wypowiedzieć umowę z miesięcznym wyprzedzeniem, na koniec miesiąca kalendarzowego, a w tym czasie nadal świadczy utrzymanie i przekazuje pliki zgodnie z ust. 3. Wypowiedzenie z zachowaniem tego terminu nie rodzi obowiązku naprawienia szkody.',
+        'W ciągu **7 dni** od zakończenia umowy Wykonawca przekazuje Zamawiającemu **pliki Strony i systemu rezerwacji** w formie umożliwiającej ich uruchomienie przez Zamawiającego lub wybranego przez niego wykonawcę technicznego (kod źródłowy i krótka instrukcja uruchomienia), dostęp do domeny i wizytówki oraz eksport rezerwacji, jeśli system rezerwacji taki eksport udostępnia. Zamawiający ma prawo przenieść Stronę i system rezerwacji na własne utrzymanie i samodzielnie wykonać potrzebne czynności techniczne, **na własny rachunek**.',
         '**System rezerwacji działa na infrastrukturze Wykonawcy, więc po zakończeniu umowy (po końcu opłaconego okresu) przestaje u Wykonawcy działać.** Zamawiający uruchamia go na własnej infrastrukturze na własny koszt. Wykonawca nie przekazuje swojej infrastruktury i nie pomaga w konfiguracji, chyba że strony uzgodnią to jako osobne, płatne zlecenie. Zamawiający został o tym poinformowany przed zawarciem umowy. Od zakończenia umowy hosting, aktualizacje, kopie zapasowe i opłaty za usługi zewnętrzne ponosi Zamawiający.',
         '**Brak płatności.** Jeśli należność za utrzymanie nie zostanie zapłacona w terminie, Wykonawca w dniu terminu i po trzech dniach wyśle przypomnienie e-mailem. W 7. dniu zaległości Wykonawca wyśle ostatnie przypomnienie i udostępni eksport rezerwacji. Jeśli zaległość nie zostanie zapłacona w ciągu **14 dni od terminu**, Wykonawca może wypowiedzieć umowę ze skutkiem natychmiastowym e-mailem, a system rezerwacji zostanie wyłączony. Pliki Strony Wykonawca przekazuje po uregulowaniu zaległości.',
         'Zamawiający może wypowiedzieć umowę ze skutkiem natychmiastowym, gdy system rezerwacji nie działa dłużej niż 14 dni z winy Wykonawcy.',
@@ -191,8 +194,8 @@
         'Zamawiający jest **administratorem** danych osób umawiających wizyty (imię i nazwisko, telefon, e-mail, termin, opcjonalna wiadomość do gabinetu), a Wykonawca **przetwarza je w jego imieniu**, wyłącznie w celu świadczenia usług z umowy i na czas jej trwania (powierzenie, art. 28 RODO).',
         'Formularz prosi, żeby w wiadomości nie podawać danych zdrowotnych, ale mogą się tam pojawić. Zamawiający odpowiada za zgody, klauzule informacyjne i politykę prywatności na Stronie, a Wykonawca wdraża je w uzgodnionym brzmieniu. Przypomnienia trafiają tylko do osób, które się na nie zgodziły.',
         '**Zakres powierzenia.** Dane identyfikacyjne i kontaktowe pacjentów oraz informacje o terminie i rodzaju umówionej wizyty (mogą ujawniać stan zdrowia), a także dane zespołu Zamawiającego podane na Stronie. Osoby, których dane dotyczą: pacjenci i osoby kontaktujące się z gabinetem oraz zespół Zamawiającego.',
-        'Wykonawca przetwarza dane wyłącznie na polecenie Zamawiającego, zapewnia poufność osób upoważnionych, stosuje zabezpieczenia: {SRODKI}, pomaga w realizacji praw osób i w obowiązkach z art. 32–36 RODO oraz zgłasza naruszenie bez zbędnej zwłoki, nie później niż w ciągu **48 godzin**. Na żądanie udostępnia informacje potrzebne do wykazania zgodności z umową, a Zamawiający może przeprowadzić audyt po uzgodnieniu terminu, nie częściej niż raz w roku.',
-        'Podwykonawcy: hosting i baza {HOSTING}; SMS {SMSD}; poczta {POCZTA}; kalendarz: Google. Przekazywanie danych poza EOG: {EOG}. O zmianie podwykonawcy Wykonawca informuje z wyprzedzeniem co najmniej 14 dni, a Zamawiający może w tym czasie zgłosić uzasadniony sprzeciw. Jeśli strony nie dojdą do porozumienia, Zamawiający może zrezygnować z umowy (§6).' + (S.zaliczki ? ' Dane płatnicze pacjenta przetwarza operator płatności ({OPERATOR}) jako odrębny administrator. Wykonawca nie ma dostępu do numerów kart ani danych logowania do banku.' : ''),
+        'Wykonawca przetwarza dane wyłącznie na udokumentowane polecenie Zamawiającego (polecenie stanowią umowa i ustawienia Zamawiającego w systemie), informuje go, jeśli jego zdaniem polecenie narusza przepisy o ochronie danych, zapewnia poufność osób upoważnionych, stosuje zabezpieczenia: {SRODKI}, pomaga w realizacji praw osób i w obowiązkach z art. 32–36 RODO oraz zgłasza naruszenie bez zbędnej zwłoki, nie później niż w ciągu **48 godzin**. Na żądanie udostępnia informacje potrzebne do wykazania zgodności z umową, a Zamawiający może przeprowadzić audyt po uzgodnieniu terminu, nie częściej niż raz w roku.',
+        'Podwykonawcy: hosting i baza {HOSTING}; SMS {SMSD}; poczta {POCZTA}; kalendarz: Google. Zamawiający wyraża zgodę na korzystanie z tych podwykonawców. Wykonawca nakłada na nich obowiązki ochrony danych nie mniej rygorystyczne niż w umowie i odpowiada wobec Zamawiającego za ich wykonanie. Przekazywanie danych poza EOG: {EOG}. O zmianie podwykonawcy Wykonawca informuje z wyprzedzeniem co najmniej 14 dni, a Zamawiający może w tym czasie zgłosić uzasadniony sprzeciw. Jeśli strony nie dojdą do porozumienia, Zamawiający może zrezygnować z umowy (§6).' + (S.zaliczki ? ' Dane płatnicze pacjenta przetwarza operator płatności ({OPERATOR}) jako odrębny administrator. Wykonawca nie ma dostępu do numerów kart ani danych logowania do banku.' : ''),
         'Po zakończeniu umowy Wykonawca zwraca dane i usuwa je ze swoich systemów w ciągu **30 dni**, chyba że prawo wymaga ich przechowywania. Zamawiający może żądać informacji o spełnianiu tych obowiązków.',
         'Dane kontaktowe i dane do umowy Zamawiającego (w tym numer telefonu użyty do kodu SMS, materiały przekazane przez formularz) Wykonawca przetwarza jako administrator, żeby zawrzeć i wykonać umowę oraz wykazać jej zawarcie. Informacja o przetwarzaniu (art. 13 RODO) jest pokazana w konfiguratorze przed zawarciem umowy.'
       ], v);
@@ -200,7 +203,7 @@
       h += '<h2>§8. Odpowiedzialność i poufność</h2>' + ust([
         'Wykonawca nie gwarantuje liczby pacjentów, pozycji w wyszukiwarce ani terminu pierwszych efektów.',
         'Treści na Stronie powstają na podstawie informacji Zamawiającego, który je akceptuje i odpowiada za ich zgodność z przepisami o informacji i reklamie działalności leczniczej.',
-        'Odpowiedzialność Wykonawcy jest ograniczona do rzeczywistej szkody i do **kwoty zapłaconej w ostatnich 12 miesiącach**, nie niższej jednak niż opłata za wdrożenie powiększona o dwanaście miesięcznych opłat za utrzymanie, bez utraconych korzyści (o ile prawo na to pozwala). Nie dotyczy to szkód wyrządzonych umyślnie ani w wyniku rażącego niedbalstwa.',
+        'Odpowiedzialność Wykonawcy jest ograniczona do rzeczywistej szkody i do **kwoty zapłaconej w ostatnich 12 miesiącach**, nie niższej jednak niż opłata za wdrożenie powiększona o dwanaście miesięcznych opłat za utrzymanie, bez utraconych korzyści (o ile prawo na to pozwala). Nie dotyczy to szkód wyrządzonych umyślnie ani w wyniku rażącego niedbalstwa ani odpowiedzialności, której przepisy prawa nie pozwalają wyłączyć ani ograniczyć.',
         'Strony zachowują poufność informacji uzyskanych w związku z umową, a Wykonawca także danych osobowych, również po zakończeniu umowy.'
       ], v);
 
@@ -233,6 +236,7 @@
         'Żadna ze stron nie odpowiada za niewykonanie lub nienależyte wykonanie umowy z powodu siły wyższej (np. awarii sieci lub dostawców, działań władz), jeśli niezwłocznie poinformuje o tym drugą stronę.',
         'Jeśli któryś zapis umowy okaże się nieważny, pozostałe obowiązują.',
         S.zgody.e && !S.pilot ? 'Zamawiający zgadza się, aby Wykonawca wskazał Stronę (nazwę gabinetu i adres Strony) jako swoją realizację. Zgodę można w każdej chwili cofnąć e-mailem.' : null,
+        'Umowa wraz z formularzem startowym stanowi całość ustaleń stron co do jej przedmiotu. Opisy na stronie oferty i w pokazie mają charakter informacyjny, a w razie rozbieżności wiążąca jest umowa.',
         'Stosuje się prawo polskie. Strony najpierw próbują rozwiązać spór polubownie, a jeśli to się nie uda, rozstrzyga go sąd właściwy według przepisów ogólnych.'
       ];
       h += '<h2>§' + (S.pilot ? 11 : 10) + '. Postanowienia końcowe</h2>' + ust(koncowe, v);
@@ -443,7 +447,7 @@
         cb('d', 'Akceptuję powierzenie przetwarzania danych osobowych (§7).') +
         (S.bledy.zgody ? '<p class="blad">' + esc(S.bledy.zgody) + '</p>' : '') +
         (S.pilot
-          ? '<label><input type="checkbox" data-z="e"' + (z.e ? ' checked' : '') + ' /><span>Akceptuję warunki pilotażu pierwszych klientów (§10), w tym wskazanie mojej strony jako realizacji. Zgodę mogę cofnąć e-mailem.</span></label></div>'
+          ? '<label><input type="checkbox" data-z="e"' + (z.e ? ' checked' : '') + ' /><span>Akceptuję warunki pilotażu pierwszych klientów (§10): krótkie rozmowy co dwa tygodnie przez trzy miesiące, opinię, zbiorcze liczby rezerwacji i wskazanie mojej strony jako realizacji. Samą zgodę na wskazanie strony jako realizacji mogę w każdej chwili cofnąć e-mailem, bez dopłaty. Pilotaż i cena pilotażowa zostają.</span></label></div>'
           : '<label class="kf-opc"><input type="checkbox" data-z="e"' + (z.e ? ' checked' : '') + ' /><span><em>Opcjonalnie:</em> zgadzam się, żeby Studio Widok wskazało moją stronę jako swoją realizację (§10).</span></label></div>') +
         blokPodpisu();
     }
@@ -549,7 +553,7 @@
       }
       var baner = '';
       if (LINK.ut && LINK.do && !S.wynik) baner += '<p class="kf-baner kf-baner--termin"><b>Link do umowy jest ważny do ' + esc(dataGodz(LINK.do)) + '.</b> Po tym terminie poprosimy o nowy.</p>';
-      if (!KONF.zatwierdzona) baner += '<p class="kf-baner"><b>Wersja próbna.</b> Wzór umowy jest w przeglądzie prawnym, więc wygenerowany dokument ma znak PROJEKT i nie ma mocy prawnej.</p>';
+      if (probna()) baner += '<p class="kf-baner"><b>Wersja próbna.</b> ' + opisProbna() + ' Wygenerowany dokument ma znak PROJEKT.</p>';
       var miekki = (!S.wynik && S.krok >= 1) ? '<p class="kf-miekki">Nie jesteś jeszcze gotowy na umowę? <a href="' + mailtoKonfiguracja() + '">Wyślij nam samą konfigurację</a> albo <a href="tel:+48783480341" data-zadzwon>zadzwoń: 783 480 341</a>.</p>' : '';
       var naglowek = S.lead
         ? '<h3>Wdrożenie dla: ' + esc(S.nazwa || S.firma || 'Twojego gabinetu') + '</h3><p class="kf-lead">Cztery krótkie kroki: pakiet, dane firmy, formularz startowy (treści, zdjęcia, inspiracje) i na końcu umowa potwierdzona kodem SMS. Po jej podpisaniu <b>od razu przystępujemy do projektu graficznego</b>. Do niczego Cię to nie zobowiązuje, dopóki nie wpiszesz kodu z SMS-a.</p>'

@@ -95,7 +95,7 @@
   document.getElementById('pk-chce').addEventListener('click', function () {
     var b = this;
     b.disabled = true;
-    zdarzenie('pokaz_chce', { ekran: teraz + 1 });
+    zdarzenie('pokaz_chce', { ekran: teraz + 1, dla: dla });
     b.textContent = 'Zapisane';
     var form = document.getElementById('pk-sms');
     function pokazFormularz() { form.hidden = false; document.getElementById('pk-tel').focus(); }

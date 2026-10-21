@@ -19,6 +19,11 @@
   function zl(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' zł'; }
   function b64u(t) { return btoa(unescape(encodeURIComponent(t))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
 
+  /* Standardowe pakiety są „na razie niedostępne”, dopóki trwa pilotaż; gdy pilotaż się kończy (termin albo brak miejsc), wracają. */
+  function udostepnijPakiety() {
+    document.querySelectorAll('[data-pakiety-standard]').forEach(function (e) { e.classList.remove('ofs-ceny--niedostepne'); });
+  }
+
   var pilotWazny = true; /* po terminie pilotażu z oferty (licznik) nie niesiemy pilotażu do umowy */
 
   /* Adres konfiguratora: z leadem przez token (jak link do umowy z CRM), bez leada przez ?p=. */
@@ -44,6 +49,7 @@
       function minal() {
         clearInterval(czas);
         pilotWazny = false;
+        udostepnijPakiety();
         pasek.hidden = true;
         document.querySelectorAll('.ofs-pilot__cta, .ofs-cta__pilot').forEach(function (e) { e.hidden = true; });
         var po = document.querySelector('[data-pilot-po]'); if (po) po.hidden = false;
@@ -66,7 +72,7 @@
     window.ODBIORNIK.pilotaz().then(function (j) {
       if (!j) return;
       var wolne = Math.max(0, j.miejsc - j.zajete);
-      if (!wolne && !pil) { document.querySelectorAll('[data-pilot-blok]').forEach(function (e) { e.hidden = true; }); return; }
+      if (!wolne && !pil) { document.querySelectorAll('[data-pilot-blok]').forEach(function (e) { e.hidden = true; }); udostepnijPakiety(); return; }
       document.querySelectorAll('[data-pilot-wolne]').forEach(function (e) { e.textContent = 'wolne miejsca: ' + wolne + ' z ' + j.miejsc; });
     });
   }
