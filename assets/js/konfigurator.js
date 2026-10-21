@@ -156,7 +156,7 @@
 
       h += '<h2>§3. Cena i płatności</h2>' + ust([
         'Wdrożenie: {CENA_WDR}{PILOT_OPIS}{WDR_OPIS}. Utrzymanie: {CENA_UTR} miesięcznie{UTR_OPIS}.',
-        'Wykonawca nie dolicza do cen podatku VAT, więc podane ceny są cenami końcowymi. Jeśli Wykonawca zarejestruje działalność gospodarczą albo z innego powodu będzie zobowiązany do doliczania VAT, poinformuje o tym Zamawiającego co najmniej 30 dni wcześniej, a od tego dnia podane ceny są cenami netto powiększanymi o VAT. Zamawiający może wtedy zrezygnować z umowy (§6).',
+        'Wykonawca nie dolicza do cen podatku VAT, więc podane ceny są cenami końcowymi. Jeśli Wykonawca przekroczy próg zwolnienia z VAT, zarejestruje działalność gospodarczą albo z innego powodu zmieni status prawny i stanie się podatnikiem VAT, podane ceny pozostają cenami brutto, to znaczy zawierają VAT, a Wykonawca nie zwiększa ich z tego powodu. O zmianie rodzaju dokumentu sprzedaży (faktura VAT zamiast rachunku) Wykonawca poinformuje Zamawiającego co najmniej 30 dni wcześniej.',
         'Dokument sprzedaży (rachunek) za wdrożenie Wykonawca wystawia **po akceptacji projektu**, z terminem płatności 7 dni. Strona zostaje uruchomiona na domenie Zamawiającego **po zapłacie**.',
         '**Pierwszy miesiąc utrzymania**, liczony od dnia uruchomienia Strony, jest wliczony w cenę wdrożenia. Kolejne miesiące utrzymania są płatne z góry, na podstawie dokumentu sprzedaży (rachunku) wystawianego na początku okresu, z terminem płatności 7 dni.',
         'Zmiana ceny utrzymania wymaga zgody Zamawiającego. Bez zgody każda ze stron może zrezygnować z umowy (§6).',

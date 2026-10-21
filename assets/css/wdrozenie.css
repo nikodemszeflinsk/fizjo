@@ -72,3 +72,8 @@
 .wd-dlaczego { border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; background: #fafaf8; font-size: 0.95rem; }
 .wd-dlaczego summary { cursor: pointer; font-weight: 700; }
 .wd-dlaczego p { margin: 8px 0 0; color: var(--ink-2, #2b3035); }
+
+.wd-tip { position: relative; border-bottom: 1.5px dotted currentColor; cursor: help; font-weight: 700; }
+.wd-tip__t { position: absolute; left: 50%; bottom: calc(100% + 8px); translate: -50% 0; width: min(280px, 80vw); padding: 9px 12px; border-radius: 10px; background: #14171a; color: #fff; font-size: 0.86rem; font-weight: 500; line-height: 1.4; box-shadow: 0 8px 22px rgba(20, 23, 26, 0.25); opacity: 0; visibility: hidden; transition: opacity 0.15s; pointer-events: none; z-index: 5; }
+.wd-tip:hover .wd-tip__t, .wd-tip:focus .wd-tip__t, .wd-tip:focus-visible .wd-tip__t { opacity: 1; visibility: visible; }
+@media (prefers-reduced-motion: reduce) { .wd-tip__t { transition: none; } }
