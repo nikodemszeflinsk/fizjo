@@ -124,6 +124,13 @@
       return fetch(adresApi() + '/pilotaz').then(function (r) { return r.json(); })
         .then(function (j) { return j && j.ok && typeof j.miejsc === 'number' ? j : null; }).catch(function () { return null; });
     },
+    /** Lead z formularza strony kampanii. Lokalnie (podgląd) udaje sukces, w chmurze zapisuje zdarzenie i zakłada kartę w CRM. */
+    lead: function (p) {
+      if (!adresApi()) return Promise.resolve({ ok: false, blad: 'siec' });
+      if (lokalnie()) return Promise.resolve({ ok: true, symulacja: true });
+      return fetch(adresApi() + '/lead', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(p) })
+        .then(function (r) { return r.json(); }).catch(function () { return { ok: false, blad: 'siec' }; });
+    },
     /** Adres Wykonawcy z Ustawień CRM ({adres}) albo null. */
     wykonawca: function () {
       if (!adresApi() || lokalnie()) return Promise.resolve(null);

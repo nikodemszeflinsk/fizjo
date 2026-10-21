@@ -1,0 +1,105 @@
+/*
+ * Strona docelowa kampanii (dla-fizjoterapeutow.html). Korzysta z komponentów karta.css i oferta-strona.css,
+ * tu są tylko elementy własne: układ hero z telefonem, kroki, cennik pilotażu, formularz, pasek mobilny, baner cookies.
+ */
+
+.kp-body { padding-bottom: 0; }
+.kp-pasek .ofr-pasek__nav { gap: 6px 18px; }
+
+/* ── Hero: tekst + telefon ───────────────────────────────────────────── */
+.kp-hero { padding-bottom: clamp(30px, 4vw, 50px); }
+.kp-hero__siatka { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr); gap: clamp(24px, 5vw, 64px); align-items: center; }
+.kp-hero__tekst .ofr-hero__lead { margin-top: 22px; }
+.kp-hero__drobne { max-width: 56ch; margin: 18px 0 0; color: var(--muted); font-size: 0.92rem; line-height: 1.55; }
+.kp-hero__obraz { margin: 0; justify-self: center; max-width: 330px; }
+.kp-hero__obraz img { display: block; width: 100%; height: auto; border-radius: 28px; border: 1px solid var(--hair-2); box-shadow: 0 18px 40px -22px rgba(20, 23, 26, 0.45); }
+.kp-hero__obraz figcaption { margin-top: 10px; color: var(--muted); font-size: 0.84rem; line-height: 1.45; }
+.ofs-chipy { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 0; padding: 0; list-style: none; }
+.ofs-chipy li { padding: 7px 14px; border-radius: 999px; border: 1.5px solid var(--hair-2); background: #fff; font-size: 0.92rem; font-weight: 700; }
+@media (max-width: 860px) {
+  .kp-hero__siatka { grid-template-columns: minmax(0, 1fr); }
+  .kp-hero__obraz { max-width: 260px; justify-self: start; }
+}
+
+/* ── Kroki ───────────────────────────────────────────────────────────── */
+.kp-kroki { margin: 26px 0 0; padding: 0; list-style: none; display: grid; gap: 14px; counter-reset: kp; }
+.kp-kroki li { position: relative; display: grid; gap: 4px; padding: 18px 20px 18px 74px; border: 1px solid var(--hair); border-radius: var(--r-sign); background: #fff; counter-increment: kp; }
+.kp-kroki li::before { content: counter(kp); position: absolute; left: 20px; top: 18px; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: #fff; font-family: var(--f-display); font-weight: 900; font-size: 1.1rem; }
+.kp-kroki b { font-family: var(--f-display); font-size: 1.15rem; font-weight: 800; letter-spacing: -0.01em; }
+.kp-kroki span { color: var(--ink-2); line-height: 1.55; }
+
+/* ── Dwie kolumny (co dostajesz, formularz) ──────────────────────────── */
+.kp-dwie { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 56px); align-items: start; }
+.kp-dwie--formularz { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); }
+@media (max-width: 860px) { .kp-dwie, .kp-dwie--formularz { grid-template-columns: minmax(0, 1fr); } }
+.kp-lista { margin: 18px 0 22px; padding: 0; list-style: none; display: grid; gap: 12px; }
+.kp-lista li { position: relative; padding-left: 28px; line-height: 1.55; color: var(--ink-2); }
+.kp-lista li::before { content: ''; position: absolute; left: 0; top: 0.28em; width: 18px; height: 18px; border-radius: 50%; background: var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5 10.5l3.2 3.2L15 7' fill='none' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 14px no-repeat; }
+.kp-lista b { color: var(--ink); }
+.kp-zrzut { margin: 0; }
+.kp-zrzut img { display: block; width: 100%; height: auto; border-radius: var(--r-sign); border: 1px solid var(--hair-2); }
+.kp-zrzut figcaption { margin-top: 10px; color: var(--muted); font-size: 0.84rem; line-height: 1.45; }
+
+/* ── Cennik pilotażu ─────────────────────────────────────────────────── */
+.kp-pilot .ofr-lead { max-width: 70ch; }
+.kp-bezp .ofr-lead { max-width: 70ch; }
+.kp-ceny { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 26px 0 20px; }
+@media (max-width: 720px) { .kp-ceny { grid-template-columns: minmax(0, 1fr); } }
+.kp-cena { padding: 22px 24px; border-radius: var(--r-sign); background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.2); }
+.kp-cena h3 { margin: 0 0 4px; font-family: var(--f-display); font-size: 1.4rem; font-weight: 800; color: #fff; }
+.kp-cena__opis { margin: 0 0 14px; color: #b9c0c5; font-size: 0.95rem; }
+.kp-cena__kwota { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; font-family: var(--f-display); font-weight: 900; }
+.kp-cena__kwota s { color: #8d969c; font-size: 1.3rem; text-decoration-thickness: 3px; text-decoration-color: #ff6b5f; }
+.kp-cena__kwota b { color: #ffd978; font-size: clamp(2rem, 4.5vw, 2.6rem); letter-spacing: -0.03em; }
+.kp-cena__kwota span { color: #b9c0c5; font-family: var(--f-body); font-size: 0.95rem; font-weight: 500; }
+.kp-cena__sub { margin: 12px 0 0; color: #e1e5e8; font-size: 0.97rem; line-height: 1.5; }
+.kp-gwarancje { margin: 0 0 22px; padding: 0; list-style: none; display: grid; gap: 10px; }
+.kp-gwarancje li { padding-left: 22px; position: relative; color: #dfe3e6; line-height: 1.55; }
+.kp-gwarancje li::before { content: ''; position: absolute; left: 0; top: 0.62em; width: 10px; height: 3px; border-radius: 2px; background: #f2b705; }
+.kp-gwarancje b { color: #fff; }
+.kp-pilot__pelny { padding: 14px 16px; border-radius: 12px; border: 1.5px dashed rgba(255, 255, 255, 0.4); color: #fff; font-weight: 700; }
+
+/* ── Formularz ───────────────────────────────────────────────────────── */
+.kp-kontakt__bezp { margin: 18px 0 0; color: var(--ink-2); }
+.kp-kontakt__bezp a { font-weight: 800; }
+.kp-formwrap { padding: clamp(18px, 3vw, 28px); border: 1px solid var(--hair-2); border-radius: var(--r-sign); background: #fff; box-shadow: 0 14px 34px -24px rgba(20, 23, 26, 0.5); }
+.kp-form { display: grid; gap: 14px; }
+.kp-pole { display: grid; gap: 5px; }
+.kp-pole label { font-weight: 700; font-size: 0.95rem; }
+.kp-pole label small { font-weight: 400; color: var(--muted); }
+.kp-pole input { width: 100%; min-height: 48px; padding: 10px 14px; border: 1.5px solid var(--hair-2); border-radius: 10px; background: #fff; color: var(--ink); font: inherit; font-size: 1rem; }
+.kp-pole input:focus-visible { outline: 3px solid var(--accent-soft); border-color: var(--accent); }
+.kp-pole input[aria-invalid='true'] { border-color: var(--alert, #b3261e); }
+.kp-pulapka { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.kp-zgoda { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; align-items: start; font-size: 0.92rem; line-height: 1.5; color: var(--ink-2); }
+.kp-zgoda input { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--accent); }
+.kp-blad { display: block; min-height: 0; color: var(--alert, #b3261e); font-size: 0.86rem; font-weight: 700; }
+.kp-blad:empty { display: none; }
+.kp-wyslij { width: 100%; justify-content: center; min-height: 52px; }
+.kp-wyslij[disabled] { opacity: 0.6; cursor: progress; }
+.kp-rodo { font-size: 0.86rem; color: var(--muted); line-height: 1.55; }
+.kp-rodo summary { cursor: pointer; font-weight: 700; color: var(--ink-2); }
+.kp-rodo p { margin: 8px 0 0; }
+.kp-sukces h3 { margin: 0 0 8px; font-family: var(--f-display); font-size: 1.5rem; font-weight: 800; }
+.kp-sukces p { color: var(--ink-2); line-height: 1.6; }
+.kp-sukces:focus { outline: none; }
+
+/* ── Pasek mobilny na dole ───────────────────────────────────────────── */
+.kp-pasek-dol { display: none; }
+@media (max-width: 720px) {
+  .kp-pasek-dol { position: fixed; z-index: 30; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: 1.4fr 1fr; gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); background: rgba(248, 249, 247, 0.96); border-top: 1px solid var(--hair-2); }
+  .kp-pasek-dol .cta { justify-content: center; min-height: 48px; padding-inline: 12px; }
+  .kp-pasek-dol.kp-ukryty { display: none; }
+  .kp-foot { padding-bottom: 76px; }
+}
+
+/* ── Baner cookies ───────────────────────────────────────────────────── */
+.kp-cookies { position: fixed; z-index: 40; left: 12px; right: 12px; bottom: 12px; max-width: 560px; margin-inline: auto; padding: 16px 18px; border-radius: 16px; background: var(--ink); color: #eef1f0; box-shadow: 0 16px 40px -18px rgba(0, 0, 0, 0.6); }
+.kp-cookies p { margin: 0 0 12px; font-size: 0.93rem; line-height: 1.5; }
+.kp-cookies a { color: #fff; text-decoration: underline; }
+.kp-cookies__akcje { display: flex; flex-wrap: wrap; gap: 8px; }
+.kp-cookies .cta--line { color: #fff; border-color: rgba(255, 255, 255, 0.55); }
+@media (max-width: 720px) { .kp-cookies { bottom: 78px; } }
+.kp-cookies-link { padding: 0; border: 0; background: none; color: inherit; font: inherit; text-decoration: underline; cursor: pointer; text-align: left; }
+
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
