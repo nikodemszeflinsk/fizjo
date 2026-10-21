@@ -89,10 +89,20 @@
       ? '<dl class="wd-przelew"><div><dt>Odbiorca</dt><dd>' + esc(P.odbiorca) + '</dd></div><div><dt>Numer rachunku</dt><dd><span id="wd-rachunek">' + esc(P.rachunek) + '</span> ' + kopiujPrzycisk(P.rachunek, 'numer rachunku') + '</dd></div><div><dt>Tytuł przelewu</dt><dd>' + esc(P.tytul) + ' ' + kopiujPrzycisk(P.tytul, 'tytuł przelewu') + '</dd></div><div><dt>Kwota</dt><dd><b>' + zl(P.kwota) + '</b> ' + kopiujPrzycisk(String(P.kwota).replace('.', ','), 'kwota') + '</dd></div></dl>'
       : '';
     var oplacona = P.status === 'oplacona';
+    var terminTxt = P.termin ? esc(dataPL(P.termin)) : 'terminie podanym na rachunku';
+    var jak = P.status === 'oczekuje'
+      ? '<div class="wd-jak"><h3>Jak zapłacić przelewem</h3><ol>' +
+        '<li><b>Zrób przelew</b> na numer rachunku poniżej. Przyciski „Kopiuj” wklejają dane do aplikacji banku bez przepisywania.</li>' +
+        '<li><b>Wpisz tytuł dokładnie tak, jak poniżej.</b> Po tytule rozpoznajemy Twoją wpłatę i przypisujemy ją do rachunku.</li>' +
+        '<li><b>Zapłać ' + zl(P.kwota) + ' do ' + terminTxt + '.</b> Kwota jest końcowa: nie doliczamy VAT ani dodatkowych opłat.</li>' +
+        '<li><b>Kliknij „Zapłaciłem przelewem”.</b> Dzięki temu wiemy, że mamy sprawdzić konto. Nie musisz wysyłać potwierdzenia przelewu.</li>' +
+        '<li><b>Co dalej:</b> po zaksięgowaniu wpłaty (zwykle w 1–2 dni robocze, przelew natychmiastowy szybciej) oznaczamy płatność jako zapłaconą, a tutaj pojawi się potwierdzenie. Od razu zaczynamy budowę strony, a uruchamiamy ją na Twojej domenie po zapłacie.</li>' +
+        '</ol><p class="st-pod">Masz pytanie albo problem z przelewem? Zadzwoń lub napisz, pomożemy.</p></div>'
+      : '';
     return '<section class="wd-karta wd-platnosc"><h2>Płatność</h2><div class="wd-kwota' + (oplacona ? ' wd-kwota--ok' : '') + '"><span>' + (oplacona ? 'Zapłacono' : 'Do zapłaty') + '</span><b>' + zl(P.kwota) + '</b>' + (oplacona ? (P.zaplacono ? '<small>' + esc(dataPL(P.zaplacono)) + '</small>' : '') : P.termin ? '<small>Termin: ' + esc(dataPL(P.termin)) + '</small>' : '') + '</div>' +
-      '<p>' + esc(P.opis) + '</p><p class="st-pod">Ceny końcowe, bez doliczania VAT.</p>' + dlaczegoRachunek() + stan + dane +
+      '<p>' + esc(P.opis) + '</p><p class="st-pod">Ceny końcowe, bez doliczania VAT.</p>' + stan + jak + dane + dlaczegoRachunek() +
       '<div class="wd-przyciski">' + dokument + faktura + (P.link_online && P.status === 'oczekuje' ? '<a class="st-btn" href="' + esc(P.link_online) + '" target="_blank" rel="noopener">Zapłać online</a>' : '') + (P.status === 'oczekuje' ? '<button type="button" class="st-btn' + (P.link_online ? ' st-btn--cichy' : '') + '" data-akcja="zaplacono">Zapłaciłem przelewem</button>' : '') + '</div>' +
-      (P.status === 'oczekuje' ? '<p class="st-pod">Po wpłacie kliknij „Zapłaciłem przelewem”, żebyśmy wiedzieli, że mamy szukać wpłaty. Ruszamy z budową zaraz po zaksięgowaniu.</p>' : '') + '</section>';
+      '</section>';
   }
   function sekcjaBudowa(d) {
     var ile = d.budowa.filter(function (b) { return b.gotowe; }).length;

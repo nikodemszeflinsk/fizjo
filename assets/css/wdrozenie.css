@@ -80,3 +80,10 @@
 
 .wd-link-projektu { display: grid; gap: 8px; justify-items: start; margin: 10px 0; }
 .wd-link-projektu .st-pod { margin: 0; }
+
+.wd-jak { padding: 16px 18px; border: 1px solid var(--line); border-radius: 14px; background: #f7f8fb; }
+.wd-jak h3 { margin: 0 0 10px; font-size: 1.05rem; }
+.wd-jak ol { margin: 0 0 10px; padding: 0; list-style: none; counter-reset: krok; display: grid; gap: 10px; }
+.wd-jak li { position: relative; padding-left: 38px; line-height: 1.5; counter-increment: krok; }
+.wd-jak li::before { content: counter(krok); position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--accent, #1f5fd6); color: #fff; font-weight: 800; font-size: 0.85rem; display: grid; place-items: center; }
+.wd-jak .st-pod { margin: 0; }
