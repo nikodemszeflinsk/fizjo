@@ -1,7 +1,6 @@
 /*
  * Personalizacja oferty linkiem z CRM: ?l=<id leada>&dla=<nazwa gabinetu>&p=<individual|enterprise>&s=1&z=1
  *  - pasek „Oferta przygotowana dla …”,
- *  - znaczek „Polecany dla Państwa” przy wskazanym pakiecie,
  *  - przyciski „Rozpocznij wdrożenie” prowadzą do konfiguratora z ustawionym pakietem, dodatkami i leadem,
  *  - zdarzenia dla CRM (tylko z id leada i skonfigurowanym odbiornikiem): „oferta otwarta” raz na sesję oraz „zadzwoń” po kliknięciu telefonu.
  * Bez parametrów strona wygląda jak zwykle, a przyciski prowadzą do konfiguratora bez danych leada.
@@ -102,18 +101,6 @@
   if (pasek && dla) {
     pasek.querySelector('b').textContent = dla;
     pasek.hidden = false;
-  }
-  if (PAK[pakiet]) {
-    document.querySelectorAll('.ofs-ceny article').forEach(function (a) {
-      var h = a.querySelector('h3');
-      if (h && h.textContent.trim() === PAK[pakiet].nazwa) {
-        var z = document.createElement('span');
-        z.className = 'ofs-polecany';
-        z.textContent = 'Polecany dla Państwa';
-        a.insertBefore(z, a.firstChild);
-        a.classList.add('ofs-cena--polecana');
-      }
-    });
   }
   try {
     if (lead && !sessionStorage.getItem('oferta-otwarta-' + lead)) {

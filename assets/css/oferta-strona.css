@@ -508,3 +508,10 @@
 /* Cena wdrożenia standardowych pakietów jest przekreślona, dopóki pakiety są niedostępne (pilotaż) */
 .ofs-przekr { text-decoration: none; }
 .ofs-ceny--niedostepne .ofs-przekr { text-decoration: line-through; text-decoration-thickness: 3px; text-decoration-color: #e9c46a; }
+
+/* Przekreślona cena wdrożenia: wyszarzona, z grubą czerwoną kreską; pod nią cena pilotażowa */
+.ofs-ceny--niedostepne .ofs-przekr { color: #8d969c; text-decoration: line-through; text-decoration-thickness: 4px; text-decoration-color: #ff6b5f; text-decoration-skip-ink: none; }
+.ofs-wpil { display: none; margin-top: 6px; font-family: var(--f-body); font-size: 0.95rem; font-weight: 700; letter-spacing: 0; color: #f2c14e; }
+.ofs-wpil b { font-family: var(--f-display); font-weight: 900; color: #ffd978; }
+.ofs-ceny--niedostepne .ofr-cena__kwota > .ofs-wpil { display: block; }
+.ofs-ceny .ofr-cena { align-content: start; }
