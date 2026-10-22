@@ -8,7 +8,7 @@
     /* KONFIGURACJA. Uzupełnij przed pierwszym użyciem. Puste pola pokazują się w umowie jako żółte „do uzupełnienia”. */
     var KONF = {
       zatwierdzona: true, /* wzór przejrzany 21.10.2026 (przegląd własny, bez prawnika); znak PROJEKT znika dopiero, gdy uzupełnisz adres Wykonawcy poniżej */
-      wersja: 'SW-2026-10-v5',
+      wersja: 'SW-2026-10-v6',
       wykonawca: { nazwa: 'Studio Widok (Nikodem Szefliński, osoba fizyczna prowadząca działalność nierejestrowaną)', nip: 'brak (działalność nierejestrowana)', adres: '' },
       email: 'kontakt@studio-widok.pl',
       telefon: '783 480 341',
@@ -223,7 +223,7 @@
       if (S.pilot) {
         h += '<h2>§10. Pilotaż pierwszych klientów</h2>' + ust([
           'Zamawiający uczestniczy w **pilotażu pierwszych klientów**: Wykonawca wdraża Strony pierwszym trzem klientom po obniżonej cenie wdrożenia. Cena wdrożenia w tej umowie wynosi {CENA_WDR} zamiast ceny standardowej {CENA_STD}. Cena utrzymania nie jest obniżona.',
-          'W ramach pilotażu, ponad zakres pakietu, Wykonawca zapewnia: (a) **trzy tury poprawek** projektu graficznego zamiast dwóch; (b) przez pierwsze trzy miesiące od uruchomienia Strony priorytet w obsłudze zgłoszeń Zamawiającego i bezpośredni numer telefonu do osoby, która zbudowała Stronę (Wykonawca dokłada starań, żeby odpowiedzieć w ciągu jednego dnia roboczego); (c) współtworzenie rozwiązania: Wykonawca traktuje priorytetowo uwagi i inicjatywy Zamawiającego dotyczące Strony i systemu rezerwacji i dokłada starań, żeby uwzględnić je przy ich dalszym rozwoju (decyzje o zakresie i kolejności rozwoju należą do Wykonawcy).',
+          'W ramach pilotażu, ponad zakres pakietu, Wykonawca zapewnia: (a) **trzy tury poprawek** projektu graficznego zamiast dwóch; (b) przez pierwsze trzy miesiące od uruchomienia Strony priorytet w obsłudze zgłoszeń Zamawiającego (Wykonawca dokłada starań, żeby odpowiedzieć w ciągu jednego dnia roboczego); (c) współtworzenie rozwiązania: Wykonawca traktuje priorytetowo uwagi i inicjatywy Zamawiającego dotyczące Strony i systemu rezerwacji i dokłada starań, żeby uwzględnić je przy ich dalszym rozwoju (decyzje o zakresie i kolejności rozwoju należą do Wykonawcy).',
           'W zamian Zamawiający: (a) przez pierwsze trzy miesiące od uruchomienia Strony odbywa z Wykonawcą krótką rozmowę (do 15 minut) raz na dwa tygodnie o działaniu Strony i systemu rezerwacji; (b) przekazuje Wykonawcy opinię o współpracy i o działaniu Strony; (c) zgadza się, aby Wykonawca wskazał Zamawiającego i Stronę (nazwę gabinetu i adres Strony) jako swoją realizację w materiałach o swojej działalności, w tym na swojej stronie internetowej i w ofertach; (d) udostępnia Wykonawcy zbiorcze liczby dotyczące rezerwacji dokonanych przez Stronę (na przykład liczbę rezerwacji w miesiącu), wyłącznie w celu opisania efektów w realizacji, bez żadnych danych pacjentów.',
           'Wykonawca nie publikuje opinii Zamawiającego bez uzgodnienia jej treści z Zamawiającym, nie używa danych pacjentów ani żadnych informacji pozwalających zidentyfikować pacjenta i nie przypisuje Zamawiającemu wyników, których ten nie potwierdził.',
           'Zamawiający może w każdej chwili cofnąć zgodę z ust. 3 lit. c e-mailem. Wykonawca usunie wtedy wskazanie realizacji ze swoich materiałów w ciągu 14 dni. Cofnięcie zgody nie obliguje Zamawiającego do dopłaty do ceny wdrożenia ani nie wpływa na pozostałe postanowienia umowy.',
