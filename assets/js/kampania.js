@@ -115,7 +115,7 @@
     if (!d) return;
     var przycisk = $('.kp-wyslij', form);
     przycisk.disabled = true;
-    var paczka = { id: id, gabinet: d.gabinet, imie: d.imie, telefon: d.telefon, email: d.email, miasto: form.miasto.value.trim(), zgoda: true, firma_www: form.firma_www.value, utm: utm, strona: 'dla-fizjoterapeutow' };
+    var paczka = { id: id, gabinet: d.gabinet, imie: d.imie, telefon: d.telefon, email: d.email, miasto: form.miasto.value.trim(), okno: form.okno ? form.okno.value : '', zgoda: true, firma_www: form.firma_www.value, utm: utm, strona: 'dla-fizjoterapeutow' };
     var wysylka = window.ODBIORNIK && window.ODBIORNIK.lead ? window.ODBIORNIK.lead(paczka) : Promise.resolve({ ok: false, blad: 'siec' });
     wysylka.then(function (r) {
       if (r && r.ok) {

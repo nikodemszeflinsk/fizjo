@@ -18,7 +18,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Overpass:wght@600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/karta.css?v=63" />
   <link rel="stylesheet" href="assets/css/oferta-strona.css?v=32" />
-  <link rel="stylesheet" href="assets/css/kampania.css?v=3" />
+  <link rel="stylesheet" href="assets/css/kampania.css?v=4" />
 </head>
 <body class="ofr-body kp-body">
   <a class="skip" href="#tresc">Przejdź do treści</a>
@@ -80,6 +80,33 @@
           <li><b>SMS-y w cenie</b><span>potwierdzenia i przypomnienia dla pacjentów</span></li>
           <li><b>Zero prowizji</b><span>płacisz za system, nie za pacjenta</span></li>
         </ul>
+      </div>
+    </section>
+
+    <!-- ── Znasz to? Cztery bóle gabinetu i rozwiązania (spójne z reklamami) ──────────────── -->
+    <section class="ofr-blok kp-bole-blok" id="bole" aria-labelledby="bole-h">
+      <div class="ofr-blok__in">
+        <p class="ofr-kicker">Znasz to?</p>
+        <h2 class="ofr-h2" id="bole-h">Cztery codzienne kłopoty gabinetu i to, co z nimi robi rezerwacja online</h2>
+        <div class="kp-bole">
+          <article class="kp-bol">
+            <p class="kp-bol__bol"><span>Ból</span>Pacjent nie przyszedł. Termin przepadł.</p>
+            <p class="kp-bol__roz"><span>Rozwiązanie</span>Pacjent dostaje SMS z przypomnieniem dzień przed wizytą i jednym kliknięciem sam zmienia termin, zamiast milczeć. Ty widzisz wszystko w jednym kalendarzu.</p>
+          </article>
+          <article class="kp-bol">
+            <p class="kp-bol__bol"><span>Ból</span>Telefon dzwoni, gdy masz ręce zajęte pacjentem.</p>
+            <p class="kp-bol__roz"><span>Rozwiązanie</span>Rezerwacje przyjmuje strona, o każdej porze. Pacjent wybiera Twój wolny termin i dostaje SMS z potwierdzeniem, a Ty leczysz.</p>
+          </article>
+          <article class="kp-bol">
+            <p class="kp-bol__bol"><span>Ból</span>Pacjent szuka w Google i trafia do konkurencji lub na portal.</p>
+            <p class="kp-bol__roz"><span>Rozwiązanie</span>Własna strona z osobnym wejściem na każdą dolegliwość, którą leczysz, i rezerwacją w mniej niż minutę. Bez portalu i bez prowizji.</p>
+          </article>
+          <article class="kp-bol">
+            <p class="kp-bol__bol"><span>Ból</span>Nie masz czasu na własną stronę.</p>
+            <p class="kp-bol__roz"><span>Rozwiązanie</span>2–3 godziny Twojej pracy: podajesz godziny, usługi i zdjęcia. My piszemy teksty, stawiamy stronę i wizytówkę Google i ustawiamy kalendarz.</p>
+          </article>
+        </div>
+        <p class="kp-bole__cta"><a class="cta cta--blue" href="#kontakt" data-lp="cta-bole">Porozmawiajmy 15 minut <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></a></p>
       </div>
     </section>
 
@@ -230,6 +257,7 @@
             <div class="kp-pole"><label for="kp-tel">Telefon</label><input id="kp-tel" name="telefon" type="tel" inputmode="tel" autocomplete="tel" placeholder="np. 600 700 800" required maxlength="20" /><span class="kp-blad" data-blad="telefon" role="alert"></span></div>
             <div class="kp-pole"><label for="kp-miasto">Miasto <small>(opcjonalnie)</small></label><input id="kp-miasto" name="miasto" autocomplete="address-level2" maxlength="60" /></div>
             <div class="kp-pole"><label for="kp-email">E-mail <small>(opcjonalnie)</small></label><input id="kp-email" name="email" type="email" inputmode="email" autocomplete="email" maxlength="120" /><span class="kp-blad" data-blad="email" role="alert"></span></div>
+            <div class="kp-pole"><label for="kp-okno">Kiedy najlepiej zadzwonić? <small>(opcjonalnie)</small></label><select id="kp-okno" name="okno"><option value="">Dowolnie w dzień roboczy</option><option value="rano">Rano (8–10)</option><option value="przerwa">W przerwie (12–14)</option><option value="popoludnie">Po południu (po 16)</option></select></div>
             <div class="kp-pulapka" aria-hidden="true"><label for="kp-www">Nie wypełniaj tego pola</label><input id="kp-www" name="firma_www" tabindex="-1" autocomplete="off" /></div>
             <label class="kp-zgoda"><input type="checkbox" id="kp-zgoda" name="zgoda" required /><span>Zgadzam się, aby Studio Widok (Nikodem Szefliński) skontaktowało się ze mną w sprawie oferty telefonicznie, SMS-em oraz e-mailem (jeśli podałem adres). Zgodę mogę cofnąć w każdej chwili. <span class="kp-blad" data-blad="zgoda" role="alert"></span></span></label>
             <button class="cta cta--blue kp-wyslij" type="submit">Poproś o telefon <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg></button>
@@ -242,7 +270,7 @@
 
           <div class="kp-sukces" id="kp-sukces" role="status" aria-live="polite" hidden tabindex="-1">
             <h3>Dziękuję, mam Twoje dane.</h3>
-            <p>Oddzwonię możliwie szybko, zwykle w ciągu jednego dnia roboczego. Numer, z którego zadzwonię, to 783 480 341.</p>
+            <p>Oddzwonię możliwie szybko, w wybranym oknie albo w ciągu jednego dnia roboczego. Numer, z którego zadzwonię, to 783 480 341. Zaraz po wysłaniu formularza wysyłam też SMS z potwierdzeniem i linkiem do dema.</p>
             <p>Do tego czasu możesz zobaczyć, jak to wygląda:</p>
             <div class="ofs-cta">
               <a class="cta cta--blue" href="demo.html" target="_blank" rel="noopener" data-oferta="demo">Zobacz demo strony</a>
@@ -293,6 +321,6 @@
   </script>
   <script src="assets/js/chmura-config.js?v=2"></script>
   <script src="assets/js/odbiornik.js?v=15"></script>
-  <script src="assets/js/kampania.js?v=3" defer></script>
+  <script src="assets/js/kampania.js?v=4" defer></script>
 </body>
 </html>
