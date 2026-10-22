@@ -15,6 +15,26 @@
   UTM_KLUCZE.forEach(function (k) { var v = (q.get(k) || '').slice(0, 80); if (v) utm[k] = v; });
   try { sessionStorage.setItem('kp-utm', JSON.stringify(utm)); } catch (e) { /* bez zapisu */ }
 
+  /* ── Spójność reklama → strona: nagłówek i lead dopasowane do bólu z reklamy (utm_content b1…b5). Bez UTM zostaje tekst domyślny. ── */
+  var WARIANTY = {
+    b1: { h1: ['Pacjent nie przyszedł? ', 'Przypomni mu SMS.'], lead: 'Strona z rezerwacją online wysyła pacjentowi SMS z przypomnieniem dzień przed wizytą i pozwala zmienić termin bez dzwonienia. Ty widzisz wszystko w jednym kalendarzu. Gotowe w około 14 dni.' },
+    b2: { h1: ['Rezerwacje przyjmuje ', 'strona.', ' Ty leczysz.'], lead: 'Pacjent wybiera Twój wolny termin o każdej porze i dostaje SMS z potwierdzeniem, a Ty nie odbierasz telefonu w trakcie zabiegu. Gotowe w około 14 dni.' },
+    b3: { h1: ['Pacjent szuka w Google. ', 'Niech trafi do Ciebie.'], lead: 'Własna strona z osobnym wejściem na każdą dolegliwość, którą leczysz, i rezerwacją online w mniej niż minutę. Bez portalu i bez prowizji. Gotowe w około 14 dni.' },
+    b4: { h1: ['Na własnej stronie jesteś ', 'jedyny.'], lead: 'Pacjent widzi tylko Ciebie i Twoje wolne terminy, a Ty płacisz stałą kwotę zamiast prowizji. Pliki strony zostają Twoje. Gotowe w około 14 dni.' },
+    b5: { h1: ['Własna strona w ', '2–3 godziny', ' Twojej pracy.'], lead: 'Ty podajesz godziny, usługi i zdjęcia. My piszemy teksty, stawiamy stronę z wizytówką Google i ustawiamy kalendarz. Gotowe w około 14 dni.' }
+  };
+  (function dopasujNaglowek() {
+    var w = WARIANTY[String(utm.utm_content || '').slice(0, 2)];
+    var h1 = $('.kp-hero .ofr-hero__h1'), lead = $('.kp-hero .ofr-hero__lead');
+    if (!w || !h1 || !lead) return;
+    h1.textContent = '';
+    w.h1.forEach(function (t, i) {
+      if (i % 2 === 1) { var m = document.createElement('mark'); m.textContent = t; h1.appendChild(m); }
+      else h1.appendChild(document.createTextNode(t));
+    });
+    lead.textContent = w.lead;
+  })();
+
   /* ── Identyfikator leada: web-…, ten sam dla ofert z linku po wysłaniu formularza ── */
   function noweId() {
     var a = 'abcdefghjkmnpqrstuvwxyz23456789', s = 'web-';
