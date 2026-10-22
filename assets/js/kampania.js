@@ -36,6 +36,8 @@
       if (!f._fbq) f._fbq = n; n.push = n; n.loaded = true; n.version = '2.0'; n.queue = [];
       t = b.createElement(e); t.async = true; t.src = v; s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s);
     })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+    /* Bez automatycznej konfiguracji Meta: nie zbiera pól formularza, tekstów przycisków ani dopasowania e-maila/telefonu. */
+    window.fbq('set', 'autoConfig', false, String(K.pixelId));
     window.fbq('init', String(K.pixelId));
     window.fbq('track', 'PageView');
   }
