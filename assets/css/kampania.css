@@ -64,6 +64,7 @@
 .kp-kontakt__bezp a { font-weight: 800; }
 .kp-formwrap { padding: clamp(18px, 3vw, 28px); border: 1px solid var(--hair-2); border-radius: var(--r-sign); background: #fff; box-shadow: 0 14px 34px -24px rgba(20, 23, 26, 0.5); }
 .kp-form { display: grid; gap: 14px; }
+.kp-form[hidden], .kp-sukces[hidden] { display: none; }
 .kp-pole { display: grid; gap: 5px; }
 .kp-pole label { font-weight: 700; font-size: 0.95rem; }
 .kp-pole label small { font-weight: 400; color: var(--muted); }
