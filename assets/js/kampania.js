@@ -150,4 +150,23 @@
       else blad('ogolny', BLEDY[kod] || BLEDY.siec);
     });
   });
+
+  /* ── Diagnostyka piksela: dodaj ?kpdebug=1 do adresu, a na dole strony zobaczysz, co piksel faktycznie wysłał do Meta. ── */
+  (function diagnostyka() {
+    if (!/[?&]kpdebug=1/.test(location.search)) return;
+    var pasek = document.createElement('div');
+    pasek.setAttribute('role', 'status');
+    pasek.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:99999;background:#14171A;color:#fff;font:13px/1.45 ui-monospace,Menlo,Consolas,monospace;padding:10px 14px;border-top:3px solid #E8600C';
+    document.body.appendChild(pasek);
+    function odswiez() {
+      var wpisy = [];
+      try { wpisy = performance.getEntriesByType('resource').filter(function (e) { return /facebook\.com\/tr/.test(e.name); }); } catch (e) { /* bez diagnostyki */ }
+      var licz = {};
+      wpisy.forEach(function (e) { var m = e.name.match(/[?&]ev=([A-Za-z]+)/); var k = m ? m[1] : '?'; licz[k] = (licz[k] || 0) + 1; });
+      var lista = Object.keys(licz).map(function (k) { return k + ' ×' + licz[k]; }).join(', ') || 'brak';
+      var piksel = K.pixelId ? K.pixelId : 'brak numeru';
+      pasek.textContent = 'Zgoda cookies: ' + (zgoda() || 'brak') + ' | piksel: ' + piksel + ' | fbq: ' + (typeof window.fbq) + ' | wysłane do Meta: ' + lista;
+    }
+    odswiez(); setInterval(odswiez, 1000);
+  })();
 })();
